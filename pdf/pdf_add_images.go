@@ -1,9 +1,4 @@
 /*
- * This file is subject to the terms and conditions defined in
- * file 'LICENSE.txt', which is part of this source code package.
- */
-
-/*
  * Add images to a PDF file, one image per page.
  *
  * Run as: go run pdf_add_images.go output.pdf img1.jpg img2.jpg img3.png ...

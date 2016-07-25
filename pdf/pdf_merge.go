@@ -1,9 +1,4 @@
 /*
- * This file is subject to the terms and conditions defined in
- * file 'LICENSE.txt', which is part of this source code package.
- */
-
-/*
  * Merges PDF files, tries to decrypt encrypted documents with an empty password
  * as best effort.
  *

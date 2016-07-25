@@ -1,9 +1,4 @@
 /*
- * This file is subject to the terms and conditions defined in
- * file 'LICENSE.txt', which is part of this source code package.
- */
-
-/*
  * Protects PDF files by setting a password on it. This example both sets user
  * and opening password and hard-codes the protection bits here, but easily adjusted
  * in the code here although not on the command line.

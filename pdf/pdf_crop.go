@@ -1,9 +1,4 @@
 /*
- * This file is subject to the terms and conditions defined in
- * file 'LICENSE.txt', which is part of this source code package.
- */
-
-/*
  * Crop pages in a PDF file. Crops the view to a certain percentage
  * of the original.
  *

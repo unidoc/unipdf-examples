@@ -1,9 +1,4 @@
 /*
- * This file is subject to the terms and conditions defined in
- * file 'LICENSE.txt', which is part of this source code package.
- */
-
-/*
  * Unlocks PDF files, tries to decrypt encrypted documents with the given password,
  * if that fails it tries an empty password as best effort.
  *
