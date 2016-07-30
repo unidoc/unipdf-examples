@@ -1,7 +1,6 @@
 /*
  * Add images to a PDF file, one image per page.
- * Standard implementation, using native go image library for image handling.
- * For a faster implementation based on LibVIPS see pdf_add_images_fast.go.
+ * Faster version, optimized using bimg/LibVPS.
  *
  * Run as: go run pdf_add_images.go output.pdf img1.jpg img2.jpg img3.png ...
  */
@@ -22,6 +21,38 @@ import (
 	unipdf "github.com/unidoc/unidoc/pdf"
 )
 
+// Fast image handling with bimg/LibVPS.
+type FastImageHandler struct{}
+
+// Read an input image file and prepare a native Image object.
+func (this FastImageHandler) Read(reader io.Reader) (*unipdf.Image, error) {
+	buffer, err := ioutil.ReadAll(reader)
+
+	img, err := bimg.NewImage(buffer).Convert(bimg.JPEG)
+	if err != nil {
+		return nil, err
+	}
+
+	size, err := bimg.NewImage(img).Size()
+	if err != nil {
+		return nil, err
+	}
+
+	buf := bytes.NewBuffer(img)
+
+	image := unipdf.Image{}
+	image.Width = int64(size.Width)
+	image.Height = int64(size.Height)
+	image.Data = buf
+
+	return &image, nil
+}
+
+// Not implemented yet.
+func (this FastImageHandler) Compress(input *unipdf.Image, quality int64) (*unipdf.Image, error) {
+	return input, nil
+}
+
 func initUniDoc(licenseKey string) error {
 	if len(licenseKey) > 0 {
 		err := unilicense.SetLicenseKey(licenseKey)
@@ -34,6 +65,9 @@ func initUniDoc(licenseKey string) error {
 	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
 	// does not do anything. Very easy to implement your own.
 	unicommon.SetLogger(unicommon.DummyLogger{})
+
+	// Set the fast image handler as the image handler.
+	unipdf.SetImageHandler(FastImageHandler{})
 
 	return nil
 }
