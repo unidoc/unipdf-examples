@@ -33,26 +33,14 @@ func initUniDoc(licenseKey string) error {
 }
 
 func main() {
-	if len(os.Args) < 4 {
-		fmt.Printf("Requires at least 3 arguments: output_path and 2 input paths\n")
-		fmt.Printf("Usage: go run pdf_merge.go output.pdf input1.pdf input2.pdf input3.pdf\n")
+	if len(os.Args) < 3 {
+		fmt.Printf("Example adds bookmarks with page number referring to each page.\n")
+		fmt.Printf("Usage: go run pdf_add_bookmarks.go input.pdf output.pdf\n")
 		os.Exit(1)
 	}
 
-	outputPath := ""
-	inputPaths := []string{}
-
-	// Sanity check the input arguments.
-	for i, arg := range os.Args {
-		if i == 0 {
-			continue
-		} else if i == 1 {
-			outputPath = arg
-			continue
-		}
-
-		inputPaths = append(inputPaths, arg)
-	}
+	inputPath := os.Args[1]
+	outputPath := os.Args[2]
 
 	err := initUniDoc("")
 	if err != nil {
@@ -60,7 +48,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = mergePdf(inputPaths, outputPath)
+	err = addBookmarks(inputPath, outputPath)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
@@ -69,53 +57,57 @@ func main() {
 	fmt.Printf("Complete, see output file: %s\n", outputPath)
 }
 
-func mergePdf(inputPaths []string, outputPath string) error {
+func addBookmarks(inputPath string, outputPath string) error {
 	pdfWriter := unipdf.NewPdfWriter()
 
-	for _, inputPath := range inputPaths {
-		f, err := os.Open(inputPath)
+	f, err := os.Open(inputPath)
+	if err != nil {
+		return err
+	}
+
+	defer f.Close()
+
+	pdfReader, err := unipdf.NewPdfReader(f)
+	if err != nil {
+		return err
+	}
+
+	isEncrypted, err := pdfReader.IsEncrypted()
+	if err != nil {
+		return err
+	}
+
+	if isEncrypted {
+		_, err = pdfReader.Decrypt([]byte(""))
 		if err != nil {
 			return err
-		}
-
-		defer f.Close()
-
-		pdfReader, err := unipdf.NewPdfReader(f)
-		if err != nil {
-			return err
-		}
-
-		isEncrypted, err := pdfReader.IsEncrypted()
-		if err != nil {
-			return err
-		}
-
-		if isEncrypted {
-			_, err = pdfReader.Decrypt([]byte(""))
-			if err != nil {
-				return err
-			}
-		}
-
-		numPages, err := pdfReader.GetNumPages()
-		if err != nil {
-			return err
-		}
-
-		for i := 0; i < numPages; i++ {
-			pageNum := i + 1
-
-			page, err := pdfReader.GetPage(pageNum)
-			if err != nil {
-				return err
-			}
-
-			err = pdfWriter.AddPage(page)
-			if err != nil {
-				return err
-			}
 		}
 	}
+
+	numPages, err := pdfReader.GetNumPages()
+	if err != nil {
+		return err
+	}
+
+	outlines := unipdf.NewOutline()
+
+	for i := 0; i < numPages; i++ {
+		pageNum := i + 1
+
+		page, err := pdfReader.GetPage(pageNum)
+		if err != nil {
+			return err
+		}
+
+		err = pdfWriter.AddPage(page)
+		if err != nil {
+			return err
+		}
+
+		item := unipdf.NewOutline(p1, "Chapter 1")
+		outlines.AddOutlineItem(item)
+	}
+	pdfWriter.AddOutlines(outlines)
 
 	fWrite, err := os.Create(outputPath)
 	if err != nil {
@@ -132,8 +124,9 @@ func mergePdf(inputPaths []string, outputPath string) error {
 	return nil
 }
 
+/*
 pdfReader -> read a pdf file
-pdfwriter -> create new 
+pdfwriter -> create new
 add all the pages
 
 then generate the outlines...
@@ -151,4 +144,4 @@ outlines.AddOutline(&ch1)
 ch1.AddOutline(&subch)
 ch2 := unipdf.NewOutline(p4, "Chapter 2")
 outlines.AddOutline(p10, ch2)
-
+*/
