@@ -78,27 +78,13 @@ func listBookmarks(inputPath string) error {
 		}
 	}
 
-	outlinesArr, err := pdfReader.GetOutlines()
-	if err != nil {
-		return err
-	}
-
-	for idx, obj := range outlinesArr {
-		dict, ok := obj.PdfObject.(*unipdf.PdfObjectDictionary)
-		if !ok {
-			continue
-		}
-		title, hasTitle := (*dict)["Title"]
-		if hasTitle {
-			fmt.Printf("%d.  Obj: %s\n", idx+1, title)
-		}
+	_, flattenedTitles, err := pdfReader.GetOutlinesFlattened()
+	fmt.Printf("--------------------\n")
+	fmt.Printf("Table of contents:\n")
+	fmt.Printf("--------------------\n")
+	for _, title := range flattenedTitles {
+		fmt.Printf("%s\n", title)
 	}
 
 	return nil
-}
-
-outlines, flattenedTitles, err := pdfReader.GetOutlinesFlattened()
-for idx, outline := range outlines {
-	fmt.Printf("Title: %s\n", flattenedTitles[i])
-	fmt.Printf("- %v\n", outline)
 }
