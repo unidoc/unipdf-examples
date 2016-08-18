@@ -89,25 +89,38 @@ func addBookmarks(inputPath string, outputPath string) error {
 		return err
 	}
 
-	outlines := unipdf.NewOutline()
+	outlineTree := unipdf.NewPdfOutlineTree()
+	isFirst := true
+	var node *unipdf.PdfOutlineItem
 
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
 
-		page, err := pdfReader.GetPage(pageNum)
+		page, err := pdfReader.GetPageAsPdfPage(pageNum)
 		if err != nil {
 			return err
 		}
 
-		err = pdfWriter.AddPage(page)
+		outputPage := page.GetPageAsIndirectObject()
+		err = pdfWriter.AddPage(outputPage)
 		if err != nil {
 			return err
 		}
 
-		item := unipdf.NewOutline(p1, "Chapter 1")
-		outlines.AddOutlineItem(item)
+		item := unipdf.NewOutlineBookmark(fmt.Sprintf("Page %d", i+1), outputPage)
+		fmt.Printf("Item: %v\n", item)
+		if isFirst {
+			outlineTree.First = &item.PdfOutlineTreeNode
+			node = item
+			isFirst = false
+		} else {
+			node.Next = &item.PdfOutlineTreeNode
+			item.Prev = &node.PdfOutlineTreeNode
+			node = item
+		}
 	}
-	pdfWriter.AddOutlines(outlines)
+	outlineTree.Last = &node.PdfOutlineTreeNode
+	pdfWriter.AddOutlineTree(&outlineTree.PdfOutlineTreeNode)
 
 	fWrite, err := os.Create(outputPath)
 	if err != nil {
