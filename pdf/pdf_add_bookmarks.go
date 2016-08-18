@@ -1,5 +1,6 @@
 /*
  * Add bookmarks to pdf file.
+ * Adds each page as a bookmark in the output file.
  *
  * Run as: go run pdf_add_bookmarks.go input.pdf output.pdf
  */
@@ -26,8 +27,8 @@ func initUniDoc(licenseKey string) error {
 	// To make the library log we just have to initialise the logger which satisfies
 	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
 	// does not do anything. Very easy to implement your own.
-	// unicommon.SetLogger(unicommon.DummyLogger{})
-	unicommon.SetLogger(unicommon.ConsoleLogger{})
+	unicommon.SetLogger(unicommon.DummyLogger{})
+	//unicommon.SetLogger(unicommon.ConsoleLogger{})
 
 	return nil
 }
@@ -89,6 +90,7 @@ func addBookmarks(inputPath string, outputPath string) error {
 		return err
 	}
 
+	// The outer containing tree.
 	outlineTree := unipdf.NewPdfOutlineTree()
 	isFirst := true
 	var node *unipdf.PdfOutlineItem
@@ -108,7 +110,8 @@ func addBookmarks(inputPath string, outputPath string) error {
 		}
 
 		item := unipdf.NewOutlineBookmark(fmt.Sprintf("Page %d", i+1), outputPage)
-		fmt.Printf("Item: %v\n", item)
+		item.Parent = &outlineTree.PdfOutlineTreeNode
+
 		if isFirst {
 			outlineTree.First = &item.PdfOutlineTreeNode
 			node = item
@@ -136,25 +139,3 @@ func addBookmarks(inputPath string, outputPath string) error {
 
 	return nil
 }
-
-/*
-pdfReader -> read a pdf file
-pdfwriter -> create new
-add all the pages
-
-then generate the outlines...
-
-p1, err := reader.GetPage(1)
-p4, err := reader.GetPage(1)
-p10, err := reader.GetPage(1)
-
-// Make destination?
-
-outlines := unipdf.NewOutlines()
-ch1 := unipdf.NewOutline(p1, "Chapter 1")
-subch := unipdf.NewOutline(p1, "Introduction")
-outlines.AddOutline(&ch1)
-ch1.AddOutline(&subch)
-ch2 := unipdf.NewOutline(p4, "Chapter 2")
-outlines.AddOutline(p10, ch2)
-*/

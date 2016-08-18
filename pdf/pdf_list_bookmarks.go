@@ -34,7 +34,7 @@ func initUniDoc(licenseKey string) error {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("Usage: go run %s input.pdf \n", os.Args[0])
+		fmt.Printf("Usage: go run pdf_list_bookmarks.go input.pdf\n")
 		os.Exit(1)
 	}
 

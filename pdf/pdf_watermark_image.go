@@ -7,7 +7,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
@@ -107,22 +106,7 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 		pageNum := i + 1
 
 		// Read the page.
-		obj, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		pageObj, ok := obj.(*unipdf.PdfIndirectObject)
-		if !ok {
-			return errors.New("Invalid page object")
-		}
-
-		pageDict, ok := pageObj.PdfObject.(*unipdf.PdfObjectDictionary)
-		if !ok {
-			return errors.New("Invalid page dictionary")
-		}
-
-		page, err := unipdf.NewPdfPage(*pageDict)
+		page, err := pdfReader.GetPageAsPdfPage(pageNum)
 		if err != nil {
 			return err
 		}

@@ -9,13 +9,8 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"os"
-
-	"gopkg.in/h2non/bimg.v1"
 
 	unicommon "github.com/unidoc/unidoc/common"
 	unilicense "github.com/unidoc/unidoc/license"

@@ -110,22 +110,7 @@ func cropPdf(inputPath string, outputPath string, percentage int64) error {
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
 
-		obj, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		pageObj, ok := obj.(*unipdf.PdfIndirectObject)
-		if !ok {
-			return errors.New("Invalid page object")
-		}
-
-		pageDict, ok := pageObj.PdfObject.(*unipdf.PdfObjectDictionary)
-		if !ok {
-			return errors.New("Invalid page dictionary")
-		}
-
-		page, err := unipdf.NewPdfPage(*pageDict)
+		page, err := pdfReader.GetPageAsPdfPage(pageNum)
 		if err != nil {
 			return err
 		}
@@ -146,8 +131,7 @@ func cropPdf(inputPath string, outputPath string, percentage int64) error {
 		(*bbox).Ury -= newHeight / 2
 		page.MediaBox = bbox
 
-		// Swap out the page dictionary.
-		pageObj.PdfObject = page.GetPageDict()
+		pageObj := page.GetPageAsIndirectObject()
 
 		err = pdfWriter.AddPage(pageObj)
 		if err != nil {
