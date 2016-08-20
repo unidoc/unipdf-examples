@@ -74,7 +74,7 @@ func initUniDoc(licenseKey string) error {
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Printf("Usage: go run pdf_add_images.go output.pdf img1.jpg img2.jpg ...\n")
+		fmt.Printf("Usage: go run pdf_add_images_fast.go output.pdf img1.jpg img2.jpg ...\n")
 		os.Exit(1)
 	}
 
@@ -122,7 +122,7 @@ func imagesToPdf(inputPaths []string, outputPath string) error {
 		height := 612 * float64(img.Height) / float64(img.Width)
 
 		// Make a page.
-		page := unipdf.PdfPage{}
+		page := unipdf.NewPdfPage()
 		bbox := unipdf.PdfRectangle{0, 0, 612, height}
 		page.MediaBox = &bbox
 

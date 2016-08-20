@@ -9,13 +9,8 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"os"
-
-	"gopkg.in/h2non/bimg.v1"
 
 	unicommon "github.com/unidoc/unidoc/common"
 	unilicense "github.com/unidoc/unidoc/license"
@@ -88,7 +83,7 @@ func imagesToPdf(inputPaths []string, outputPath string) error {
 		height := 612 * float64(img.Height) / float64(img.Width)
 
 		// Make a page.
-		page := unipdf.PdfPage{}
+		page := unipdf.NewPdfPage()
 		bbox := unipdf.PdfRectangle{0, 0, 612, height}
 		page.MediaBox = &bbox
 

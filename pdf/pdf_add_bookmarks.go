@@ -1,14 +1,13 @@
 /*
- * Rotate pages in a PDF file.
- * Example of how to manipulate pages.
+ * Add bookmarks to pdf file.
+ * Adds each page as a bookmark in the output file.
  *
- * Run as: go run pdf_rotate.go output.pdf input.pdf
+ * Run as: go run pdf_add_bookmarks.go input.pdf output.pdf
  */
 
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
@@ -29,19 +28,20 @@ func initUniDoc(licenseKey string) error {
 	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
 	// does not do anything. Very easy to implement your own.
 	unicommon.SetLogger(unicommon.DummyLogger{})
+	//unicommon.SetLogger(unicommon.ConsoleLogger{})
 
 	return nil
 }
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Printf("Requires at least 2 arguments: output.pdf input.pdf\n")
-		fmt.Printf("Usage: go run pdf_rotate.go output.pdf input.pdf\n")
+		fmt.Printf("Example adds bookmarks with page number referring to each page.\n")
+		fmt.Printf("Usage: go run pdf_add_bookmarks.go input.pdf output.pdf\n")
 		os.Exit(1)
 	}
 
-	outputPath := os.Args[1]
-	inputPath := os.Args[2]
+	inputPath := os.Args[1]
+	outputPath := os.Args[2]
 
 	err := initUniDoc("")
 	if err != nil {
@@ -49,7 +49,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = rotatePdf(inputPath, outputPath)
+	err = addBookmarks(inputPath, outputPath)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
@@ -58,8 +58,7 @@ func main() {
 	fmt.Printf("Complete, see output file: %s\n", outputPath)
 }
 
-// Rotate all pages by 90 degrees.
-func rotatePdf(inputPath string, outputPath string) error {
+func addBookmarks(inputPath string, outputPath string) error {
 	pdfWriter := unipdf.NewPdfWriter()
 
 	f, err := os.Open(inputPath)
@@ -79,14 +78,10 @@ func rotatePdf(inputPath string, outputPath string) error {
 		return err
 	}
 
-	// Try decrypting both with given password and an empty one if that fails.
 	if isEncrypted {
-		success, err := pdfReader.Decrypt([]byte(""))
+		_, err = pdfReader.Decrypt([]byte(""))
 		if err != nil {
 			return err
-		}
-		if !success {
-			return errors.New("Unable to decrypt pdf with empty pass")
 		}
 	}
 
@@ -94,6 +89,11 @@ func rotatePdf(inputPath string, outputPath string) error {
 	if err != nil {
 		return err
 	}
+
+	// The outer containing tree.
+	outlineTree := unipdf.NewPdfOutlineTree()
+	isFirst := true
+	var node *unipdf.PdfOutlineItem
 
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
@@ -103,21 +103,27 @@ func rotatePdf(inputPath string, outputPath string) error {
 			return err
 		}
 
-		// Do the rotation.
-		var rotation int64 = 0
-		if page.Rotate != nil {
-			rotation = *(page.Rotate)
-		}
-		rotation += 90 // Rotate by 90 deg.
-		page.Rotate = &rotation
-
-		// Swap out the page dictionary.
-		pageObj := page.GetPageAsIndirectObject()
-		err = pdfWriter.AddPage(pageObj)
+		outputPage := page.GetPageAsIndirectObject()
+		err = pdfWriter.AddPage(outputPage)
 		if err != nil {
 			return err
 		}
+
+		item := unipdf.NewOutlineBookmark(fmt.Sprintf("Page %d", i+1), outputPage)
+		item.Parent = &outlineTree.PdfOutlineTreeNode
+
+		if isFirst {
+			outlineTree.First = &item.PdfOutlineTreeNode
+			node = item
+			isFirst = false
+		} else {
+			node.Next = &item.PdfOutlineTreeNode
+			item.Prev = &node.PdfOutlineTreeNode
+			node = item
+		}
 	}
+	outlineTree.Last = &node.PdfOutlineTreeNode
+	pdfWriter.AddOutlineTree(&outlineTree.PdfOutlineTreeNode)
 
 	fWrite, err := os.Create(outputPath)
 	if err != nil {
