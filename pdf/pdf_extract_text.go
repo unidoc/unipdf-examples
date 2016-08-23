@@ -1,7 +1,7 @@
 /*
- * List all content streams for all pages in a pdf file.
+ * PDF to text: Extract all text for each page of a pdf file.
  *
- * Run as: go run pdf_print_content_streams.go input.pdf
+ * Run as: go run pdf_extract_text.go input.pdf
  */
 
 package main
@@ -34,7 +34,7 @@ func initUniDoc(licenseKey string) error {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("Usage: go run pdf_list_content_streams.go input.pdf\n")
+		fmt.Printf("Usage: go run pdf_extract_text.go input.pdf\n")
 		os.Exit(1)
 	}
 
@@ -84,7 +84,7 @@ func listContentStreams(inputPath string) error {
 	}
 
 	fmt.Printf("--------------------\n")
-	fmt.Printf("Content streams:\n")
+	fmt.Printf("PDF to text extraction:\n")
 	fmt.Printf("--------------------\n")
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
@@ -99,20 +99,14 @@ func listContentStreams(inputPath string) error {
 			return err
 		}
 		fmt.Printf("Page %d has %d content streams:\n", pageNum, len(contentStreams))
-
 		for idx, cstream := range contentStreams {
 			fmt.Printf("Page %d - content stream %d:\n", pageNum, idx+1)
-			fmt.Printf("%s\n", cstream)
-
 			cstreamParser := unipdf.NewContentStreamParser(cstream)
-			operations, err := cstreamParser.Parse()
+			txt, err := cstreamParser.ExtractText()
 			if err != nil {
 				return err
 			}
-			fmt.Printf("=== Full list\n")
-			for idx, op := range operations {
-				fmt.Printf("Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
-			}
+			fmt.Printf("%s\n", txt)
 		}
 	}
 
