@@ -13,7 +13,7 @@ import (
 
 	unicommon "github.com/unidoc/unidoc/common"
 	unilicense "github.com/unidoc/unidoc/license"
-	unipdf "github.com/unidoc/unidoc/pdf"
+	unipdf "github.com/unidoc/unidoc/pdf/model"
 )
 
 func initUniDoc(licenseKey string) error {

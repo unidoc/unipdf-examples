@@ -129,7 +129,7 @@ func rotatePdf(inputPath string, outputPath string) error {
 		// Swap out the page dictionary.
 		pageObj.PdfObject = page.GetPageDict()
 
-		err = pdfWriter.AddPage(pageObj)
+		err = pdfWriter.AddPage(pageObj.GetPageAsIndirectObject())
 		if err != nil {
 			return err
 		}
