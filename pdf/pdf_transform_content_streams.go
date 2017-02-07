@@ -7,6 +7,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -18,7 +19,7 @@ import (
 	unipdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func initUniDoc(licenseKey string) error {
+func initUniDoc(licenseKey string, debug bool) error {
 	// PETER: I can't find github.com/unidoc/unidoc/license so I have comment out the license code
 	//        in this example program.
 	// if len(licenseKey) > 0 {
@@ -32,44 +33,56 @@ func initUniDoc(licenseKey string) error {
 	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
 	// does not do anything. Very easy to implement your own.
 	// unicommon.SetLogger(unicommon.DummyLogger{})
-	unicommon.DebugOutput = true
+	unicommon.DebugOutput = debug
 	unicommon.SetLogger(unicommon.ConsoleLogger{})
 
 	return nil
 }
 
 func main() {
-	if len(os.Args) < 3 {
-		fmt.Println("Usage: go run pdf_transform_content_streams.go input.pdf output.pdf")
+	debug := false
+	outputDir := ""
+	flag.BoolVar(&debug, "d", false, "Enable debug logging")
+	flag.StringVar(&outputDir, "o", "", "Output directory")
+	flag.Parse()
+	args := flag.Args()
+	if len(args) < 1 || len(outputDir) == 0 {
+		fmt.Fprintf(os.Stderr, "Usage: %s -o <output directory> [-d] <file1> <file2> ...\n",
+			os.Args[0])
 		os.Exit(1)
 	}
 
-	inputPath := os.Args[1]
-	outputPath := os.Args[2]
+	pdfList := []string{}
+	for _, a := range args {
+		files, err := filepath.Glob(a)
+		if err != nil {
+			panic(err)
+		}
+		pdfList = append(pdfList, files...)
+	}
 
-	err := initUniDoc("")
+	err := initUniDoc("", debug)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
-	pdfList, err := filepath.Glob(inputPath)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("inputPath=%#q\n", inputPath)
-	fmt.Printf("%d files\n", len(pdfList))
+	os.MkdirAll(outputDir, 0777)
+
+	fmt.Printf("pdfList=%d %#q\n", len(pdfList), pdfList)
 
 	for idx, inputPath := range pdfList {
-		fmt.Fprintf(os.Stderr, "inputPath %3d of %d %#q\n", idx, len(pdfList), inputPath)
+		outputPath := modifyPath(inputPath, outputDir)
+		fmt.Fprintf(os.Stderr, "inputPath %3d of %d %#q => %#q\n", idx, len(pdfList),
+			inputPath, outputPath)
 		err = transformContentStreams(inputPath, outputPath)
 		if err != nil {
-			fmt.Printf("Error: %v\n", err)
+			fmt.Fprintf(os.Stderr, "transformContentStreams failed. err=%v\n", err)
 			os.Exit(1)
 		}
 
-		fmt.Printf("Input : Size %10d: %q\n", fileSize(inputPath), inputPath)
-		fmt.Printf("Output: Size %10d: %q\n", fileSize(outputPath), outputPath)
+		fmt.Printf("Input : Size %10d: %#q\n", fileSize(inputPath), inputPath)
+		fmt.Printf("Output: Size %10d: %#q\n", fileSize(outputPath), outputPath)
 	}
 
 	fmt.Printf("%d files\n", len(pdfList))
@@ -127,12 +140,13 @@ func transformContentStreams(inputPath, outputPath string) error {
 		if err != nil {
 			return err
 		}
+		xobjDict := unipdf.XObjectImageMap{}
 
 		contentStreamsOut := []string{}
 		for idx, cstream := range contentStreams {
-			fmt.Printf("%#q\n", cstream)
+			unicommon.Log.Debug("transformContentStream=%s\n", cstream)
 
-			cstreamParser := unipdf.NewContentStreamParser(cstream)
+			cstreamParser := unipdf.NewContentStreamParser(cstream, xobjDict)
 			operations, err := cstreamParser.Parse()
 			if err != nil {
 				return err
@@ -157,7 +171,15 @@ func transformContentStreams(inputPath, outputPath string) error {
 
 		}
 
-		fmt.Printf("Page %d has %d content streams:\n", pageNum, len(contentStreamsOut))
+		for name, ximg := range xobjDict {
+			unicommon.Log.Debug("transformContentStreams: name=%#q ximg=%T", name, ximg)
+			err = page.AddImageResource(name, ximg)
+			if err != nil {
+				return err
+			}
+		}
+
+		fmt.Printf("Page %d has %d content streams\n", pageNum, len(contentStreamsOut))
 		err = page.SetContentStreams(contentStreamsOut)
 		if err != nil {
 			return err
@@ -226,4 +248,22 @@ func (x byCount) Less(i, j int) bool {
 		return li < lj
 	}
 	return x[i] < x[j]
+}
+
+func modifyPath(inputPath, outputDir string) string {
+	_, name := filepath.Split(inputPath)
+	outputPath := filepath.Join(outputDir, name)
+	in, err := filepath.Abs(inputPath)
+	if err != nil {
+		panic(err)
+	}
+	out, err := filepath.Abs(outputPath)
+	if err != nil {
+		panic(err)
+	}
+	if strings.ToLower(in) == strings.ToLower(out) {
+		unicommon.Log.Error("modifyPath: Cannot modify path to itself. inputPath=%#q outputDir=%#q",
+			inputPath, outputDir)
+	}
+	return outputPath
 }
