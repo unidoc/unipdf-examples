@@ -7,9 +7,12 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -42,8 +45,12 @@ func initUniDoc(licenseKey string, debug bool) error {
 func main() {
 	debug := false
 	outputDir := ""
+	var minSize int64 = -1
+	var maxSize int64 = -1
 	flag.BoolVar(&debug, "d", false, "Enable debug logging")
 	flag.StringVar(&outputDir, "o", "", "Output directory")
+	flag.Int64Var(&minSize, "min", -1, "Minimum size of files to process (bytes)")
+	flag.Int64Var(&maxSize, "max", -1, "Maximum size of files to process (bytes)")
 	flag.Parse()
 	args := flag.Args()
 	if len(args) < 1 || len(outputDir) == 0 {
@@ -67,22 +74,35 @@ func main() {
 		os.Exit(1)
 	}
 
-	os.MkdirAll(outputDir, 0777)
+	err = os.MkdirAll(outputDir, 0777)
+	if err != nil {
+		unicommon.Log.Error("MkdirAll failed. outputDir=%#q err=%v", outputDir, err)
+	}
 
 	fmt.Printf("pdfList=%d %#q\n", len(pdfList), pdfList)
 
-	for idx, inputPath := range pdfList {
+	for idx, inputPath := range sortFiles(pdfList, minSize, maxSize) {
+		_, name := filepath.Split(inputPath)
+		inputSize := fileSize(inputPath)
+		fmt.Fprintf(os.Stderr, "inputPath %3d of %d %#-30q  (%6d->", idx,
+			len(pdfList), name, inputSize)
 		outputPath := modifyPath(inputPath, outputDir)
-		fmt.Fprintf(os.Stderr, "inputPath %3d of %d %#q => %#q\n", idx, len(pdfList),
-			inputPath, outputPath)
 		err = transformContentStreams(inputPath, outputPath)
+
+		outputSize := fileSize(outputPath)
+		fmt.Fprintf(os.Stderr, "%6d %3d%%) => %#q\n",
+			outputSize, int(float64(outputSize)/float64(inputSize)*100.0+0.5), outputPath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "transformContentStreams failed. err=%v\n", err)
 			os.Exit(1)
 		}
 
-		fmt.Printf("Input : Size %10d: %#q\n", fileSize(inputPath), inputPath)
-		fmt.Printf("Output: Size %10d: %#q\n", fileSize(outputPath), outputPath)
+		equal, err := pdfsEqual(inputPath, outputPath, "compare.pdfs")
+		if !equal || err != nil {
+			unicommon.Log.Error("Transform has changed PDF. inputPath=%q outputPath=%q",
+				inputPath, outputPath)
+			return
+		}
 	}
 
 	fmt.Printf("%d files\n", len(pdfList))
@@ -136,51 +156,44 @@ func transformContentStreams(inputPath, outputPath string) error {
 		pageNum := i + 1
 		page := pdfReader.PageList[i]
 
-		contentStreams, err := page.GetContentStreams()
+		cstream, err := page.GetAllContentStreams()
 		if err != nil {
 			return err
 		}
-		xobjDict := unipdf.XObjectImageMap{}
 
-		contentStreamsOut := []string{}
-		for idx, cstream := range contentStreams {
-			unicommon.Log.Debug("transformContentStream=%s\n", cstream)
-
-			cstreamParser := unipdf.NewContentStreamParser(cstream, xobjDict)
-			operations, err := cstreamParser.Parse()
-			if err != nil {
-				return err
-			}
-
-			opStrings := []string{}
-			for i, op := range operations {
-				// fmt.Printf("Operation %d: %s - Params: %+v\n", idx+1, op.Operand, op.Params)
-				opCounts[op.Operand]++
-				allOpCounts[op.Operand]++
-				s := op.DefaultWriteString()
-				s = fmt.Sprintf("\t%-40s %% command %d of %d [%d] %s\n", s, i, len(operations),
-					len(op.Params), op.Operand)
-				opStrings = append(opStrings, s)
-			}
-
-			cstreamOut := strings.Join(opStrings, " ")
-			contentStreamsOut = append(contentStreamsOut, cstreamOut)
-
-			fmt.Printf("Page %d - content stream %d: %d => %d\n", pageNum, idx+1,
-				len(cstream), len(cstreamOut))
-
+		cstreamParser := unipdf.NewContentStreamParser(cstream, page)
+		unicommon.Log.Debug("transformContentStream: pageNum=%d cstream=\n'%s'\nXXXXXX",
+			pageNum, cstream)
+		operations, err := cstreamParser.Parse()
+		if err != nil {
+			return err
 		}
 
-		for name, ximg := range xobjDict {
-			unicommon.Log.Debug("transformContentStreams: name=%#q ximg=%T", name, ximg)
-			err = page.AddImageResource(name, ximg)
-			if err != nil {
-				return err
-			}
+		opStrings := []string{}
+		for _, op := range operations {
+			// fmt.Printf("Operation %d: %s - Params: %+v\n", idx+1, op.Operand, op.Params)
+			opCounts[op.Operand]++
+			allOpCounts[op.Operand]++
+			s := op.DefaultWriteString()
+			// s = fmt.Sprintf("\t%-40s %% command %d of %d [%d] %s\n", s, i, len(operations),
+			// 	len(op.Params), op.Operand)
+
+			opStrings = append(opStrings, s)
 		}
 
-		fmt.Printf("Page %d has %d content streams\n", pageNum, len(contentStreamsOut))
-		err = page.SetContentStreams(contentStreamsOut)
+		cstreamOut := strings.Join(opStrings, " ")
+
+		fmt.Printf("Page %d - content stream %d: %d => %d\n", pageNum, len(cstream), len(cstreamOut))
+
+		// for name, ximg := range xobjDict {
+		// 	unicommon.Log.Debug("transformContentStreams: name=%#q ximg=%T", name, ximg)
+		// 	err = page.AddImageResource(name, ximg)
+		// 	if err != nil {
+		// 		return err
+		// 	}
+		// }
+
+		err = page.SetContentStreams([]string{cstreamOut})
 		if err != nil {
 			return err
 		}
@@ -190,6 +203,14 @@ func transformContentStreams(inputPath, outputPath string) error {
 			return err
 		}
 	}
+
+	pageDict, err := pdfWriter.Pages()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%d pages -----------@@@-----------\n", len(*pageDict))
+	fmt.Printf("%s\n", *pageDict)
 
 	fWrite, err := os.Create(outputPath)
 	if err != nil {
@@ -252,6 +273,8 @@ func (x byCount) Less(i, j int) bool {
 
 func modifyPath(inputPath, outputDir string) string {
 	_, name := filepath.Split(inputPath)
+	name = fmt.Sprintf("%08d_%s", fileSize(inputPath), name)
+
 	outputPath := filepath.Join(outputDir, name)
 	in, err := filepath.Abs(inputPath)
 	if err != nil {
@@ -266,4 +289,153 @@ func modifyPath(inputPath, outputDir string) string {
 			inputPath, outputDir)
 	}
 	return outputPath
+}
+
+func sortFiles(pathList []string, minSize, maxSize int64) []string {
+	n := len(pathList)
+	fdList := make([]FileData, n)
+	for i, path := range pathList {
+		fi, err := os.Stat(path)
+		if err != nil {
+			panic(err)
+		}
+		fdList[i].path = path
+		fdList[i].FileInfo = fi
+	}
+
+	sort.Stable(byFile(fdList))
+	i0 := 0
+	i1 := n
+	if minSize >= 0 {
+		i0 = sort.Search(len(fdList), func(i int) bool { return fdList[i].Size() >= minSize })
+	}
+	if maxSize >= 0 {
+		i1 = sort.Search(len(fdList), func(i int) bool { return fdList[i].Size() >= maxSize })
+	}
+	fdList = fdList[i0:i1]
+
+	outList := make([]string, n)
+	for i, fd := range fdList {
+		outList[i] = fd.path
+	}
+
+	return outList
+}
+
+type FileData struct {
+	path string
+	os.FileInfo
+}
+
+// byName sorts slices of PdfObjectName. It is needed because sort.Strings(keys) gives a typecheck
+// error, which I find strange because a PdfObjectName is a string.
+type byFile []FileData
+
+func (x byFile) Len() int { return len(x) }
+
+func (x byFile) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
+
+func (x byFile) Less(i, j int) bool {
+	si, sj := x[i].Size(), x[j].Size()
+	if si != sj {
+		return si < sj
+	}
+	return x[i].path < x[j].path
+}
+
+func pdfsEqual(path1, path2, temp string) (bool, error) {
+	dir1 := filepath.Join(temp, "1")
+	dir2 := filepath.Join(temp, "2")
+	err := os.MkdirAll(dir1, 0777)
+	if err != nil {
+		panic(err)
+	}
+	err = os.MkdirAll(dir2, 0777)
+	if err != nil {
+		panic(err)
+	}
+	err = runGhostscript(path1, dir1)
+	if err != nil {
+		panic(err)
+	}
+	err = runGhostscript(path2, dir2)
+	if err != nil {
+		panic(err)
+	}
+	equal, err := directoriesEqual(dir1, dir2, temp)
+	if err != nil {
+		panic(err)
+	}
+	os.RemoveAll(dir1)
+	os.RemoveAll(dir2)
+	return equal, nil
+}
+
+// runPs2Pdf runs Ghostscript  on file `pdf` to create file one png file per page in directory
+// `outputDir`
+func runGhostscript(pdf, outputDir string) error {
+	unicommon.Log.Info("runGhostscript: pdf=%#q outputDir=%#q", pdf, outputDir)
+	outputPath := filepath.Join(outputDir, "doc-%03d.png")
+	output := fmt.Sprintf("-sOutputFile=%s", outputPath)
+	cmd := exec.Command("gs",
+		"-dSAFER",
+		"-dBATCH",
+		"-dNOPAUSE",
+		"-r150",
+		"-sDEVICE=pnggray",
+		"-dTextAlphaBits=4",
+		output,
+		pdf)
+	unicommon.Log.Info("runGhostscript: cmd=%#q", cmd.Args)
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		unicommon.Log.Error("runGhostscript: pdf=%q err=%v\nstdout=\n%s\nstderr=\n%s\n",
+			pdf, err, stdout, stderr)
+		panic(err)
+	}
+
+	return err
+}
+
+// directoriesEqual compares files that match `mask` in directories `dir1` and `dir2` and returns
+// true if they are the same.
+func directoriesEqual(mask, dir1, dir2 string) (bool, error) {
+	pattern1 := filepath.Join(dir1, mask)
+	pattern2 := filepath.Join(dir2, mask)
+	files1, err := filepath.Glob(pattern1)
+	if err != nil {
+		panic(err)
+	}
+	files2, err := filepath.Glob(pattern2)
+	if err != nil {
+		panic(err)
+	}
+	if len(files1) != len(files2) {
+		return false, nil
+	}
+	n := len(files1)
+	for i := 0; i < n; i++ {
+		equal, err := filesEqual(files1[i], files2[i])
+		if !equal || err != nil {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+// filesEqual compares files `path1` and `path2` and returns true if they are the same.
+func filesEqual(path1, path2 string) (bool, error) {
+	f1, err := ioutil.ReadFile(path1)
+	if err != nil {
+		panic(err)
+	}
+	f2, err := ioutil.ReadFile(path2)
+	if err != nil {
+		panic(err)
+	}
+	return bytes.Equal(f1, f2), nil
 }
