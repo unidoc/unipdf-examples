@@ -126,10 +126,10 @@ func main() {
 		outputPath := modifyPath(inputPath, outputDir)
 
 		t0 := time.Now()
-		numPages, err := transformContentStreams(inputPath, outputPath, noContentTransforms)
+		numPages, err := transformPdfFile(inputPath, outputPath, noContentTransforms)
 		dt := time.Since(t0)
 		if err != nil {
-			unicommon.Log.Error("transformContentStreams failed. err=%v", err)
+			unicommon.Log.Error("transformPdfFile failed. err=%v", err)
 			failFiles = append(failFiles, inputPath)
 			if runAllTests {
 				continue
@@ -179,7 +179,9 @@ func main() {
 
 var allOpCounts = map[string]int{}
 
-func transformContentStreams(inputPath, outputPath string, noContentTransforms bool) (int, error) {
+// transformPdfFile transforms PDF `inputPath` and writes the resulting PDF to `outputPath`
+// If `noContentTransforms` is true then stream contents are not parsed
+func transformPdfFile(inputPath, outputPath string, noContentTransforms bool) (int, error) {
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return 0, err
@@ -237,6 +239,10 @@ func transformContentStreams(inputPath, outputPath string, noContentTransforms b
 	return numPages, nil
 }
 
+// transformPageContents
+// 	- parses the contents of streams in `page` into a slice of operations
+//  - converts the slice of operation into a stream
+//  - replaces the parsed streams in page with the new stream
 func transformPageContents(page *unipdf.PdfPage, pageNum int) error {
 	// fmt.Fprintln(os.Stderr, "$$$")
 
@@ -268,7 +274,7 @@ func transformPageContents(page *unipdf.PdfPage, pageNum int) error {
 	fmt.Printf("Page %d - content stream %d: %d => %d\n", pageNum, len(cstream), len(cstreamOut))
 
 	// for name, ximg := range xobjDict {
-	// 	unicommon.Log.Debug("transformContentStreams: name=%#q ximg=%T", name, ximg)
+	// 	unicommon.Log.Debug("transformPdfFile: name=%#q ximg=%T", name, ximg)
 	// 	err = page.AddImageResource(name, ximg)
 	// 	if err != nil {
 	// 		return err
@@ -287,6 +293,7 @@ func transformPageContents(page *unipdf.PdfPage, pageNum int) error {
 	return nil
 }
 
+// fileSize returns the size of file `path` in bytes
 func fileSize(path string) int64 {
 	fi, err := os.Stat(path)
 	if err != nil {
@@ -295,6 +302,7 @@ func fileSize(path string) int64 {
 	return fi.Size()
 }
 
+// sortCounts returns the keys of map `counts` sorted by count
 func sortCounts(counts map[string]int) []string {
 	wordCounts = counts
 	keys := []string{}
@@ -326,6 +334,7 @@ func (x byCount) Less(i, j int) bool {
 	return x[i] < x[j]
 }
 
+// modifyPath returns `inputPath` with its directory replaced by `outputDir`
 func modifyPath(inputPath, outputDir string) string {
 	_, name := filepath.Split(inputPath)
 	// name = fmt.Sprintf("%08d_%s", fileSize(inputPath), name)
@@ -347,6 +356,9 @@ func modifyPath(inputPath, outputDir string) string {
 	return outputPath
 }
 
+// sortFiles returns the paths of the files in `pathList` sorted by ascending size.
+// If minSize > 0 then only files of this size or larger are returned.
+// If maxSize > 0 then only files of this size or smaller are returned.
 func sortFiles(pathList []string, minSize, maxSize int64) []string {
 	n := len(pathList)
 	fdList := make([]FileData, n)
@@ -407,7 +419,6 @@ func (x byFile) Less(i, j int) bool {
 // 	equal: PDF files are equal
 //  bad1: error is in path1
 //  err: the error
-
 func pdfsEqual(path1, path2, temp string) (bool, bool, error) {
 	dir1 := filepath.Join(temp, "1")
 	dir2 := filepath.Join(temp, "2")
@@ -508,6 +519,7 @@ func filesEqual(path1, path2 string) (bool, error) {
 	return bytes.Equal(f1, f2), nil
 }
 
+// makeUniqueDir creates a new directory inside `baseDir`
 func makeUniqueDir(baseDir string) string {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	for i := 0; i < 1000; i++ {
