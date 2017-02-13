@@ -2,8 +2,8 @@
  * Transform all content streams in all pages in a list of pdf files.
  *
  * There are currently 2 transforms implemented.
- *	- Identity transform. No -g command line option
- *	- Grayscale transform. -g command line option
+ *	- Identity transform. No -t command line option
+ *	- Grayscale transform. -t command line option
  *
  * The identity transform
  *	- converts PDF files into our internal representation
@@ -16,11 +16,11 @@
  *	- converts the internal representation back to a PDF file
  *	- checks that the output PDF file is grayscale
  *
- * Run as: ./pdf_transform_content_streams -o output [-g] testdata/*.pdf > blah
+ * Run as: ./pdf_transform_content_streams -o output [-d] testdata/*.pdf > blah
  *
- *   This will transform all .pdfs file in testdata and write the results to output.
- *   The main results are written to stderr so you will see them in your console.
- *	 Detailed information is written to stdout and you will see them in blah.
+ * This will transform all .pdf file in testdata and write the results to output.
+ * The main results are written to stderr so you will see them in your console.
+ * Detailed information is written to stdout and you will see them in blah.
  *
  *  See the other command line options in the top of main()
  *		-a tests all the input files. The default behavior is stop at the first failure. Use this
