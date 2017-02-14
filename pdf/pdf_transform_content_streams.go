@@ -399,7 +399,7 @@ func transformColorToGrayscale(page *unipdf.PdfPage, pageNum int,
 			}
 			// fmt.Fprintf(os.Stderr, "^^k op=%s\n", (*pOperations)[i])
 		case "K":
-			if vals, err = op.GetFloatParams(3); err != nil {
+			if vals, err = op.GetFloatParams(4); err != nil {
 				return err
 			}
 			if err = op.SetOpFloatParams("G", []float64{cmykToGray(vals)}); err != nil {
