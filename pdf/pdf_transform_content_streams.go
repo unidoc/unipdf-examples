@@ -99,6 +99,7 @@ func main() {
 	keep := false                 // Keep the rasters used for PDF comparison"
 	noContentTransforms := false  // Don't parse stream contents?
 	doGrayscaleTransform := false // Apply the grayscale transform?
+	compareGrayscale := false     // Do PDF raster comparison on grayscale rasters?
 	runAllTests := false          // Don't stop when a PDF file fails to process?
 	outputDir := ""               // Transformed PDFs are written here
 	var minSize int64 = -1        // Minimum size for an input PDF to be processed.
@@ -107,6 +108,7 @@ func main() {
 	flag.BoolVar(&keep, "k", false, "Keep the rasters used for PDF comparison")
 	flag.BoolVar(&noContentTransforms, "x", false, "Don't transform streams")
 	flag.BoolVar(&doGrayscaleTransform, "t", false, "Do grayscale transform")
+	flag.BoolVar(&compareGrayscale, "g", false, "Do PDF raster comparison on grayscale rasters")
 	flag.BoolVar(&runAllTests, "a", false, "Run all tests. Don't stop at first failure")
 	flag.StringVar(&outputDir, "o", "", "Output directory")
 	flag.Int64Var(&minSize, "min", -1, "Minimum size of files to process (bytes)")
@@ -150,7 +152,7 @@ func main() {
 	for idx, inputPath := range pdfList {
 		_, name := filepath.Split(inputPath)
 		inputSize := fileSize(inputPath)
-		fmt.Fprintf(os.Stderr, "inputPath %3d of %d %#-30q  (%6d->", idx,
+		fmt.Fprintf(os.Stderr, "%3d of %d %#-30q  (%6d->", idx,
 			len(pdfList), name, inputSize)
 		outputPath := modifyPath(inputPath, outputDir)
 
@@ -300,15 +302,15 @@ func transformPageContents(page *unipdf.PdfPage, pageNum int, doGrayscaleTransfo
 		return err
 	}
 
-	printOpCounts("before", getOpCounts(operations))
+	// printOpCounts("before", getOpCounts(operations))
 
-	if doGrayscaleTransform {
-		if err := transformColorToGrayscale(page, pageNum, &operations); err != nil {
-			return err
-		}
-	}
+	// if doGrayscaleTransform {
+	// 	if err := transformColorToGrayscale(page, pageNum, &operations); err != nil {
+	// 		return err
+	// 	}
+	// }
 
-	printOpCounts("after ", getOpCounts(operations))
+	// printOpCounts("after ", getOpCounts(operations))
 
 	return writePageContents(page, pageNum, operations)
 }
@@ -339,7 +341,7 @@ func parsePageContents(page *unipdf.PdfPage, pageNum int) ([]*unipdf.ContentStre
 		return nil, err
 	}
 
-	cstreamParser := unipdf.NewContentStreamParser(cstream, page)
+	cstreamParser := unipdf.NewContentStreamParser(cstream /*, page*/)
 	unicommon.Log.Debug("transformContentStream: pageNum=%d cstream=\n'%s'\nXXXXXX",
 		pageNum, cstream)
 	return cstreamParser.Parse()
@@ -363,53 +365,53 @@ func writePageContents(page *unipdf.PdfPage, pageNum int,
 	// 	}
 	// }
 
-	return page.SetContentStreams([]string{cstreamOut})
+	return page.SetContentStreams([]string{cstreamOut}, nil)
 }
 
-// transformColorToGrayscale transforms color pages to grayscale
-func transformColorToGrayscale(page *unipdf.PdfPage, pageNum int,
-	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
+// // transformColorToGrayscale transforms color pages to grayscale
+// func transformColorToGrayscale(page *unipdf.PdfPage, pageNum int,
+// 	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
 
-	for _, op := range *pOperations {
-		var vals []float64
-		switch op.Operand {
-		case "rg":
-			if vals, err = op.GetFloatParams(3); err != nil {
-				return err
-			}
-			if err = op.SetOpFloatParams("g", []float64{rgbToGray(vals)}); err != nil {
-				return err
-			}
-			// fmt.Fprintf(os.Stderr, "^^rg op=%s\n", (*pOperations)[i])
-		case "RG":
-			if vals, err = op.GetFloatParams(3); err != nil {
-				return err
-			}
-			if err = op.SetOpFloatParams("G", []float64{rgbToGray(vals)}); err != nil {
-				return err
-			}
-			// op.Operand = "XXXXX"
-			// fmt.Fprintf(os.Stderr, "^^RG op=%s\n", (*pOperations)[i])
-		case "k":
-			if vals, err = op.GetFloatParams(4); err != nil {
-				return err
-			}
-			if err = op.SetOpFloatParams("g", []float64{cmykToGray(vals)}); err != nil {
-				return err
-			}
-			// fmt.Fprintf(os.Stderr, "^^k op=%s\n", (*pOperations)[i])
-		case "K":
-			if vals, err = op.GetFloatParams(4); err != nil {
-				return err
-			}
-			if err = op.SetOpFloatParams("G", []float64{cmykToGray(vals)}); err != nil {
-				return err
-			}
-			// fmt.Fprintf(os.Stderr, "^^K op=%s\n", (*pOperations)[i])
-		}
-	}
-	return nil
-}
+// 	for _, op := range *pOperations {
+// 		var vals []float64
+// 		switch op.Operand {
+// 		case "rg":
+// 			if vals, err = op.GetFloatParams(3); err != nil {
+// 				return err
+// 			}
+// 			if err = op.SetOpFloatParams("g", []float64{rgbToGray(vals)}); err != nil {
+// 				return err
+// 			}
+// 			// fmt.Fprintf(os.Stderr, "^^rg op=%s\n", (*pOperations)[i])
+// 		case "RG":
+// 			if vals, err = op.GetFloatParams(3); err != nil {
+// 				return err
+// 			}
+// 			if err = op.SetOpFloatParams("G", []float64{rgbToGray(vals)}); err != nil {
+// 				return err
+// 			}
+// 			// op.Operand = "XXXXX"
+// 			// fmt.Fprintf(os.Stderr, "^^RG op=%s\n", (*pOperations)[i])
+// 		case "k":
+// 			if vals, err = op.GetFloatParams(4); err != nil {
+// 				return err
+// 			}
+// 			if err = op.SetOpFloatParams("g", []float64{cmykToGray(vals)}); err != nil {
+// 				return err
+// 			}
+// 			// fmt.Fprintf(os.Stderr, "^^k op=%s\n", (*pOperations)[i])
+// 		case "K":
+// 			if vals, err = op.GetFloatParams(4); err != nil {
+// 				return err
+// 			}
+// 			if err = op.SetOpFloatParams("G", []float64{cmykToGray(vals)}); err != nil {
+// 				return err
+// 			}
+// 			// fmt.Fprintf(os.Stderr, "^^K op=%s\n", (*pOperations)[i])
+// 		}
+// 	}
+// 	return nil
+// }
 
 // rgbToGray returns the grayscale equivalent of the r,g,b values in `vals`
 func rgbToGray(vals []float64) float64 {
