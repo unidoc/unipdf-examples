@@ -37,7 +37,36 @@
  *		lda.pdf
  *		BLUEBOOK.pdf
  *		pdf_hacks.pdf
- */
+
+ 27 fail with latest v2 code
+	  0 `lda.pdf`
+	  1 `power_law_bins.pdf`
+	  2 `rules_of_ml.pdf`
+	  3 `compression.kdd06(1).pdf`
+	  4 `climate_science_words.pdf`
+	  5 `joi160132.pdf`
+	  6 `1560401.pdf`
+	  7 `twitter.pdf`
+	  8 `pearson_science_8_sb_chapter_5_unit_5.2.pdf`
+	  9 `1512.03547v2.pdf`
+	 10 `BLUEBOOK.pdf`
+	 11 `cvxopt_1306.0057v1.pdf`
+	 12 `scan_alan_2016-03-30-10-38-15.pdf`
+	 13 `a0w20000000dikuAAA.pdf`
+	 14 `2013-12-12_rg_final_report.pdf`
+	 15 `Parsing-Probabilistic.pdf`
+	 16 `PhysRevLett.118.060401.pdf`
+	 17 `art%3A10.1186%2Fs13673-015-0039-9.pdf`
+	 18 `dark-internet-mail-environment-march-2015.pdf`
+	 19 `2015-09-16-T23-39-51_ec2-user_ip-172-31-6-72_jim.pdf`
+	 20 `Hierarchical Detection of Hard Exudates.pdf`
+	 21 `WhatIsEnergy.pdf`
+	 22 `Physics_Sample_Chapter_3.pdf`
+	 23 `day3_TemporalImageProcessing.pdf`
+	 24 `Lesson_054_handout.pdf`
+	 25 `talk_Simons_part1_pdf.pdf`
+	 26 `nips-tutorial-policy-optimization-Schulman-Abbeel.pdf`
+*/
 
 package main
 
@@ -125,12 +154,7 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
-
-	pdfList, err := patternsToPaths(args)
-	if err != nil {
-		unicommon.Log.Error("patternsToPaths failed. args=%#q err=%v", args, err)
-		os.Exit(1)
-	}
+	unipdf.ValidatingOperations = true
 
 	err = os.MkdirAll(outputDir, 0777)
 	if err != nil {
@@ -144,8 +168,12 @@ func main() {
 		defer removeDir(compDir)
 	}
 
+	pdfList, err := patternsToPaths(args)
+	if err != nil {
+		unicommon.Log.Error("patternsToPaths failed. args=%#q err=%v", args, err)
+		os.Exit(1)
+	}
 	pdfList = sortFiles(pdfList, minSize, maxSize)
-	fmt.Printf("pdfList=%d %#q\n", len(pdfList), pdfList)
 	badFiles := []string{}
 	failFiles := []string{}
 
@@ -302,15 +330,13 @@ func transformPageContents(page *unipdf.PdfPage, pageNum int, doGrayscaleTransfo
 		return err
 	}
 
-	// printOpCounts("before", getOpCounts(operations))
-
-	// if doGrayscaleTransform {
-	// 	if err := transformColorToGrayscale(page, pageNum, &operations); err != nil {
-	// 		return err
-	// 	}
-	// }
-
-	// printOpCounts("after ", getOpCounts(operations))
+	if doGrayscaleTransform {
+		printOpCounts("before", getOpCounts(operations))
+		if err := transformColorToGrayscale(page, pageNum, &operations); err != nil {
+			return err
+		}
+		printOpCounts("after ", getOpCounts(operations))
+	}
 
 	return writePageContents(page, pageNum, operations)
 }
@@ -368,50 +394,50 @@ func writePageContents(page *unipdf.PdfPage, pageNum int,
 	return page.SetContentStreams([]string{cstreamOut}, nil)
 }
 
-// // transformColorToGrayscale transforms color pages to grayscale
-// func transformColorToGrayscale(page *unipdf.PdfPage, pageNum int,
-// 	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
+// transformColorToGrayscale transforms color pages to grayscale
+func transformColorToGrayscale(page *unipdf.PdfPage, pageNum int,
+	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
 
-// 	for _, op := range *pOperations {
-// 		var vals []float64
-// 		switch op.Operand {
-// 		case "rg":
-// 			if vals, err = op.GetFloatParams(3); err != nil {
-// 				return err
-// 			}
-// 			if err = op.SetOpFloatParams("g", []float64{rgbToGray(vals)}); err != nil {
-// 				return err
-// 			}
-// 			// fmt.Fprintf(os.Stderr, "^^rg op=%s\n", (*pOperations)[i])
-// 		case "RG":
-// 			if vals, err = op.GetFloatParams(3); err != nil {
-// 				return err
-// 			}
-// 			if err = op.SetOpFloatParams("G", []float64{rgbToGray(vals)}); err != nil {
-// 				return err
-// 			}
-// 			// op.Operand = "XXXXX"
-// 			// fmt.Fprintf(os.Stderr, "^^RG op=%s\n", (*pOperations)[i])
-// 		case "k":
-// 			if vals, err = op.GetFloatParams(4); err != nil {
-// 				return err
-// 			}
-// 			if err = op.SetOpFloatParams("g", []float64{cmykToGray(vals)}); err != nil {
-// 				return err
-// 			}
-// 			// fmt.Fprintf(os.Stderr, "^^k op=%s\n", (*pOperations)[i])
-// 		case "K":
-// 			if vals, err = op.GetFloatParams(4); err != nil {
-// 				return err
-// 			}
-// 			if err = op.SetOpFloatParams("G", []float64{cmykToGray(vals)}); err != nil {
-// 				return err
-// 			}
-// 			// fmt.Fprintf(os.Stderr, "^^K op=%s\n", (*pOperations)[i])
-// 		}
-// 	}
-// 	return nil
-// }
+	for _, op := range *pOperations {
+		var vals []float64
+		switch op.Operand {
+		case "rg":
+			if vals, err = op.GetFloatParams(3); err != nil {
+				return err
+			}
+			if err = op.SetOpFloatParams("g", []float64{rgbToGray(vals)}); err != nil {
+				return err
+			}
+			// fmt.Fprintf(os.Stderr, "^^rg op=%s\n", (*pOperations)[i])
+		case "RG":
+			if vals, err = op.GetFloatParams(3); err != nil {
+				return err
+			}
+			if err = op.SetOpFloatParams("G", []float64{rgbToGray(vals)}); err != nil {
+				return err
+			}
+			// op.Operand = "XXXXX"
+			// fmt.Fprintf(os.Stderr, "^^RG op=%s\n", (*pOperations)[i])
+		case "k":
+			if vals, err = op.GetFloatParams(4); err != nil {
+				return err
+			}
+			if err = op.SetOpFloatParams("g", []float64{cmykToGray(vals)}); err != nil {
+				return err
+			}
+			// fmt.Fprintf(os.Stderr, "^^k op=%s\n", (*pOperations)[i])
+		case "K":
+			if vals, err = op.GetFloatParams(4); err != nil {
+				return err
+			}
+			if err = op.SetOpFloatParams("G", []float64{cmykToGray(vals)}); err != nil {
+				return err
+			}
+			// fmt.Fprintf(os.Stderr, "^^K op=%s\n", (*pOperations)[i])
+		}
+	}
+	return nil
+}
 
 // rgbToGray returns the grayscale equivalent of the r,g,b values in `vals`
 func rgbToGray(vals []float64) float64 {
