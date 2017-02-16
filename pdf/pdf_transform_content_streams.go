@@ -72,17 +72,21 @@ package main
 
 import (
 	"bytes"
+	"encoding/csv"
 	"flag"
 	"fmt"
 	"image"
+	"io"
 	"io/ioutil"
 	"math"
 	"math/rand"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -121,6 +125,11 @@ type imageThreshold struct {
 var identityThreshold = imageThreshold{
 	fracPixels: 1.0e-4, // Fraction of pixels in page raster that may differ
 	mean:       10.0,   // Max mean difference on scale 0..255 for pixels that differ
+}
+
+var testStats = statistics{
+	testResultPath: "xform.test.results.csv",
+	imageInfoPath:  "xform.image.info.csv",
 }
 
 func main() {
@@ -177,9 +186,18 @@ func main() {
 	badFiles := []string{}
 	failFiles := []string{}
 
+	if err = testStats.load(); err != nil {
+		unicommon.Log.Error("stats.load failed. testStats=%+v err=%v", testStats, err)
+		os.Exit(1)
+	}
+	defer testStats.save()
+
 	for idx, inputPath := range pdfList {
+
+		testStats.save()
 		_, name := filepath.Split(inputPath)
 		inputSize := fileSize(inputPath)
+
 		fmt.Fprintf(os.Stderr, "%3d of %d %#-30q  (%6d->", idx,
 			len(pdfList), name, inputSize)
 		outputPath := modifyPath(inputPath, outputDir)
@@ -202,8 +220,19 @@ func main() {
 			numPages, dt.Seconds(), outputPath)
 
 		if doGrayscaleTransform {
-			isColor, err := isPdfColor(outputPath, compDir, keep)
-			if err != nil || isColor {
+
+			isColorIn, err := isPdfColor(inputPath, compDir, keep)
+			isColorOut, err := isPdfColor(outputPath, compDir, keep)
+			e := testResult{
+				name:     path.Base(inputPath),
+				colorIn:  isColorIn,
+				colorOut: isColorOut,
+				numPages: numPages,
+				duration: dt.Seconds(),
+			}
+			testStats.addTestResult(e, true)
+
+			if err != nil || isColorOut {
 				if err != nil {
 					unicommon.Log.Error("Transform has damaged PDF. err=%v\n\tinputPath=%#q\n\toutputPath=%#q",
 						err, inputPath, outputPath)
@@ -295,9 +324,10 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms, doGrays
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
 		page := pdfReader.PageList[i]
+		unicommon.Log.Debug("^^^^ page %d=%s", pageNum, page)
 
 		if !noContentTransforms {
-			err = transformPageContents(page, pageNum, doGrayscaleTransform)
+			err = transformPageContents(page, inputPath, pageNum, doGrayscaleTransform)
 			if err != nil {
 				return numPages, err
 			}
@@ -324,15 +354,20 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms, doGrays
 //	- parses the contents of streams in `page` into a slice of operations
 //	- converts the slice of operations into a stream
 //	- replaces the streams in `page` with the new stream
-func transformPageContents(page *unipdf.PdfPage, pageNum int, doGrayscaleTransform bool) error {
+func transformPageContents(page *unipdf.PdfPage, inputPath string, pageNum int, doGrayscaleTransform bool) error {
 	operations, err := parsePageContents(page, pageNum)
 	if err != nil {
 		return err
 	}
 
+	// fmt.Printf("&&&&& %d opertions\n", len(operations))
+	// for i, op := range operations {
+	// 	fmt.Printf("%5d: %s\n", i, op)
+	// }
+
 	if doGrayscaleTransform {
 		printOpCounts("before", getOpCounts(operations))
-		if err := transformColorToGrayscale(page, pageNum, &operations); err != nil {
+		if err := transformColorToGrayscale(page, inputPath, pageNum, &operations); err != nil {
 			return err
 		}
 		printOpCounts("after ", getOpCounts(operations))
@@ -395,12 +430,21 @@ func writePageContents(page *unipdf.PdfPage, pageNum int,
 }
 
 // transformColorToGrayscale transforms color pages to grayscale
-func transformColorToGrayscale(page *unipdf.PdfPage, pageNum int,
+func transformColorToGrayscale(page *unipdf.PdfPage, inputPath string, pageNum int,
 	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
+
+	xobjs := []string{}
 
 	for _, op := range *pOperations {
 		var vals []float64
 		switch op.Operand {
+		case "Do":
+			name, err := op.GetNameParam()
+			if err != nil {
+				return err
+			}
+			xobjs = append(xobjs, name)
+			// unicommon.og.Debug("Do: name=%#q\n", name)
 		case "rg":
 			if vals, err = op.GetFloatParams(3); err != nil {
 				return err
@@ -434,6 +478,25 @@ func transformColorToGrayscale(page *unipdf.PdfPage, pageNum int,
 				return err
 			}
 			// fmt.Fprintf(os.Stderr, "^^K op=%s\n", (*pOperations)[i])
+		}
+	}
+
+	for _, name := range xobjs {
+		imageSummary, err := page.ConvertXObjectToGray(name)
+		if err != nil {
+			return err
+		}
+		if imageSummary != nil {
+			e := imageInfo{
+				fileName:   path.Base(inputPath),
+				pageNum:    pageNum,
+				xobjName:   name,
+				length:     imageSummary.Length,
+				filter1:    imageSummary.Filter1,
+				filter2:    imageSummary.Filter2,
+				colorSpace: imageSummary.ColorSpace,
+			}
+			testStats.addImageInfo(e, true)
 		}
 	}
 	return nil
@@ -901,4 +964,248 @@ func fileSize(path string) int64 {
 		panic(err)
 	}
 	return fi.Size()
+}
+
+type statistics struct {
+	testResultPath string
+	imageInfoPath  string
+	testResultList []testResult
+	imageInfoList  []imageInfo
+	testResultMap  map[string]int
+	imageInfoMap   map[string]int
+}
+
+func (s *statistics) load() error {
+	s.testResultList = []testResult{}
+	s.testResultMap = map[string]int{}
+	s.imageInfoList = []imageInfo{}
+	s.imageInfoMap = map[string]int{}
+
+	testResultList, err := testResultRead(s.testResultPath)
+	if err != nil {
+		return err
+	}
+	for _, e := range testResultList {
+		s.addTestResult(e, true)
+	}
+
+	imageInfoList, err := imageInfoRead(s.imageInfoPath)
+	if err != nil {
+		return err
+	}
+	for _, e := range imageInfoList {
+		s.addImageInfo(e, true)
+	}
+
+	return nil
+}
+
+func (s *statistics) save() error {
+	err1 := testResultWrite(s.testResultPath, s.testResultList)
+	err2 := imageInfoWrite(s.imageInfoPath, s.imageInfoList)
+	if err1 != nil {
+		return err1
+	}
+	return err2
+}
+
+func (s *statistics) addTestResult(e testResult, force bool) {
+	i, ok := s.testResultMap[e.name]
+	if !ok {
+		s.testResultList = append(s.testResultList, e)
+		s.testResultMap[e.name] = len(s.testResultList) - 1
+	} else if force {
+		s.testResultList[i] = e
+	}
+}
+
+func (s *statistics) addImageInfo(e imageInfo, force bool) {
+	k := imageInfoKey(e)
+	i, ok := s.imageInfoMap[k]
+	if !ok {
+		s.imageInfoList = append(s.imageInfoList, e)
+		s.imageInfoMap[k] = i
+	} else if force {
+		s.imageInfoList[i] = e
+	}
+}
+
+func imageInfoKey(e imageInfo) string {
+	return fmt.Sprintf("%s:page%d:%s", e.fileName, e.pageNum, e.xobjName)
+}
+
+type testResult struct {
+	name     string
+	colorIn  bool
+	colorOut bool
+	numPages int
+	duration float64
+}
+
+type imageInfo struct {
+	fileName   string
+	pageNum    int
+	xobjName   string
+	length     int
+	filter1    string
+	filter2    string
+	colorSpace string
+}
+
+func testResultRead(path string) ([]testResult, error) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return []testResult{}, nil
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	r := csv.NewReader(f)
+
+	results := []testResult{}
+	for i := 0; ; i++ {
+		row, err := r.Read()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			unicommon.Log.Error("testResultRead: i=%d err=%v", i, err)
+			return results, err
+		}
+		if i == 0 {
+			continue
+		}
+		e := testResult{
+			name:     row[0],
+			colorIn:  toBool(row[1]),
+			colorOut: toBool(row[2]),
+			numPages: toInt(row[3]),
+			duration: toFloat(row[4]),
+		}
+		results = append(results, e)
+	}
+	return results, nil
+}
+
+func testResultWrite(path string, results []testResult) error {
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0777)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	w := csv.NewWriter(f)
+
+	if err := w.Write([]string{"name", "colorIn", "colorOut", "numPages", "duration"}); err != nil {
+		return err
+	}
+	for i, e := range results {
+		row := []string{
+			e.name,
+			fmt.Sprintf("%t", e.colorIn),
+			fmt.Sprintf("%t", e.colorOut),
+			fmt.Sprintf("%d", e.numPages),
+			fmt.Sprintf("%.3f", e.duration),
+		}
+		if err := w.Write(row); err != nil {
+			unicommon.Log.Error("testResultWrite: Error writing record. i=%d path=%#q err=%v",
+				i, path, err)
+		}
+	}
+
+	w.Flush()
+	return w.Error()
+}
+
+func imageInfoRead(path string) ([]imageInfo, error) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return []imageInfo{}, nil
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	r := csv.NewReader(f)
+
+	results := []imageInfo{}
+	for i := 0; ; i++ {
+		row, err := r.Read()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			unicommon.Log.Error("imageInfoRead: i=%d err=%v", i, err)
+			return results, err
+		}
+		if i == 0 {
+			continue
+		}
+		e := imageInfo{
+			fileName:   row[0],
+			pageNum:    toInt(row[1]),
+			xobjName:   row[2],
+			length:     toInt(row[3]),
+			filter1:    row[4],
+			filter2:    row[5],
+			colorSpace: row[6],
+		}
+		results = append(results, e)
+	}
+	return results, nil
+}
+
+func imageInfoWrite(path string, results []imageInfo) error {
+	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0777)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	w := csv.NewWriter(f)
+
+	if err := w.Write([]string{"fileName", "pageNum", "xobjName", "length",
+		"filter1", "filter2", "colorSpace"}); err != nil {
+		return err
+	}
+	for i, e := range results {
+		if len(e.xobjName) == 0 {
+			panic("YYYY")
+		}
+		row := []string{
+			e.fileName,
+			fmt.Sprintf("%d", e.pageNum),
+			e.xobjName,
+			fmt.Sprintf("%d", e.length),
+			e.filter1,
+			e.filter2,
+			e.colorSpace,
+		}
+		if err := w.Write(row); err != nil {
+			unicommon.Log.Error("testResultWrite: Error writing record. i=%d path=%#q err=%v",
+				i, path, err)
+		}
+	}
+
+	w.Flush()
+	return w.Error()
+}
+
+func toBool(s string) bool {
+	return strings.ToLower(strings.TrimSpace(s)) == "true"
+}
+
+func toInt(s string) int {
+	s = strings.TrimSpace(s)
+	x, err := strconv.Atoi(s)
+	if err != nil {
+		panic(err)
+	}
+	return x
+}
+
+func toFloat(s string) float64 {
+	s = strings.TrimSpace(s)
+	x, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		panic(err)
+	}
+	return x
 }
