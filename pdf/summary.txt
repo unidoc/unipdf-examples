@@ -20,8 +20,8 @@ all files: 304 total
    4: DeviceGray           33
    5: [No color]           22
    6: DeviceCMYK           9
-   7: CalRGB               2
-   8: Separation           2
+   7: Separation           2
+   8: CalRGB               2
 --------------------------------------------------------------------------------
 color_files: 241 total
 9 encodings
@@ -42,8 +42,8 @@ color_files: 241 total
    4: DeviceGray           33
    5: [No color]           22
    6: DeviceCMYK           9
-   7: CalRGB               2
-   8: Separation           2
+   7: Separation           2
+   8: CalRGB               2
 --------------------------------------------------------------------------------
 fail_files: 211 total
 9 encodings
@@ -64,5 +64,5 @@ fail_files: 211 total
    4: DeviceGray           33
    5: [No color]           22
    6: DeviceCMYK           9
-   7: CalRGB               2
-   8: Separation           2
+   7: Separation           2
+   8: CalRGB               2

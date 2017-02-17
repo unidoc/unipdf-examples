@@ -128,9 +128,12 @@ var identityThreshold = imageThreshold{
 }
 
 var testStats = statistics{
+	enabled:        false,
 	testResultPath: "xform.test.results.csv",
 	imageInfoPath:  "xform.image.info.csv",
 }
+
+var allOpCounts = map[string]int{}
 
 func main() {
 	debug := false                // Write debug level info to stdout?
@@ -281,13 +284,8 @@ func main() {
 		fmt.Fprintf(os.Stderr, "%3d %#q\n", i, path)
 	}
 
-	fmt.Printf("%d ops ----------------^^^----------------\n", len(allOpCounts))
-	for i, k := range sortCounts(allOpCounts) {
-		fmt.Printf("%3d: %#6q %5d\n", i, k, allOpCounts[k])
-	}
+	printOpCounts("all operation in PDF", allOpCounts)
 }
-
-var allOpCounts = map[string]int{}
 
 // transformPdfFile transforms PDF `inputPath` and writes the resulting PDF to `outputPath`
 // If `noContentTransforms` is true then stream contents are not parsed
@@ -347,6 +345,11 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms, doGrays
 
 	err = pdfWriter.Write(fWrite)
 
+	unicommon.Log.Error("allAlternateColorSpaces: %d", len(allAlternateColorSpaces))
+	for k, v := range allAlternateColorSpaces {
+		fmt.Fprintf(os.Stderr, "%#15q: %d\n", k, v)
+	}
+
 	return numPages, nil
 }
 
@@ -366,11 +369,12 @@ func transformPageContents(page *unipdf.PdfPage, inputPath string, pageNum int, 
 	// }
 
 	if doGrayscaleTransform {
-		printOpCounts("before", getOpCounts(operations))
+		printOperations(fmt.Sprintf("Page %d: before", pageNum), operations)
+		printOpCounts(fmt.Sprintf("Page %d: before", pageNum), getOpCounts(operations))
 		if err := transformColorToGrayscale(page, inputPath, pageNum, &operations); err != nil {
 			return err
 		}
-		printOpCounts("after ", getOpCounts(operations))
+		printOpCounts(fmt.Sprintf("Page %d: after ", pageNum), getOpCounts(operations))
 	}
 
 	return writePageContents(page, pageNum, operations)
@@ -384,6 +388,13 @@ func getOpCounts(operations []*unipdf.ContentStreamOperation) map[string]int {
 		allOpCounts[op.Operand]++
 	}
 	return opCounts
+}
+
+func printOperations(description string, operations []*unipdf.ContentStreamOperation) {
+	fmt.Printf("%d operations --------^^^--------%#q\n", len(operations), description)
+	for _, op := range operations {
+		fmt.Printf("%s\n", op)
+	}
 }
 
 // printOpCounts prints `opCounts` in descending order of occurrences of operand
@@ -429,22 +440,67 @@ func writePageContents(page *unipdf.PdfPage, pageNum int,
 	return page.SetContentStreams([]string{cstreamOut}, nil)
 }
 
+var allAlternateColorSpaces = map[string]int{}
+
 // transformColorToGrayscale transforms color pages to grayscale
 func transformColorToGrayscale(page *unipdf.PdfPage, inputPath string, pageNum int,
 	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
 
-	xobjs := []string{}
+	xobjImgs := []string{}
+	xobjCSs := []string{}
+
+	currentColorSpace := "DeviceGray"
 
 	for _, op := range *pOperations {
 		var vals []float64
 		switch op.Operand {
+		case "cs", "CS":
+			name, err := op.GetNameParam()
+			if err != nil {
+				return err
+			}
+			xobjCSs = append(xobjCSs, name)
+
+			_, currentColorSpace, _ = page.GetColorSpace(name)
+			unicommon.Log.Info("##: %s currentColorSpace=%#q", op, currentColorSpace)
+			switch currentColorSpace {
+			case "DeviceRGB":
+				unicommon.Log.Info("### %s: name=%#q", op, name)
+				if err = op.SetNameParam("DeviceGray"); err != nil {
+					return err
+				}
+				unicommon.Log.Info("##@ %s: ", op)
+			}
+		// case "CS":
+		// 	name, err := op.GetNameParam()
+		// 	if err != nil {
+		// 		return err
+		// 	}
+		// 	xobjCSs = append(xobjCSs, name)
+		// 	unicommon.Log.Info("CS: name=%#q", name)
+		// 	_, currentColorSpace, _ := page.GetColorSpace(name)
 		case "Do":
 			name, err := op.GetNameParam()
 			if err != nil {
 				return err
 			}
-			xobjs = append(xobjs, name)
-			// unicommon.og.Debug("Do: name=%#q\n", name)
+			xobjImgs = append(xobjImgs, name)
+			// unicommon.Log.Debug("Do: name=%#qn", name)
+		case "sc", "SC", "scn", "SCN":
+			{
+				unicommon.Log.Info("#@: %s currentColorSpace=%#q", op, currentColorSpace)
+				switch currentColorSpace {
+				case "DeviceRGB":
+
+					if vals, err = op.GetFloatParams(3); err != nil {
+						return err
+					}
+					unicommon.Log.Info("#!# %s: vals=%v", op, vals)
+					if err = op.SetOpFloatParams(op.Operand, []float64{rgbToGray(vals)}); err != nil {
+						return err
+					}
+				}
+			}
 		case "rg":
 			if vals, err = op.GetFloatParams(3); err != nil {
 				return err
@@ -481,7 +537,21 @@ func transformColorToGrayscale(page *unipdf.PdfPage, inputPath string, pageNum i
 		}
 	}
 
-	for _, name := range xobjs {
+	for _, name := range xobjCSs {
+		colorSpace, alternate, err := page.GetColorSpace(name)
+		if err != nil {
+			return err
+		}
+		unicommon.Log.Debug("colorspace: %#q=%s %s", name, alternate, colorSpace)
+		_, ok := allAlternateColorSpaces[alternate]
+		if !ok {
+			allAlternateColorSpaces[alternate] = 1
+		} else {
+			allAlternateColorSpaces[alternate]++
+		}
+	}
+
+	for _, name := range xobjImgs {
 		imageSummary, err := page.ConvertXObjectToGray(name)
 		if err != nil {
 			return err
@@ -967,6 +1037,7 @@ func fileSize(path string) int64 {
 }
 
 type statistics struct {
+	enabled        bool
 	testResultPath string
 	imageInfoPath  string
 	testResultList []testResult
@@ -976,6 +1047,9 @@ type statistics struct {
 }
 
 func (s *statistics) load() error {
+	if !s.enabled {
+		return nil
+	}
 	s.testResultList = []testResult{}
 	s.testResultMap = map[string]int{}
 	s.imageInfoList = []imageInfo{}
@@ -1001,6 +1075,9 @@ func (s *statistics) load() error {
 }
 
 func (s *statistics) save() error {
+	if !s.enabled {
+		return nil
+	}
 	err1 := testResultWrite(s.testResultPath, s.testResultList)
 	err2 := imageInfoWrite(s.imageInfoPath, s.imageInfoList)
 	if err1 != nil {
@@ -1010,6 +1087,9 @@ func (s *statistics) save() error {
 }
 
 func (s *statistics) addTestResult(e testResult, force bool) {
+	if !s.enabled {
+		return
+	}
 	i, ok := s.testResultMap[e.name]
 	if !ok {
 		s.testResultList = append(s.testResultList, e)
@@ -1020,6 +1100,9 @@ func (s *statistics) addTestResult(e testResult, force bool) {
 }
 
 func (s *statistics) addImageInfo(e imageInfo, force bool) {
+	if !s.enabled {
+		return
+	}
 	k := imageInfoKey(e)
 	i, ok := s.imageInfoMap[k]
 	if !ok {
