@@ -76,6 +76,8 @@ import (
 	"flag"
 	"fmt"
 	"image"
+	"image/color"
+	"image/png"
 	"io"
 	"io/ioutil"
 	"math"
@@ -223,9 +225,8 @@ func main() {
 			numPages, dt.Seconds(), outputPath)
 
 		if doGrayscaleTransform {
-
-			isColorIn, err := isPdfColor(inputPath, compDir, keep)
-			isColorOut, err := isPdfColor(outputPath, compDir, keep)
+			isColorIn, _, err := isPdfColor(inputPath, compDir, false, keep)
+			isColorOut, colorPagesOut, err := isPdfColor(outputPath, compDir, true, keep)
 			e := testResult{
 				name:     path.Base(inputPath),
 				colorIn:  isColorIn,
@@ -242,6 +243,10 @@ func main() {
 				} else {
 					unicommon.Log.Error("Output PDF is color.\n\tinputPath=%#q\n\toutputPath=%#q",
 						inputPath, outputPath)
+					unicommon.Log.Error("isPdfColor: %d Color pages", len(colorPagesOut))
+					for _, p := range colorPagesOut {
+						unicommon.Log.Error("isPdfColor: page %d", p+1)
+					}
 				}
 				failFiles = append(failFiles, inputPath)
 				if runAllTests {
@@ -442,6 +447,7 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc_ string,
 	xobjCSs := []string{}
 
 	currentColorSpace := "DeviceGray"
+	currentSeparate := false
 
 	for _, op := range *pOperations {
 		h := fmt.Sprintf("%s op=%s", rubric, op)
@@ -454,10 +460,11 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc_ string,
 			}
 			xobjCSs = append(xobjCSs, name)
 
-			_, currentColorSpace, _ = page.GetColorSpace(name)
-			unicommon.Log.Info("%s currentColorSpace=%#q", h, currentColorSpace)
+			_, currentColorSpace, currentSeparate, _ = page.GetColorSpace(name)
+			unicommon.Log.Info("%s currentColorSpace=%#q currentSeparate=%t",
+				h, currentColorSpace, currentSeparate)
 			switch currentColorSpace {
-			case "DeviceRGB":
+			case "DeviceRGB", "DeviceCMYK":
 				unicommon.Log.Info("### %s: name=%#q", h, name)
 				if err = op.SetNameParam("DeviceGray"); err != nil {
 					return err
@@ -471,15 +478,34 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc_ string,
 			}
 			xobjImgs = append(xobjImgs, name)
 		case "sc", "SC", "scn", "SCN":
-			unicommon.Log.Info("#@: %s currentColorSpace=%#q", h, currentColorSpace)
-			switch currentColorSpace {
-			case "DeviceRGB":
-				if vals, err = op.GetFloatParams(3); err != nil {
+			unicommon.Log.Info("#@: %s currentColorSpace=%#q currentSeparate=%t",
+				h, currentColorSpace, currentSeparate)
+			if currentSeparate {
+				if vals, err = op.GetFloatParams(1); err != nil {
 					return err
 				}
 				unicommon.Log.Info("#!# %s: vals=%v", h, vals)
-				if err = op.SetOpFloatParams(op.Operand, []float64{rgbToGray(vals)}); err != nil {
+				if err = op.SetOpFloatParams(op.Operand, []float64{1.0 - vals[0]}); err != nil {
 					return err
+				}
+			} else {
+				switch currentColorSpace {
+				case "DeviceRGB":
+					if vals, err = op.GetFloatParams(3); err != nil {
+						return err
+					}
+					unicommon.Log.Info("#!# %s: vals=%v", h, vals)
+					if err = op.SetOpFloatParams(op.Operand, []float64{rgbToGray(vals)}); err != nil {
+						return err
+					}
+				case "DeviceCMKY":
+					if vals, err = op.GetFloatParams(4); err != nil {
+						return err
+					}
+					unicommon.Log.Info("#!^ %s: vals=%v", h, vals)
+					if err = op.SetOpFloatParams(op.Operand, []float64{cmykToGray(vals)}); err != nil {
+						return err
+					}
 				}
 			}
 		case "rg", "RG":
@@ -502,7 +528,7 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc_ string,
 	}
 
 	for _, name := range xobjCSs {
-		colorSpace, alternate, err := page.GetColorSpace(name)
+		colorSpace, alternate, _, err := page.GetColorSpace(name)
 		if err != nil {
 			return err
 		}
@@ -725,7 +751,8 @@ func runGhostscript(pdf, outputDir string, grayscale bool) error {
 		"-dNOPAUSE",
 		"-r150",
 		fmt.Sprintf("-sDEVICE=%s", pngDevices[grayscale]),
-		"-dTextAlphaBits=4",
+		"-dTextAlphaBits=1",
+		"-dGraphicsAlphaBits=1",
 		output,
 		pdf)
 	unicommon.Log.Debug("runGhostscript: cmd=%#q", cmd.Args)
@@ -867,7 +894,7 @@ func meanFloatSlice(vals []float64) float64 {
 
 // isPdfColor returns true if PDF files `path` has color marks on any page
 // If `keep` is true then the page rasters are retained
-func isPdfColor(path, temp string, keep bool) (bool, error) {
+func isPdfColor(path, temp string, showPages, keep bool) (bool, []int, error) {
 	dir := filepath.Join(temp, "color")
 	err := os.MkdirAll(dir, 0777)
 	if err != nil {
@@ -879,15 +906,16 @@ func isPdfColor(path, temp string, keep bool) (bool, error) {
 
 	err = runGhostscript(path, dir, false)
 	if err != nil {
-		return false, err
+		return false, nil, err
+	}
+
+	if !showPages {
+		colorPages, err := colorDirectoryPages("*.png", dir)
+		return len(colorPages) > 0, colorPages, err
 	}
 
 	isColor, err := isColorDirectory("*.png", dir)
-	if err != nil {
-		return false, err
-	}
-
-	return isColor, nil
+	return isColor, nil, err
 }
 
 // isColorDirectory returns true if any of the image files that match `mask` in directories `dir`
@@ -909,8 +937,88 @@ func isColorDirectory(mask, dir string) (bool, error) {
 	return false, nil
 }
 
+// isColorDirectory returns lists pages  the image files that match `mask` in directories `dir`
+// that have any color pixels. It
+func colorDirectoryPages(mask, dir string) ([]int, error) {
+	pattern := filepath.Join(dir, mask)
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		unicommon.Log.Error("isColorDirectory: Glob failed. pattern=%#q err=%v", pattern, err)
+		return nil, err
+	}
+
+	colorPages := []int{}
+	for i, path := range files {
+		color, err := isColorImage(path)
+		if err != nil {
+			return colorPages, err
+		}
+		if color {
+			colorPages = append(colorPages, i)
+		}
+	}
+	return colorPages, nil
+}
+
 // isColorImage returns true if image file `path` contains color
 func isColorImage(path string) (bool, error) {
+	img, err := readImage(path)
+	if err != nil {
+		return false, err
+	}
+	isColor := imgIsColor(img)
+	if isColor {
+		markedPath := fmt.Sprintf("%s.marked.png", path)
+		markedImg := imgMarkColor(img)
+		if err := writeImage(markedPath, markedImg); err != nil {
+			return isColor, err
+		}
+	}
+	return isColor, nil
+}
+
+// imgIsColor returns true if image `img` contains color
+func imgIsColor(img image.Image) bool {
+	w, h := img.Bounds().Max.X, img.Bounds().Max.Y
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			r, g, b, _ := img.At(x, y).RGBA()
+			rg := int(r) - int(g)
+			gb := int(g) - int(b)
+			if rg < 0 {
+				rg = -rg
+			}
+			if gb < 0 {
+				gb = -gb
+			}
+			if rg+gb > 4*255 {
+				// if r != g || g != b {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func imgMarkColor(imgIn image.Image) image.Image {
+	img := image.NewNRGBA(imgIn.Bounds())
+	black := color.RGBA{0, 0, 0, 255}
+	// white := color.RGBA{255, 255, 255, 255}
+	w, h := img.Bounds().Max.X, img.Bounds().Max.Y
+	for x := 0; x < w; x++ {
+		for y := 0; y < h; y++ {
+			r, g, b, _ := imgIn.At(x, y).RGBA()
+			if r != g || g != b {
+				img.Set(x, y, black)
+				// unicommon.Log.Error("^^^ (%d, %d) %d %d %d", x, y, r, g, b)
+			}
+		}
+	}
+	return img
+}
+
+// isColorImage returns true if image file `path` contains color
+func showColorImage(path string) (bool, error) {
 	img, err := readImage(path)
 	if err != nil {
 		return false, err
@@ -939,6 +1047,18 @@ func readImage(path string) (image.Image, error) {
 
 	img, _, err := image.Decode(f)
 	return img, err
+}
+
+// readImage reads image file `path` and returns its contents as an Image.
+func writeImage(path string, img image.Image) error {
+	f, err := os.Create(path)
+	if err != nil {
+		unicommon.Log.Error("writeImage: Could not create file. path=%#q err=%v", path, err)
+		return err
+	}
+	defer f.Close()
+
+	return png.Encode(f, img)
 }
 
 // makeUniqueDir creates a new directory inside `baseDir`
