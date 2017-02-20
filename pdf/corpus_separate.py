@@ -85,7 +85,13 @@ color_files = {row.name for row in trBody if row.colorIn}
 fail_files = {row.name for row in trBody if (row.colorIn and row.colorOut)}
 success_files = all_files - fail_files
 img_xobj_files = {row.name for row in trBody if row.image_xobj > 0}
+img1_files = {row.name for row in trBody if row.image_xobj == 1}
+name_pages = {row.name: (row.numPages, row.duration) for row in trBody}
 
+color_fail_img1_files = list(color_files & fail_files & img1_files)
+color_fail_img1_files.sort(key=lambda s: name_pages[s])
+for i, name in enumerate(color_fail_img1_files):
+    print('%4d: %-20s %s' % (i, name, name_pages[name]))
 
 basedir = 'test.corpus.new'
 colordirs = {
