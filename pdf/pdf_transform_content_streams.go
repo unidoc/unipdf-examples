@@ -248,9 +248,9 @@ func main() {
 					unicommon.Log.Error("Output PDF is color.\n\tinputPath=%#q\n\toutputPath=%#q",
 						inputPath, outputPath)
 					unicommon.Log.Error("isPdfColor: %d Color pages", len(colorPagesOut))
-					for _, p := range colorPagesOut {
-						unicommon.Log.Error("isPdfColor: page %d", p)
-					}
+					// for _, p := range colorPagesOut {
+					// 	unicommon.Log.Error("isPdfColor: page %d", p)
+					// }
 				}
 				failFiles = append(failFiles, inputPath)
 				if runAllTests {
@@ -368,7 +368,7 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms,
 	// 	fmt.Fprintf(os.Stderr, "%#15q: %d\n", k, v)
 	// }
 
-	unicommon.Log.Error("$$$ xobjectStats=%+v", xobjectStats)
+	// unicommon.Log.Error("$$$ xobjectStats=%+v", xobjectStats)
 	return numPages, nil
 }
 
@@ -475,8 +475,22 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc_ string,
 			xobjCSs = append(xobjCSs, name)
 
 			_, currentColorSpace, currentSeparate, _ = page.GetColorSpace(name)
+			// if currentColorSpace == "Pattern" {
+			// 	if err = op.SetNameParam("DeviceGray"); err != nil {
+			// 		return err
+			// 	}
+			// 	currentColorSpace = "DeviceGray"
+			// 	unicommon.Log.Info("##$ %s: ", op)
+			// }
 			unicommon.Log.Info("%s currentColorSpace=%#q currentSeparate=%t",
 				h, currentColorSpace, currentSeparate)
+			if currentSeparate {
+				unicommon.Log.Info("#^# %s: name=%#q", h, name)
+				if err = op.SetNameParam("DeviceGray"); err != nil {
+					return err
+				}
+				unicommon.Log.Info("#@! %s: ", op)
+			}
 			switch currentColorSpace {
 			case "DeviceRGB", "DeviceCMYK":
 				unicommon.Log.Info("### %s: name=%#q", h, name)
@@ -980,14 +994,14 @@ func colorDirectoryPages(mask, dir string, keep bool) ([]int, error) {
 		}
 		// unicommon.Log.Error("isColorDirectory:  path=%#q", path)
 		isColor, err := isColorImage(path, keep)
-		unicommon.Log.Error("isColorDirectory: isColor=%t path=%#q", isColor, path)
+		// unicommon.Log.Error("isColorDirectory: isColor=%t path=%#q", isColor, path)
 		if err != nil {
 			panic(err)
 			return colorPages, err
 		}
 		if isColor {
 			colorPages = append(colorPages, pageNum)
-			unicommon.Log.Error("isColorDirectory: colorPages=%d %d", len(colorPages), colorPages)
+			// unicommon.Log.Error("isColorDirectory: colorPages=%d %d", len(colorPages), colorPages)
 		}
 	}
 	return colorPages, nil
@@ -1008,6 +1022,8 @@ func isColorImage(path string, keep bool) (bool, error) {
 	}
 	return isColor, err
 }
+
+const colorThreshold = 4 * 255
 
 // imgIsColor returns true if image `img` contains color
 func imgIsColor(img image.Image) bool {
@@ -1040,7 +1056,15 @@ func imgMarkColor(imgIn image.Image) image.Image {
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
 			r, g, b, _ := imgIn.At(x, y).RGBA()
-			if r != g || g != b {
+			rg := int(r) - int(g)
+			gb := int(g) - int(b)
+			if rg < 0 {
+				rg = -rg
+			}
+			if gb < 0 {
+				gb = -gb
+			}
+			if rg+gb > 4*255 {
 				img.Set(x, y, black)
 				// unicommon.Log.Error("^^^ (%d, %d) %d %d %d", x, y, r, g, b)
 			}

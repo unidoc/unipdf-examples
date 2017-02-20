@@ -100,21 +100,24 @@ xobjdirs = {
 print('colordirs=%s %d' % (dict_counts(colordirs), num_values(colordirs)))
 print('xobjdirs=%s %d' % (dict_counts(xobjdirs), num_values(xobjdirs)))
 
+do_write = False
 name_dir = {}
 print('Results match')
-for dc in colordirs:
-    for dx in xobjdirs:
+for dc in sorted(colordirs):
+    for dx in sorted(xobjdirs):
         dcx = os.path.join(basedir, dc, dx)
         match_names = colordirs[dc] & xobjdirs[dx]
         for name in match_names:
             name_dir[name] = dcx
         print('%4d [%d pass + %d fail] "%s"' % (len(match_names), len(match_names & success_files),
-                                      len(match_names & fail_files), dcx))
-        makedir(dcx)
+                                                len(match_names & fail_files), dcx))
+        if do_write:
+            makedir(dcx)
 
 
 dir_other = os.path.join(basedir, 'other')
-makedir(dir_other)
+if do_write:
+    makedir(dir_other)
 
 
 path_list = [path for a in sys.argv[1:] for path in glob(a)]
@@ -128,7 +131,8 @@ for path in path_list:
     assert dest.lower() != path.lower()
     dest_count[dest_dir] += 1
     # print('%50s => %s' % (name, dest))
-    shutil.copyfile(path, dest)
+    if do_write:
+        shutil.copyfile(path, dest)
 
 print('Files copied. Total = %d' % len(path_list))
 for dest in sorted(dest_count):
