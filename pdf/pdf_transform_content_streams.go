@@ -86,6 +86,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"sort"
 	"strconv"
@@ -130,7 +131,7 @@ var identityThreshold = imageThreshold{
 }
 
 var testStats = statistics{
-	enabled:        false,
+	enabled:        true,
 	testResultPath: "xform.test.results.csv",
 	imageInfoPath:  "xform.image.info.csv",
 }
@@ -227,12 +228,15 @@ func main() {
 		if doGrayscaleTransform {
 			isColorIn, _, err := isPdfColor(inputPath, compDir, false, keep)
 			isColorOut, colorPagesOut, err := isPdfColor(outputPath, compDir, true, keep)
+
 			e := testResult{
 				name:     path.Base(inputPath),
 				colorIn:  isColorIn,
 				colorOut: isColorOut,
 				numPages: numPages,
 				duration: dt.Seconds(),
+				xobjImg:  xobjectStats["Image"],
+				xobjForm: xobjectStats["Form"],
 			}
 			testStats.addTestResult(e, true)
 
@@ -245,7 +249,7 @@ func main() {
 						inputPath, outputPath)
 					unicommon.Log.Error("isPdfColor: %d Color pages", len(colorPagesOut))
 					for _, p := range colorPagesOut {
-						unicommon.Log.Error("isPdfColor: page %d", p+1)
+						unicommon.Log.Error("isPdfColor: page %d", p)
 					}
 				}
 				failFiles = append(failFiles, inputPath)
@@ -292,9 +296,12 @@ func main() {
 	printOpCounts("all operation in PDF", allOpCounts)
 }
 
+var xobjectStats map[string]int
+
 // transformPdfFile transforms PDF `inputPath` and writes the resulting PDF to `outputPath`
 // If `noContentTransforms` is true then stream contents are not parsed
-func transformPdfFile(inputPath, outputPath string, noContentTransforms, doGrayscaleTransform bool) (int, error) {
+func transformPdfFile(inputPath, outputPath string, noContentTransforms,
+	doGrayscaleTransform bool) (int, error) {
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return 0, err
@@ -324,10 +331,16 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms, doGrays
 
 	pdfWriter := unipdf.NewPdfWriter()
 
+	xobjectStats = map[string]int{}
+
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
 		page := pdfReader.PageList[i]
-		unicommon.Log.Debug("^^^^ page %d=%s", pageNum, page.String())
+		unicommon.Log.Debug("^^^^page %d=%s", pageNum, page.String())
+		for t, n := range page.XobjectStats() {
+			// m := xobjectStats[t]
+			xobjectStats[t] = n + xobjectStats[t]
+		}
 
 		if !noContentTransforms {
 			err = transformPageContents(page, inputPath, pageNum, doGrayscaleTransform)
@@ -355,6 +368,7 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms, doGrays
 	// 	fmt.Fprintf(os.Stderr, "%#15q: %d\n", k, v)
 	// }
 
+	unicommon.Log.Error("$$$ xobjectStats=%+v", xobjectStats)
 	return numPages, nil
 }
 
@@ -734,11 +748,17 @@ func pdfsEqual(path1, path2 string, threshold imageThreshold,
 	return equal, false, nil
 }
 
+var (
+	gsImageFormat  = "doc-%03d.png"
+	gsImagePattern = `doc-(\d+).png$`
+	gsImageRegex   = regexp.MustCompile(gsImagePattern)
+)
+
 // runGhostscript runs Ghostscript on file `pdf` to create file one png file per page in directory
 // `outputDir`
 func runGhostscript(pdf, outputDir string, grayscale bool) error {
 	unicommon.Log.Debug("runGhostscript: pdf=%#q outputDir=%#q", pdf, outputDir)
-	outputPath := filepath.Join(outputDir, "doc-%03d.png")
+	outputPath := filepath.Join(outputDir, gsImageFormat)
 	output := fmt.Sprintf("-sOutputFile=%s", outputPath)
 	pngDevices := map[bool]string{
 		false: "png16m",
@@ -909,8 +929,8 @@ func isPdfColor(path, temp string, showPages, keep bool) (bool, []int, error) {
 		return false, nil, err
 	}
 
-	if !showPages {
-		colorPages, err := colorDirectoryPages("*.png", dir)
+	if showPages {
+		colorPages, err := colorDirectoryPages("*.png", dir, keep)
 		return len(colorPages) > 0, colorPages, err
 	}
 
@@ -929,7 +949,7 @@ func isColorDirectory(mask, dir string) (bool, error) {
 	}
 
 	for _, path := range files {
-		isColor, err := isColorImage(path)
+		isColor, err := isColorImage(path, false)
 		if isColor || err != nil {
 			return isColor, err
 		}
@@ -937,9 +957,9 @@ func isColorDirectory(mask, dir string) (bool, error) {
 	return false, nil
 }
 
-// isColorDirectory returns lists pages  the image files that match `mask` in directories `dir`
-// that have any color pixels. It
-func colorDirectoryPages(mask, dir string) ([]int, error) {
+// colorDirectoryPages returns a lists of the page numbers of the image files that match `mask` in
+// directories `dir` that have any color pixels.
+func colorDirectoryPages(mask, dir string, keep bool) ([]int, error) {
 	pattern := filepath.Join(dir, mask)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
@@ -948,33 +968,45 @@ func colorDirectoryPages(mask, dir string) ([]int, error) {
 	}
 
 	colorPages := []int{}
-	for i, path := range files {
-		color, err := isColorImage(path)
+	for _, path := range files {
+		matches := gsImageRegex.FindStringSubmatch(path)
+		if len(matches) == 0 {
+			continue
+		}
+		pageNum, err := strconv.Atoi(matches[1])
 		if err != nil {
+			panic(err)
 			return colorPages, err
 		}
-		if color {
-			colorPages = append(colorPages, i)
+		// unicommon.Log.Error("isColorDirectory:  path=%#q", path)
+		isColor, err := isColorImage(path, keep)
+		unicommon.Log.Error("isColorDirectory: isColor=%t path=%#q", isColor, path)
+		if err != nil {
+			panic(err)
+			return colorPages, err
+		}
+		if isColor {
+			colorPages = append(colorPages, pageNum)
+			unicommon.Log.Error("isColorDirectory: colorPages=%d %d", len(colorPages), colorPages)
 		}
 	}
 	return colorPages, nil
 }
 
 // isColorImage returns true if image file `path` contains color
-func isColorImage(path string) (bool, error) {
+func isColorImage(path string, keep bool) (bool, error) {
 	img, err := readImage(path)
 	if err != nil {
 		return false, err
 	}
 	isColor := imgIsColor(img)
-	if isColor {
+	if isColor && keep {
 		markedPath := fmt.Sprintf("%s.marked.png", path)
+		unicommon.Log.Error("isColorImage: Saving markedPath=%#q", markedPath)
 		markedImg := imgMarkColor(img)
-		if err := writeImage(markedPath, markedImg); err != nil {
-			return isColor, err
-		}
+		err = writeImage(markedPath, markedImg)
 	}
-	return isColor, nil
+	return isColor, err
 }
 
 // imgIsColor returns true if image `img` contains color
@@ -1154,13 +1186,13 @@ func (s *statistics) load() error {
 		s.addTestResult(e, true)
 	}
 
-	imageInfoList, err := imageInfoRead(s.imageInfoPath)
-	if err != nil {
-		return err
-	}
-	for _, e := range imageInfoList {
-		s.addImageInfo(e, true)
-	}
+	// imageInfoList, err := imageInfoRead(s.imageInfoPath)
+	// if err != nil {
+	// 	return err
+	// }
+	// for _, e := range imageInfoList {
+	// 	s.addImageInfo(e, true)
+	// }
 
 	return nil
 }
@@ -1169,12 +1201,12 @@ func (s *statistics) save() error {
 	if !s.enabled {
 		return nil
 	}
-	err1 := testResultWrite(s.testResultPath, s.testResultList)
-	err2 := imageInfoWrite(s.imageInfoPath, s.imageInfoList)
-	if err1 != nil {
-		return err1
-	}
-	return err2
+	return testResultWrite(s.testResultPath, s.testResultList)
+	// err2 := imageInfoWrite(s.imageInfoPath, s.imageInfoList)
+	// if err1 != nil {
+	// 	return err1
+	// }
+	// return err2
 }
 
 func (s *statistics) addTestResult(e testResult, force bool) {
@@ -1214,6 +1246,8 @@ type testResult struct {
 	colorOut bool
 	numPages int
 	duration float64
+	xobjImg  int
+	xobjForm int
 }
 
 type imageInfo struct {
@@ -1255,6 +1289,8 @@ func testResultRead(path string) ([]testResult, error) {
 			colorOut: toBool(row[2]),
 			numPages: toInt(row[3]),
 			duration: toFloat(row[4]),
+			xobjImg:  toInt(row[5]),
+			xobjForm: toInt(row[6]),
 		}
 		results = append(results, e)
 	}
@@ -1269,7 +1305,8 @@ func testResultWrite(path string, results []testResult) error {
 	defer f.Close()
 	w := csv.NewWriter(f)
 
-	if err := w.Write([]string{"name", "colorIn", "colorOut", "numPages", "duration"}); err != nil {
+	if err := w.Write([]string{"name", "colorIn", "colorOut", "numPages", "duration",
+		"image xobj", "form xobj"}); err != nil {
 		return err
 	}
 	for i, e := range results {
@@ -1279,6 +1316,8 @@ func testResultWrite(path string, results []testResult) error {
 			fmt.Sprintf("%t", e.colorOut),
 			fmt.Sprintf("%d", e.numPages),
 			fmt.Sprintf("%.3f", e.duration),
+			fmt.Sprintf("%d", e.xobjImg),
+			fmt.Sprintf("%d", e.xobjForm),
 		}
 		if err := w.Write(row); err != nil {
 			unicommon.Log.Error("testResultWrite: Error writing record. i=%d path=%#q err=%v",
@@ -1290,77 +1329,77 @@ func testResultWrite(path string, results []testResult) error {
 	return w.Error()
 }
 
-func imageInfoRead(path string) ([]imageInfo, error) {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return []imageInfo{}, nil
-	}
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	r := csv.NewReader(f)
+// func imageInfoRead(path string) ([]imageInfo, error) {
+// 	if _, err := os.Stat(path); os.IsNotExist(err) {
+// 		return []imageInfo{}, nil
+// 	}
+// 	f, err := os.Open(path)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	defer f.Close()
+// 	r := csv.NewReader(f)
 
-	results := []imageInfo{}
-	for i := 0; ; i++ {
-		row, err := r.Read()
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			unicommon.Log.Error("imageInfoRead: i=%d err=%v", i, err)
-			return results, err
-		}
-		if i == 0 {
-			continue
-		}
-		e := imageInfo{
-			fileName:   row[0],
-			pageNum:    toInt(row[1]),
-			xobjName:   row[2],
-			length:     toInt(row[3]),
-			filter1:    row[4],
-			filter2:    row[5],
-			colorSpace: row[6],
-		}
-		results = append(results, e)
-	}
-	return results, nil
-}
+// 	results := []imageInfo{}
+// 	for i := 0; ; i++ {
+// 		row, err := r.Read()
+// 		if err == io.EOF {
+// 			break
+// 		} else if err != nil {
+// 			unicommon.Log.Error("imageInfoRead: i=%d err=%v", i, err)
+// 			return results, err
+// 		}
+// 		if i == 0 {
+// 			continue
+// 		}
+// 		e := imageInfo{
+// 			fileName:   row[0],
+// 			pageNum:    toInt(row[1]),
+// 			xobjName:   row[2],
+// 			length:     toInt(row[3]),
+// 			filter1:    row[4],
+// 			filter2:    row[5],
+// 			colorSpace: row[6],
+// 		}
+// 		results = append(results, e)
+// 	}
+// 	return results, nil
+// }
 
-func imageInfoWrite(path string, results []imageInfo) error {
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0777)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	w := csv.NewWriter(f)
+// func imageInfoWrite(path string, results []imageInfo) error {
+// 	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0777)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer f.Close()
+// 	w := csv.NewWriter(f)
 
-	if err := w.Write([]string{"fileName", "pageNum", "xobjName", "length",
-		"filter1", "filter2", "colorSpace"}); err != nil {
-		return err
-	}
-	for i, e := range results {
-		if len(e.xobjName) == 0 {
-			panic("YYYY")
-		}
-		row := []string{
-			e.fileName,
-			fmt.Sprintf("%d", e.pageNum),
-			e.xobjName,
-			fmt.Sprintf("%d", e.length),
-			e.filter1,
-			e.filter2,
-			e.colorSpace,
-		}
-		if err := w.Write(row); err != nil {
-			unicommon.Log.Error("testResultWrite: Error writing record. i=%d path=%#q err=%v",
-				i, path, err)
-		}
-	}
+// 	if err := w.Write([]string{"fileName", "pageNum", "xobjName", "length",
+// 		"filter1", "filter2", "colorSpace"}); err != nil {
+// 		return err
+// 	}
+// 	for i, e := range results {
+// 		if len(e.xobjName) == 0 {
+// 			panic("YYYY")
+// 		}
+// 		row := []string{
+// 			e.fileName,
+// 			fmt.Sprintf("%d", e.pageNum),
+// 			e.xobjName,
+// 			fmt.Sprintf("%d", e.length),
+// 			e.filter1,
+// 			e.filter2,
+// 			e.colorSpace,
+// 		}
+// 		if err := w.Write(row); err != nil {
+// 			unicommon.Log.Error("testResultWrite: Error writing record. i=%d path=%#q err=%v",
+// 				i, path, err)
+// 		}
+// 	}
 
-	w.Flush()
-	return w.Error()
-}
+// 	w.Flush()
+// 	return w.Error()
+// }
 
 func toBool(s string) bool {
 	return strings.ToLower(strings.TrimSpace(s)) == "true"

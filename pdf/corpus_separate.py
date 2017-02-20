@@ -20,12 +20,27 @@ import sys
 import os
 import csv
 import shutil
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from glob import glob
 
 
-testResultPath = "xform.test.results.csv"
-imageInfoPath = "xform.image.info.csv"
+def dict_counts(a_dict):
+    return {k: len(v) for k, v in a_dict.items()}
+
+
+def num_values(a_dict):
+    return sum(len(v) for v in a_dict.values())
+
+
+def toBool(s):
+    return s.strip().lower() == 'true'
+
+
+def makedir(a_dir):
+    try:
+        os.makedirs(a_dir)
+    except:
+        pass
 
 
 def read_csv(path):
@@ -36,74 +51,85 @@ def read_csv(path):
     return header, body
 
 
+
+testResultPath = "xform.test.results.csv"
+imageInfoPath = "xform.image.info.csv"
 trHeader, trBody = read_csv(testResultPath)
-iiHeader, iiBody = read_csv(imageInfoPath)
 
+key_type_list = [
+    ('name', str),
+    ('colorIn', toBool),
+    ('colorOut', toBool),
+    ('numPages', int),
+    ('duration', float),
+    ('image_xobj', int),
+    ('form_xobj', int)
+]
+types = dict(key_type_list)
+
+key_list = [key for key, _ in key_type_list]
+header = [key.replace(' ', '_') for key in trHeader]
+column_key = {header.index(key): key for key in key_list}
+print('column_key=%s' % column_key)
+column_type = {col: types[key] for col, key in column_key.items()}
+print('column_type=%s' % column_type)
+Result = namedtuple('Result', key_list)
+
+print(trHeader)
 print('%s: %d %dx%d %s' % (testResultPath, len(trHeader), len(trBody), len(trBody[0]), trHeader))
-print('%s: %d %dx%d %s' % (imageInfoPath, len(iiHeader), len(iiBody), len(iiBody[0]), iiHeader))
 
-all_files = [row[0] for row in trBody]
-color_files = [row[0] for row in trBody if row[1] == 'true']
-fail_files = [row[0] for row in trBody if row[1] == 'true' and row[2] == 'true']
+trBody = [Result(*[column_type[i](x) for i, x in enumerate(row)]) for row in trBody]
 
-
-# name_encoding = {name: [encodings]} : name ∈ all files in corpus
-# name_colorspace = {name: [color spaces]} : name ∈ all files in corpus
-name_encoding = defaultdict(set)
-name_colorspace = defaultdict(set)
-for name, _, _, _, encoding1, encoding2, colorspace in iiBody:
-    if encoding1:
-        name_encoding[name].add(encoding1)
-    if encoding2:
-        name_encoding[name].add(encoding2)
-    if not encoding1 and not encoding2:
-        name_encoding[name].add('[No encoding]')
-    if colorspace == '':
-        colorspace = '[No colorspace]'
-    name_colorspace[name].add(colorspace)
+all_files = {row.name for row in trBody}
+color_files = {row.name for row in trBody if row.colorIn}
+fail_files = {row.name for row in trBody if (row.colorIn and row.colorOut)}
+success_files = all_files - fail_files
+img_xobj_files = {row.name for row in trBody if row.image_xobj > 0}
 
 
-NO_XOBJ = '[No XObjects]'
-
-# Mark files that don't contain image XObjects
-for name in all_files:
-    e = name in name_encoding
-    c = name in name_colorspace
-    assert e == c, (name, e, c)
-    if not e:
-        name_encoding[name].add(NO_XOBJ)
-        name_colorspace[name].add(NO_XOBJ)
-
-# Files that contain image XObjects
-xobj_files = [name for name in all_files if NO_XOBJ not in name_encoding[name]]
-
-
-path_list = [path for a in sys.argv[1:] for path in glob(a)]
-path_list = sorted(set(path_list))
-
-basedir = 'test.corpus'
+basedir = 'test.corpus.new'
 colordirs = {
     'color': set(color_files),
     'gray': set(all_files) - set(color_files)
 }
 xobjdirs = {
-    'xobj': set(xobj_files),
-    'no.xobj': set(all_files) - set(xobj_files)
+    'xobj': set(img_xobj_files),
+    'no.xobj': set(all_files) - set(img_xobj_files)
 }
 
+print('colordirs=%s %d' % (dict_counts(colordirs), num_values(colordirs)))
+print('xobjdirs=%s %d' % (dict_counts(xobjdirs), num_values(xobjdirs)))
+
+name_dir = {}
+print('Results match')
 for dc in colordirs:
     for dx in xobjdirs:
         dcx = os.path.join(basedir, dc, dx)
         match_names = colordirs[dc] & xobjdirs[dx]
-        print('Copying %d files to %s' % (len(match_names), dcx))
-        try:
-            os.makedirs(dcx)
-        except:
-            pass
+        for name in match_names:
+            name_dir[name] = dcx
+        print('%4d [%d pass + %d fail] "%s"' % (len(match_names), len(match_names & success_files),
+                                      len(match_names & fail_files), dcx))
+        makedir(dcx)
 
-        for path in path_list:
-            name = os.path.basename(path)
-            if name not in match_names:
-                continue
-            dest = os.path.join(dcx, name)
-            shutil.copyfile(path, dest)
+
+dir_other = os.path.join(basedir, 'other')
+makedir(dir_other)
+
+
+path_list = [path for a in sys.argv[1:] for path in glob(a)]
+path_list = sorted(set(path_list))
+
+dest_count = defaultdict(int)
+for path in path_list:
+    name = os.path.basename(path)
+    dest_dir = name_dir.get(name, dir_other)
+    dest = os.path.join(dest_dir, name)
+    assert dest.lower() != path.lower()
+    dest_count[dest_dir] += 1
+    # print('%50s => %s' % (name, dest))
+    shutil.copyfile(path, dest)
+
+print('Files copied. Total = %d' % len(path_list))
+for dest in sorted(dest_count):
+     print('%4d "%s"' % (dest_count[dest], dest))
