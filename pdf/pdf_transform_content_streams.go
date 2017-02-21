@@ -458,28 +458,55 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 	return err
 }
 
+type graphicState struct {
+	colorSpace   string
+	isSeparation bool
+}
+
+type graphicStateStack []graphicState
+
+func (gsStack *graphicStateStack) push(colorSpace string, isSeparation bool) {
+	gs := graphicState{colorSpace, isSeparation}
+	*gsStack = append(*gsStack, gs)
+	unicommon.Log.Debug("gsStack=%d", len(*gsStack))
+}
+
+func (gsStack *graphicStateStack) pop() (colorSpace string, isSeparation bool) {
+	unicommon.Log.Debug("gsStack=%d", len(*gsStack))
+	gs := (*gsStack)[len(*gsStack)-1]
+	*gsStack = (*gsStack)[:len(*gsStack)-1]
+	return gs.colorSpace, gs.isSeparation
+}
+
 // transformColorToGrayscale transforms color pages to grayscale
 func transformColorToGrayscale_(page *unipdf.PdfPage, desc_ string,
 	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
 
 	stackDepth++
 	defer func() { stackDepth-- }()
-	rubric := fmt.Sprintf("transformColorToGrayscale: <%d> %s.", stackDepth, desc_)
+	rubric := fmt.Sprintf("<%d> %s.", stackDepth, desc_)
 	unicommon.Log.Info("****%s", rubric)
 
 	xobjImgs := []string{}
 	xobjCSs := []string{}
 
+	gsStack := graphicStateStack{}
 	currentColorSpace := "DeviceGray"
 	currentSeparate := false
 
-	for _, op := range *pOperations {
-		h := fmt.Sprintf("%s op=%s", rubric, op)
+	for i, op := range *pOperations {
+		h := fmt.Sprintf("%s i=%d op=%s", rubric, i, op)
+		unicommon.Log.Debug("*$@ %s", h)
 		var vals []float64
 		switch op.Operand {
+		case "q":
+			gsStack.push(currentColorSpace, currentSeparate)
+		case "Q":
+			currentColorSpace, currentSeparate = gsStack.pop()
 		case "cs", "CS":
 			name, err := op.GetNameParam()
 			if err != nil {
+				panic(err)
 				return err
 			}
 			xobjCSs = append(xobjCSs, name)
@@ -492,8 +519,8 @@ func transformColorToGrayscale_(page *unipdf.PdfPage, desc_ string,
 			// 	currentColorSpace = "DeviceGray"
 			// 	unicommon.Log.Info("##$ %s: ", op)
 			// }
-			unicommon.Log.Info("%s currentColorSpace=%#q currentSeparate=%t",
-				h, currentColorSpace, currentSeparate)
+			unicommon.Log.Info("%s ^&! name=%#q currentColorSpace=%#q currentSeparate=%t",
+				h, name, currentColorSpace, currentSeparate)
 			if currentSeparate {
 				unicommon.Log.Info("#^# %s: name=%#q", h, name)
 				if err = op.SetNameParam("DeviceGray"); err != nil {
@@ -1474,8 +1501,8 @@ func getOpCounts(operations []*unipdf.ContentStreamOperation) map[string]int {
 
 func printOperations(description string, operations []*unipdf.ContentStreamOperation) {
 	fmt.Printf("%d operations --------^^^--------%#q\n", len(operations), description)
-	for _, op := range operations {
-		fmt.Printf("\t%s\n", op)
+	for i, op := range operations {
+		fmt.Printf("%8d: %s\n", i, op)
 	}
 }
 

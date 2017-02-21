@@ -1,24 +1,24 @@
 name,colorIn,colorOut,numPages,duration,image xobj,form xobj
 frege.pdf,true,true,14,0.185,2,2
 legal_pages7_color3.pdf,true,false,7,0.004,0,0
-cmyk.pdf,true,false,9,0.005,0,0
+cmyk.pdf,true,false,9,0.004,0,0
 WEIß_pages6_color4.pdf,true,false,6,0.004,0,0
-lines.pdf,true,false,20,0.011,0,0
-English Report.pdf,true,false,16,0.008,0,0
-Sunday 2016 team Fixtures.pdf,true,false,12,0.125,0,0
-ACS4PartnerQuotes.pdf,true,false,2,0.017,0,0
+lines.pdf,true,false,20,0.010,0,0
+English Report.pdf,true,false,16,0.006,0,0
+Sunday 2016 team Fixtures.pdf,true,false,12,0.094,0,0
+ACS4PartnerQuotes.pdf,true,false,2,0.025,0,0
 dense2_lines.pdf,true,false,3,0.250,0,0
 ColourNaming.pdf,false,false,12,0.083,0,0
 killer_modelling.pdf,true,false,5,0.157,0,0
-blank.pdf,false,false,1,0.001,0,0
-convoluted_line.pdf,false,false,1,0.002,0,0
-fonts_in_form_xobject.pdf,false,false,1,0.003,0,1
-202 moot.pdf,false,false,2,0.021,0,0
-word_bmp.pdf,false,false,1,0.066,1,0
-word_jpeg_grayscale.pdf,false,false,1,0.063,1,0
-pdl.pdf,false,false,1,0.025,1,0
-pre-algebra_translate.pdf,true,false,2,0.016,4,0
-Jedi.pdf,true,true,1,0.035,1,0
+blank.pdf,false,false,1,0.002,0,0
+convoluted_line.pdf,false,false,1,0.004,0,0
+fonts_in_form_xobject.pdf,false,false,1,0.004,0,1
+202 moot.pdf,false,false,2,0.023,0,0
+word_bmp.pdf,false,false,1,0.067,1,0
+word_jpeg_grayscale.pdf,false,false,1,0.065,1,0
+pdl.pdf,false,false,1,0.023,1,0
+pre-algebra_translate.pdf,true,false,2,0.014,4,0
+Jedi.pdf,true,true,1,0.027,1,0
 rfc6962.txt.pdf,false,false,27,0.027,0,0
 kernel_trick.pdf,false,false,3,0.054,0,0
 ACFrOgCf6f4kzU-mNiolvkiOlADV6cnWfoWv_FZPB6kB4aBtGh68m8KVTc5q0t50Bian-2myr3AQvH0HLbHDFnyo3fY_BDudV1i3zI9i_g6S36lOesSvotIATPqvLF0= (1).pdf,false,false,9,0.159,9,0
@@ -167,7 +167,7 @@ l09r01.pdf,true,true,32,0.687,3,1
 sa.pdf,false,false,16,0.781,101,0
 HyperLogLog.pdf,true,false,20,0.703,0,7
 PaperCut-Professional-Services-Guide.pdf,true,true,35,0.411,69,0
-legislative-process-poster-espanol.pdf,true,true,1,0.050,1,6
+legislative-process-poster-espanol.pdf,true,true,1,0.072,1,6
 all_vs_all.pdf,true,true,7,0.241,2,0
 searchable-symmetric-encryption-elcrypt.pdf,true,true,1,0.313,7,0
 14(1).pdf,true,true,10,0.343,6,18
@@ -287,3 +287,5 @@ faa4bd35a36296305ce7e4cbbbb9d7f0a909de18.pdf,true,true,18,1.101,44,55
 Trump-Intelligence-Allegations.pdf,true,true,35,0.270,35,0
 DeepLearningBook.pdf,true,true,802,55.375,0,0
 1311.2901v3.pdf,true,true,11,27.039,100,13
+AnneMakauProfile.pdf,true,false,3,0.011,0,0
+49-7441.pdf,true,true,1,0.007,2,0
