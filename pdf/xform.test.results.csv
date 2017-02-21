@@ -1,5 +1,5 @@
 name,colorIn,colorOut,numPages,duration,image xobj,form xobj
-frege.pdf,true,true,14,0.200,2,2
+frege.pdf,true,true,14,0.185,2,2
 legal_pages7_color3.pdf,true,false,7,0.004,0,0
 cmyk.pdf,true,false,9,0.005,0,0
 WEIß_pages6_color4.pdf,true,false,6,0.004,0,0
@@ -17,17 +17,17 @@ fonts_in_form_xobject.pdf,false,false,1,0.003,0,1
 word_bmp.pdf,false,false,1,0.066,1,0
 word_jpeg_grayscale.pdf,false,false,1,0.063,1,0
 pdl.pdf,false,false,1,0.025,1,0
-pre-algebra_translate.pdf,true,false,2,0.014,4,0
-Jedi.pdf,true,true,1,0.029,1,0
+pre-algebra_translate.pdf,true,false,2,0.016,4,0
+Jedi.pdf,true,true,1,0.035,1,0
 rfc6962.txt.pdf,false,false,27,0.027,0,0
 kernel_trick.pdf,false,false,3,0.054,0,0
 ACFrOgCf6f4kzU-mNiolvkiOlADV6cnWfoWv_FZPB6kB4aBtGh68m8KVTc5q0t50Bian-2myr3AQvH0HLbHDFnyo3fY_BDudV1i3zI9i_g6S36lOesSvotIATPqvLF0= (1).pdf,false,false,9,0.159,9,0
-A Sunshine - IEP.pdf,true,true,9,0.217,8,0
-android.pdf,true,true,1,0.033,1,0
-10.235.1.2_SMTP_via_LDAP_05-16-2016_09-43-48.pdf.pdf,true,true,3,0.006,6,0
+A Sunshine - IEP.pdf,true,true,9,0.191,8,0
+android.pdf,true,false,1,0.043,1,0
+10.235.1.2_SMTP_via_LDAP_05-16-2016_09-43-48.pdf.pdf,true,true,3,0.005,6,0
 symbiosis-provocation.pdf,false,false,8,0.068,0,0
 Whitepaper-XMP-metadata-in-PDFlib-products.pdf,true,false,4,0.069,0,7
-docs.pdf,true,true,1,0.028,2,0
+docs.pdf,true,true,1,0.031,2,0
 unlexicalized-parsing.pdf,false,false,8,0.269,0,0
 blockchain_academic_verification_use_case.pdf,true,true,4,0.142,0,0
 4e.pdf,true,false,5,0.184,0,0
@@ -35,71 +35,71 @@ midtermF13secondSols.pdf,false,false,7,0.068,0,0
 pcfgs.pdf,false,false,18,0.214,0,0
 multi_string_search.pdf,false,false,22,0.087,0,0
 lexpcfgs.pdf,false,false,22,0.232,0,0
-MS Activities Term 2 2016 Letter.pdf,true,true,3,0.034,1,0
-mh-guide-matrix.pdf,true,false,1,0.108,1,0
-letter to Parents re Telstra Phone Line.pdf,true,true,1,0.021,2,0
-Doc_Test_papercut.pdf,true,true,4,0.052,2,0
+MS Activities Term 2 2016 Letter.pdf,true,true,3,0.041,1,0
+mh-guide-matrix.pdf,true,false,1,0.089,1,0
+letter to Parents re Telstra Phone Line.pdf,true,true,1,0.017,2,0
+Doc_Test_papercut.pdf,true,true,4,0.040,2,0
 ptrelnot.pdf,true,true,5,0.137,14,0
-invoice88786339.pdf,true,true,2,0.041,4,0
+invoice88786339.pdf,true,true,2,0.047,4,0
 yao1982-ocr.pdf,false,false,5,0.105,0,0
 lcs.pdf,false,false,6,0.215,0,7
 docpro07aut.pdf,true,false,16,0.233,0,0
 lec04.pdf,true,false,24,0.125,0,0
-HH factsheet.pdf,true,true,2,0.075,7,3
+HH factsheet.pdf,true,true,2,0.068,7,3
 SA_implementations.pdf,false,false,9,0.244,1,0
 fawkes.pdf,false,false,13,0.174,0,0
 lec03-sp01.pdf,true,false,5,0.103,0,0
 lm.pdf,false,false,12,0.123,0,0
 7600_Model355_ColorElectrostaticPlotter_TechnicalData_5959-9727-6pages_Jan90.pdf,false,false,6,0.007,6,0
 l1_logistic_reg_aaai.pdf,true,false,7,0.381,0,0
-ICT Parent letter 7 2016.pdf,true,true,1,0.028,3,0
+ICT Parent letter 7 2016.pdf,true,true,1,0.030,3,0
 outbreak.pdf,false,false,7,0.060,0,0
 database_03_abs.pdf,false,false,2,0.013,0,2
 recht11a.pdf,false,false,18,0.482,0,0
 mehrotra_trick_final2.pdf,false,false,15,0.232,0,0
 kuksa08nips.pdf,false,false,8,0.123,0,1
 biau08a.pdf,false,false,19,0.393,0,0
-designofasearchablesymmetrickeyciphersystem-120529001108-phpapp02.pdf,true,false,11,0.111,1,0
+designofasearchablesymmetrickeyciphersystem-120529001108-phpapp02.pdf,true,false,11,0.123,1,0
 twitter_sentimenti.pdf,true,false,7,0.112,0,6
 knn  v3.pdf,false,false,1,0.495,3,0
 Yemeni_Laws92.pdf,false,false,14,0.458,0,0
-Zendesk FAQ.pdf,true,true,3,0.128,5,1
+Zendesk FAQ.pdf,true,true,3,0.104,5,1
 batsbzx201630-20.pdf,true,false,27,0.438,0,0
 Suffix.pdf,false,false,11,0.370,0,0
 RAND_PE198.pdf,true,false,16,0.347,0,0
 SemanticStates201.pdf,true,false,17,0.433,0,0
 bitcoin.pdf,false,false,9,0.185,0,0
 nips01-discriminativegenerative.pdf,false,false,8,0.131,0,0
-Term One Sport Junior.pdf,true,false,1,0.112,2,0
+Term One Sport Junior.pdf,true,false,1,0.132,2,0
 1603.06186v2.pdf,false,false,10,0.470,0,0
 suffix-icalp03.pdf,false,false,13,0.138,0,0
 shamirturing.pdf,false,false,2,0.098,2,0
 expressions.pdf,false,false,6,0.006,7,0
 1206.6382.pdf,true,false,8,0.394,0,0
 1409.1556v6.pdf,false,false,14,0.616,0,0
-wald2002-2.pdf,true,true,35,0.906,3,0
-mcs-ensembles.pdf,true,true,15,0.232,1,0
+wald2002-2.pdf,true,true,35,1.085,3,0
+mcs-ensembles.pdf,true,false,15,0.265,1,0
 epson_pages3_color_pages1.pdf,true,false,3,0.373,0,0
 MFP Scan.pdf,true,true,1,0.003,1,0
-cure53.pdf,true,true,13,0.314,13,0
-brotli-2015-09-22.pdf,true,false,6,0.362,1,0
-CaiHof-CIKM2004.pdf,true,false,10,0.547,7,0
-250a5c08cb131c12125c916530830b6d-4836-RJASET-DOI.pdf,true,true,5,0.042,19,0
+cure53.pdf,true,false,13,0.406,13,0
+brotli-2015-09-22.pdf,true,false,6,0.423,1,0
+CaiHof-CIKM2004.pdf,true,false,10,0.693,7,0
+250a5c08cb131c12125c916530830b6d-4836-RJASET-DOI.pdf,true,true,5,0.048,19,0
 lingdet-mccs.pdf,false,false,31,0.255,9,0
 image2015-12-13-070827.pdf,false,false,2,0.004,2,0
 cst.pdf,false,false,18,0.277,7,0
 manber.pdf,false,false,11,0.248,30,0
-go.pdf,true,false,53,0.657,1,0
-word_jpeg_color.pdf,true,false,1,0.476,3,0
+go.pdf,true,false,53,0.793,1,0
+word_jpeg_color.pdf,true,false,1,0.518,3,0
 Electronic Reports.pdf,true,true,1,0.017,2,0
-school.pdf,true,true,1,0.019,2,0
-word_color_png_24bit.pdf,true,false,1,0.477,3,0
-word_color_png_32bit.pdf,true,false,1,0.473,3,0
-PaperCutv15.3internalupdate.pdf,true,false,3,0.414,4,0
-Andrew Fuller flyer.pdf,true,true,1,0.329,1130,0
-AcrobatDC_acrobat_digital_signature_appearances.pdf,true,true,13,0.280,2,0
+school.pdf,true,true,1,0.022,2,0
+word_color_png_24bit.pdf,true,false,1,0.523,3,0
+word_color_png_32bit.pdf,true,false,1,0.521,3,0
+PaperCutv15.3internalupdate.pdf,true,false,3,0.466,4,0
+Andrew Fuller flyer.pdf,true,true,1,0.359,1130,0
+AcrobatDC_acrobat_digital_signature_appearances.pdf,true,true,13,0.326,2,0
 copier%40wdwm.com_20151012_102149.pdf,false,false,5,0.007,5,0
-Cirrato Whitepaper.pdf,true,true,13,0.198,18,0
+Cirrato Whitepaper.pdf,true,true,13,0.217,18,0
 0912.0779v1.pdf,true,false,14,0.399,0,5
 508_icmlpaper.pdf,true,true,8,0.182,2,2
 age_text.pdf,true,true,12,0.156,3,0
@@ -167,7 +167,7 @@ l09r01.pdf,true,true,32,0.687,3,1
 sa.pdf,false,false,16,0.781,101,0
 HyperLogLog.pdf,true,false,20,0.703,0,7
 PaperCut-Professional-Services-Guide.pdf,true,true,35,0.411,69,0
-legislative-process-poster-espanol.pdf,true,true,1,0.049,1,6
+legislative-process-poster-espanol.pdf,true,true,1,0.050,1,6
 all_vs_all.pdf,true,true,7,0.241,2,0
 searchable-symmetric-encryption-elcrypt.pdf,true,true,1,0.313,7,0
 14(1).pdf,true,true,10,0.343,6,18

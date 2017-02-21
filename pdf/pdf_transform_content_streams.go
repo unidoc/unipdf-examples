@@ -394,7 +394,7 @@ func transformPageContents(page *unipdf.PdfPage, inputPath string, pageNum int,
 
 func transformString(page *unipdf.PdfPage, cstream, desc string, doGrayscaleTransform bool) (string,
 	error) {
-	unicommon.Log.Info("transformString: desc=%s", desc)
+	unicommon.Log.Info("transformString: desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
 
 	operations, err := parseStreamContents(cstream, desc)
 	if err != nil {
@@ -405,6 +405,7 @@ func transformString(page *unipdf.PdfPage, cstream, desc string, doGrayscaleTran
 		printOperations(fmt.Sprintf("%s: before", desc), operations)
 		printOpCounts(fmt.Sprintf("%s: before", desc), getOpCounts(operations))
 		if err := transformColorToGrayscale(page, desc, &operations); err != nil {
+			panic(err)
 			return "", err
 		}
 		printOpCounts(fmt.Sprintf("%s: after ", desc), getOpCounts(operations))
@@ -448,8 +449,17 @@ func transformStreamGrayscale(page *unipdf.PdfPage, cstream, desc string) (strin
 
 var stackDepth = 0
 
+func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
+	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
+	err = transformColorToGrayscale_(page, desc, pOperations)
+	if err != nil {
+		panic(err)
+	}
+	return err
+}
+
 // transformColorToGrayscale transforms color pages to grayscale
-func transformColorToGrayscale(page *unipdf.PdfPage, desc_ string,
+func transformColorToGrayscale_(page *unipdf.PdfPage, desc_ string,
 	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
 
 	stackDepth++
@@ -500,11 +510,14 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc_ string,
 				unicommon.Log.Info("##@ %s: ", op)
 			}
 		case "Do":
+			unicommon.Log.Info("@!^ %s:", h)
 			name, err := op.GetNameParam()
 			if err != nil {
+				panic(err)
 				return err
 			}
 			xobjImgs = append(xobjImgs, name)
+			unicommon.Log.Info("@!$ %s name=%s xobjImgs=+%v:", h, name, xobjImgs)
 		case "sc", "SC", "scn", "SCN":
 			unicommon.Log.Info("#@: %s currentColorSpace=%#q currentSeparate=%t",
 				h, currentColorSpace, currentSeparate)
@@ -558,6 +571,7 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc_ string,
 	for _, name := range xobjCSs {
 		colorSpace, alternate, _, err := page.GetColorSpace(name)
 		if err != nil {
+			panic(err)
 			return err
 		}
 		unicommon.Log.Debug("%s colorspace: %#q=%s %s", rubric, name, alternate, colorSpace)
@@ -569,6 +583,7 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc_ string,
 		}
 	}
 
+	unicommon.Log.Debug("Do XObjects: xobjImgs=%d %+v", len(xobjImgs), xobjImgs)
 	for _, name := range xobjImgs {
 		/*imageSummary*/ _, err := page.ConvertXObjectToGray(name, desc_, transformStreamGrayscale)
 		if err != nil {
@@ -1460,7 +1475,7 @@ func getOpCounts(operations []*unipdf.ContentStreamOperation) map[string]int {
 func printOperations(description string, operations []*unipdf.ContentStreamOperation) {
 	fmt.Printf("%d operations --------^^^--------%#q\n", len(operations), description)
 	for _, op := range operations {
-		fmt.Printf("%s\n", op)
+		fmt.Printf("\t%s\n", op)
 	}
 }
 
@@ -1468,6 +1483,6 @@ func printOperations(description string, operations []*unipdf.ContentStreamOpera
 func printOpCounts(description string, opCounts map[string]int) {
 	fmt.Printf("%d ops -------------------------%#q\n", len(opCounts), description)
 	for i, k := range sortCounts(opCounts) {
-		fmt.Printf("%3d: %#6q %5d\n", i, k, opCounts[k])
+		fmt.Printf("\t%3d: %#6q %5d\n", i, k, opCounts[k])
 	}
 }

@@ -24,6 +24,12 @@ from collections import defaultdict, namedtuple
 from glob import glob
 
 
+do_write = False
+testResultPath = "xform.test.results.csv"
+imageInfoPath = "xform.image.info.csv"
+basedir = 'test.corpus'
+
+
 def dict_counts(a_dict):
     return {k: len(v) for k, v in a_dict.items()}
 
@@ -51,9 +57,6 @@ def read_csv(path):
     return header, body
 
 
-
-testResultPath = "xform.test.results.csv"
-imageInfoPath = "xform.image.info.csv"
 trHeader, trBody = read_csv(testResultPath)
 
 key_type_list = [
@@ -93,7 +96,6 @@ color_fail_img1_files.sort(key=lambda s: name_pages[s])
 for i, name in enumerate(color_fail_img1_files):
     print('%4d: %-20s %s' % (i, name, name_pages[name]))
 
-basedir = 'test.corpus.new'
 colordirs = {
     'color': set(color_files),
     'gray': set(all_files) - set(color_files)
@@ -106,7 +108,6 @@ xobjdirs = {
 print('colordirs=%s %d' % (dict_counts(colordirs), num_values(colordirs)))
 print('xobjdirs=%s %d' % (dict_counts(xobjdirs), num_values(xobjdirs)))
 
-do_write = False
 name_dir = {}
 print('Results match')
 for dc in sorted(colordirs):
@@ -128,6 +129,7 @@ if do_write:
 
 path_list = [path for a in sys.argv[1:] for path in glob(a)]
 path_list = sorted(set(path_list))
+print('path_list=%d' % len(path_list))
 
 dest_count = defaultdict(int)
 for path in path_list:
@@ -138,7 +140,10 @@ for path in path_list:
     dest_count[dest_dir] += 1
     # print('%50s => %s' % (name, dest))
     if do_write:
-        shutil.copyfile(path, dest)
+        try:
+            shutil.copyfile(path, dest)
+        except:
+            print('%50s => %s failed' % (name, dest))
 
 print('Files copied. Total = %d' % len(path_list))
 for dest in sorted(dest_count):
