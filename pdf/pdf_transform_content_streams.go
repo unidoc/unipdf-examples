@@ -458,6 +458,9 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 	return err
 }
 
+/*
+ * Simple graphics state stack
+ */
 type graphicState struct {
 	colorSpace   string
 	isSeparation bool
@@ -549,12 +552,14 @@ func transformColorToGrayscale_(page *unipdf.PdfPage, desc_ string,
 			unicommon.Log.Info("#@: %s currentColorSpace=%#q currentSeparate=%t",
 				h, currentColorSpace, currentSeparate)
 			if currentSeparate {
-				if vals, err = op.GetFloatParams(1); err != nil {
-					return err
-				}
-				unicommon.Log.Info("#!# %s: vals=%v", h, vals)
-				if err = op.SetOpFloatParams(op.Operand, []float64{1.0 - vals[0]}); err != nil {
-					return err
+				if !op.IsNameParam() {
+					if vals, err = op.GetFloatParams(1); err != nil {
+						return err
+					}
+					unicommon.Log.Info("#!# %s: vals=%v", h, vals)
+					if err = op.SetOpFloatParams(op.Operand, []float64{1.0 - vals[0]}); err != nil {
+						return err
+					}
 				}
 			} else {
 				switch currentColorSpace {
@@ -1081,8 +1086,13 @@ func imgIsColor(img image.Image) bool {
 			if gb < 0 {
 				gb = -gb
 			}
-			if rg+gb > 4*255 {
+			rgb := float64(rg+gb) / float64(0xFFFF) * float64(0xFF)
+			if rgb > 4.0 {
 				// if r != g || g != b {
+				r = uint32(float64(r) / float64(0xFFFF) * float64(0xFF))
+				g = uint32(float64(g) / float64(0xFFFF) * float64(0xFF))
+				b = uint32(float64(b) / float64(0xFFFF) * float64(0xFF))
+				// unicommon.Log.Error("(%d, %d)r g b = %d %d %d : %.1f", x, y, r, g, b, rgb)
 				return true
 			}
 		}
@@ -1106,9 +1116,14 @@ func imgMarkColor(imgIn image.Image) image.Image {
 			if gb < 0 {
 				gb = -gb
 			}
-			if rg+gb > 4*255 {
+			rgb := float64(rg+gb) / float64(0xFFFF) * float64(0xFF)
+			if rgb > 4.0 {
 				img.Set(x, y, black)
-				// unicommon.Log.Error("^^^ (%d, %d) %d %d %d", x, y, r, g, b)
+				// r = uint32(float64(r) / float64(0xFFFF) * float64(0xFF))
+				// g = uint32(float64(g) / float64(0xFFFF) * float64(0xFF))
+				// b = uint32(float64(b) / float64(0xFFFF) * float64(0xFF))
+				// rgb := int(float64(rg+gb) / float64(0xFFFF) * float64(0xFF))
+				// unicommon.Log.Error("^^^ (%d, %d) %d %d %d: %.1f", x, y, r, g, b, rgb)
 			}
 		}
 	}

@@ -1,62 +1,62 @@
 name,colorIn,colorOut,numPages,duration,image xobj,form xobj
 frege.pdf,true,true,14,0.185,2,2
-legal_pages7_color3.pdf,true,false,7,0.004,0,0
-cmyk.pdf,true,false,9,0.004,0,0
-WEIß_pages6_color4.pdf,true,false,6,0.004,0,0
-lines.pdf,true,false,20,0.010,0,0
-English Report.pdf,true,false,16,0.006,0,0
-Sunday 2016 team Fixtures.pdf,true,false,12,0.094,0,0
-ACS4PartnerQuotes.pdf,true,false,2,0.025,0,0
-dense2_lines.pdf,true,false,3,0.250,0,0
-ColourNaming.pdf,false,false,12,0.083,0,0
-killer_modelling.pdf,true,false,5,0.157,0,0
+legal_pages7_color3.pdf,true,false,7,0.007,0,0
+cmyk.pdf,true,false,9,0.008,0,0
+WEIß_pages6_color4.pdf,true,false,6,0.008,0,0
+lines.pdf,true,false,20,0.024,0,0
+English Report.pdf,true,false,16,0.017,0,0
+Sunday 2016 team Fixtures.pdf,true,false,12,0.173,0,0
+ACS4PartnerQuotes.pdf,true,false,2,0.045,0,0
+dense2_lines.pdf,true,false,3,0.433,0,0
+ColourNaming.pdf,false,false,12,0.151,0,0
+killer_modelling.pdf,true,false,5,0.257,0,0
 blank.pdf,false,false,1,0.002,0,0
 convoluted_line.pdf,false,false,1,0.004,0,0
-fonts_in_form_xobject.pdf,false,false,1,0.004,0,1
-202 moot.pdf,false,false,2,0.023,0,0
-word_bmp.pdf,false,false,1,0.067,1,0
-word_jpeg_grayscale.pdf,false,false,1,0.065,1,0
-pdl.pdf,false,false,1,0.023,1,0
-pre-algebra_translate.pdf,true,false,2,0.014,4,0
-Jedi.pdf,true,true,1,0.027,1,0
-rfc6962.txt.pdf,false,false,27,0.027,0,0
-kernel_trick.pdf,false,false,3,0.054,0,0
-ACFrOgCf6f4kzU-mNiolvkiOlADV6cnWfoWv_FZPB6kB4aBtGh68m8KVTc5q0t50Bian-2myr3AQvH0HLbHDFnyo3fY_BDudV1i3zI9i_g6S36lOesSvotIATPqvLF0= (1).pdf,false,false,9,0.159,9,0
-A Sunshine - IEP.pdf,true,true,9,0.191,8,0
-android.pdf,true,false,1,0.043,1,0
-10.235.1.2_SMTP_via_LDAP_05-16-2016_09-43-48.pdf.pdf,true,true,3,0.005,6,0
-symbiosis-provocation.pdf,false,false,8,0.068,0,0
-Whitepaper-XMP-metadata-in-PDFlib-products.pdf,true,false,4,0.069,0,7
-docs.pdf,true,true,1,0.031,2,0
-unlexicalized-parsing.pdf,false,false,8,0.269,0,0
+fonts_in_form_xobject.pdf,false,false,1,0.005,0,1
+202 moot.pdf,false,false,2,0.045,0,0
+word_bmp.pdf,false,false,1,0.005,1,0
+word_jpeg_grayscale.pdf,false,false,1,0.005,1,0
+pdl.pdf,false,false,1,0.063,1,0
+pre-algebra_translate.pdf,true,false,2,0.035,4,0
+Jedi.pdf,true,true,1,0.052,1,0
+rfc6962.txt.pdf,false,false,27,0.046,0,0
+kernel_trick.pdf,false,false,3,0.094,0,0
+ACFrOgCf6f4kzU-mNiolvkiOlADV6cnWfoWv_FZPB6kB4aBtGh68m8KVTc5q0t50Bian-2myr3AQvH0HLbHDFnyo3fY_BDudV1i3zI9i_g6S36lOesSvotIATPqvLF0= (1).pdf,false,false,9,0.297,9,0
+A Sunshine - IEP.pdf,true,true,9,0.325,8,0
+android.pdf,true,true,1,0.075,1,0
+10.235.1.2_SMTP_via_LDAP_05-16-2016_09-43-48.pdf.pdf,true,true,3,0.008,6,0
+symbiosis-provocation.pdf,false,false,8,0.114,0,0
+Whitepaper-XMP-metadata-in-PDFlib-products.pdf,true,false,4,0.121,0,7
+docs.pdf,true,false,1,0.056,2,0
+unlexicalized-parsing.pdf,false,false,8,0.632,0,0
 blockchain_academic_verification_use_case.pdf,true,true,4,0.142,0,0
-4e.pdf,true,false,5,0.184,0,0
-midtermF13secondSols.pdf,false,false,7,0.068,0,0
-pcfgs.pdf,false,false,18,0.214,0,0
-multi_string_search.pdf,false,false,22,0.087,0,0
-lexpcfgs.pdf,false,false,22,0.232,0,0
+4e.pdf,true,false,5,0.333,0,0
+midtermF13secondSols.pdf,false,false,7,0.126,0,0
+pcfgs.pdf,false,false,18,0.648,0,0
+multi_string_search.pdf,false,false,22,0.273,0,0
+lexpcfgs.pdf,false,false,22,0.440,0,0
 MS Activities Term 2 2016 Letter.pdf,true,true,3,0.041,1,0
-mh-guide-matrix.pdf,true,false,1,0.089,1,0
-letter to Parents re Telstra Phone Line.pdf,true,true,1,0.017,2,0
-Doc_Test_papercut.pdf,true,true,4,0.040,2,0
+mh-guide-matrix.pdf,true,false,1,0.158,1,0
+letter to Parents re Telstra Phone Line.pdf,true,false,1,0.067,2,0
+Doc_Test_papercut.pdf,true,true,4,0.015,2,0
 ptrelnot.pdf,true,true,5,0.137,14,0
-invoice88786339.pdf,true,true,2,0.047,4,0
-yao1982-ocr.pdf,false,false,5,0.105,0,0
-lcs.pdf,false,false,6,0.215,0,7
-docpro07aut.pdf,true,false,16,0.233,0,0
-lec04.pdf,true,false,24,0.125,0,0
-HH factsheet.pdf,true,true,2,0.068,7,3
-SA_implementations.pdf,false,false,9,0.244,1,0
-fawkes.pdf,false,false,13,0.174,0,0
-lec03-sp01.pdf,true,false,5,0.103,0,0
-lm.pdf,false,false,12,0.123,0,0
-7600_Model355_ColorElectrostaticPlotter_TechnicalData_5959-9727-6pages_Jan90.pdf,false,false,6,0.007,6,0
-l1_logistic_reg_aaai.pdf,true,false,7,0.381,0,0
-ICT Parent letter 7 2016.pdf,true,true,1,0.030,3,0
-outbreak.pdf,false,false,7,0.060,0,0
-database_03_abs.pdf,false,false,2,0.013,0,2
-recht11a.pdf,false,false,18,0.482,0,0
-mehrotra_trick_final2.pdf,false,false,15,0.232,0,0
+invoice88786339.pdf,true,false,2,0.108,4,0
+yao1982-ocr.pdf,false,false,5,0.255,0,0
+lcs.pdf,false,false,6,0.529,0,7
+docpro07aut.pdf,true,false,16,0.534,0,0
+lec04.pdf,true,false,24,0.265,0,0
+HH factsheet.pdf,true,true,2,0.456,7,3
+SA_implementations.pdf,false,false,9,0.506,1,0
+fawkes.pdf,false,false,13,0.348,0,0
+lec03-sp01.pdf,true,false,5,0.249,0,0
+lm.pdf,false,false,12,0.243,0,0
+7600_Model355_ColorElectrostaticPlotter_TechnicalData_5959-9727-6pages_Jan90.pdf,false,false,6,0.016,6,0
+l1_logistic_reg_aaai.pdf,true,false,7,0.719,0,0
+ICT Parent letter 7 2016.pdf,true,false,1,0.052,3,0
+outbreak.pdf,false,false,7,0.146,0,0
+database_03_abs.pdf,false,false,2,0.034,0,2
+recht11a.pdf,false,false,18,0.996,0,0
+mehrotra_trick_final2.pdf,false,false,15,0.469,0,0
 kuksa08nips.pdf,false,false,8,0.123,0,1
 biau08a.pdf,false,false,19,0.393,0,0
 designofasearchablesymmetrickeyciphersystem-120529001108-phpapp02.pdf,true,false,11,0.123,1,0
@@ -287,5 +287,6 @@ faa4bd35a36296305ce7e4cbbbb9d7f0a909de18.pdf,true,true,18,1.101,44,55
 Trump-Intelligence-Allegations.pdf,true,true,35,0.270,35,0
 DeepLearningBook.pdf,true,true,802,55.375,0,0
 1311.2901v3.pdf,true,true,11,27.039,100,13
-AnneMakauProfile.pdf,true,false,3,0.011,0,0
-49-7441.pdf,true,true,1,0.007,2,0
+AnneMakauProfile.pdf,true,false,3,0.025,0,0
+49-7441.pdf,true,false,1,0.026,2,0
+2017 Arts Festival Letter.pdf,true,true,1,0.045,2,0
