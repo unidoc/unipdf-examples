@@ -57,16 +57,16 @@ outbreak.pdf,false,false,7,0.146,0,0
 database_03_abs.pdf,false,false,2,0.034,0,2
 recht11a.pdf,false,false,18,0.996,0,0
 mehrotra_trick_final2.pdf,false,false,15,0.469,0,0
-kuksa08nips.pdf,false,false,8,0.123,0,1
-biau08a.pdf,false,false,19,0.393,0,0
-designofasearchablesymmetrickeyciphersystem-120529001108-phpapp02.pdf,true,false,11,0.123,1,0
-twitter_sentimenti.pdf,true,false,7,0.112,0,6
-knn  v3.pdf,false,false,1,0.495,3,0
-Yemeni_Laws92.pdf,false,false,14,0.458,0,0
-Zendesk FAQ.pdf,true,true,3,0.104,5,1
-batsbzx201630-20.pdf,true,false,27,0.438,0,0
-Suffix.pdf,false,false,11,0.370,0,0
-RAND_PE198.pdf,true,false,16,0.347,0,0
+kuksa08nips.pdf,false,false,8,0.278,0,1
+biau08a.pdf,false,false,19,0.860,0,0
+designofasearchablesymmetrickeyciphersystem-120529001108-phpapp02.pdf,true,true,11,0.193,1,0
+twitter_sentimenti.pdf,true,true,7,0.270,0,6
+knn  v3.pdf,true,true,1,0.898,3,0
+Yemeni_Laws92.pdf,false,false,14,0.918,0,0
+Zendesk FAQ.pdf,true,false,3,0.289,5,1
+batsbzx201630-20.pdf,true,false,27,0.904,0,0
+Suffix.pdf,false,false,11,0.944,0,0
+RAND_PE198.pdf,true,false,16,0.627,0,0
 SemanticStates201.pdf,true,false,17,0.433,0,0
 bitcoin.pdf,false,false,9,0.185,0,0
 nips01-discriminativegenerative.pdf,false,false,8,0.131,0,0
@@ -290,3 +290,4 @@ DeepLearningBook.pdf,true,true,802,55.375,0,0
 AnneMakauProfile.pdf,true,false,3,0.025,0,0
 49-7441.pdf,true,false,1,0.026,2,0
 2017 Arts Festival Letter.pdf,true,true,1,0.045,2,0
+se.pdf,false,false,12,0.819,0,0

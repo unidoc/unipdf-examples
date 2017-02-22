@@ -398,6 +398,7 @@ func transformString(page *unipdf.PdfPage, cstream, desc string, doGrayscaleTran
 
 	operations, err := parseStreamContents(cstream, desc)
 	if err != nil {
+		printOperations(fmt.Sprintf("%s: ERROR incomplete", desc), operations)
 		return "", err
 	}
 
@@ -424,7 +425,11 @@ func transformString(page *unipdf.PdfPage, cstream, desc string, doGrayscaleTran
 func parseStreamContents(cstream string, desc string) ([]*unipdf.ContentStreamOperation, error) {
 	cstreamParser := unipdf.NewContentStreamParser(cstream)
 	unicommon.Log.Debug("transformContentStream: %s cstream=\n'%s'\nXXXXXX", desc, cstream)
-	return cstreamParser.Parse()
+	operations, err := cstreamParser.Parse()
+	if err != nil {
+		panic(err)
+	}
+	return operations, err
 }
 
 // // writePageContents converts `operations` into a stream and replaces the streams in `page` with it
@@ -492,6 +497,8 @@ func transformColorToGrayscale_(page *unipdf.PdfPage, desc_ string,
 
 	xobjImgs := []string{}
 	xobjCSs := []string{}
+	xobjImgMap := map[string]bool{}
+	xobjCSMap := map[string]bool{}
 
 	gsStack := graphicStateStack{}
 	currentColorSpace := "DeviceGray"
@@ -512,7 +519,10 @@ func transformColorToGrayscale_(page *unipdf.PdfPage, desc_ string,
 				panic(err)
 				return err
 			}
-			xobjCSs = append(xobjCSs, name)
+			if _, ok := xobjCSMap[name]; !ok {
+				xobjCSs = append(xobjCSs, name)
+				xobjCSMap[name] = true
+			}
 
 			_, currentColorSpace, currentSeparate, _ = page.GetColorSpace(name)
 			// if currentColorSpace == "Pattern" {
@@ -546,8 +556,11 @@ func transformColorToGrayscale_(page *unipdf.PdfPage, desc_ string,
 				panic(err)
 				return err
 			}
-			xobjImgs = append(xobjImgs, name)
-			unicommon.Log.Info("@!$ %s name=%s xobjImgs=+%v:", h, name, xobjImgs)
+			if _, ok := xobjImgMap[name]; !ok {
+				xobjImgs = append(xobjImgs, name)
+				unicommon.Log.Info("@!$ %s name=%s xobjImgs=+%v:", h, name, xobjImgs)
+				xobjImgMap[name] = true
+			}
 		case "sc", "SC", "scn", "SCN":
 			unicommon.Log.Info("#@: %s currentColorSpace=%#q currentSeparate=%t",
 				h, currentColorSpace, currentSeparate)
