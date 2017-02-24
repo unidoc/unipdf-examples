@@ -93,8 +93,8 @@ import (
 	"strings"
 	"time"
 
-	unicommon "github.com/unidoc/unidoc/common"
 	// unilicense "github.com/unidoc/unidoc/license"
+	unicommon "github.com/unidoc/unidoc/common"
 	unipdf "github.com/unidoc/unidoc/pdf/model"
 )
 
@@ -235,8 +235,6 @@ func main() {
 				colorOut: isColorOut,
 				numPages: numPages,
 				duration: dt.Seconds(),
-				xobjImg:  xobjectStats["Image"],
-				xobjForm: xobjectStats["Form"],
 			}
 			testStats.addTestResult(e, true)
 
@@ -245,12 +243,7 @@ func main() {
 					unicommon.Log.Error("Transform has damaged PDF. err=%v\n\tinputPath=%#q\n\toutputPath=%#q",
 						err, inputPath, outputPath)
 				} else {
-					unicommon.Log.Error("Output PDF is color.\n\tinputPath=%#q\n\toutputPath=%#q",
-						inputPath, outputPath)
 					unicommon.Log.Error("isPdfColor: %d Color pages", len(colorPagesOut))
-					// for _, p := range colorPagesOut {
-					// 	unicommon.Log.Error("isPdfColor: page %d", p)
-					// }
 				}
 				failFiles = append(failFiles, inputPath)
 				if runAllTests {
@@ -282,8 +275,7 @@ func main() {
 		}
 	}
 
-	fmt.Fprintf(os.Stderr, "%d files %d bad %d failed\n",
-		len(pdfList), len(badFiles), len(failFiles))
+	fmt.Fprintf(os.Stderr, "%d files %d bad %d failed\n", len(pdfList), len(badFiles), len(failFiles))
 	fmt.Fprintf(os.Stderr, "%d bad\n", len(badFiles))
 	for i, path := range badFiles {
 		fmt.Fprintf(os.Stderr, "%3d %#q\n", i, path)
@@ -295,8 +287,6 @@ func main() {
 
 	printOpCounts("all operation in PDF", allOpCounts)
 }
-
-var xobjectStats map[string]int
 
 // transformPdfFile transforms PDF `inputPath` and writes the resulting PDF to `outputPath`
 // If `noContentTransforms` is true then stream contents are not parsed
@@ -331,19 +321,13 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms,
 
 	pdfWriter := unipdf.NewPdfWriter()
 
-	xobjectStats = map[string]int{}
-
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
 		page := pdfReader.PageList[i]
-		unicommon.Log.Debug("^^^^page %d=%s", pageNum, page.String())
-		for t, n := range page.XobjectStats() {
-			// m := xobjectStats[t]
-			xobjectStats[t] = n + xobjectStats[t]
-		}
+		unicommon.Log.Debug("^^^^page %d", pageNum)
 
 		if !noContentTransforms {
-			err = transformPageContents(page, inputPath, pageNum, doGrayscaleTransform)
+			err = transformPdfPage(page, inputPath, pageNum, doGrayscaleTransform)
 			if err != nil {
 				return numPages, err
 			}
@@ -360,24 +344,16 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms,
 		return numPages, err
 	}
 	defer fWrite.Close()
-
 	err = pdfWriter.Write(fWrite)
 
-	// unicommon.Log.Error("allAlternateColorSpaces: %d", len(allAlternateColorSpaces))
-	// for k, v := range allAlternateColorSpaces {
-	// 	fmt.Fprintf(os.Stderr, "%#15q: %d\n", k, v)
-	// }
-
-	// unicommon.Log.Error("$$$ xobjectStats=%+v", xobjectStats)
 	return numPages, nil
 }
 
-// transformPageContents
+// transformPdfPage
 //	- parses the contents of streams in `page` into a slice of operations
 //	- converts the slice of operations into a stream
 //	- replaces the streams in `page` with the new stream
-
-func transformPageContents(page *unipdf.PdfPage, inputPath string, pageNum int,
+func transformPdfPage(page *unipdf.PdfPage, inputPath string, pageNum int,
 	doGrayscaleTransform bool) error {
 	cstream, err := page.GetAllContentStreams()
 	if err != nil {
@@ -392,9 +368,11 @@ func transformPageContents(page *unipdf.PdfPage, inputPath string, pageNum int,
 	return page.SetContentStreams([]string{cstreamOut}, nil)
 }
 
+// transformString applies the transform (currently identity or grayscale conversion) to string
+// and updates `page`
 func transformString(page *unipdf.PdfPage, cstream, desc string, doGrayscaleTransform bool) (string,
 	error) {
-	unicommon.Log.Info("transformString: desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
+	unicommon.Log.Debug("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
 
 	operations, err := parseStreamContents(cstream, desc)
 	if err != nil {
@@ -406,7 +384,6 @@ func transformString(page *unipdf.PdfPage, cstream, desc string, doGrayscaleTran
 		printOperations(fmt.Sprintf("%s: before", desc), operations)
 		printOpCounts(fmt.Sprintf("%s: before", desc), getOpCounts(operations))
 		if err := transformColorToGrayscale(page, desc, &operations); err != nil {
-			panic(err)
 			return "", err
 		}
 		printOpCounts(fmt.Sprintf("%s: after ", desc), getOpCounts(operations))
@@ -421,257 +398,133 @@ func transformString(page *unipdf.PdfPage, cstream, desc string, doGrayscaleTran
 	return cstreamOut, nil
 }
 
-// parsePageContents parses the contents of streams in `page` and returns them as a slice of operations
+// parsePageContents parses the contents of streams in `cstream` and returns them as a slice of
+// operations
 func parseStreamContents(cstream string, desc string) ([]*unipdf.ContentStreamOperation, error) {
 	cstreamParser := unipdf.NewContentStreamParser(cstream)
-	unicommon.Log.Debug("transformContentStream: %s cstream=\n'%s'\nXXXXXX", desc, cstream)
-	operations, err := cstreamParser.Parse()
-	if err != nil {
-		panic(err)
-	}
-	return operations, err
+	unicommon.Log.Debug("%s cstream=\n'%s'\nXXXXXX", desc, cstream)
+	return cstreamParser.Parse()
 }
 
-// // writePageContents converts `operations` into a stream and replaces the streams in `page` with it
-// func writePageContents(page *unipdf.PdfPage, pageNum int,
-// 	operations []*unipdf.ContentStreamOperation) error {
-
-// 	opStrings := []string{}
-// 	for _, op := range operations {
-// 		opStrings = append(opStrings, op.DefaultWriteString())
-// 	}
-// 	cstreamOut := strings.Join(opStrings, " ")
-
-// 	return page.SetContentStreams([]string{cstreamOut}, nil)
-// }
-
-var allAlternateColorSpaces = map[string]int{}
-
-func transformStreamGrayscale(page *unipdf.PdfPage, cstream, desc string) (string, error) {
-	unicommon.Log.Info("transformStreamGrayscale: desc=%s", desc)
-	return transformString(page, cstream, desc, true)
-}
-
-var stackDepth = 0
-
+// transformColorToGrayscale transforms color pages to grayscale
 func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
-	err = transformColorToGrayscale_(page, desc, pOperations)
+
+	unicommon.Log.Debug("%s", desc)
+
+	resources, err := page.GetResources()
 	if err != nil {
 		panic(err)
 	}
-	return err
+
+	var colorSpaceMap map[string]unipdf.PdfColorspace
+	if resources.ColorSpace != nil {
+		colorSpaceMap = resources.ColorSpace.Colorspaces
+	}
+	colorSpace, _ := unipdf.NewPdfColorspaceFromPdfObject(nil)
+
+	gsStack := graphicStateStack{}
+
+	for i, op := range *pOperations {
+		unicommon.Log.Debug("i=%d op=%s", i, op)
+		var vals []float64
+		switch op.Operand {
+		case "q":
+			gsStack.push(colorSpace)
+		case "Q":
+			colorSpace = gsStack.pop()
+			unicommon.Log.Debug("colorSpace=%T", colorSpace)
+		case "cs", "CS":
+			name, err := op.GetNameParam()
+			if err != nil {
+				return err
+			}
+			fromMap := false
+			colorSpace, fromMap = colorSpaceMap[name]
+			if !fromMap {
+				colorSpace, err = unipdf.NewPdfColorspaceFromPdfObject(op.Params[0])
+				if err != nil {
+					unicommon.Log.Error("No color space name=%s err=%v", op.Params[0], err)
+					return err
+				}
+			}
+			if unipdf.PdfColorspaceHasColor(colorSpace) {
+				if err = op.SetNameParam("DeviceGray"); err != nil {
+					return err
+				}
+			}
+			unicommon.Log.Debug("colorSpace=%T fromMap=%t", colorSpace, fromMap)
+
+		case "sc", "SC", "scn", "SCN":
+			if unipdf.PdfColorspaceHasColor(colorSpace) {
+				if vals, err = op.GetFloatParams(colorSpace.GetNumComponents()); err != nil {
+					unicommon.Log.Error("Wrong # params. colorSpace=%#T err=%v", colorSpace, err)
+					return err
+				}
+				gray, err := colorSpace.ToGrayValue(vals)
+				if err != nil {
+					return err
+				}
+				if err = op.SetOpFloatParams(op.Operand, []float64{gray}); err != nil {
+					return err
+				}
+			}
+
+		case "rg", "RG", "k", "K":
+			cs := opColorSpace[op.Operand]
+			if vals, err = op.GetFloatParams(cs.GetNumComponents()); err != nil {
+				unicommon.Log.Error("Wrong # params. colorSpace=%#T err=%v", colorSpace, err)
+				return err
+			}
+			gray, err := colorSpace.ToGrayValue(vals)
+			if err != nil {
+				return err
+			}
+			if err = op.SetOpFloatParams(opGrayOp[op.Operand], []float64{gray}); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 /*
  * Simple graphics state stack
  */
 type graphicState struct {
-	colorSpace   string
-	isSeparation bool
+	colorSpace unipdf.PdfColorspace
 }
 
 type graphicStateStack []graphicState
 
-func (gsStack *graphicStateStack) push(colorSpace string, isSeparation bool) {
-	gs := graphicState{colorSpace, isSeparation}
+func (gsStack *graphicStateStack) push(colorSpace unipdf.PdfColorspace) {
+	gs := graphicState{colorSpace}
 	*gsStack = append(*gsStack, gs)
 	unicommon.Log.Debug("gsStack=%d", len(*gsStack))
 }
 
-func (gsStack *graphicStateStack) pop() (colorSpace string, isSeparation bool) {
+func (gsStack *graphicStateStack) pop() unipdf.PdfColorspace {
 	unicommon.Log.Debug("gsStack=%d", len(*gsStack))
 	gs := (*gsStack)[len(*gsStack)-1]
 	*gsStack = (*gsStack)[:len(*gsStack)-1]
-	return gs.colorSpace, gs.isSeparation
+	return gs.colorSpace
 }
 
-// transformColorToGrayscale transforms color pages to grayscale
-func transformColorToGrayscale_(page *unipdf.PdfPage, desc_ string,
-	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
-
-	stackDepth++
-	defer func() { stackDepth-- }()
-	rubric := fmt.Sprintf("<%d> %s.", stackDepth, desc_)
-	unicommon.Log.Info("****%s", rubric)
-
-	xobjImgs := []string{}
-	xobjCSs := []string{}
-	xobjImgMap := map[string]bool{}
-	xobjCSMap := map[string]bool{}
-
-	gsStack := graphicStateStack{}
-	currentColorSpace := "DeviceGray"
-	currentSeparate := false
-
-	for i, op := range *pOperations {
-		h := fmt.Sprintf("%s i=%d op=%s", rubric, i, op)
-		unicommon.Log.Debug("*$@ %s", h)
-		var vals []float64
-		switch op.Operand {
-		case "q":
-			gsStack.push(currentColorSpace, currentSeparate)
-		case "Q":
-			currentColorSpace, currentSeparate = gsStack.pop()
-		case "cs", "CS":
-			name, err := op.GetNameParam()
-			if err != nil {
-				panic(err)
-				return err
-			}
-			if _, ok := xobjCSMap[name]; !ok {
-				xobjCSs = append(xobjCSs, name)
-				xobjCSMap[name] = true
-			}
-
-			_, currentColorSpace, currentSeparate, _ = page.GetColorSpace(name)
-			// if currentColorSpace == "Pattern" {
-			// 	if err = op.SetNameParam("DeviceGray"); err != nil {
-			// 		return err
-			// 	}
-			// 	currentColorSpace = "DeviceGray"
-			// 	unicommon.Log.Info("##$ %s: ", op)
-			// }
-			unicommon.Log.Info("%s ^&! name=%#q currentColorSpace=%#q currentSeparate=%t",
-				h, name, currentColorSpace, currentSeparate)
-			if currentSeparate {
-				unicommon.Log.Info("#^# %s: name=%#q", h, name)
-				if err = op.SetNameParam("DeviceGray"); err != nil {
-					return err
-				}
-				unicommon.Log.Info("#@! %s: ", op)
-			}
-			switch currentColorSpace {
-			case "DeviceRGB", "DeviceCMYK":
-				unicommon.Log.Info("### %s: name=%#q", h, name)
-				if err = op.SetNameParam("DeviceGray"); err != nil {
-					return err
-				}
-				unicommon.Log.Info("##@ %s: ", op)
-			}
-		case "Do":
-			unicommon.Log.Info("@!^ %s:", h)
-			name, err := op.GetNameParam()
-			if err != nil {
-				panic(err)
-				return err
-			}
-			if _, ok := xobjImgMap[name]; !ok {
-				xobjImgs = append(xobjImgs, name)
-				unicommon.Log.Info("@!$ %s name=%s xobjImgs=+%v:", h, name, xobjImgs)
-				xobjImgMap[name] = true
-			}
-		case "sc", "SC", "scn", "SCN":
-			unicommon.Log.Info("#@: %s currentColorSpace=%#q currentSeparate=%t",
-				h, currentColorSpace, currentSeparate)
-			if currentSeparate {
-				if !op.IsNameParam() {
-					if vals, err = op.GetFloatParams(1); err != nil {
-						return err
-					}
-					unicommon.Log.Info("#!# %s: vals=%v", h, vals)
-					if err = op.SetOpFloatParams(op.Operand, []float64{1.0 - vals[0]}); err != nil {
-						return err
-					}
-				}
-			} else {
-				switch currentColorSpace {
-				case "DeviceRGB":
-					if vals, err = op.GetFloatParams(3); err != nil {
-						return err
-					}
-					unicommon.Log.Info("#!# %s: vals=%v", h, vals)
-					if err = op.SetOpFloatParams(op.Operand, []float64{rgbToGray(vals)}); err != nil {
-						return err
-					}
-				case "DeviceCMKY":
-					if vals, err = op.GetFloatParams(4); err != nil {
-						return err
-					}
-					unicommon.Log.Info("#!^ %s: vals=%v", h, vals)
-					if err = op.SetOpFloatParams(op.Operand, []float64{cmykToGray(vals)}); err != nil {
-						return err
-					}
-				}
-			}
-		case "rg", "RG":
-			if vals, err = op.GetFloatParams(3); err != nil {
-				return err
-			}
-			if err = op.SetOpFloatParams(grayOp[op.Operand], []float64{rgbToGray(vals)}); err != nil {
-				return err
-			}
-			unicommon.Log.Info("#!# %s: vals=%v", h, vals)
-		case "k", "K":
-			if vals, err = op.GetFloatParams(4); err != nil {
-				return err
-			}
-			if err = op.SetOpFloatParams(grayOp[op.Operand], []float64{cmykToGray(vals)}); err != nil {
-				return err
-			}
-			unicommon.Log.Info("#!# %s: vals=%v", h, vals)
-		}
+var (
+	opGrayOp = map[string]string{
+		"rg": "g",
+		"RG": "G",
+		"k":  "g",
+		"K":  "G",
 	}
-
-	for _, name := range xobjCSs {
-		colorSpace, alternate, _, err := page.GetColorSpace(name)
-		if err != nil {
-			panic(err)
-			return err
-		}
-		unicommon.Log.Debug("%s colorspace: %#q=%s %s", rubric, name, alternate, colorSpace)
-		_, ok := allAlternateColorSpaces[alternate]
-		if !ok {
-			allAlternateColorSpaces[alternate] = 1
-		} else {
-			allAlternateColorSpaces[alternate]++
-		}
+	opColorSpace = map[string]unipdf.PdfColorspace{
+		"rg": unipdf.NewPdfColorspaceDeviceRGB(),
+		"RG": unipdf.NewPdfColorspaceDeviceRGB(),
+		"k":  unipdf.NewPdfColorspaceDeviceCMYK(),
+		"K":  unipdf.NewPdfColorspaceDeviceCMYK(),
 	}
-
-	unicommon.Log.Debug("Do XObjects: xobjImgs=%d %+v", len(xobjImgs), xobjImgs)
-	for _, name := range xobjImgs {
-		/*imageSummary*/ _, err := page.ConvertXObjectToGray(name, desc_, transformStreamGrayscale)
-		if err != nil {
-			return err
-		}
-		// if imageSummary != nil {
-		// 	e := imageInfo{
-		// 		fileName:   path.Base(inputPath),
-		// 		pageNum:    pageNum,
-		// 		xobjName:   name,
-		// 		length:     imageSummary.Length,
-		// 		filter1:    imageSummary.Filter1,
-		// 		filter2:    imageSummary.Filter2,
-		// 		colorSpace: imageSummary.ColorSpace,
-		// 	}
-		// 	testStats.addImageInfo(e, true)
-		// }
-	}
-	return nil
-}
-
-var grayOp = map[string]string{
-	"rg": "g",
-	"RG": "G",
-	"k":  "g",
-	"K":  "G",
-}
-
-// rgbToGray returns the grayscale equivalent of the r,g,b values in `vals`
-func rgbToGray(vals []float64) float64 {
-	r, g, b := vals[0], vals[1], vals[2]
-	return (r + g + b) / 3.0
-}
-
-// cmykToGray returns the grayscale equivalent of the c,m,y,k values in `vals`
-func cmykToGray(vals []float64) float64 {
-	c, m, y, k := vals[0], vals[1], vals[2], vals[3]
-	a := 1.0 - k - (c+m+y)/3.0
-	if a < 0.0 {
-		a = 0.0
-	}
-	return a
-}
+)
 
 // sortCounts returns the keys of map `counts` sorted by count
 func sortCounts(counts map[string]int) []string {

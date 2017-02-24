@@ -85,11 +85,23 @@ trBody = [Result(*[column_type[i](x) for i, x in enumerate(row)]) for row in trB
 
 all_files = {row.name for row in trBody}
 color_files = {row.name for row in trBody if row.colorIn}
+gray_files = all_files - color_files
 fail_files = {row.name for row in trBody if (row.colorIn and row.colorOut)}
 success_files = all_files - fail_files
 img_xobj_files = {row.name for row in trBody if row.image_xobj > 0}
 img1_files = {row.name for row in trBody if row.image_xobj == 1}
 name_pages = {row.name: (row.numPages, row.duration) for row in trBody}
+
+
+def summarize(name, files):
+    print('%15s: %3d = %3d pass + %3d fail' % (name,
+        len(files), len(files & success_files), len(files & fail_files)))
+
+
+summarize('all files', all_files)
+summarize('color files', color_files)
+summarize('gray files', gray_files)
+
 
 color_fail_img1_files = list(color_files & fail_files & img1_files)
 color_fail_img1_files.sort(key=lambda s: name_pages[s])
