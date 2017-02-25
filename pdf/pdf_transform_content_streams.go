@@ -16,7 +16,7 @@
  *	- converts the internal representation back to a PDF file
  *	- checks that the output PDF file is grayscale
  *
- * Run as: ./pdf_transform_content_streams -o output [-d] testdata/*.pdf > blah
+ * Run as: ./pdf_transform_content_streams -o output [-d] [-t] testdata/*.pdf > blah
  *
  * This will transform all .pdf file in testdata and write the results to output.
  * The main results are written to stderr so you will see them in your console.
@@ -30,43 +30,7 @@
  *			Running -a then -a -x will tell you how well this code is performing on your corpus
  *			and which failures are due to content parsing.
  *			(-x will disable -g)
- *
- *	Currently failing files in PETER's corpus of 332 PDF files
- *		Radon_Transform.pdf
- *		ESCP-R reference_151008.pdf
- *		lda.pdf
- *		BLUEBOOK.pdf
- *		pdf_hacks.pdf
-
- 27 fail with latest v2 code
-	  0 `lda.pdf`
-	  1 `power_law_bins.pdf`
-	  2 `rules_of_ml.pdf`
-	  3 `compression.kdd06(1).pdf`
-	  4 `climate_science_words.pdf`
-	  5 `joi160132.pdf`
-	  6 `1560401.pdf`
-	  7 `twitter.pdf`
-	  8 `pearson_science_8_sb_chapter_5_unit_5.2.pdf`
-	  9 `1512.03547v2.pdf`
-	 10 `BLUEBOOK.pdf`
-	 11 `cvxopt_1306.0057v1.pdf`
-	 12 `scan_alan_2016-03-30-10-38-15.pdf`
-	 13 `a0w20000000dikuAAA.pdf`
-	 14 `2013-12-12_rg_final_report.pdf`
-	 15 `Parsing-Probabilistic.pdf`
-	 16 `PhysRevLett.118.060401.pdf`
-	 17 `art%3A10.1186%2Fs13673-015-0039-9.pdf`
-	 18 `dark-internet-mail-environment-march-2015.pdf`
-	 19 `2015-09-16-T23-39-51_ec2-user_ip-172-31-6-72_jim.pdf`
-	 20 `Hierarchical Detection of Hard Exudates.pdf`
-	 21 `WhatIsEnergy.pdf`
-	 22 `Physics_Sample_Chapter_3.pdf`
-	 23 `day3_TemporalImageProcessing.pdf`
-	 24 `Lesson_054_handout.pdf`
-	 25 `talk_Simons_part1_pdf.pdf`
-	 26 `nips-tutorial-policy-optimization-Schulman-Abbeel.pdf`
-*/
+ */
 
 package main
 
@@ -285,13 +249,17 @@ func main() {
 		fmt.Fprintf(os.Stderr, "%3d %#q\n", i, path)
 	}
 
-	printOpCounts("all operation in PDF", allOpCounts)
+	printOpCounts("operations in all PDFs", allOpCounts)
+	printCsCounts("color spaces in all PDFs", allCsCounts)
 }
 
 // transformPdfFile transforms PDF `inputPath` and writes the resulting PDF to `outputPath`
 // If `noContentTransforms` is true then stream contents are not parsed
 func transformPdfFile(inputPath, outputPath string, noContentTransforms,
 	doGrayscaleTransform bool) (int, error) {
+
+	docCsCounts = map[string]int{}
+
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return 0, err
@@ -327,7 +295,8 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms,
 		unicommon.Log.Debug("^^^^page %d", pageNum)
 
 		if !noContentTransforms {
-			err = transformPdfPage(page, inputPath, pageNum, doGrayscaleTransform)
+			desc := fmt.Sprintf("%s:page%d", filepath.Base(inputPath), pageNum)
+			err = transformPdfPage(page, desc, doGrayscaleTransform)
 			if err != nil {
 				return numPages, err
 			}
@@ -353,20 +322,27 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms,
 //	- parses the contents of streams in `page` into a slice of operations
 //	- converts the slice of operations into a stream
 //	- replaces the streams in `page` with the new stream
-func transformPdfPage(page *unipdf.PdfPage, inputPath string, pageNum int,
-	doGrayscaleTransform bool) error {
+func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
 	cstream, err := page.GetAllContentStreams()
 	if err != nil {
 		return err
 	}
 
-	desc := fmt.Sprintf("%s:page%d", filepath.Base(inputPath), pageNum)
 	cstreamOut, err := transformString(page, cstream, desc, doGrayscaleTransform)
 	if err != nil {
 		return err
 	}
 	return page.SetContentStreams([]string{cstreamOut}, nil)
 }
+
+// func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
+// 	resources, err := page.GetResources()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	xobjectDict := resources.XObject
+
+// }
 
 // transformString applies the transform (currently identity or grayscale conversion) to string
 // and updates `page`
@@ -380,14 +356,16 @@ func transformString(page *unipdf.PdfPage, cstream, desc string, doGrayscaleTran
 		return "", err
 	}
 
+	printOperations(fmt.Sprintf("%s: original", desc), operations)
+	printOpCounts(fmt.Sprintf("%s: original", desc), getOpCounts(operations))
 	if doGrayscaleTransform {
-		printOperations(fmt.Sprintf("%s: before", desc), operations)
-		printOpCounts(fmt.Sprintf("%s: before", desc), getOpCounts(operations))
 		if err := transformColorToGrayscale(page, desc, &operations); err != nil {
 			return "", err
 		}
-		printOpCounts(fmt.Sprintf("%s: after ", desc), getOpCounts(operations))
+		printOpCounts(fmt.Sprintf("%s: transformed ", desc), getOpCounts(operations))
 	}
+	printCsCounts(desc, docCsCounts)
+	printCsCounts("color spaces in all PDFs", allCsCounts)
 
 	opStrings := []string{}
 	for _, op := range operations {
@@ -405,6 +383,12 @@ func parseStreamContents(cstream string, desc string) ([]*unipdf.ContentStreamOp
 	unicommon.Log.Debug("%s cstream=\n'%s'\nXXXXXX", desc, cstream)
 	return cstreamParser.Parse()
 }
+
+// Per-document color space counts
+var docCsCounts = map[string]int{}
+
+// Color space counts for all documents
+var allCsCounts = map[string]int{}
 
 // transformColorToGrayscale transforms color pages to grayscale
 func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
@@ -453,6 +437,10 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 					return err
 				}
 			}
+			csName := fmt.Sprintf("%#T", colorSpace)
+			docCsCounts[csName]++
+			allCsCounts[csName]++
+			// fmt.Fprintf(os.Stderr, "allCsCounts=%#v\n", allCsCounts)
 			unicommon.Log.Debug("colorSpace=%T fromMap=%t", colorSpace, fromMap)
 
 		case "sc", "SC", "scn", "SCN":
@@ -472,11 +460,14 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 
 		case "rg", "RG", "k", "K":
 			cs := opColorSpace[op.Operand]
+			csName := fmt.Sprintf("%#T", cs)
+			docCsCounts[csName]++
+			allCsCounts[csName]++
 			if vals, err = op.GetFloatParams(cs.GetNumComponents()); err != nil {
 				unicommon.Log.Error("Wrong # params. colorSpace=%#T err=%v", colorSpace, err)
 				return err
 			}
-			gray, err := colorSpace.ToGrayValue(vals)
+			gray, err := cs.ToGrayValue(vals)
 			if err != nil {
 				return err
 			}
@@ -525,6 +516,14 @@ var (
 		"K":  unipdf.NewPdfColorspaceDeviceCMYK(),
 	}
 )
+
+// totalCounts returns the keys of map `counts` sorted by count
+func totalCounts(counts map[string]int) (total int) {
+	for _, n := range counts {
+		total += n
+	}
+	return
+}
 
 // sortCounts returns the keys of map `counts` sorted by count
 func sortCounts(counts map[string]int) []string {
@@ -954,11 +953,6 @@ func imgIsColor(img image.Image) bool {
 			}
 			rgb := float64(rg+gb) / float64(0xFFFF) * float64(0xFF)
 			if rgb > 4.0 {
-				// if r != g || g != b {
-				r = uint32(float64(r) / float64(0xFFFF) * float64(0xFF))
-				g = uint32(float64(g) / float64(0xFFFF) * float64(0xFF))
-				b = uint32(float64(b) / float64(0xFFFF) * float64(0xFF))
-				// unicommon.Log.Error("(%d, %d)r g b = %d %d %d : %.1f", x, y, r, g, b, rgb)
 				return true
 			}
 		}
@@ -985,11 +979,6 @@ func imgMarkColor(imgIn image.Image) image.Image {
 			rgb := float64(rg+gb) / float64(0xFFFF) * float64(0xFF)
 			if rgb > 4.0 {
 				img.Set(x, y, black)
-				// r = uint32(float64(r) / float64(0xFFFF) * float64(0xFF))
-				// g = uint32(float64(g) / float64(0xFFFF) * float64(0xFF))
-				// b = uint32(float64(b) / float64(0xFFFF) * float64(0xFF))
-				// rgb := int(float64(rg+gb) / float64(0xFFFF) * float64(0xFF))
-				// unicommon.Log.Error("^^^ (%d, %d) %d %d %d: %.1f", x, y, r, g, b, rgb)
 			}
 		}
 	}
@@ -1111,9 +1100,7 @@ type statistics struct {
 	testResultPath string
 	imageInfoPath  string
 	testResultList []testResult
-	imageInfoList  []imageInfo
 	testResultMap  map[string]int
-	imageInfoMap   map[string]int
 }
 
 func (s *statistics) load() error {
@@ -1122,8 +1109,6 @@ func (s *statistics) load() error {
 	}
 	s.testResultList = []testResult{}
 	s.testResultMap = map[string]int{}
-	s.imageInfoList = []imageInfo{}
-	s.imageInfoMap = map[string]int{}
 
 	testResultList, err := testResultRead(s.testResultPath)
 	if err != nil {
@@ -1133,14 +1118,6 @@ func (s *statistics) load() error {
 		s.addTestResult(e, true)
 	}
 
-	// imageInfoList, err := imageInfoRead(s.imageInfoPath)
-	// if err != nil {
-	// 	return err
-	// }
-	// for _, e := range imageInfoList {
-	// 	s.addImageInfo(e, true)
-	// }
-
 	return nil
 }
 
@@ -1149,11 +1126,6 @@ func (s *statistics) save() error {
 		return nil
 	}
 	return testResultWrite(s.testResultPath, s.testResultList)
-	// err2 := imageInfoWrite(s.imageInfoPath, s.imageInfoList)
-	// if err1 != nil {
-	// 	return err1
-	// }
-	// return err2
 }
 
 func (s *statistics) addTestResult(e testResult, force bool) {
@@ -1169,24 +1141,6 @@ func (s *statistics) addTestResult(e testResult, force bool) {
 	}
 }
 
-func (s *statistics) addImageInfo(e imageInfo, force bool) {
-	if !s.enabled {
-		return
-	}
-	k := imageInfoKey(e)
-	i, ok := s.imageInfoMap[k]
-	if !ok {
-		s.imageInfoList = append(s.imageInfoList, e)
-		s.imageInfoMap[k] = i
-	} else if force {
-		s.imageInfoList[i] = e
-	}
-}
-
-func imageInfoKey(e imageInfo) string {
-	return fmt.Sprintf("%s:page%d:%s", e.fileName, e.pageNum, e.xobjName)
-}
-
 type testResult struct {
 	name     string
 	colorIn  bool
@@ -1195,16 +1149,6 @@ type testResult struct {
 	duration float64
 	xobjImg  int
 	xobjForm int
-}
-
-type imageInfo struct {
-	fileName   string
-	pageNum    int
-	xobjName   string
-	length     int
-	filter1    string
-	filter2    string
-	colorSpace string
 }
 
 func testResultRead(path string) ([]testResult, error) {
@@ -1276,78 +1220,6 @@ func testResultWrite(path string, results []testResult) error {
 	return w.Error()
 }
 
-// func imageInfoRead(path string) ([]imageInfo, error) {
-// 	if _, err := os.Stat(path); os.IsNotExist(err) {
-// 		return []imageInfo{}, nil
-// 	}
-// 	f, err := os.Open(path)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer f.Close()
-// 	r := csv.NewReader(f)
-
-// 	results := []imageInfo{}
-// 	for i := 0; ; i++ {
-// 		row, err := r.Read()
-// 		if err == io.EOF {
-// 			break
-// 		} else if err != nil {
-// 			unicommon.Log.Error("imageInfoRead: i=%d err=%v", i, err)
-// 			return results, err
-// 		}
-// 		if i == 0 {
-// 			continue
-// 		}
-// 		e := imageInfo{
-// 			fileName:   row[0],
-// 			pageNum:    toInt(row[1]),
-// 			xobjName:   row[2],
-// 			length:     toInt(row[3]),
-// 			filter1:    row[4],
-// 			filter2:    row[5],
-// 			colorSpace: row[6],
-// 		}
-// 		results = append(results, e)
-// 	}
-// 	return results, nil
-// }
-
-// func imageInfoWrite(path string, results []imageInfo) error {
-// 	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0777)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	defer f.Close()
-// 	w := csv.NewWriter(f)
-
-// 	if err := w.Write([]string{"fileName", "pageNum", "xobjName", "length",
-// 		"filter1", "filter2", "colorSpace"}); err != nil {
-// 		return err
-// 	}
-// 	for i, e := range results {
-// 		if len(e.xobjName) == 0 {
-// 			panic("YYYY")
-// 		}
-// 		row := []string{
-// 			e.fileName,
-// 			fmt.Sprintf("%d", e.pageNum),
-// 			e.xobjName,
-// 			fmt.Sprintf("%d", e.length),
-// 			e.filter1,
-// 			e.filter2,
-// 			e.colorSpace,
-// 		}
-// 		if err := w.Write(row); err != nil {
-// 			unicommon.Log.Error("testResultWrite: Error writing record. i=%d path=%#q err=%v",
-// 				i, path, err)
-// 		}
-// 	}
-
-// 	w.Flush()
-// 	return w.Error()
-// }
-
 func toBool(s string) bool {
 	return strings.ToLower(strings.TrimSpace(s)) == "true"
 }
@@ -1392,5 +1264,13 @@ func printOpCounts(description string, opCounts map[string]int) {
 	fmt.Printf("%d ops -------------------------%#q\n", len(opCounts), description)
 	for i, k := range sortCounts(opCounts) {
 		fmt.Printf("\t%3d: %#6q %5d\n", i, k, opCounts[k])
+	}
+}
+
+// printCsCounts prints `csCounts` in descending order of occurrences of color spaces
+func printCsCounts(description string, csCounts map[string]int) {
+	fmt.Printf("%d Color Spaces -------------------------%#q\n", len(csCounts), description)
+	for i, k := range sortCounts(csCounts) {
+		fmt.Printf("\t%3d: %#6q %5d\n", i, k, csCounts[k])
 	}
 }
