@@ -323,6 +323,7 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms,
 //	- converts the slice of operations into a stream
 //	- replaces the streams in `page` with the new stream
 func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
+
 	cstream, err := page.GetAllContentStreams()
 	if err != nil {
 		return err
@@ -332,17 +333,30 @@ func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bo
 	if err != nil {
 		return err
 	}
-	return page.SetContentStreams([]string{cstreamOut}, nil)
+	err = page.SetContentStreams([]string{cstreamOut}, nil)
+	if err != nil {
+		return err
+	}
+	return transformXObjects(page, desc, doGrayscaleTransform)
 }
 
-// func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
-// 	resources, err := page.GetResources()
-// 	if err != nil {
-// 		return err
-// 	}
-// 	xobjectDict := resources.XObject
+func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
+	// resources, err := page.GetResources()
+	// if err != nil {
+	// 	return err
+	// }
+	nameXimgMap, err := page.GetImageResourceMap()
+	if err != nil {
+		return err
+	}
+	for name, ximg := range nameXimgMap {
+		fmt.Fprintf(os.Stderr, "Converting image XObject %#q to gray", name)
+		if err := ximg.ToGray(); err != nil {
 
-// }
+		}
+	}
+	return nil
+}
 
 // transformString applies the transform (currently identity or grayscale conversion) to string
 // and updates `page`
@@ -437,10 +451,10 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 					return err
 				}
 			}
+			unicommon.Log.Debug("colorspace=%T fromMap=%t", colorspace, fromMap)
 			csName := fmt.Sprintf("%#T", colorspace)
 			docCsCounts[csName]++
 			allCsCounts[csName]++
-			unicommon.Log.Debug("colorspace=%T fromMap=%t", colorspace, fromMap)
 
 		case "sc", "SC", "scn", "SCN":
 			if unipdf.PdfColorspaceHasColor(colorspace) {
@@ -459,9 +473,6 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 
 		case "rg", "RG", "k", "K":
 			cs := opColorspace[op.Operand]
-			csName := fmt.Sprintf("%#T", cs)
-			docCsCounts[csName]++
-			allCsCounts[csName]++
 			if vals, err = op.GetFloatParams(cs.GetNumComponents()); err != nil {
 				unicommon.Log.Error("Wrong # params. colorspace=%#T err=%v", colorspace, err)
 				return err
@@ -474,9 +485,14 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 				return err
 			}
 
+			csName := fmt.Sprintf("%#T", cs)
+			docCsCounts[csName]++
+			allCsCounts[csName]++
+
 		case "g", "G":
 			// For instrumentation only
 			cs := opColorspace[op.Operand]
+
 			csName := fmt.Sprintf("%#T", cs)
 			docCsCounts[csName]++
 			allCsCounts[csName]++
