@@ -350,7 +350,7 @@ func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform b
 		return err
 	}
 	for name, ximg := range nameXimgMap {
-		fmt.Fprintf(os.Stderr, "Converting image XObject %#q to gray", name)
+		fmt.Fprintf(os.Stdout, "Converting image XObject %#q to gray", name)
 		if err := ximg.ToGray(); err != nil {
 
 		}
