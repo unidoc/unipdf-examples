@@ -24,7 +24,7 @@ from collections import defaultdict, namedtuple
 from glob import glob
 
 
-do_write = False
+do_write = True
 testResultPath = "xform.test.results.csv"
 imageInfoPath = "xform.image.info.csv"
 basedir = 'test.corpus'
@@ -88,14 +88,14 @@ color_files = {row.name for row in trBody if row.colorIn}
 gray_files = all_files - color_files
 fail_files = {row.name for row in trBody if (row.colorIn and row.colorOut)}
 success_files = all_files - fail_files
-img_xobj_files = {row.name for row in trBody if row.image_xobj > 0}
+img_xobj_files = set() # {row.name for row in trBody if row.image_xobj > 0}
 img1_files = {row.name for row in trBody if row.image_xobj == 1}
 name_pages = {row.name: (row.numPages, row.duration) for row in trBody}
 
 
 def summarize(name, files):
     print('%15s: %3d = %3d pass + %3d fail' % (name,
-        len(files), len(files & success_files), len(files & fail_files)))
+          len(files), len(files & success_files), len(files & fail_files)))
 
 
 summarize('all files', all_files)
