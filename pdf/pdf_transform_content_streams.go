@@ -341,20 +341,38 @@ func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bo
 }
 
 func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
-	// resources, err := page.GetResources()
-	// if err != nil {
-	// 	return err
-	// }
+	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
+
+	xobjs, err := page.GetXObjects()
+	if err != nil {
+		return nil
+	}
+	unicommon.Log.Info("-XObjects=%s", xobjs)
+
 	nameXimgMap, err := page.GetImageResourceMap()
 	if err != nil {
+		unicommon.Log.Error("No resource map. err=%v", err)
 		return err
 	}
+	unicommon.Log.Info("nameXimgMap=%d", len(nameXimgMap))
 	for name, ximg := range nameXimgMap {
-		fmt.Fprintf(os.Stdout, "Converting image XObject %#q to gray", name)
+		unicommon.Log.Info("Converting image XObject %#q to gray", name)
 		if err := ximg.ToGray(); err != nil {
-
+			return err
 		}
 	}
+	err = page.SetImageResourceMap(nameXimgMap)
+	if err != nil {
+		unicommon.Log.Error("SetImageResourceMap failed.. err=%v", err)
+		return err
+	}
+
+	xobjs, err = page.GetXObjects()
+	if err != nil {
+		return nil
+	}
+	unicommon.Log.Info("+XObjects=%s", xobjs)
+
 	return nil
 }
 
@@ -412,7 +430,7 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 
 	resources, err := page.GetResources()
 	if err != nil {
-		panic(err)
+		panic(err) // !@#$ REmove in production code
 	}
 
 	var colorspaceMap map[string]unipdf.PdfColorspace
