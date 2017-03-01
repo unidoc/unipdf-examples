@@ -25,9 +25,11 @@ from glob import glob
 
 
 do_write = True
+fail_only = False
 testResultPath = "xform.test.results.csv"
-imageInfoPath = "xform.image.info.csv"
 basedir = 'test.corpus'
+if fail_only:
+    basedir = 'fail.corpus'
 
 
 def dict_counts(a_dict):
@@ -129,6 +131,8 @@ for dc in sorted(colordirs):
     for dx in sorted(xobjdirs):
         dcx = os.path.join(basedir, dc, dx)
         match_names = colordirs[dc] & xobjdirs[dx]
+        if fail_only:
+            match_names = match_names & fail_files
         for name in match_names:
             name_dir[name] = dcx
         print('%4d [%d pass + %d fail] "%s"' % (len(match_names), len(match_names & success_files),

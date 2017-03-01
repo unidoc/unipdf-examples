@@ -462,7 +462,9 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 	if resources.ColorSpace != nil {
 		colorspaceMap = resources.ColorSpace.Colorspaces
 	}
-	colorspace, _ := unipdf.NewPdfColorspaceFromPdfObject(nil)
+	gs := graphicState{}
+	gs.colorspaceStroke, _ = unipdf.NewPdfColorspaceFromPdfObject(nil)
+	gs.colorspaceFill, _ = unipdf.NewPdfColorspaceFromPdfObject(nil)
 
 	gsStack := graphicStateStack{}
 
@@ -471,17 +473,16 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 		var vals []float64
 		switch op.Operand {
 		case "q":
-			gsStack.push(colorspace)
+			gsStack.push(gs)
 		case "Q":
-			colorspace = gsStack.pop()
-			unicommon.Log.Debug("colorspace=%T", colorspace)
+			gs = gsStack.pop()
+			unicommon.Log.Debug("gs=%+v", gs)
 		case "cs", "CS":
 			name, err := op.GetNameParam()
 			if err != nil {
 				return err
 			}
-			fromMap := false
-			colorspace, fromMap = colorspaceMap[name]
+			colorspace, fromMap := colorspaceMap[name]
 			if !fromMap {
 				colorspace, err = unipdf.NewPdfColorspaceFromPdfObject(op.Params[0])
 				if err != nil {
@@ -494,12 +495,30 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 					return err
 				}
 			}
-			unicommon.Log.Debug("colorspace=%T fromMap=%t", colorspace, fromMap)
+			if isUpper(op.Operand) {
+				gs.colorspaceStroke = colorspace
+			} else {
+				gs.colorspaceFill = colorspace
+			}
+			unicommon.Log.Debug("gs=%s fromMap=%t", gs, fromMap)
 			csName := fmt.Sprintf("%#T", colorspace)
 			docCsCounts[csName]++
 			allCsCounts[csName]++
 
 		case "sc", "SC", "scn", "SCN":
+			var colorspace unipdf.PdfColorspace
+			if isUpper(op.Operand) {
+				colorspace = gs.colorspaceStroke
+			} else {
+				colorspace = gs.colorspaceFill
+			}
+			unicommon.Log.Debug("^^^ op=%s hasColor=%t gs=%s",
+				op, unipdf.PdfColorspaceHasColor(colorspace), gs)
+
+			// !@#$ SemanticStates201.pdf
+			// if _, ok := colorspace.(*unipdf.PdfColorspaceSpecialPattern); ok {
+			// 	op.SetOpFloatParams(op.Operand, []float64{0.0})
+			// } else
 			if unipdf.PdfColorspaceHasColor(colorspace) {
 				if vals, err = op.GetFloatParams(colorspace.GetNumComponents()); err != nil {
 					unicommon.Log.Error("Wrong # params. colorspace=%#T err=%v", colorspace, err)
@@ -517,7 +536,7 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 		case "rg", "RG", "k", "K":
 			cs := opColorspace[op.Operand]
 			if vals, err = op.GetFloatParams(cs.GetNumComponents()); err != nil {
-				unicommon.Log.Error("Wrong # params. colorspace=%#T err=%v", colorspace, err)
+				unicommon.Log.Error("Wrong # params. cs=%#T err=%v", cs, err)
 				return err
 			}
 			gray, err := cs.ToGrayValue(vals)
@@ -549,22 +568,31 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
  * Simple graphics state stack
  */
 type graphicState struct {
-	colorspace unipdf.PdfColorspace
+	colorspaceStroke unipdf.PdfColorspace
+	colorspaceFill   unipdf.PdfColorspace
+}
+
+func (gs graphicState) String() string {
+	return fmt.Sprintf("{colorspaceStroke=%T colorspaceFill=%T}",
+		gs.colorspaceStroke, gs.colorspaceFill)
 }
 
 type graphicStateStack []graphicState
 
-func (gsStack *graphicStateStack) push(colorspace unipdf.PdfColorspace) {
-	gs := graphicState{colorspace}
+func (gsStack *graphicStateStack) push(gs graphicState) {
 	*gsStack = append(*gsStack, gs)
 	unicommon.Log.Debug("gsStack=%d", len(*gsStack))
 }
 
-func (gsStack *graphicStateStack) pop() unipdf.PdfColorspace {
+func (gsStack *graphicStateStack) pop() graphicState {
 	unicommon.Log.Debug("gsStack=%d", len(*gsStack))
 	gs := (*gsStack)[len(*gsStack)-1]
 	*gsStack = (*gsStack)[:len(*gsStack)-1]
-	return gs.colorspace
+	return gs
+}
+
+func isUpper(s string) bool {
+	return strings.ToUpper(s) == s
 }
 
 var (

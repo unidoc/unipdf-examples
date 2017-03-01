@@ -3,6 +3,8 @@ TODO
 Convert colors to grayscale in shading dicts. See extreme-days-and-nights-daylight-variation-in-the-arctic-reykjavik-murmansk-and-alert_e634.pdf
 
 
+SemanticStates201.pdf PdfColorspaceSpecialPattern
+
 PdfColorspaceCalRGB Has 1 component per pixel 2012060560369753.pdf
 
 upload1419017431.pdf Im1 1320 0 obj
