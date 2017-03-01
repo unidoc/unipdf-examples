@@ -97,7 +97,7 @@ var identityThreshold = imageThreshold{
 var testStats = statistics{
 	enabled:        true,
 	testResultPath: "xform.test.results.csv",
-	imageInfoPath:  "xform.image.info.csv",
+	// imageInfoPath:  "xform.image.info.csv",
 }
 
 var allOpCounts = map[string]int{}
@@ -160,11 +160,10 @@ func main() {
 		unicommon.Log.Error("stats.load failed. testStats=%+v err=%v", testStats, err)
 		os.Exit(1)
 	}
-	defer testStats.save()
+	defer testStats._save()
 
 	for idx, inputPath := range pdfList {
 
-		testStats.save()
 		_, name := filepath.Split(inputPath)
 		inputSize := fileSize(inputPath)
 
@@ -172,8 +171,10 @@ func main() {
 			len(pdfList), name, inputSize)
 		outputPath := modifyPath(inputPath, outputDir)
 
+		objCounts := ObjCounts{xobjNameSubtype: map[string]string{}}
 		t0 := time.Now()
-		numPages, err := transformPdfFile(inputPath, outputPath, noContentTransforms, doGrayscaleTransform)
+		numPages, err := transformPdfFile(inputPath, outputPath, noContentTransforms,
+			doGrayscaleTransform, &objCounts)
 		dt := time.Since(t0)
 		if err != nil {
 			unicommon.Log.Error("transformPdfFile failed. err=%v", err)
@@ -192,6 +193,15 @@ func main() {
 		if doGrayscaleTransform {
 			isColorIn, _, err := isPdfColor(inputPath, compDir, false, keep)
 			isColorOut, colorPagesOut, err := isPdfColor(outputPath, compDir, true, keep)
+			xobjForm := 0
+			xobjImg := 0
+			for _, subtype := range objCounts.xobjNameSubtype {
+				if subtype == "Form" {
+					xobjForm++
+				} else if subtype == "Image" {
+					xobjImg++
+				}
+			}
 
 			e := testResult{
 				name:     path.Base(inputPath),
@@ -199,6 +209,8 @@ func main() {
 				colorOut: isColorOut,
 				numPages: numPages,
 				duration: dt.Seconds(),
+				xobjForm: xobjForm,
+				xobjImg:  xobjImg,
 			}
 			testStats.addTestResult(e, true)
 
@@ -253,10 +265,14 @@ func main() {
 	printCsCounts("color spaces in all PDFs", allCsCounts)
 }
 
+type ObjCounts struct {
+	xobjNameSubtype map[string]string
+}
+
 // transformPdfFile transforms PDF `inputPath` and writes the resulting PDF to `outputPath`
 // If `noContentTransforms` is true then stream contents are not parsed
-func transformPdfFile(inputPath, outputPath string, noContentTransforms,
-	doGrayscaleTransform bool) (int, error) {
+func transformPdfFile(inputPath, outputPath string, noContentTransforms, doGrayscaleTransform bool,
+	objCounts *ObjCounts) (int, error) {
 
 	docCsCounts = map[string]int{}
 
@@ -296,7 +312,7 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms,
 
 		if !noContentTransforms {
 			desc := fmt.Sprintf("%s:page%d", filepath.Base(inputPath), pageNum)
-			err = transformPdfPage(page, desc, doGrayscaleTransform)
+			err = transformPdfPage(page, desc, doGrayscaleTransform, objCounts)
 			if err != nil {
 				return numPages, err
 			}
@@ -322,7 +338,8 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms,
 //	- parses the contents of streams in `page` into a slice of operations
 //	- converts the slice of operations into a stream
 //	- replaces the streams in `page` with the new stream
-func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
+func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool,
+	objCounts *ObjCounts) error {
 
 	cstream, err := page.GetAllContentStreams()
 	if err != nil {
@@ -337,12 +354,20 @@ func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bo
 	if err != nil {
 		return err
 	}
-	return transformXObjects(page, desc, doGrayscaleTransform)
+	return transformXObjects(page, desc, doGrayscaleTransform, objCounts)
 }
 
-func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
+func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool,
+	objCounts *ObjCounts) error {
 	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
 
+	nameSubtype, err := page.GetXObjectSubtypes()
+	if err != nil {
+		return nil
+	}
+	for name, subtype := range nameSubtype {
+		objCounts.xobjNameSubtype[name] = subtype
+	}
 	xobjs, err := page.GetXObjects()
 	if err != nil {
 		return nil
@@ -970,14 +995,14 @@ func isColorImage(path string, keep bool) (bool, error) {
 	isColor := imgIsColor(img)
 	if isColor && keep {
 		markedPath := fmt.Sprintf("%s.marked.png", path)
-		unicommon.Log.Error("isColorImage: Saving markedPath=%#q", markedPath)
-		markedImg := imgMarkColor(img)
+		markedImg, summary := imgMarkColor(img)
+		unicommon.Log.Error("markedPath=%#q %s", markedPath, summary)
 		err = writeImage(markedPath, markedImg)
 	}
 	return isColor, err
 }
 
-const colorThreshold = 4 * 255
+const colorThreshold = 5.0
 
 // imgIsColor returns true if image `img` contains color
 func imgIsColor(img image.Image) bool {
@@ -994,7 +1019,7 @@ func imgIsColor(img image.Image) bool {
 				gb = -gb
 			}
 			rgb := float64(rg+gb) / float64(0xFFFF) * float64(0xFF)
-			if rgb > 4.0 {
+			if rgb > colorThreshold {
 				return true
 			}
 		}
@@ -1002,11 +1027,12 @@ func imgIsColor(img image.Image) bool {
 	return false
 }
 
-func imgMarkColor(imgIn image.Image) image.Image {
+func imgMarkColor(imgIn image.Image) (image.Image, string) {
 	img := image.NewNRGBA(imgIn.Bounds())
 	black := color.RGBA{0, 0, 0, 255}
 	// white := color.RGBA{255, 255, 255, 255}
 	w, h := img.Bounds().Max.X, img.Bounds().Max.Y
+	data := []float64{}
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
 			r, g, b, _ := imgIn.At(x, y).RGBA()
@@ -1019,32 +1045,51 @@ func imgMarkColor(imgIn image.Image) image.Image {
 				gb = -gb
 			}
 			rgb := float64(rg+gb) / float64(0xFFFF) * float64(0xFF)
-			if rgb > 4.0 {
+			if rgb > colorThreshold {
 				img.Set(x, y, black)
+				data = append(data, rgb)
 			}
 		}
 	}
-	return img
+	return img, summarizeSeries(data)
 }
 
-// isColorImage returns true if image file `path` contains color
-func showColorImage(path string) (bool, error) {
-	img, err := readImage(path)
-	if err != nil {
-		return false, err
-	}
-
-	w, h := img.Bounds().Max.X, img.Bounds().Max.Y
-	for x := 0; x < w; x++ {
-		for y := 0; y < h; y++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			if r != g || g != b {
-				return true, nil
-			}
+func summarizeSeries(data []float64) string {
+	n := len(data)
+	total := 0.0
+	min := +1e20
+	max := -1e20
+	for _, x := range data {
+		total += x
+		if x < min {
+			min = x
+		}
+		if x > max {
+			max = x
 		}
 	}
-	return false, nil
+	mean := total / float64(n)
+	return fmt.Sprintf("n=%d min=%.3f mean=%.3f max=%.3f", n, min, mean, max)
 }
+
+// // isColorImage returns true if image file `path` contains color
+// func showColorImage(path string) (bool, error) {
+// 	img, err := readImage(path)
+// 	if err != nil {
+// 		return false, err
+// 	}
+
+// 	w, h := img.Bounds().Max.X, img.Bounds().Max.Y
+// 	for x := 0; x < w; x++ {
+// 		for y := 0; y < h; y++ {
+// 			r, g, b, _ := img.At(x, y).RGBA()
+// 			if r != g || g != b {
+// 				return true, nil
+// 			}
+// 		}
+// 	}
+// 	return false, nil
+// }
 
 // readImage reads image file `path` and returns its contents as an Image.
 func readImage(path string) (image.Image, error) {
@@ -1163,7 +1208,7 @@ func (s *statistics) load() error {
 	return nil
 }
 
-func (s *statistics) save() error {
+func (s *statistics) _save() error {
 	if !s.enabled {
 		return nil
 	}
@@ -1178,8 +1223,11 @@ func (s *statistics) addTestResult(e testResult, force bool) {
 	if !ok {
 		s.testResultList = append(s.testResultList, e)
 		s.testResultMap[e.name] = len(s.testResultList) - 1
-	} else if force {
+	} else {
 		s.testResultList[i] = e
+	}
+	if force {
+		s._save()
 	}
 }
 
@@ -1239,7 +1287,7 @@ func testResultWrite(path string, results []testResult) error {
 	w := csv.NewWriter(f)
 
 	if err := w.Write([]string{"name", "colorIn", "colorOut", "numPages", "duration",
-		"image xobj", "form xobj"}); err != nil {
+		"imageXobj", "formXobj"}); err != nil {
 		return err
 	}
 	for i, e := range results {

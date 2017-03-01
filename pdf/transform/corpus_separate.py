@@ -65,8 +65,8 @@ key_type_list = [
     ('colorOut', toBool),
     ('numPages', int),
     ('duration', float),
-    ('image_xobj', int),
-    ('form_xobj', int)
+    ('imageXobj', int),
+    ('formXobj', int)
 ]
 types = dict(key_type_list)
 
@@ -88,8 +88,9 @@ color_files = {row.name for row in trBody if row.colorIn}
 gray_files = all_files - color_files
 fail_files = {row.name for row in trBody if (row.colorIn and row.colorOut)}
 success_files = all_files - fail_files
-img_xobj_files = set() # {row.name for row in trBody if row.image_xobj > 0}
-img1_files = {row.name for row in trBody if row.image_xobj == 1}
+img_xobj_files = {row.name for row in trBody if row.imageXobj > 0}
+form_xobj_files = {row.name for row in trBody if row.formXobj > 0}
+img1_files = {row.name for row in trBody if (row.imageXobj == 1 and row.formXobj ==0)}
 name_pages = {row.name: (row.numPages, row.duration) for row in trBody}
 
 
@@ -109,12 +110,14 @@ for i, name in enumerate(color_fail_img1_files):
     print('%4d: %-20s %s' % (i, name, name_pages[name]))
 
 colordirs = {
-    'color': set(color_files),
-    'gray': set(all_files) - set(color_files)
+    'color': color_files,
+    'gray': all_files - color_files
 }
 xobjdirs = {
-    'xobj': set(img_xobj_files),
-    'no.xobj': set(all_files) - set(img_xobj_files)
+    'both.xobj': img_xobj_files & form_xobj_files,
+    'no.xobj': all_files - img_xobj_files - form_xobj_files,
+    'img.xobj': img_xobj_files,
+    'form.xobj': form_xobj_files,
 }
 
 print('colordirs=%s %d' % (dict_counts(colordirs), num_values(colordirs)))
