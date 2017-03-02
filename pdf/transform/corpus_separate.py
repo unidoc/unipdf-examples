@@ -25,7 +25,7 @@ from glob import glob
 
 
 do_write = True
-fail_only = False
+fail_only = True
 testResultPath = "xform.test.results.csv"
 basedir = 'test.corpus'
 if fail_only:
@@ -118,8 +118,8 @@ colordirs = {
 xobjdirs = {
     'both.xobj': img_xobj_files & form_xobj_files,
     'no.xobj': all_files - img_xobj_files - form_xobj_files,
-    'img.xobj': img_xobj_files,
-    'form.xobj': form_xobj_files,
+    'img.xobj': img_xobj_files - form_xobj_files,
+    'form.xobj': form_xobj_files - img_xobj_files,
 }
 
 print('colordirs=%s %d' % (dict_counts(colordirs), num_values(colordirs)))
@@ -154,11 +154,13 @@ dest_count = defaultdict(int)
 for path in path_list:
     name = os.path.basename(path)
     dest_dir = name_dir.get(name, dir_other)
+    if dest_dir == dir_other:
+        continue
     dest = os.path.join(dest_dir, name)
     assert dest.lower() != path.lower()
     dest_count[dest_dir] += 1
     # print('%50s => %s' % (name, dest))
-    if do_write:
+    if do_write :
         try:
             shutil.copyfile(path, dest)
         except:

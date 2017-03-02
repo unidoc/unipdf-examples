@@ -1,0 +1,81 @@
+name,colorIn,colorOut,numPages,duration,imageXobj,formXobj
+HH factsheet.pdf,true,true,2,0.088,4,3
+Zendesk FAQ.pdf,true,true,3,0.151,3,1
+wald2002-2.pdf,true,true,35,1.101,3,0
+250a5c08cb131c12125c916530830b6d-4836-RJASET-DOI.pdf,true,true,5,0.061,19,0
+Andrew Fuller flyer.pdf,true,true,1,0.531,1130,0
+AcrobatDC_acrobat_digital_signature_appearances.pdf,true,true,13,0.375,2,0
+Little_niss_oct1014.pdf,true,false,40,0.210,4,0
+geoff_hinton_dark14.pdf,true,true,20,0.269,21,0
+3page_test.pdf,true,true,3,0.082,6,1
+2012060560369753.pdf,true,true,6,0.093,5,0
+science.pdf,true,true,4,0.136,7,0
+pearson_science_8_sb_chapter_5_unit_5.2.pdf,true,true,11,1.059,117,3
+CCM sandbox issue reproduction.pdf,true,false,9,0.416,29,0
+Ball_Drop_activity.pdf,true,false,6,0.315,16,0
+ncfast.pdf,false,false,28,0.266,11,0
+RISORincCV_Ver3.07_20130305.pdf,true,false,67,1.831,0,0
+Privet201.pdf,true,false,30,1.766,0,0
+threshold_sigs.pdf,true,false,26,0.805,4,1
+PrinterOn Enterprise & PaperCut Integration.pdf,true,false,17,0.735,12,0
+1512.03547v2.pdf,false,false,89,2.909,0,0
+post-treatment-bias.pdf,true,false,47,1.249,4,0
+zerocash-extended-20140518.pdf,true,true,56,1.209,0,4
+BLUEBOOK.pdf,false,false,242,1.340,20,0
+cvxopt_1306.0057v1.pdf,true,false,36,3.073,0,0
+o2.pdf,false,false,2,0.918,2,0
+protocol.pdf,true,true,47,1.087,0,2
+whitepaper2015.pdf,true,true,19,0.409,5,8
+1507.02672v1.pdf,true,true,19,0.658,0,3
+cryptdb.pdf,true,true,16,0.526,0,3
+scan_alan_2016-03-30-10-38-15.pdf,true,false,1,3.578,1,0
+PNAS-2016-Battiston-10031-6.pdf,true,false,6,0.855,12,0
+mueller.pdf,true,true,34,0.467,2,18
+2013-12-12_rg_final_report.pdf,true,false,308,1.462,11,0
+craig-thesis (1).pdf,false,false,209,2.278,0,0
+craig-thesis.pdf,false,false,209,1.667,0,0
+Implementing Homomorphic Encryption.pdf,true,true,83,0.649,1,22
+bv_cvxbook_extra_exercises.pdf,false,false,127,2.561,0,0
+HansRosling.pdf,true,true,4,0.839,1,1
+Read-the-draft-of-the-executive-order-on-CIA.pdf,true,false,4,0.259,1,0
+Exam3SP2012Soln.pdf,false,false,10,0.014,10,0
+Longevity Bulletin Issue 9.pdf,true,true,32,0.646,2,1
+itu-t81.pdf,true,false,186,2.609,0,0
+stick_breaking.pdf,true,true,38,0.410,0,36
+tikonov.pdf,false,false,12,0.191,12,0
+weakLongrangeForcesTheory_01.pdf,true,false,37,0.420,15,0
+pcl_xl_2_0_technical_reference_rev2_2.pdf,true,false,265,2.856,2,0
+Lattice Based Cryptography for Beginners.pdf,true,true,121,1.514,0,3
+text_13pages.pdf,false,false,13,0.018,13,0
+gap.pdf,false,false,13,0.059,13,0
+Parsing-Probabilistic.pdf,true,false,59,0.783,10,0
+cosy.pdf,true,false,1,0.055,9,0
+12 Image reconstruction.pdf,true,true,20,0.312,90,0
+The_State_of_Late_Payment_MarketInvoice_2016.pdf,true,true,20,0.916,1,21
+ijdl-2013.pdf,true,false,16,0.262,5,4
+pnp.pdf,false,false,116,1.210,0,0
+Framingham Heart Study.pdf,true,false,7,0.286,2,0
+The-Byzantine-Generals-Problem.pdf,false,false,20,0.425,1,0
+word_color_gif.pdf,true,true,1,0.073,3,0
+Redmon_You_Only_Look_CVPR_2016_paper.pdf,true,true,10,0.517,10,25
+Szegedy_Going_Deeper_With_2015_CVPR_paper.pdf,true,true,9,0.126,0,15
+RMG_Factsheet_2017.pdf,true,false,4,0.273,6,1
+MIT Cryptographer Silvio Micali - ALGORAND - The Efficient and Democratic Ledger.pdf,true,false,57,0.544,0,3
+cs-ippprodprint10-20010212-5100.3.pdf,true,true,76,0.944,31,0
+PhysRevLett.118.060401.pdf,true,false,8,0.297,4,0
+fgvc-2015-fast-bird-part.pdf,true,false,2,0.174,6,0
+1603.09056.pdf,true,true,9,0.192,0,5
+ICA_2017_01.pdf,true,true,25,0.937,13,1
+p329-galle.pdf,true,false,10,1.207,5,3
+1207.0580.pdf,true,false,18,0.378,10,0
+1701.02434v1.pdf,true,true,60,0.791,0,34
+art%3A10.1186%2Fs13673-015-0039-9.pdf,true,false,16,0.761,23,2
+3725b275.pdf,true,true,5,0.089,6,6
+BALU_Raghavendran.pdf,true,true,128,1.200,2,4
+US5553145.pdf,false,false,13,0.378,13,0
+PaperCut Case Study - Bakers Delight.pdf,true,true,2,0.520,0,6
+BookClubGuide16.pdf,true,true,4,3.704,7,5
+PaperCut Device REST Web Service API.pdf,true,false,8,1.224,1,0
+The_Block_Cipher_Companion.pdf,true,true,279,0.447,0,2
+fireflyforparents.pdf,true,false,18,0.890,28,0
+Zero_Configuration_Networking_The_Definitive_Guide.pdf,true,true,254,1.143,3,1

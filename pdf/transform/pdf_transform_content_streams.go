@@ -341,6 +341,15 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms, doGrays
 func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool,
 	objCounts *ObjCounts) error {
 
+	nameSubtype, err := page.GetXObjectSubtypes()
+	if err != nil {
+		return nil
+	}
+	unicommon.Log.Info("nameSubtype=%+v", nameSubtype)
+	for name, subtype := range nameSubtype {
+		objCounts.xobjNameSubtype[name] = subtype
+	}
+
 	cstream, err := page.GetAllContentStreams()
 	if err != nil {
 		return err
@@ -354,23 +363,15 @@ func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bo
 	if err != nil {
 		return err
 	}
-	return transformXObjects(page, desc, doGrayscaleTransform, objCounts)
+	return transformXObjects(page, desc, doGrayscaleTransform)
 }
 
-func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool,
-	objCounts *ObjCounts) error {
+func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
 	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
 
-	nameSubtype, err := page.GetXObjectSubtypes()
-	if err != nil {
-		return nil
-	}
-	for name, subtype := range nameSubtype {
-		objCounts.xobjNameSubtype[name] = subtype
-	}
 	xobjs, err := page.GetXObjects()
 	if err != nil {
-		return nil
+		return err
 	}
 	unicommon.Log.Info("-XObjects=%s", xobjs)
 
@@ -379,8 +380,16 @@ func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform b
 		unicommon.Log.Error("No resource map. err=%v", err)
 		return err
 	}
-	unicommon.Log.Info("nameXimgMap=%d", len(nameXimgMap))
-	for name, ximg := range nameXimgMap {
+
+	names := []string{}
+	for name := range nameXimgMap {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+
+	unicommon.Log.Info("nameXimgMap=%d %+v", len(nameXimgMap), names)
+	for _, name := range names {
+		ximg := nameXimgMap[name]
 		unicommon.Log.Info("Converting image XObject %#q to gray", name)
 		if err := ximg.ToGray(); err != nil {
 			return err
@@ -388,7 +397,7 @@ func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform b
 	}
 	err = page.SetImageResourceMap(nameXimgMap)
 	if err != nil {
-		unicommon.Log.Error("SetImageResourceMap failed.. err=%v", err)
+		unicommon.Log.Error("SetImageResourceMap failed. err=%v", err)
 		return err
 	}
 
@@ -468,6 +477,11 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 
 	gsStack := graphicStateStack{}
 
+	noContentColor := false
+
+	// op0 := unipdf.ContentStreamOperation{Operand: "sc"}
+	// op0 := unipdf.ContentStreamOperation{Operand: "SC"}
+
 	for i, op := range *pOperations {
 		unicommon.Log.Debug("i=%d op=%s", i, op)
 		var vals []float64
@@ -506,50 +520,58 @@ func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
 			allCsCounts[csName]++
 
 		case "sc", "SC", "scn", "SCN":
-			var colorspace unipdf.PdfColorspace
-			if isUpper(op.Operand) {
-				colorspace = gs.colorspaceStroke
+			if noContentColor {
+				*op = unipdf.ContentStreamOperation{}
 			} else {
-				colorspace = gs.colorspaceFill
-			}
-			unicommon.Log.Debug("^^^ op=%s hasColor=%t gs=%s",
-				op, unipdf.PdfColorspaceHasColor(colorspace), gs)
+				var colorspace unipdf.PdfColorspace
+				if isUpper(op.Operand) {
+					colorspace = gs.colorspaceStroke
+				} else {
+					colorspace = gs.colorspaceFill
+				}
+				unicommon.Log.Debug("^^^ op=%s hasColor=%t gs=%s",
+					op, unipdf.PdfColorspaceHasColor(colorspace), gs)
 
-			// !@#$ SemanticStates201.pdf
-			// if _, ok := colorspace.(*unipdf.PdfColorspaceSpecialPattern); ok {
-			// 	op.SetOpFloatParams(op.Operand, []float64{0.0})
-			// } else
-			if unipdf.PdfColorspaceHasColor(colorspace) {
-				if vals, err = op.GetFloatParams(colorspace.GetNumComponents()); err != nil {
-					unicommon.Log.Error("Wrong # params. colorspace=%#T err=%v", colorspace, err)
-					return err
-				}
-				gray, err := colorspace.ToGrayValue(vals)
-				if err != nil {
-					return err
-				}
-				if err = op.SetOpFloatParams(op.Operand, []float64{gray}); err != nil {
-					return err
+				// !@#$ SemanticStates201.pdf  HH factsheet.pdf
+				if _, ok := colorspace.(*unipdf.PdfColorspaceSpecialPattern); ok {
+					*op = unipdf.ContentStreamOperation{}
+					// op.SetOpFloatParams(op.Operand, []float64{0.0})
+				} else if unipdf.PdfColorspaceHasColor(colorspace) {
+					if vals, err = op.GetFloatParams(colorspace.GetNumComponents()); err != nil {
+						unicommon.Log.Error("Wrong # params. colorspace=%#T err=%v", colorspace, err)
+						return err
+					}
+					gray, err := colorspace.ToGrayValue(vals)
+					if err != nil {
+						return err
+					}
+					if err = op.SetOpFloatParams(op.Operand, []float64{gray}); err != nil {
+						return err
+					}
 				}
 			}
 
 		case "rg", "RG", "k", "K":
-			cs := opColorspace[op.Operand]
-			if vals, err = op.GetFloatParams(cs.GetNumComponents()); err != nil {
-				unicommon.Log.Error("Wrong # params. cs=%#T err=%v", cs, err)
-				return err
-			}
-			gray, err := cs.ToGrayValue(vals)
-			if err != nil {
-				return err
-			}
-			if err = op.SetOpFloatParams(opGrayOp[op.Operand], []float64{gray}); err != nil {
-				return err
-			}
+			if noContentColor {
+				*op = unipdf.ContentStreamOperation{}
+			} else {
+				cs := opColorspace[op.Operand]
+				if vals, err = op.GetFloatParams(cs.GetNumComponents()); err != nil {
+					unicommon.Log.Error("Wrong # params. cs=%#T err=%v", cs, err)
+					return err
+				}
+				gray, err := cs.ToGrayValue(vals)
+				if err != nil {
+					return err
+				}
+				if err = op.SetOpFloatParams(opGrayOp[op.Operand], []float64{gray}); err != nil {
+					return err
+				}
 
-			csName := fmt.Sprintf("%#T", cs)
-			docCsCounts[csName]++
-			allCsCounts[csName]++
+				csName := fmt.Sprintf("%#T", cs)
+				docCsCounts[csName]++
+				allCsCounts[csName]++
+			}
 
 		case "g", "G":
 			// For instrumentation only
