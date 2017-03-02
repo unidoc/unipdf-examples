@@ -1,8 +1,8 @@
 name,colorIn,colorOut,numPages,duration,imageXobj,formXobj
-HH factsheet.pdf,true,true,2,0.088,4,3
+HH factsheet.pdf,true,true,2,0.066,4,3
 Zendesk FAQ.pdf,true,true,3,0.151,3,1
-wald2002-2.pdf,true,true,35,1.101,3,0
-250a5c08cb131c12125c916530830b6d-4836-RJASET-DOI.pdf,true,true,5,0.061,19,0
+wald2002-2.pdf,true,true,35,0.736,3,0
+250a5c08cb131c12125c916530830b6d-4836-RJASET-DOI.pdf,true,true,5,0.059,19,0
 Andrew Fuller flyer.pdf,true,true,1,0.531,1130,0
 AcrobatDC_acrobat_digital_signature_appearances.pdf,true,true,13,0.375,2,0
 Little_niss_oct1014.pdf,true,false,40,0.210,4,0
@@ -36,7 +36,7 @@ craig-thesis (1).pdf,false,false,209,2.278,0,0
 craig-thesis.pdf,false,false,209,1.667,0,0
 Implementing Homomorphic Encryption.pdf,true,true,83,0.649,1,22
 bv_cvxbook_extra_exercises.pdf,false,false,127,2.561,0,0
-HansRosling.pdf,true,true,4,0.839,1,1
+HansRosling.pdf,true,true,4,1.151,1,1
 Read-the-draft-of-the-executive-order-on-CIA.pdf,true,false,4,0.259,1,0
 Exam3SP2012Soln.pdf,false,false,10,0.014,10,0
 Longevity Bulletin Issue 9.pdf,true,true,32,0.646,2,1
@@ -79,3 +79,120 @@ PaperCut Device REST Web Service API.pdf,true,false,8,1.224,1,0
 The_Block_Cipher_Companion.pdf,true,true,279,0.447,0,2
 fireflyforparents.pdf,true,false,18,0.890,28,0
 Zero_Configuration_Networking_The_Definitive_Guide.pdf,true,true,254,1.143,3,1
+Afternoon Need States Report_FINAL 6.25.15.pdf,true,false,42,2.182,112,0
+dark-internet-mail-environment-march-2015.pdf,true,true,140,1.618,294,0
+day2_ListeningToHypercolors.pdf,true,false,32,0.351,7,0
+PaperCutMF-Top-10-Reasons.pdf,true,true,2,0.641,0,10
+080101IEEETransMedImag.pdf,false,false,8,0.220,58,0
+20090512_php35CB.pdf,false,false,14,0.379,89,0
+1601.06759v2.pdf,true,true,11,0.197,3,10
+Feature Extraction Using the Hough Transform.pdf,false,false,8,0.113,1,0
+dbes3aid.pdf,true,false,425,7.085,0,0
+05-20.pdf,true,true,41,0.398,60,13
+OpenCV Computer Vision with Python.pdf,true,false,122,1.224,3,2
+The great chain of being sure about things _ The Economist.pdf,true,true,9,15.367,4,0
+t1_week_6_3rd_march_2016.pdf,true,true,12,1.005,39,9
+WhatIsEnergy.pdf,true,true,6,0.837,8,2
+Physics_Sample_Chapter_3.pdf,true,false,36,2.876,17,60
+Folk_o_bostadsrakningen_1970_12.pdf,true,false,146,1.692,145,0
+day3_TemporalImageProcessing.pdf,true,true,49,0.983,26,3
+PracticalPythonAndOpenCV_Chapter10.pdf,true,false,41,0.983,18,0
+augmentingReality_salon01.pdf,true,false,49,1.243,19,0
+Spatial Transformer Networks.pdf,true,true,14,0.436,2,9
+Lesson_054_handout.pdf,true,false,18,0.945,10,3
+122_2016_2746_MOESM3_ESM.pdf,true,false,3162,54.366,0,0
+Debug.Hacks中文版_深入调试的技术和工具.pdf,true,false,419,4.892,1,1
+Trump-Intelligence-Allegations.pdf,true,false,35,9.369,33,0
+talk_Simons_part1_pdf.pdf,true,true,79,4.719,411,1
+nips-tutorial-policy-optimization-Schulman-Abbeel.pdf,true,true,120,4.839,101,3
+blank.pdf,false,false,1,0.002,0,0
+legal_pages7_color3.pdf,true,false,7,0.004,0,0
+cmyk.pdf,true,false,9,0.004,0,0
+convoluted_line.pdf,false,false,1,0.003,0,0
+fonts_in_form_xobject.pdf,false,false,1,0.003,0,1
+WEIß_pages6_color4.pdf,true,false,6,0.006,0,0
+lines.pdf,true,false,20,0.010,0,0
+AnneMakauProfile.pdf,true,false,3,0.011,0,0
+English Report.pdf,true,false,16,0.009,0,0
+202 moot.pdf,false,false,2,0.021,0,0
+word_bmp.pdf,false,false,1,0.025,1,0
+word_jpeg_grayscale.pdf,false,false,1,0.031,1,0
+warnock_camelot.pdf,false,false,6,0.011,0,0
+pdl.pdf,false,false,1,0.021,1,0
+Sunday 2016 team Fixtures.pdf,true,false,12,0.089,0,0
+Jedi.pdf,true,true,1,0.026,1,0
+pre-algebra_translate.pdf,true,false,2,0.016,2,0
+ACS4PartnerQuotes.pdf,true,false,2,0.018,0,0
+49-7441.pdf,true,false,1,0.008,2,0
+dense2_lines.pdf,true,false,3,0.180,0,0
+rfc6962.txt.pdf,false,false,27,0.029,0,0
+ColourNaming.pdf,false,false,12,0.074,0,0
+kernel_trick.pdf,false,false,3,0.053,0,0
+ACFrOgCf6f4kzU-mNiolvkiOlADV6cnWfoWv_FZPB6kB4aBtGh68m8KVTc5q0t50Bian-2myr3AQvH0HLbHDFnyo3fY_BDudV1i3zI9i_g6S36lOesSvotIATPqvLF0= (1).pdf,false,false,9,0.151,1,0
+A Sunshine - IEP.pdf,false,false,9,0.200,1,0
+killer_modelling.pdf,true,false,5,0.137,0,0
+android.pdf,true,false,1,0.034,1,0
+symbiosis-provocation.pdf,false,false,8,0.066,0,0
+Whitepaper-XMP-metadata-in-PDFlib-products.pdf,true,true,4,0.073,0,2
+docs.pdf,true,false,1,0.040,2,0
+unlexicalized-parsing.pdf,false,false,8,0.255,0,0
+4e.pdf,true,false,5,0.169,0,0
+midtermF13secondSols.pdf,false,false,7,0.063,0,0
+pcfgs.pdf,false,false,18,0.211,0,0
+multi_string_search.pdf,false,false,22,0.099,0,0
+lexpcfgs.pdf,false,false,22,0.205,0,0
+mh-guide-matrix.pdf,true,false,1,0.077,1,0
+letter to Parents re Telstra Phone Line.pdf,true,false,1,0.027,2,0
+Doc_Test_papercut.pdf,true,false,4,0.043,2,0
+invoice88786339.pdf,true,false,2,0.041,2,0
+yao1982-ocr.pdf,false,false,5,0.107,0,0
+lcs.pdf,false,false,6,0.263,0,2
+IJIRAE_Survey_on_Text_Classification.pdf,true,false,6,0.299,1,0
+docpro07aut.pdf,true,false,16,0.192,0,0
+lec04.pdf,true,false,24,0.082,0,0
+SA_implementations.pdf,false,false,9,0.240,1,0
+fawkes.pdf,false,false,13,0.168,0,0
+lec03-sp01.pdf,true,false,5,0.082,0,0
+lm.pdf,false,false,12,0.092,0,0
+7600_Model355_ColorElectrostaticPlotter_TechnicalData_5959-9727-6pages_Jan90.pdf,false,false,6,0.007,6,0
+2017 Arts Festival Letter.pdf,true,false,1,0.023,2,0
+l1_logistic_reg_aaai.pdf,true,false,7,0.371,0,0
+ICT Parent letter 7 2016.pdf,true,false,1,0.029,3,0
+outbreak.pdf,false,false,7,0.139,0,0
+database_03_abs.pdf,false,false,2,0.015,0,1
+recht11a.pdf,false,false,18,0.406,0,0
+0165551514551903.pdf,false,false,17,0.199,2,0
+ahs-scn-bjh-quick-facts.pdf,true,true,1,0.022,0,2
+mehrotra_trick_final2.pdf,false,false,15,0.195,0,0
+kuksa08nips.pdf,false,false,8,0.103,0,1
+biau08a.pdf,false,false,19,0.322,0,0
+se.pdf,false,false,12,0.292,0,0
+designofasearchablesymmetrickeyciphersystem-120529001108-phpapp02.pdf,true,false,11,0.077,1,0
+twitter_sentimenti.pdf,true,true,7,0.062,0,6
+knn  v3.pdf,false,false,1,0.401,3,0
+1502.03167.pdf,true,false,11,0.427,0,0
+Yemeni_Laws92.pdf,false,false,14,0.359,0,0
+batsbzx201630-20.pdf,true,false,27,0.566,0,0
+Suffix.pdf,false,false,11,0.344,0,0
+RAND_PE198.pdf,true,false,16,0.273,0,0
+p.pdf,true,true,18,0.182,0,2
+SemanticStates201.pdf,true,false,17,0.362,0,0
+bitcoin.pdf,false,false,9,0.147,0,0
+nips01-discriminativegenerative.pdf,false,false,8,0.126,0,0
+KEI_UT_Raessler.pdf,true,false,14,0.102,3,0
+Term One Sport Junior.pdf,true,false,1,0.053,2,0
+1603.06186v2.pdf,false,false,10,0.426,0,0
+suffix-icalp03.pdf,false,false,13,0.130,0,0
+shamirturing.pdf,false,false,2,0.069,1,0
+1206.6382.pdf,true,false,8,0.362,0,0
+1409.1556v6.pdf,false,false,14,0.497,0,0
+mcs-ensembles.pdf,true,false,15,0.204,1,0
+epson_pages3_color_pages1.pdf,true,false,3,0.338,0,0
+3GABP.pdf,true,false,26,1.149,1,0
+cure53.pdf,true,false,13,0.271,1,0
+frege.pdf,true,true,14,0.133,0,2
+brotli-2015-09-22.pdf,true,false,6,0.333,1,0
+CaiHof-CIKM2004.pdf,true,false,10,0.447,7,0
+lingdet-mccs.pdf,false,false,31,0.227,1,0
+image2015-12-13-070827.pdf,false,false,2,0.085,2,0
+cst.pdf,false,false,18,0.190,1,0

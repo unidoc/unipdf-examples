@@ -2,6 +2,11 @@ TODO
 ====
 Convert colors to grayscale in shading dicts. See extreme-days-and-nights-daylight-variation-in-the-arctic-reykjavik-murmansk-and-alert_e634.pdf
 
+HansRosling.pdf grayscale response  looks wrong.
+
+pre-algebra_translate.pdf QR code is all black after conversion
+
+explosion-database-choice.pdf  encoding.go:270:DecodeStream: Invalid row length...(39195/291=134+201/291
 
 SemanticStates201.pdf PdfColorspaceSpecialPattern
 
