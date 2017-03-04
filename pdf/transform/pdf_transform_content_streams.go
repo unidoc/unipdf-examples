@@ -350,23 +350,23 @@ func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bo
 		objCounts.xobjNameSubtype[name] = subtype
 	}
 
-	cstream, err := page.GetAllContentStreams()
+	err = transformPdfPageContent(page, desc, doGrayscaleTransform, objCounts)
 	if err != nil {
 		return err
 	}
 
-	cstreamOut, err := transformString(page, cstream, desc, doGrayscaleTransform)
+	err = transformImageXObjects(page, desc, doGrayscaleTransform)
 	if err != nil {
 		return err
 	}
-	err = page.SetContentStreams([]string{cstreamOut}, nil)
+	err = transformFormXObjects(page, desc, doGrayscaleTransform)
 	if err != nil {
 		return err
 	}
-	return transformXObjects(page, desc, doGrayscaleTransform)
+	return nil
 }
 
-func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
+func transformImageXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
 	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
 
 	xobjs, err := page.GetXObjects()
@@ -375,7 +375,7 @@ func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform b
 	}
 	unicommon.Log.Info("-XObjects=%s", xobjs)
 
-	nameXimgMap, err := page.GetImageResourceMap()
+	nameXimgMap, err := page.GetXImageResourceMap()
 	if err != nil {
 		unicommon.Log.Error("No resource map. err=%v", err)
 		return err
@@ -395,9 +395,9 @@ func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform b
 			return err
 		}
 	}
-	err = page.SetImageResourceMap(nameXimgMap)
+	err = page.SetXImageResourceMap(nameXimgMap)
 	if err != nil {
-		unicommon.Log.Error("SetImageResourceMap failed. err=%v", err)
+		unicommon.Log.Error("SetXImageResourceMap failed. err=%v", err)
 		return err
 	}
 
@@ -410,9 +410,73 @@ func transformXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform b
 	return nil
 }
 
+func transformFormXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
+	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
+
+	xobjs, err := page.GetXObjects()
+	if err != nil {
+		return err
+	}
+	unicommon.Log.Info("-XObjects=%s", xobjs)
+
+	nameXformMap, err := page.GetXFormResourceMap()
+	if err != nil {
+		unicommon.Log.Error("No resource map. err=%v", err)
+		return err
+	}
+
+	names := []string{}
+	for name := range nameXformMap {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+
+	unicommon.Log.Info("nameXformMap=%d %+v", len(nameXformMap), names)
+	for _, name := range names {
+		xform := nameXformMap[name]
+		formDesc := fmt.Sprintf("%s:form['%#q']", desc, name)
+		unicommon.Log.Info("Converting form XObject %#q to gray", name)
+		if err := transformPdfPageContent(xform, formDesc, doGrayscaleTransform, nil); err != nil {
+			return err
+		}
+	}
+	err = page.SetXFormResourceMap(nameXformMap)
+	if err != nil {
+		unicommon.Log.Error("SetXFormResourceMap failed. err=%v", err)
+		return err
+	}
+
+	xobjs, err = page.GetXObjects()
+	if err != nil {
+		return nil
+	}
+	unicommon.Log.Info("+XObjects=%s", xobjs)
+
+	return nil
+}
+
+func transformPdfPageContent(page unipdf.PdfWithContent, // *unipdf.PdfPage,
+	desc string, doGrayscaleTransform bool,
+	objCounts *ObjCounts) error {
+	cstream, err := page.GetAllContentStreams()
+	if err != nil {
+		return err
+	}
+	cstreamOut, err := transformString(page, cstream, desc, doGrayscaleTransform)
+	if err != nil {
+		return err
+	}
+	err = page.SetContentStreams([]string{cstreamOut}, nil)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // transformString applies the transform (currently identity or grayscale conversion) to string
 // and updates `page`
-func transformString(page *unipdf.PdfPage, cstream, desc string, doGrayscaleTransform bool) (string,
+func transformString(page unipdf.PdfWithContent, //*unipdf.PdfPage,
+	cstream, desc string, doGrayscaleTransform bool) (string,
 	error) {
 	unicommon.Log.Debug("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
 
@@ -457,7 +521,8 @@ var docCsCounts = map[string]int{}
 var allCsCounts = map[string]int{}
 
 // transformColorToGrayscale transforms color pages to grayscale
-func transformColorToGrayscale(page *unipdf.PdfPage, desc string,
+func transformColorToGrayscale(page unipdf.PdfWithContent, //*unipdf.PdfPage,
+	desc string,
 	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
 
 	unicommon.Log.Debug("%s", desc)

@@ -8,9 +8,14 @@ pre-algebra_translate.pdf QR code is all black after conversion
 
 explosion-database-choice.pdf  encoding.go:270:DecodeStream: Invalid row length...(39195/291=134+201/291
 
+Cirrato Whitepaper.pdf     encoding.go:762:DecodeStream: jpeg.Decode failed. err=invalid JPEG format: bad Th value
+
+
 SemanticStates201.pdf PdfColorspaceSpecialPattern
 
 PdfColorspaceCalRGB Has 1 component per pixel 2012060560369753.pdf
+
+
 
 upload1419017431.pdf Im1 1320 0 obj
 <</BitsPerComponent 8/ColorSpace/DeviceCMYK/Filter/DCTDecode/Height 182/Length 41827/Subtype/Image/Type/XObject/Width 166>>

@@ -1,110 +1,110 @@
 name,colorIn,colorOut,numPages,duration,imageXobj,formXobj
-HH factsheet.pdf,true,true,2,0.066,4,3
-Zendesk FAQ.pdf,true,true,3,0.151,3,1
+HH factsheet.pdf,true,true,2,0.080,4,3
+Zendesk FAQ.pdf,true,true,3,0.182,3,1
 wald2002-2.pdf,true,true,35,0.736,3,0
 250a5c08cb131c12125c916530830b6d-4836-RJASET-DOI.pdf,true,true,5,0.059,19,0
-Andrew Fuller flyer.pdf,true,true,1,0.531,1130,0
-AcrobatDC_acrobat_digital_signature_appearances.pdf,true,true,13,0.375,2,0
-Little_niss_oct1014.pdf,true,false,40,0.210,4,0
-geoff_hinton_dark14.pdf,true,true,20,0.269,21,0
-3page_test.pdf,true,true,3,0.082,6,1
-2012060560369753.pdf,true,true,6,0.093,5,0
-science.pdf,true,true,4,0.136,7,0
-pearson_science_8_sb_chapter_5_unit_5.2.pdf,true,true,11,1.059,117,3
-CCM sandbox issue reproduction.pdf,true,false,9,0.416,29,0
-Ball_Drop_activity.pdf,true,false,6,0.315,16,0
-ncfast.pdf,false,false,28,0.266,11,0
-RISORincCV_Ver3.07_20130305.pdf,true,false,67,1.831,0,0
-Privet201.pdf,true,false,30,1.766,0,0
-threshold_sigs.pdf,true,false,26,0.805,4,1
-PrinterOn Enterprise & PaperCut Integration.pdf,true,false,17,0.735,12,0
-1512.03547v2.pdf,false,false,89,2.909,0,0
-post-treatment-bias.pdf,true,false,47,1.249,4,0
-zerocash-extended-20140518.pdf,true,true,56,1.209,0,4
-BLUEBOOK.pdf,false,false,242,1.340,20,0
-cvxopt_1306.0057v1.pdf,true,false,36,3.073,0,0
-o2.pdf,false,false,2,0.918,2,0
-protocol.pdf,true,true,47,1.087,0,2
-whitepaper2015.pdf,true,true,19,0.409,5,8
-1507.02672v1.pdf,true,true,19,0.658,0,3
-cryptdb.pdf,true,true,16,0.526,0,3
-scan_alan_2016-03-30-10-38-15.pdf,true,false,1,3.578,1,0
-PNAS-2016-Battiston-10031-6.pdf,true,false,6,0.855,12,0
-mueller.pdf,true,true,34,0.467,2,18
-2013-12-12_rg_final_report.pdf,true,false,308,1.462,11,0
+Andrew Fuller flyer.pdf,true,true,1,0.358,1130,0
+AcrobatDC_acrobat_digital_signature_appearances.pdf,true,true,13,0.221,2,0
+Little_niss_oct1014.pdf,true,false,40,0.145,4,0
+geoff_hinton_dark14.pdf,true,true,20,0.145,21,0
+3page_test.pdf,true,false,3,0.142,6,1
+2012060560369753.pdf,true,false,6,1.341,5,0
+science.pdf,true,false,4,0.920,7,0
+pearson_science_8_sb_chapter_5_unit_5.2.pdf,false,false,11,0.737,117,3
+CCM sandbox issue reproduction.pdf,true,false,9,0.300,29,0
+Ball_Drop_activity.pdf,true,false,6,0.296,16,0
+ncfast.pdf,false,false,28,0.208,11,0
+RISORincCV_Ver3.07_20130305.pdf,true,false,67,1.300,0,0
+Privet201.pdf,true,false,30,1.130,0,0
+threshold_sigs.pdf,true,false,26,0.578,4,1
+PrinterOn Enterprise & PaperCut Integration.pdf,true,false,17,0.458,12,0
+1512.03547v2.pdf,false,false,89,1.852,0,0
+post-treatment-bias.pdf,true,false,47,0.792,4,0
+zerocash-extended-20140518.pdf,false,false,56,1.986,0,4
+BLUEBOOK.pdf,false,false,242,1.293,20,0
+cvxopt_1306.0057v1.pdf,true,false,36,2.229,0,0
+o2.pdf,false,false,2,0.519,2,0
+protocol.pdf,true,true,47,0.880,0,2
+whitepaper2015.pdf,false,false,19,0.485,5,8
+1507.02672v1.pdf,true,true,19,0.396,0,3
+cryptdb.pdf,true,true,16,2.858,0,3
+scan_alan_2016-03-30-10-38-15.pdf,true,false,1,1.692,1,0
+PNAS-2016-Battiston-10031-6.pdf,true,false,6,0.635,12,0
+mueller.pdf,false,false,34,1.098,2,18
+2013-12-12_rg_final_report.pdf,true,false,308,1.039,11,0
 craig-thesis (1).pdf,false,false,209,2.278,0,0
-craig-thesis.pdf,false,false,209,1.667,0,0
-Implementing Homomorphic Encryption.pdf,true,true,83,0.649,1,22
-bv_cvxbook_extra_exercises.pdf,false,false,127,2.561,0,0
-HansRosling.pdf,true,true,4,1.151,1,1
-Read-the-draft-of-the-executive-order-on-CIA.pdf,true,false,4,0.259,1,0
-Exam3SP2012Soln.pdf,false,false,10,0.014,10,0
-Longevity Bulletin Issue 9.pdf,true,true,32,0.646,2,1
-itu-t81.pdf,true,false,186,2.609,0,0
-stick_breaking.pdf,true,true,38,0.410,0,36
+craig-thesis.pdf,false,false,209,1.739,0,0
+Implementing Homomorphic Encryption.pdf,false,false,83,0.956,1,22
+bv_cvxbook_extra_exercises.pdf,false,false,127,2.805,0,0
+HansRosling.pdf,false,false,4,1.033,1,1
+Read-the-draft-of-the-executive-order-on-CIA.pdf,true,false,4,0.281,1,0
+Exam3SP2012Soln.pdf,false,false,10,0.015,10,0
+Longevity Bulletin Issue 9.pdf,false,false,32,0.940,2,1
+itu-t81.pdf,true,false,186,2.689,0,0
+stick_breaking.pdf,true,false,38,2.368,0,36
 tikonov.pdf,false,false,12,0.191,12,0
-weakLongrangeForcesTheory_01.pdf,true,false,37,0.420,15,0
-pcl_xl_2_0_technical_reference_rev2_2.pdf,true,false,265,2.856,2,0
-Lattice Based Cryptography for Beginners.pdf,true,true,121,1.514,0,3
-text_13pages.pdf,false,false,13,0.018,13,0
-gap.pdf,false,false,13,0.059,13,0
-Parsing-Probabilistic.pdf,true,false,59,0.783,10,0
-cosy.pdf,true,false,1,0.055,9,0
-12 Image reconstruction.pdf,true,true,20,0.312,90,0
-The_State_of_Late_Payment_MarketInvoice_2016.pdf,true,true,20,0.916,1,21
-ijdl-2013.pdf,true,false,16,0.262,5,4
-pnp.pdf,false,false,116,1.210,0,0
-Framingham Heart Study.pdf,true,false,7,0.286,2,0
-The-Byzantine-Generals-Problem.pdf,false,false,20,0.425,1,0
-word_color_gif.pdf,true,true,1,0.073,3,0
-Redmon_You_Only_Look_CVPR_2016_paper.pdf,true,true,10,0.517,10,25
-Szegedy_Going_Deeper_With_2015_CVPR_paper.pdf,true,true,9,0.126,0,15
-RMG_Factsheet_2017.pdf,true,false,4,0.273,6,1
-MIT Cryptographer Silvio Micali - ALGORAND - The Efficient and Democratic Ledger.pdf,true,false,57,0.544,0,3
-cs-ippprodprint10-20010212-5100.3.pdf,true,true,76,0.944,31,0
-PhysRevLett.118.060401.pdf,true,false,8,0.297,4,0
-fgvc-2015-fast-bird-part.pdf,true,false,2,0.174,6,0
-1603.09056.pdf,true,true,9,0.192,0,5
-ICA_2017_01.pdf,true,true,25,0.937,13,1
-p329-galle.pdf,true,false,10,1.207,5,3
-1207.0580.pdf,true,false,18,0.378,10,0
-1701.02434v1.pdf,true,true,60,0.791,0,34
-art%3A10.1186%2Fs13673-015-0039-9.pdf,true,false,16,0.761,23,2
-3725b275.pdf,true,true,5,0.089,6,6
-BALU_Raghavendran.pdf,true,true,128,1.200,2,4
+weakLongrangeForcesTheory_01.pdf,true,false,37,0.398,15,0
+pcl_xl_2_0_technical_reference_rev2_2.pdf,true,false,265,2.580,2,0
+Lattice Based Cryptography for Beginners.pdf,true,true,121,1.890,0,3
+text_13pages.pdf,false,false,13,0.022,13,0
+gap.pdf,false,false,13,0.018,13,0
+Parsing-Probabilistic.pdf,true,false,59,0.770,10,0
+cosy.pdf,true,false,1,0.057,9,0
+12 Image reconstruction.pdf,true,true,20,0.318,90,0
+The_State_of_Late_Payment_MarketInvoice_2016.pdf,false,false,20,1.427,1,21
+ijdl-2013.pdf,true,false,16,0.285,5,4
+pnp.pdf,false,false,116,1.138,0,0
+Framingham Heart Study.pdf,true,false,7,0.214,2,0
+The-Byzantine-Generals-Problem.pdf,false,false,20,0.401,1,0
+word_color_gif.pdf,true,true,1,0.051,3,0
+Redmon_You_Only_Look_CVPR_2016_paper.pdf,false,false,10,0.585,10,25
+Szegedy_Going_Deeper_With_2015_CVPR_paper.pdf,true,true,9,0.347,0,15
+RMG_Factsheet_2017.pdf,true,false,4,0.292,6,1
+MIT Cryptographer Silvio Micali - ALGORAND - The Efficient and Democratic Ledger.pdf,true,false,57,0.539,0,3
+cs-ippprodprint10-20010212-5100.3.pdf,true,true,76,0.896,31,0
+PhysRevLett.118.060401.pdf,true,false,8,0.308,4,0
+fgvc-2015-fast-bird-part.pdf,true,false,2,0.151,6,0
+1603.09056.pdf,true,true,9,0.189,0,5
+ICA_2017_01.pdf,false,false,25,1.145,13,1
+p329-galle.pdf,true,false,10,0.991,5,3
+1207.0580.pdf,true,false,18,0.369,10,0
+1701.02434v1.pdf,true,true,60,2.520,0,34
+art%3A10.1186%2Fs13673-015-0039-9.pdf,true,false,16,0.756,23,2
+3725b275.pdf,false,false,5,0.255,6,6
+BALU_Raghavendran.pdf,false,false,128,2.819,2,4
 US5553145.pdf,false,false,13,0.378,13,0
-PaperCut Case Study - Bakers Delight.pdf,true,true,2,0.520,0,6
-BookClubGuide16.pdf,true,true,4,3.704,7,5
-PaperCut Device REST Web Service API.pdf,true,false,8,1.224,1,0
-The_Block_Cipher_Companion.pdf,true,true,279,0.447,0,2
-fireflyforparents.pdf,true,false,18,0.890,28,0
-Zero_Configuration_Networking_The_Definitive_Guide.pdf,true,true,254,1.143,3,1
-Afternoon Need States Report_FINAL 6.25.15.pdf,true,false,42,2.182,112,0
-dark-internet-mail-environment-march-2015.pdf,true,true,140,1.618,294,0
-day2_ListeningToHypercolors.pdf,true,false,32,0.351,7,0
-PaperCutMF-Top-10-Reasons.pdf,true,true,2,0.641,0,10
-080101IEEETransMedImag.pdf,false,false,8,0.220,58,0
-20090512_php35CB.pdf,false,false,14,0.379,89,0
-1601.06759v2.pdf,true,true,11,0.197,3,10
-Feature Extraction Using the Hough Transform.pdf,false,false,8,0.113,1,0
-dbes3aid.pdf,true,false,425,7.085,0,0
-05-20.pdf,true,true,41,0.398,60,13
-OpenCV Computer Vision with Python.pdf,true,false,122,1.224,3,2
-The great chain of being sure about things _ The Economist.pdf,true,true,9,15.367,4,0
-t1_week_6_3rd_march_2016.pdf,true,true,12,1.005,39,9
-WhatIsEnergy.pdf,true,true,6,0.837,8,2
-Physics_Sample_Chapter_3.pdf,true,false,36,2.876,17,60
-Folk_o_bostadsrakningen_1970_12.pdf,true,false,146,1.692,145,0
-day3_TemporalImageProcessing.pdf,true,true,49,0.983,26,3
-PracticalPythonAndOpenCV_Chapter10.pdf,true,false,41,0.983,18,0
-augmentingReality_salon01.pdf,true,false,49,1.243,19,0
-Spatial Transformer Networks.pdf,true,true,14,0.436,2,9
-Lesson_054_handout.pdf,true,false,18,0.945,10,3
-122_2016_2746_MOESM3_ESM.pdf,true,false,3162,54.366,0,0
-Debug.Hacks中文版_深入调试的技术和工具.pdf,true,false,419,4.892,1,1
-Trump-Intelligence-Allegations.pdf,true,false,35,9.369,33,0
-talk_Simons_part1_pdf.pdf,true,true,79,4.719,411,1
-nips-tutorial-policy-optimization-Schulman-Abbeel.pdf,true,true,120,4.839,101,3
+PaperCut Case Study - Bakers Delight.pdf,true,true,2,3.115,0,6
+BookClubGuide16.pdf,true,false,4,3.944,7,5
+PaperCut Device REST Web Service API.pdf,true,false,8,0.877,1,0
+The_Block_Cipher_Companion.pdf,true,false,279,4.776,0,2
+fireflyforparents.pdf,true,false,18,0.816,28,0
+Zero_Configuration_Networking_The_Definitive_Guide.pdf,true,true,254,1.507,3,1
+Afternoon Need States Report_FINAL 6.25.15.pdf,true,false,42,2.077,112,0
+dark-internet-mail-environment-march-2015.pdf,true,true,140,1.473,294,0
+day2_ListeningToHypercolors.pdf,true,false,32,0.262,7,0
+PaperCutMF-Top-10-Reasons.pdf,true,true,2,1.272,0,10
+080101IEEETransMedImag.pdf,false,false,8,0.208,58,0
+20090512_php35CB.pdf,false,false,14,0.320,89,0
+1601.06759v2.pdf,true,true,11,0.365,3,10
+Feature Extraction Using the Hough Transform.pdf,false,false,8,0.094,1,0
+dbes3aid.pdf,true,false,425,6.808,0,0
+05-20.pdf,true,true,41,0.609,60,13
+OpenCV Computer Vision with Python.pdf,true,false,122,1.182,3,2
+The great chain of being sure about things _ The Economist.pdf,true,true,9,14.715,4,0
+t1_week_6_3rd_march_2016.pdf,true,false,12,1.634,39,9
+WhatIsEnergy.pdf,false,false,6,1.492,8,2
+Physics_Sample_Chapter_3.pdf,true,false,36,2.658,17,60
+Folk_o_bostadsrakningen_1970_12.pdf,true,false,146,1.600,145,0
+day3_TemporalImageProcessing.pdf,false,false,49,1.952,26,3
+PracticalPythonAndOpenCV_Chapter10.pdf,true,false,41,0.929,18,0
+augmentingReality_salon01.pdf,true,false,49,1.126,19,0
+Spatial Transformer Networks.pdf,true,false,14,1.166,2,9
+Lesson_054_handout.pdf,true,false,18,0.943,10,3
+122_2016_2746_MOESM3_ESM.pdf,true,false,3162,52.247,0,0
+Debug.Hacks中文版_深入调试的技术和工具.pdf,true,false,419,5.131,1,1
+Trump-Intelligence-Allegations.pdf,true,false,35,9.313,33,0
+talk_Simons_part1_pdf.pdf,true,false,79,14.215,411,1
+nips-tutorial-policy-optimization-Schulman-Abbeel.pdf,true,true,120,13.689,101,3
 blank.pdf,false,false,1,0.002,0,0
 legal_pages7_color3.pdf,true,false,7,0.004,0,0
 cmyk.pdf,true,false,9,0.004,0,0
@@ -133,7 +133,7 @@ A Sunshine - IEP.pdf,false,false,9,0.200,1,0
 killer_modelling.pdf,true,false,5,0.137,0,0
 android.pdf,true,false,1,0.034,1,0
 symbiosis-provocation.pdf,false,false,8,0.066,0,0
-Whitepaper-XMP-metadata-in-PDFlib-products.pdf,true,true,4,0.073,0,2
+Whitepaper-XMP-metadata-in-PDFlib-products.pdf,true,false,4,0.105,0,2
 docs.pdf,true,false,1,0.040,2,0
 unlexicalized-parsing.pdf,false,false,8,0.255,0,0
 4e.pdf,true,false,5,0.169,0,0
@@ -162,20 +162,20 @@ outbreak.pdf,false,false,7,0.139,0,0
 database_03_abs.pdf,false,false,2,0.015,0,1
 recht11a.pdf,false,false,18,0.406,0,0
 0165551514551903.pdf,false,false,17,0.199,2,0
-ahs-scn-bjh-quick-facts.pdf,true,true,1,0.022,0,2
+ahs-scn-bjh-quick-facts.pdf,true,true,1,0.029,0,2
 mehrotra_trick_final2.pdf,false,false,15,0.195,0,0
 kuksa08nips.pdf,false,false,8,0.103,0,1
 biau08a.pdf,false,false,19,0.322,0,0
 se.pdf,false,false,12,0.292,0,0
 designofasearchablesymmetrickeyciphersystem-120529001108-phpapp02.pdf,true,false,11,0.077,1,0
-twitter_sentimenti.pdf,true,true,7,0.062,0,6
+twitter_sentimenti.pdf,true,false,7,0.100,0,6
 knn  v3.pdf,false,false,1,0.401,3,0
 1502.03167.pdf,true,false,11,0.427,0,0
 Yemeni_Laws92.pdf,false,false,14,0.359,0,0
 batsbzx201630-20.pdf,true,false,27,0.566,0,0
 Suffix.pdf,false,false,11,0.344,0,0
 RAND_PE198.pdf,true,false,16,0.273,0,0
-p.pdf,true,true,18,0.182,0,2
+p.pdf,true,false,18,0.228,0,2
 SemanticStates201.pdf,true,false,17,0.362,0,0
 bitcoin.pdf,false,false,9,0.147,0,0
 nips01-discriminativegenerative.pdf,false,false,8,0.126,0,0
@@ -190,9 +190,124 @@ mcs-ensembles.pdf,true,false,15,0.204,1,0
 epson_pages3_color_pages1.pdf,true,false,3,0.338,0,0
 3GABP.pdf,true,false,26,1.149,1,0
 cure53.pdf,true,false,13,0.271,1,0
-frege.pdf,true,true,14,0.133,0,2
+frege.pdf,true,true,14,0.135,0,2
 brotli-2015-09-22.pdf,true,false,6,0.333,1,0
 CaiHof-CIKM2004.pdf,true,false,10,0.447,7,0
 lingdet-mccs.pdf,false,false,31,0.227,1,0
 image2015-12-13-070827.pdf,false,false,2,0.085,2,0
 cst.pdf,false,false,18,0.190,1,0
+Implementing Gentry’s Fully-Homomorphic Encryption Scheme.pdf,true,false,29,0.526,0,2
+go.pdf,true,false,53,0.481,1,0
+word_jpeg_color.pdf,true,false,1,0.169,3,0
+school.pdf,true,false,1,0.046,2,0
+word_color_png_24bit.pdf,true,false,1,0.192,3,0
+word_color_png_32bit.pdf,true,false,1,0.160,3,0
+PaperCutv15.3internalupdate.pdf,true,false,3,0.191,4,0
+0912.0779v1.pdf,true,false,14,0.397,0,5
+508_icmlpaper.pdf,true,true,8,0.129,0,2
+age_text.pdf,true,false,12,0.146,3,0
+Research Perspectives and Challenges for Bitcoin and Cryptocurrencies.pdf,false,false,18,0.218,0,0
+s.pdf,true,false,1,0.042,3,0
+ESCP-R reference_151008.pdf,true,false,12,2.948,1,0
+NWPTPayoffLang.pdf,true,false,4,0.063,0,0
+059.pdf,true,false,13,0.181,0,0
+CuckooCycle.pdf,true,false,13,0.181,0,0
+coolnacl-20120725.pdf,true,false,18,0.134,0,0
+ISAT-final-briefing.pdf,true,false,23,0.180,4,1
+extreme-days-and-nights-daylight-variation-in-the-arctic-reykjavik-murmansk-and-alert_e634.pdf,true,true,1,0.060,0,48
+Parallel and Dynamic Searchable Symmetric Encryption.pdf,true,false,15,0.252,0,1
+1306.1840v1.pdf,true,false,8,0.179,0,1
+1VAP428661-DB_SCN_SCN-D.pdf,true,false,4,0.266,1,1
+2017 Apps List.pdf,true,false,3,0.167,73,0
+w13229.pdf,true,false,44,0.333,0,0
+pca_text.pdf,true,false,8,0.174,0,4
+raluca-cryptdb.pdf,true,true,16,0.320,0,5
+Presto_UserGuide.pdf,true,false,17,0.143,1,0
+address-change.pdf,true,false,2,0.072,0,2
+whitepaper.pdf,true,false,9,0.110,0,6
+ibm12.pdf,true,true,22,0.157,0,1
+integrity.pdf,true,true,20,0.915,27,0
+upload1419017431.pdf,true,false,22,0.331,5,0
+yy.pdf,false,false,7,0.090,1,0
+Principl Letter - start of year - 2017.pdf,true,false,5,0.114,2,0
+Artificiell Intelligens och machine learing för sjukvård och life science.pdf,true,true,26,0.390,1,1
+signature.pdf,true,true,10,0.070,0,3
+384.full.pdf,true,false,9,0.145,2,0
+Pages from Wolfcub Vision 01-Jan-16-6749.pdf,true,false,1,0.353,7,0
+gv05-joc.pdf,false,false,29,0.469,0,0
+PauloCarrilloPenaCameraReadyJuly132016.pdf,true,false,7,0.197,6,0
+dna - Wolfram_Alpha.pdf,true,true,2,0.101,33,3
+howto.pdf,false,false,11,0.063,0,0
+1702.06959.pdf,true,false,12,0.192,1,0
+journal.pone.0048386.pdf,true,false,8,0.265,4,0
+lda.pdf,true,false,30,0.719,0,0
+1203.5960.pdf,false,false,7,0.259,30,0
+DeBruijnPrimer.pdf,true,true,5,0.176,1,3
+image2015-12-15-093014.pdf,false,false,4,0.188,4,0
+Homomorphic-no-bootstrap.pdf,false,false,27,0.426,0,0
+papercutmf-pull-up-banner.pdf,true,false,4,0.401,0,0
+cs.pdf,true,false,44,2.799,1,0
+20122845.full.pdf,true,false,9,0.427,4,0
+VerifiableDataStructures.pdf,true,false,7,0.402,1,0
+348_icmlpaper.pdf,true,false,8,0.287,0,2
+rules_of_ml.pdf,true,false,24,1.336,0,0
+compression.kdd06(1).pdf,false,false,7,1.073,0,0
+2568.pdf,true,false,34,0.273,0,1
+Politics_of_Voter_Fraud_Final.pdf,true,false,44,0.946,1,0
+pasted-image-5398.pdf,true,false,1,0.040,1,0
+gavin-wood-yellow-paper.pdf,true,false,32,0.920,0,0
+climate_science_words.pdf,true,false,9,0.338,5,0
+hierarchical_anova_priors.pdf,false,false,25,0.230,0,10
+1409.6070v1.pdf,true,true,13,0.176,12,8
+SK Hynix Case Study November 16 2015 - Final.pdf,true,false,8,0.215,9,0
+dev_plan.pdf,true,false,3,0.267,113,0
+CDD201.pdf,true,false,41,1.775,0,0
+Pfeffer_Nonprofit-Management-Institute-2016.pdf,true,true,40,0.195,4,4
+1611.01989.pdf,true,true,19,0.347,0,7
+fernbach13.pdf,true,false,9,0.136,2,1
+encrypted-search(book-chapter).pdf,false,false,48,0.386,0,10
+l09r01.pdf,true,false,32,0.666,3,1
+Bez_test.pdf,true,false,1,0.102,3,4
+HyperLogLog.pdf,true,false,20,0.623,0,7
+IJETAE_1012_47.pdf,true,false,5,0.203,7,2
+PaperCut-Professional-Services-Guide.pdf,true,false,35,0.402,14,0
+shattered.pdf,true,false,23,0.343,1,0
+legislative-process-poster-espanol.pdf,false,false,1,0.045,1,6
+all_vs_all.pdf,true,false,7,0.215,1,0
+14(1).pdf,true,false,10,0.284,6,2
+Deep learning for image denoising.pdf,true,false,10,0.245,6,2
+PaperCut MF - MFD Integration Matrix.pdf,true,false,2,0.385,1,0
+1206.4637.pdf,false,false,8,0.435,0,6
+210.pdf,false,false,33,0.469,0,0
+How-to-sign-a-PDF-form-using-a-digital-signature.pdf,true,false,5,0.136,12,0
+tout.pdf,true,false,1,0.110,4,4
+1702.06237.pdf,true,false,59,1.541,0,0
+Updated Bring Your Own Technology 2017 Letter.pdf,true,false,6,0.220,3,0
+nips2010.pdf,false,false,37,1.125,0,5
+Mandarin_Chinese_Common_Entrance_Level_1_and_2_word_and_character_list.pdf,false,false,12,0.599,0,1
+joi160132.pdf,false,false,9,0.304,1,1
+Lise_GenomeLett2002.pdf,true,false,10,0.835,11,0
+1013.pdf,true,false,30,0.519,0,0
+missing.pdf,false,false,16,1.846,0,0
+CRG Leaders or Leaderfulness Digital 6_16_16.pdf,false,false,24,0.249,1,3
+7Vol30No1.pdf,true,true,7,0.396,507,0
+RootstockWhitePaperv9-Overview.pdf,true,false,24,1.390,1,0
+Feature Extraction for Document Classification.pdf,false,false,8,0.243,4,3
+gentry-homomorphic-encryption.pdf,false,false,10,0.431,0,1
+1610.02306v1.pdf,true,false,11,0.143,8,0
+1560401.pdf,false,false,16,0.057,18,0
+text_regular3_1.pdf,false,false,1,0.560,0,0
+inconsistency.pdf,true,false,31,0.644,31,0
+copy-machine-study-ellen-langer.pdf,false,false,8,0.015,0,8
+BSA Fiery Direct Print Issue.pdf,true,false,7,0.171,11,0
+conditonal_random_fields.pdf,false,false,90,1.090,0,10
+lattice-survey.pdf,false,false,90,0.988,0,0
+privacy-fact-sheet-17-australian-privacy-principles_2.pdf,false,false,11,0.302,1,5
+sciencetopics.pdf,true,false,8,0.187,6,0
+2016095pap.pdf,true,false,36,0.865,1,0
+sugihara-causality-science-2012.pdf,true,false,6,0.482,14,0
+Meissen_MQP2.pdf,true,false,58,0.471,12,0
+p253-porter.pdf,true,false,7,0.305,4,0
+sharp_brochure.pdf,true,false,8,0.471,10,0
+srep40678.pdf,false,false,8,0.694,1,2
+a0w20000000dikuAAA.pdf,true,true,4,0.462,83,0
