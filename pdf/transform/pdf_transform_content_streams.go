@@ -341,7 +341,7 @@ func transformPdfFile(inputPath, outputPath string, noContentTransforms, doGrays
 func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool,
 	objCounts *ObjCounts) error {
 
-	nameSubtype, err := page.GetXObjectSubtypes()
+	nameSubtype, err := unipdf.GetXObjectSubtypes(page)
 	if err != nil {
 		return nil
 	}
@@ -355,18 +355,15 @@ func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bo
 		return err
 	}
 
-	err = transformImageXObjects(page, desc, doGrayscaleTransform)
+	err = transformXObjects(page, desc, doGrayscaleTransform)
 	if err != nil {
 		return err
 	}
-	err = transformFormXObjects(page, desc, doGrayscaleTransform)
-	if err != nil {
-		return err
-	}
+
 	return nil
 }
 
-func transformImageXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
+func transformXObjects(page unipdf.PdfWithContent, desc string, doGrayscaleTransform bool) error {
 	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
 
 	xobjs, err := page.GetXObjects()
@@ -375,7 +372,28 @@ func transformImageXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransf
 	}
 	unicommon.Log.Info("-XObjects=%s", xobjs)
 
-	nameXimgMap, err := page.GetXImageResourceMap()
+	err = transformImageXObjects(page, desc, doGrayscaleTransform)
+	if err != nil {
+		return err
+	}
+	err = transformFormXObjects(page, desc, doGrayscaleTransform)
+	if err != nil {
+		return err
+	}
+
+	xobjs, err = page.GetXObjects()
+	if err != nil {
+		return nil
+	}
+	unicommon.Log.Info("+XObjects=%s", xobjs)
+
+	return nil
+}
+
+func transformImageXObjects(page unipdf.PdfWithContent, desc string, doGrayscaleTransform bool) error {
+	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
+
+	nameXimgMap, err := unipdf.GetXImageResourceMap(page)
 	if err != nil {
 		unicommon.Log.Error("No resource map. err=%v", err)
 		return err
@@ -395,31 +413,20 @@ func transformImageXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransf
 			return err
 		}
 	}
-	err = page.SetXImageResourceMap(nameXimgMap)
+
+	err = unipdf.SetXImageResourceMap(page, nameXimgMap)
 	if err != nil {
 		unicommon.Log.Error("SetXImageResourceMap failed. err=%v", err)
 		return err
 	}
 
-	xobjs, err = page.GetXObjects()
-	if err != nil {
-		return nil
-	}
-	unicommon.Log.Info("+XObjects=%s", xobjs)
-
 	return nil
 }
 
-func transformFormXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransform bool) error {
+func transformFormXObjects(page unipdf.PdfWithContent, desc string, doGrayscaleTransform bool) error {
 	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
 
-	xobjs, err := page.GetXObjects()
-	if err != nil {
-		return err
-	}
-	unicommon.Log.Info("-XObjects=%s", xobjs)
-
-	nameXformMap, err := page.GetXFormResourceMap()
+	nameXformMap, err := unipdf.GetXFormResourceMap(page)
 	if err != nil {
 		unicommon.Log.Error("No resource map. err=%v", err)
 		return err
@@ -439,18 +446,15 @@ func transformFormXObjects(page *unipdf.PdfPage, desc string, doGrayscaleTransfo
 		if err := transformPdfPageContent(xform, formDesc, doGrayscaleTransform, nil); err != nil {
 			return err
 		}
+		if err := transformXObjects(xform, formDesc, doGrayscaleTransform); err != nil {
+			return err
+		}
 	}
-	err = page.SetXFormResourceMap(nameXformMap)
+	err = unipdf.SetXFormResourceMap(page, nameXformMap)
 	if err != nil {
 		unicommon.Log.Error("SetXFormResourceMap failed. err=%v", err)
 		return err
 	}
-
-	xobjs, err = page.GetXObjects()
-	if err != nil {
-		return nil
-	}
-	unicommon.Log.Info("+XObjects=%s", xobjs)
 
 	return nil
 }
@@ -546,6 +550,46 @@ func transformColorToGrayscale(page unipdf.PdfWithContent, //*unipdf.PdfPage,
 
 	// op0 := unipdf.ContentStreamOperation{Operand: "sc"}
 	// op0 := unipdf.ContentStreamOperation{Operand: "SC"}
+	badOps := map[string]bool{
+		// "l":  true,
+		// "BX": true,
+		// "EX": true,
+		// "c":  true,
+		// "m":  true,
+		"sh": true,
+		"Do": false,
+	}
+	//   0:   `Td`    54
+	//  1:   `TJ`    54
+	//  2:   `Tf`    26
+	//  3:    `G`     8
+	//  4:    `g`     8
+	//  5:   `cm`     4
+	//  6:   `BT`     2
+	//  7:   `ET`     2
+	//  8:    `Q`     2
+	//  9:    `q`     2
+	// 10:   `Do`     1
+
+	// `c`    43
+	//  1:    `m`     7
+	//  2:    `Q`     4
+	//  3:    `q`     4
+	//  4:    `y`     3
+	//  5:   `cm`     2
+	//  6:   `gs`     2
+	//  7:   `re`     2
+	//  8:    `v`     2
+	//  9:   `cs`     1
+	// 10:    `f`     1
+	// 11:    `g`     1
+	// 12:    `h`     1
+	// 13:    `n`     1
+	// 14:  `scn`     1
+	// 15:   `sh`     1
+	// 16:   `TL`     1
+	// 17:    `W`     1
+	removeOps(pOperations, badOps)
 
 	for i, op := range *pOperations {
 		unicommon.Log.Debug("i=%d op=%s", i, op)
@@ -698,6 +742,16 @@ var (
 		"K":  unipdf.NewPdfColorspaceDeviceCMYK(),
 	}
 )
+
+func removeOps(pOperations *[]*unipdf.ContentStreamOperation, badOps map[string]bool) {
+	filtered := []*unipdf.ContentStreamOperation{}
+	for _, op := range *pOperations {
+		if !badOps[op.Operand] {
+			filtered = append(filtered, op)
+		}
+	}
+	*pOperations = filtered
+}
 
 // totalCounts returns the keys of map `counts` sorted by count
 func totalCounts(counts map[string]int) (total int) {
