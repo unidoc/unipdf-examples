@@ -1,6 +1,94 @@
 TODO
 ====
+p297 10.3 Conversions among Device Colour Spaces
+gray = .3r + .59g + .11b
+     = 1.0 -min(1.0, k + .3c + .59m + .11y)
+
+
+p182 8.7.4.3Shading Dictionaries
+
 Convert colors to grayscale in shading dicts. See extreme-days-and-nights-daylight-variation-in-the-arctic-reykjavik-murmansk-and-alert_e634.pdf
+
+ahs-scn-bjh-quick-facts.pdf
+
+
+34 0 obj
+<</BBox [350.782000 452.200000 626.534000 51.347300]/Group 45 0 R/Length 3917/Matrix [1.000000 0.000000 0.000000 1.000000 0.000000 0.000000]/Resources <</ColorSpace <</CS1 31 0 R/CS0 35 0 R>>/ExtGState <</GS0 29 0 R>>/Shading <</Sh0 40 0 R>>>>/Subtype /Form/Type /XObject>>
+stream
+
+40 0 obj
+<</Domain [0.000000 1.000000]/Extend [true true]/Function 41 0 R/ShadingType 2/AntiAlias false/ColorSpace 35 0 R/Coords [0.000000 0.000000 1.000000 0.000000]>>
+endobj
+
+41 0 obj
+<</Domain [0.000000 1.000000]/Encode [0.000000 1.000000 0.000000 1.000000 1.000000 0.000000]/FunctionType 3/Functions [42 0 R 43 0 R 44 0 R]/Bounds [0.269226 0.994507]>>
+endobj
+42 0 obj
+<</FunctionType 2/N 1.000000/C0 [0.000000 0.474808]/C1 [0.000000 1.000000]/Domain [0.000000 1.000000]>>
+endobj
+43 0 obj
+<</FunctionType 2/N 1.000000/C0 [0.000000 1.000000]/C1 [1.000000 0.000000]/Domain [0.000000 1.000000]>>
+endobj
+44 0 obj
+<</C0 [1.000000 0.000000]/C1 [1.000000 0.000000]/Domain [0.000000 1.000000]/FunctionType 2/N 13.513400>>
+endobj
+
+35 0 obj
+[/DeviceN [/PANTONE#20300#20C /Yellow] /DeviceCMYK 36 0 R 37 0 R]
+endobj
+36 0 obj
+<</Domain [0.000000 1.000000 0.000000 1.000000]/Filter /FlateDecode/FunctionType 4/Length 126/Range [0.000000 1.000000 0.000000 1.000000 0.000000 1.000000 0.000000 1.000000]>>
+stream
+H‰ª6Ô3....
+
+37 0 obj
+<</Colorants 38 0 R/Process 39 0 R/Subtype /NChannel>>
+endobj
+
+38 0 obj
+<</PANTONE#20300#20C 31 0 R>>
+endobj
+39 0 obj
+<</ColorSpace /DeviceCMYK/Components [/Cyan /Magenta /Yellow /Black]>>
+endobj
+
+31 0 obj
+[/Separation /PANTONE#20300#20C
+/DeviceCMYK
+<</Range [0.000000 1.000000 0.000000 1.000000 0.000000 1.000000 0.000000 1.000000]
+  /C0 [0.000000 0.000000 0.000000 0.000000]
+  /C1 [1.000000 0.440002 0.000000 0.000000]
+  /N 1.000000
+  /FunctionType 2
+  /Domain [0.000000 1.000000]>>]
+endobj
+
+p186 Table 80 – Additional Entries Specific to a Type 2 Shading Dictionary
+Type
+Value
+Coords
+array
+(Required) An array of four numbers [x0 y0 x1 y1] specifying the starting and ending coordinates
+of the axis, expressed in the shading’s target coordinate space.
+Domain
+array
+(Optional) An array of two numbers [t0 t1] specifying the limiting values of a parametric variable t.
+The variable is considered to vary linearly between these two values as the colour gradient varies
+between the starting and ending points of the axis. The variable t becomes the input argument to the
+colour function(s). Default value: [0.0 1.0].
+Function
+function
+(Required) A 1-in, n-out function or an array of n 1-in, 1-out functions (where n is the number of
+colour components in the shading dictionary’s colour space). The function(s) shall be called with
+values of the parametric variable t in the domain defined by the Domain entry. Each function’s domain
+shall be a superset of that of the shading dictionary. If the value returned by the function for a
+given colour component is out of range, it shall be adjusted to the nearest valid value.
+Extend
+array
+(Optional) An array of two boolean values specifying whether to extend the shading beyond the
+starting and ending points of the axis, respectively. Default value: [false false].
+
+p92 7.10 Functions
 
 HansRosling.pdf grayscale response  looks wrong.
 

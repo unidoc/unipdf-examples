@@ -24,10 +24,10 @@ zerocash-extended-20140518.pdf,false,false,56,1.986,0,4
 BLUEBOOK.pdf,false,false,242,1.293,20,0
 cvxopt_1306.0057v1.pdf,true,false,36,2.229,0,0
 o2.pdf,false,false,2,0.519,2,0
-protocol.pdf,true,true,47,0.880,0,2
+protocol.pdf,true,true,47,0.810,0,2
 whitepaper2015.pdf,false,false,19,0.485,5,8
-1507.02672v1.pdf,true,true,19,0.396,0,3
-cryptdb.pdf,true,true,16,2.858,0,3
+1507.02672v1.pdf,true,true,19,0.303,0,3
+cryptdb.pdf,true,true,16,0.275,0,3
 scan_alan_2016-03-30-10-38-15.pdf,true,false,1,1.692,1,0
 PNAS-2016-Battiston-10031-6.pdf,true,false,6,0.635,12,0
 mueller.pdf,false,false,34,1.098,2,18
@@ -45,7 +45,7 @@ stick_breaking.pdf,true,false,38,2.368,0,36
 tikonov.pdf,false,false,12,0.191,12,0
 weakLongrangeForcesTheory_01.pdf,true,false,37,0.398,15,0
 pcl_xl_2_0_technical_reference_rev2_2.pdf,true,false,265,2.580,2,0
-Lattice Based Cryptography for Beginners.pdf,true,true,121,1.890,0,3
+Lattice Based Cryptography for Beginners.pdf,true,true,121,1.501,0,3
 text_13pages.pdf,false,false,13,0.022,13,0
 gap.pdf,false,false,13,0.018,13,0
 Parsing-Probabilistic.pdf,true,false,59,0.770,10,0
@@ -58,22 +58,22 @@ Framingham Heart Study.pdf,true,false,7,0.214,2,0
 The-Byzantine-Generals-Problem.pdf,false,false,20,0.401,1,0
 word_color_gif.pdf,true,true,1,0.051,3,0
 Redmon_You_Only_Look_CVPR_2016_paper.pdf,false,false,10,0.585,10,25
-Szegedy_Going_Deeper_With_2015_CVPR_paper.pdf,true,true,9,0.347,0,15
+Szegedy_Going_Deeper_With_2015_CVPR_paper.pdf,true,true,9,0.179,0,15
 RMG_Factsheet_2017.pdf,true,false,4,0.292,6,1
 MIT Cryptographer Silvio Micali - ALGORAND - The Efficient and Democratic Ledger.pdf,true,false,57,0.539,0,3
 cs-ippprodprint10-20010212-5100.3.pdf,true,true,76,0.896,31,0
 PhysRevLett.118.060401.pdf,true,false,8,0.308,4,0
 fgvc-2015-fast-bird-part.pdf,true,false,2,0.151,6,0
-1603.09056.pdf,true,true,9,0.189,0,5
+1603.09056.pdf,true,true,9,0.133,0,5
 ICA_2017_01.pdf,false,false,25,1.145,13,1
 p329-galle.pdf,true,false,10,0.991,5,3
 1207.0580.pdf,true,false,18,0.369,10,0
-1701.02434v1.pdf,true,true,60,2.520,0,34
+1701.02434v1.pdf,true,true,60,2.327,0,34
 art%3A10.1186%2Fs13673-015-0039-9.pdf,true,false,16,0.756,23,2
 3725b275.pdf,false,false,5,0.255,6,6
 BALU_Raghavendran.pdf,false,false,128,2.819,2,4
 US5553145.pdf,false,false,13,0.378,13,0
-PaperCut Case Study - Bakers Delight.pdf,true,true,2,3.115,0,6
+PaperCut Case Study - Bakers Delight.pdf,true,false,2,2.497,0,6
 BookClubGuide16.pdf,true,false,4,3.944,7,5
 PaperCut Device REST Web Service API.pdf,true,false,8,0.877,1,0
 The_Block_Cipher_Companion.pdf,true,false,279,4.776,0,2
@@ -82,7 +82,7 @@ Zero_Configuration_Networking_The_Definitive_Guide.pdf,true,true,254,1.507,3,1
 Afternoon Need States Report_FINAL 6.25.15.pdf,true,false,42,2.077,112,0
 dark-internet-mail-environment-march-2015.pdf,true,true,140,1.473,294,0
 day2_ListeningToHypercolors.pdf,true,false,32,0.262,7,0
-PaperCutMF-Top-10-Reasons.pdf,true,true,2,1.272,0,10
+PaperCutMF-Top-10-Reasons.pdf,true,true,2,0.932,0,10
 080101IEEETransMedImag.pdf,false,false,8,0.208,58,0
 20090512_php35CB.pdf,false,false,14,0.320,89,0
 1601.06759v2.pdf,true,true,11,0.365,3,10
@@ -162,7 +162,7 @@ outbreak.pdf,false,false,7,0.139,0,0
 database_03_abs.pdf,false,false,2,0.015,0,1
 recht11a.pdf,false,false,18,0.406,0,0
 0165551514551903.pdf,false,false,17,0.199,2,0
-ahs-scn-bjh-quick-facts.pdf,true,true,1,0.029,0,2
+ahs-scn-bjh-quick-facts.pdf,true,false,1,0.028,0,2
 mehrotra_trick_final2.pdf,false,false,15,0.195,0,0
 kuksa08nips.pdf,false,false,8,0.103,0,1
 biau08a.pdf,false,false,19,0.322,0,0
@@ -190,7 +190,7 @@ mcs-ensembles.pdf,true,false,15,0.204,1,0
 epson_pages3_color_pages1.pdf,true,false,3,0.338,0,0
 3GABP.pdf,true,false,26,1.149,1,0
 cure53.pdf,true,false,13,0.271,1,0
-frege.pdf,true,true,14,0.135,0,2
+frege.pdf,true,false,14,0.186,0,2
 brotli-2015-09-22.pdf,true,false,6,0.333,1,0
 CaiHof-CIKM2004.pdf,true,false,10,0.447,7,0
 lingdet-mccs.pdf,false,false,31,0.227,1,0
@@ -204,7 +204,7 @@ word_color_png_24bit.pdf,true,false,1,0.192,3,0
 word_color_png_32bit.pdf,true,false,1,0.160,3,0
 PaperCutv15.3internalupdate.pdf,true,false,3,0.191,4,0
 0912.0779v1.pdf,true,false,14,0.397,0,5
-508_icmlpaper.pdf,true,true,8,0.129,0,2
+508_icmlpaper.pdf,true,true,8,0.125,0,2
 age_text.pdf,true,false,12,0.146,3,0
 Research Perspectives and Challenges for Bitcoin and Cryptocurrencies.pdf,false,false,18,0.218,0,0
 s.pdf,true,false,1,0.042,3,0
@@ -214,24 +214,24 @@ NWPTPayoffLang.pdf,true,false,4,0.063,0,0
 CuckooCycle.pdf,true,false,13,0.181,0,0
 coolnacl-20120725.pdf,true,false,18,0.134,0,0
 ISAT-final-briefing.pdf,true,false,23,0.180,4,1
-extreme-days-and-nights-daylight-variation-in-the-arctic-reykjavik-murmansk-and-alert_e634.pdf,true,true,1,0.060,0,48
+extreme-days-and-nights-daylight-variation-in-the-arctic-reykjavik-murmansk-and-alert_e634.pdf,true,false,1,0.099,0,48
 Parallel and Dynamic Searchable Symmetric Encryption.pdf,true,false,15,0.252,0,1
 1306.1840v1.pdf,true,false,8,0.179,0,1
 1VAP428661-DB_SCN_SCN-D.pdf,true,false,4,0.266,1,1
 2017 Apps List.pdf,true,false,3,0.167,73,0
 w13229.pdf,true,false,44,0.333,0,0
 pca_text.pdf,true,false,8,0.174,0,4
-raluca-cryptdb.pdf,true,true,16,0.320,0,5
+raluca-cryptdb.pdf,true,false,16,0.293,0,5
 Presto_UserGuide.pdf,true,false,17,0.143,1,0
 address-change.pdf,true,false,2,0.072,0,2
 whitepaper.pdf,true,false,9,0.110,0,6
-ibm12.pdf,true,true,22,0.157,0,1
+ibm12.pdf,true,false,22,0.737,0,1
 integrity.pdf,true,true,20,0.915,27,0
 upload1419017431.pdf,true,false,22,0.331,5,0
 yy.pdf,false,false,7,0.090,1,0
 Principl Letter - start of year - 2017.pdf,true,false,5,0.114,2,0
 Artificiell Intelligens och machine learing för sjukvård och life science.pdf,true,true,26,0.390,1,1
-signature.pdf,true,true,10,0.070,0,3
+signature.pdf,true,true,10,0.078,0,3
 384.full.pdf,true,false,9,0.145,2,0
 Pages from Wolfcub Vision 01-Jan-16-6749.pdf,true,false,1,0.353,7,0
 gv05-joc.pdf,false,false,29,0.469,0,0
@@ -263,7 +263,7 @@ SK Hynix Case Study November 16 2015 - Final.pdf,true,false,8,0.215,9,0
 dev_plan.pdf,true,false,3,0.267,113,0
 CDD201.pdf,true,false,41,1.775,0,0
 Pfeffer_Nonprofit-Management-Institute-2016.pdf,true,true,40,0.195,4,4
-1611.01989.pdf,true,true,19,0.347,0,7
+1611.01989.pdf,true,true,19,0.319,0,7
 fernbach13.pdf,true,false,9,0.136,2,1
 encrypted-search(book-chapter).pdf,false,false,48,0.386,0,10
 l09r01.pdf,true,false,32,0.666,3,1
