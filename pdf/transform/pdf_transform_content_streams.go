@@ -360,6 +360,52 @@ func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bo
 		return err
 	}
 
+	err = transformColorspaces(page, desc, doGrayscaleTransform)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func transformColorspaces(page unipdf.PdfFormPage, desc string, doGrayscaleTransform bool) error {
+	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
+
+	resources, err := page.GetResources()
+	if err != nil {
+		return err
+	}
+	colorspaces := resources.ColorSpace
+	if colorspaces == nil {
+		return nil
+	}
+	names := colorspaces.Names
+	sort.Strings(names)
+	for _, name := range names {
+		obj := colorspaces.Colorspaces[name]
+		// For indexed color spaces, we just modify the lookup table to grayscale
+		if cs, isIndexed := obj.(*unipdf.PdfColorspaceSpecialIndexed); isIndexed {
+			err := cs.ColorspaceToGray()
+			if err != nil {
+				return err
+			}
+		}
+	}
+	// err = transformImageXObjects(page, desc, doGrayscaleTransform)
+	// if err != nil {
+	// 	return err
+	// }
+	// err = transformFormXObjects(page, desc, doGrayscaleTransform)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// xobjs, err = page.GetXObjects()
+	// if err != nil {
+	// 	return nil
+	// }
+	// unicommon.Log.Info("+XObjects=%s", xobjs)
+
 	return nil
 }
 
@@ -408,7 +454,7 @@ func transformImageXObjects(page unipdf.PdfFormPage, desc string, doGrayscaleTra
 	unicommon.Log.Info("nameXimgMap=%d %+v", len(nameXimgMap), names)
 	for _, name := range names {
 		ximg := nameXimgMap[name]
-		unicommon.Log.Info("Converting image XObject %#q to gray", name)
+		unicommon.Log.Info("Converting image XObject %#q to gray ximg=%s", name, ximg)
 		if err := ximg.ToGray(); err != nil {
 			return err
 		}
@@ -551,45 +597,45 @@ func transformColorToGrayscale(page unipdf.PdfFormPage, //*unipdf.PdfPage,
 	// op0 := unipdf.ContentStreamOperation{Operand: "sc"}
 	// op0 := unipdf.ContentStreamOperation{Operand: "SC"}
 	badOps := map[string]bool{
-		// "l":  true,
-		// "BX": true,
-		// "EX": true,
-		// "c":  true,
-		// "m":  true,
-		"sh": true,
-		"Do": false,
+	// "l":  true,
+	// "BX": true,
+	// "EX": true,
+	// "c":  true,
+	// "m":  true,
+	// "Do": true,
+	// // "gs": true,
+	// "cm":  true,
+	// "scn": true,
+	// "TD":  true,
+	// "BDC": true,
+	// "EMC": true,
+	// "sh": true, // !@#$ Fix shading
 	}
-	//   0:   `Td`    54
-	//  1:   `TJ`    54
-	//  2:   `Tf`    26
-	//  3:    `G`     8
-	//  4:    `g`     8
-	//  5:   `cm`     4
-	//  6:   `BT`     2
-	//  7:   `ET`     2
-	//  8:    `Q`     2
-	//  9:    `q`     2
-	// 10:   `Do`     1
-
-	// `c`    43
-	//  1:    `m`     7
-	//  2:    `Q`     4
-	//  3:    `q`     4
-	//  4:    `y`     3
-	//  5:   `cm`     2
-	//  6:   `gs`     2
-	//  7:   `re`     2
-	//  8:    `v`     2
-	//  9:   `cs`     1
-	// 10:    `f`     1
-	// 11:    `g`     1
-	// 12:    `h`     1
-	// 13:    `n`     1
-	// 14:  `scn`     1
-	// 15:   `sh`     1
-	// 16:   `TL`     1
-	// 17:    `W`     1
-	removeOps(pOperations, badOps)
+	//  0:   `re`   304
+	//  1:    `f`   203
+	//  2:   `Tw`   122
+	//  3:   `Tc`   118
+	//  4:   `Tm`    88
+	//  5:   `BT`    85
+	//  6:   `ET`    85
+	//  7:   `Tj`    83
+	//  8:   `TJ`    82
+	//  9:    `Q`    68
+	// 10:    `q`    68
+	// 11:    `n`    67
+	// 12:    `W`    67
+	// 13:   `Td`    64
+	// 14:  `scn`    58
+	// 15:  `BDC`    55
+	// 16:  `EMC`    55
+	// 17:   `f*`    34
+	// 18:   `Tf`    34
+	// 19:   `TD`     3
+	// 20:   `cm`     1
+	// 21:   `cs`     1
+	// 22:   `Do`     1
+	// 23:   `gs`     1
+	removeOps(pOperations, badOps, false)
 
 	for i, op := range *pOperations {
 		unicommon.Log.Debug("i=%d op=%s", i, op)
@@ -743,11 +789,13 @@ var (
 	}
 )
 
-func removeOps(pOperations *[]*unipdf.ContentStreamOperation, badOps map[string]bool) {
+func removeOps(pOperations *[]*unipdf.ContentStreamOperation, badOps map[string]bool, removeAll bool) {
 	filtered := []*unipdf.ContentStreamOperation{}
-	for _, op := range *pOperations {
-		if !badOps[op.Operand] {
-			filtered = append(filtered, op)
+	if !removeAll {
+		for _, op := range *pOperations {
+			if !badOps[op.Operand] {
+				filtered = append(filtered, op)
+			}
 		}
 	}
 	*pOperations = filtered
