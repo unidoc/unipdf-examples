@@ -59,6 +59,7 @@ import (
 
 	// unilicense "github.com/unidoc/unidoc/license"
 	unicommon "github.com/unidoc/unidoc/common"
+	unicontent "github.com/unidoc/unidoc/pdf/contentstream"
 	unipdf "github.com/unidoc/unidoc/pdf/model"
 )
 
@@ -76,8 +77,7 @@ func initUniDoc(licenseKey string, debug bool) error {
 	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
 	// does not do anything. Very easy to implement your own.
 	// unicommon.SetLogger(unicommon.DummyLogger{})
-	unicommon.DebugOutput = debug
-	unicommon.SetLogger(unicommon.ConsoleLogger{})
+	unicommon.SetLogger(unicommon.ConsoleLogger{LogLevel: unicommon.LogLevelDebug})
 
 	return nil
 }
@@ -133,7 +133,7 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
-	unipdf.ValidatingOperations = true
+	unicontent.ValidatingOperations = true
 
 	err = os.MkdirAll(outputDir, 0777)
 	if err != nil {
@@ -400,7 +400,7 @@ func transformColorspaces(page unipdf.PdfFormPage, desc string, doGrayscaleTrans
 	// 	return err
 	// }
 
-	// xobjs, err = page.GetXObjects()
+	// xobjs, err = unipdf.GetXObjects(page)
 	// if err != nil {
 	// 	return nil
 	// }
@@ -412,7 +412,7 @@ func transformColorspaces(page unipdf.PdfFormPage, desc string, doGrayscaleTrans
 func transformXObjects(page unipdf.PdfFormPage, desc string, doGrayscaleTransform bool) error {
 	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
 
-	xobjs, err := page.GetXObjects()
+	xobjs, err := unipdf.GetXObjects(page)
 	if err != nil {
 		return err
 	}
@@ -427,7 +427,7 @@ func transformXObjects(page unipdf.PdfFormPage, desc string, doGrayscaleTransfor
 		return err
 	}
 
-	xobjs, err = page.GetXObjects()
+	xobjs, err = unipdf.GetXObjects(page)
 	if err != nil {
 		return nil
 	}
@@ -454,6 +454,9 @@ func transformImageXObjects(page unipdf.PdfFormPage, desc string, doGrayscaleTra
 	unicommon.Log.Info("nameXimgMap=%d %+v", len(nameXimgMap), names)
 	for _, name := range names {
 		ximg := nameXimgMap[name]
+		if ximg == nil {
+			panic("nil Image XObject")
+		}
 		unicommon.Log.Info("Converting image XObject %#q to gray ximg=%s", name, ximg)
 		if err := ximg.ToGray(); err != nil {
 			return err
@@ -558,8 +561,8 @@ func transformString(page unipdf.PdfFormPage, //*unipdf.PdfPage,
 
 // parsePageContents parses the contents of streams in `cstream` and returns them as a slice of
 // operations
-func parseStreamContents(cstream string, desc string) ([]*unipdf.ContentStreamOperation, error) {
-	cstreamParser := unipdf.NewContentStreamParser(cstream)
+func parseStreamContents(cstream string, desc string) ([]*unicontent.ContentStreamOperation, error) {
+	cstreamParser := unicontent.NewContentStreamParser(cstream)
 	unicommon.Log.Debug("%s cstream=\n'%s'\nXXXXXX", desc, cstream)
 	return cstreamParser.Parse()
 }
@@ -573,7 +576,7 @@ var allCsCounts = map[string]int{}
 // transformColorToGrayscale transforms color pages to grayscale
 func transformColorToGrayscale(page unipdf.PdfFormPage, //*unipdf.PdfPage,
 	desc string,
-	pOperations *[]*unipdf.ContentStreamOperation) (err error) {
+	pOperations *[]*unicontent.ContentStreamOperation) (err error) {
 
 	unicommon.Log.Debug("%s", desc)
 
@@ -594,8 +597,8 @@ func transformColorToGrayscale(page unipdf.PdfFormPage, //*unipdf.PdfPage,
 
 	noContentColor := false
 
-	// op0 := unipdf.ContentStreamOperation{Operand: "sc"}
-	// op0 := unipdf.ContentStreamOperation{Operand: "SC"}
+	// op0 := unicontent.ContentStreamOperation{Operand: "sc"}
+	// op0 := unicontent.ContentStreamOperation{Operand: "SC"}
 	badOps := map[string]bool{
 	// "l":  true,
 	// "BX": true,
@@ -676,7 +679,7 @@ func transformColorToGrayscale(page unipdf.PdfFormPage, //*unipdf.PdfPage,
 
 		case "sc", "SC", "scn", "SCN":
 			if noContentColor {
-				*op = unipdf.ContentStreamOperation{}
+				*op = unicontent.ContentStreamOperation{}
 			} else {
 				var colorspace unipdf.PdfColorspace
 				if isUpper(op.Operand) {
@@ -689,7 +692,7 @@ func transformColorToGrayscale(page unipdf.PdfFormPage, //*unipdf.PdfPage,
 
 				// !@#$ SemanticStates201.pdf  HH factsheet.pdf
 				if _, ok := colorspace.(*unipdf.PdfColorspaceSpecialPattern); ok {
-					*op = unipdf.ContentStreamOperation{}
+					*op = unicontent.ContentStreamOperation{}
 					// op.SetOpFloatParams(op.Operand, []float64{0.0})
 				} else if unipdf.PdfColorspaceHasColor(colorspace) {
 					if vals, err = op.GetFloatParams(colorspace.GetNumComponents()); err != nil {
@@ -708,7 +711,7 @@ func transformColorToGrayscale(page unipdf.PdfFormPage, //*unipdf.PdfPage,
 
 		case "rg", "RG", "k", "K":
 			if noContentColor {
-				*op = unipdf.ContentStreamOperation{}
+				*op = unicontent.ContentStreamOperation{}
 			} else {
 				cs := opColorspace[op.Operand]
 				if vals, err = op.GetFloatParams(cs.GetNumComponents()); err != nil {
@@ -789,8 +792,8 @@ var (
 	}
 )
 
-func removeOps(pOperations *[]*unipdf.ContentStreamOperation, badOps map[string]bool, removeAll bool) {
-	filtered := []*unipdf.ContentStreamOperation{}
+func removeOps(pOperations *[]*unicontent.ContentStreamOperation, badOps map[string]bool, removeAll bool) {
+	filtered := []*unicontent.ContentStreamOperation{}
 	if !removeAll {
 		for _, op := range *pOperations {
 			if !badOps[op.Operand] {
@@ -1550,7 +1553,7 @@ func toFloat(s string) float64 {
 }
 
 // getOpCounts returns a map of operand: number of occurrences of operand in `operations`
-func getOpCounts(operations []*unipdf.ContentStreamOperation) map[string]int {
+func getOpCounts(operations []*unicontent.ContentStreamOperation) map[string]int {
 	opCounts := map[string]int{}
 	for _, op := range operations {
 		opCounts[op.Operand]++
@@ -1559,7 +1562,7 @@ func getOpCounts(operations []*unipdf.ContentStreamOperation) map[string]int {
 	return opCounts
 }
 
-func printOperations(description string, operations []*unipdf.ContentStreamOperation) {
+func printOperations(description string, operations []*unicontent.ContentStreamOperation) {
 	fmt.Printf("%d operations --------^^^--------%#q\n", len(operations), description)
 	for i, op := range operations {
 		fmt.Printf("%8d: %s\n", i, op)
