@@ -11,25 +11,18 @@ import (
 	"os"
 
 	unicommon "github.com/unidoc/unidoc/common"
-	unilicense "github.com/unidoc/unidoc/license"
-	unipdf "github.com/unidoc/unidoc/pdf"
+	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func initUniDoc(licenseKey string) error {
-	if len(licenseKey) > 0 {
-		err := unilicense.SetLicenseKey(licenseKey)
-		if err != nil {
-			return err
-		}
-	}
-
+func init() {
 	// To make the library log we just have to initialise the logger which satisfies
 	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
 	// does not do anything. Very easy to implement your own.
 	unicommon.SetLogger(unicommon.DummyLogger{})
-	//unicommon.SetLogger(unicommon.ConsoleLogger{})
 
-	return nil
+	//Or can use a debug-level console logger:
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 }
 
 func main() {
@@ -38,18 +31,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	inputPath := os.Args[1]
+	for i := 1; i < len(os.Args); i++ {
+		inputPath := os.Args[i]
+		fmt.Println(inputPath)
 
-	err := initUniDoc("")
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
-
-	err = listContentStreams(inputPath)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
+		err := listContentStreams(inputPath)
+		if err != nil {
+			fmt.Println(inputPath)
+			fmt.Printf("Error: %v\n", err)
+			os.Exit(1)
+		}
 	}
 }
 
@@ -61,7 +52,7 @@ func listContentStreams(inputPath string) error {
 
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -72,9 +63,14 @@ func listContentStreams(inputPath string) error {
 	}
 
 	if isEncrypted {
-		_, err = pdfReader.Decrypt([]byte(""))
+		fmt.Println("Is encrypted!")
+		ok, err := pdfReader.Decrypt([]byte(""))
 		if err != nil {
 			return err
+		}
+		if !ok {
+			fmt.Println("Unable to decrypt with empty string - skipping")
+			return nil
 		}
 	}
 
@@ -88,8 +84,9 @@ func listContentStreams(inputPath string) error {
 	fmt.Printf("--------------------\n")
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
+		fmt.Printf("Page %d\n", pageNum)
 
-		page, err := pdfReader.GetPageAsPdfPage(pageNum)
+		page, err := pdfReader.GetPage(pageNum)
 		if err != nil {
 			return err
 		}
@@ -100,19 +97,24 @@ func listContentStreams(inputPath string) error {
 		}
 		fmt.Printf("Page %d has %d content streams:\n", pageNum, len(contentStreams))
 
-		for idx, cstream := range contentStreams {
-			fmt.Printf("Page %d - content stream %d:\n", pageNum, idx+1)
-			fmt.Printf("%s\n", cstream)
+		pageContentStr := ""
 
-			cstreamParser := unipdf.NewContentStreamParser(cstream)
-			operations, err := cstreamParser.Parse()
-			if err != nil {
-				return err
-			}
-			fmt.Printf("=== Full list\n")
-			for idx, op := range operations {
-				fmt.Printf("Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
-			}
+		// If the value is an array, the effect shall be as if all of the streams in the array were concatenated,
+		// in order, to form a single stream.
+		for _, cstream := range contentStreams {
+			pageContentStr += cstream
+		}
+		fmt.Printf("%s\n", pageContentStr)
+
+		cstreamParser := pdfcontent.NewContentStreamParser(pageContentStr)
+		operations, err := cstreamParser.Parse()
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("=== Full list\n")
+		for idx, op := range operations {
+			fmt.Printf("Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
 		}
 	}
 

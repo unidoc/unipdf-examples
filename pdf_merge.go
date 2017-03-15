@@ -2,7 +2,7 @@
  * Merges PDF files, tries to decrypt encrypted documents with an empty password
  * as best effort.
  *
- * Run as: go run pdf_merge.go output.pdf input1.pdf input2.pdf input3.pdf
+ * Run as: go run pdf_merge.go output.pdf input1.pdf input2.pdf input3.pdf ...
  */
 
 package main
@@ -12,31 +12,19 @@ import (
 	"os"
 
 	unicommon "github.com/unidoc/unidoc/common"
-	unilicense "github.com/unidoc/unidoc/license"
-	unipdf "github.com/unidoc/unidoc/pdf"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func initUniDoc(licenseKey string) error {
-	if len(licenseKey) > 0 {
-		err := unilicense.SetLicenseKey(licenseKey)
-		if err != nil {
-			return err
-		}
-	}
-
-	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
-	// does not do anything. Very easy to implement your own.
-	unicommon.SetLogger(unicommon.DummyLogger{})
-
-	return nil
+func init() {
+	// Debug log level.
+	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 }
 
 func main() {
 	if len(os.Args) < 4 {
 		fmt.Printf("Requires at least 3 arguments: output_path and 2 input paths\n")
-		fmt.Printf("Usage: go run pdf_merge.go output.pdf input1.pdf input2.pdf input3.pdf\n")
-		os.Exit(1)
+		fmt.Printf("Usage: go run pdf_merge.go output.pdf input1.pdf input2.pdf input3.pdf ...\n")
+		os.Exit(0)
 	}
 
 	outputPath := ""
@@ -54,13 +42,7 @@ func main() {
 		inputPaths = append(inputPaths, arg)
 	}
 
-	err := initUniDoc("")
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
-
-	err = mergePdf(inputPaths, outputPath)
+	err := mergePdf(inputPaths, outputPath)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
@@ -70,7 +52,7 @@ func main() {
 }
 
 func mergePdf(inputPaths []string, outputPath string) error {
-	pdfWriter := unipdf.NewPdfWriter()
+	pdfWriter := pdf.NewPdfWriter()
 
 	for _, inputPath := range inputPaths {
 		f, err := os.Open(inputPath)
@@ -80,7 +62,7 @@ func mergePdf(inputPaths []string, outputPath string) error {
 
 		defer f.Close()
 
-		pdfReader, err := unipdf.NewPdfReader(f)
+		pdfReader, err := pdf.NewPdfReader(f)
 		if err != nil {
 			return err
 		}
