@@ -25,8 +25,8 @@ func init() {
 	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
 	// does not do anything. Very easy to implement your own.
 	//common.SetLogger(common.DummyLogger{})
-	//common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelTrace))
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelTrace))
 }
 
 func main() {
@@ -271,7 +271,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				return err
 			}
 
-			// TODO: Replace inline image data with grayImage..
+			// Replace inline image data with the gray image.
 			pOp := pdfcontent.ContentStreamOperation{}
 			pOp.Operand = "BI"
 			pOp.Params = []pdfcore.PdfObject{grayInlineImg}
@@ -382,6 +382,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 		return nil, err
 	}
 
+	// For debug purposes: (high level logging).
 	fmt.Printf("=== Unprocessed - Full list\n")
 	for idx, op := range operations {
 		fmt.Printf("U. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
