@@ -76,8 +76,7 @@ func initUniDoc(licenseKey string, debug bool) error {
 	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
 	// does not do anything. Very easy to implement your own.
 	// unicommon.SetLogger(unicommon.DummyLogger{})
-	unicommon.DebugOutput = debug
-	unicommon.SetLogger(unicommon.ConsoleLogger{})
+	unicommon.SetLogger(unicommon.ConsoleLogger{unicommon.LogLevelDebug})
 
 	return nil
 }
