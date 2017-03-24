@@ -72,15 +72,14 @@ func annotatePdfAddText(inputPath string, outputPath string, annotationText stri
 			return err
 		}
 
-		// Add the annotation...
-		annotation := pdf.NewPdfAnnotation()
-		textAnnotation := &pdf.PdfAnnotationText{PdfAnnotation: annotation}
+		// New text annotation.
+		textAnnotation := pdf.NewPdfAnnotationText()
 		textAnnotation.Contents = pdfcore.MakeString(annotationText)
 		// The rect specifies the location of the markup.
 		textAnnotation.Rect = pdfcore.MakeArray(pdfcore.MakeInteger(20), pdfcore.MakeInteger(100), pdfcore.MakeInteger(10+50), pdfcore.MakeInteger(100+50))
-		annotation.SetContext(textAnnotation)
+
 		// Add to the page annotations.
-		page.Annotations = append(page.Annotations, annotation)
+		page.Annotations = append(page.Annotations, textAnnotation.PdfAnnotation)
 
 		err = pdfWriter.AddPage(page)
 		if err != nil {
