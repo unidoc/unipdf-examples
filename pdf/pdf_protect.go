@@ -3,12 +3,11 @@
  * and opening password and hard-codes the protection bits here, but easily adjusted
  * in the code here although not on the command line.
  *
- *
  * When reading the input it tries to decrypt with empty password if the input file
  * is encrypted, if that fails we fail also.
  *
- * Run as: go run pdf_protect.go password output.pdf input.pdf
- * To protect input.pdf with password 'test' and save as output.pdf run: go run pdf_protect.go test output.pdf input.pdf
+ * Run as: go run pdf_protect.go input.pdf password output.pdf
+ * e.g.: go run pdf_protect.go my.pdf mypass my_protected.pdf
  */
 
 package main
@@ -17,46 +16,21 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unidoc/common"
-	unilicense "github.com/unidoc/unidoc/license"
-	unipdf "github.com/unidoc/unidoc/pdf"
+	pdfcore "github.com/unidoc/unidoc/pdf/core"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
-
-func initUniDoc(licenseKey string) error {
-	if len(licenseKey) > 0 {
-		err := unilicense.SetLicenseKey(licenseKey)
-		if err != nil {
-			return err
-		}
-	}
-
-	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
-	// does not do anything. Very easy to implement your own.
-	unicommon.SetLogger(unicommon.DummyLogger{})
-
-	return nil
-}
 
 func main() {
 	if len(os.Args) < 4 {
-		fmt.Printf("Requires at least 3 arguments: password output.pdf input.pdf\n")
-		fmt.Printf("Usage: To protect input.pdf with password 'test' and save as output.pdf run: go run pdf_protect.go test output.pdf input.pdf\n")
+		fmt.Printf("Usage: go run pdf_protect.go input.pdf password output.pdf\n")
 		os.Exit(1)
 	}
 
-	password := os.Args[1]
+	inputPath := os.Args[1]
+	password := os.Args[2]
+	outputPath := os.Args[3]
 
-	outputPath := os.Args[2]
-	inputPath := os.Args[3]
-
-	err := initUniDoc("")
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
-
-	err = protectPdf(inputPath, outputPath, password)
+	err := protectPdf(inputPath, outputPath, password)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
@@ -66,7 +40,7 @@ func main() {
 }
 
 func protectPdf(inputPath string, outputPath string, password string) error {
-	pdfWriter := unipdf.NewPdfWriter()
+	pdfWriter := pdf.NewPdfWriter()
 
 	// Feel free to change these values when testing.
 	allowPrinting := false
@@ -74,7 +48,7 @@ func protectPdf(inputPath string, outputPath string, password string) error {
 	allowCopying := true
 	allowForm := false
 
-	permissions := unipdf.AccessPermissions{}
+	permissions := pdfcore.AccessPermissions{}
 	permissions.Printing = allowPrinting
 	permissions.Modify = allowModifications
 	permissions.Annotate = allowModifications
@@ -84,7 +58,7 @@ func protectPdf(inputPath string, outputPath string, password string) error {
 	permissions.FillForms = allowForm
 	permissions.LimitPrintQuality = false
 
-	encryptOptions := &unipdf.EncryptOptions{}
+	encryptOptions := &pdf.EncryptOptions{}
 	encryptOptions.Permissions = permissions
 
 	err := pdfWriter.Encrypt([]byte(password), []byte(password), encryptOptions)
@@ -99,7 +73,7 @@ func protectPdf(inputPath string, outputPath string, password string) error {
 
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -111,13 +85,12 @@ func protectPdf(inputPath string, outputPath string, password string) error {
 
 	// Try decrypting both with given password and an empty one if that fails.
 	if isEncrypted {
-		_, err = pdfReader.Decrypt([]byte(password))
+		auth, err := pdfReader.Decrypt([]byte(password))
 		if err != nil {
-			// Fails, try fallback with empty password.
-			_, err = pdfReader.Decrypt([]byte(""))
-			if err != nil {
-				return err
-			}
+			return err
+		}
+		if !auth {
+			return fmt.Errorf("Wrong password")
 		}
 	}
 

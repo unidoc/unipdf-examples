@@ -1,5 +1,9 @@
 /*
+ * Example for UniDoc v2.
  * PDF to text: Extract all text for each page of a pdf file.
+ *
+ * N.B. Only outputs character codes as seen in the content stream.  Need to account for encoding to get readable
+ * text in many cases.
  *
  * Run as: go run pdf_extract_text.go input.pdf
  */
@@ -10,27 +14,9 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unidoc/common"
-	unilicense "github.com/unidoc/unidoc/license"
-	unipdf "github.com/unidoc/unidoc/pdf"
+	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
-
-func initUniDoc(licenseKey string) error {
-	if len(licenseKey) > 0 {
-		err := unilicense.SetLicenseKey(licenseKey)
-		if err != nil {
-			return err
-		}
-	}
-
-	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
-	// does not do anything. Very easy to implement your own.
-	unicommon.SetLogger(unicommon.DummyLogger{})
-	//unicommon.SetLogger(unicommon.ConsoleLogger{})
-
-	return nil
-}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -40,13 +26,7 @@ func main() {
 
 	inputPath := os.Args[1]
 
-	err := initUniDoc("")
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
-
-	err = listContentStreams(inputPath)
+	err := listContentStreams(inputPath)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
@@ -61,7 +41,7 @@ func listContentStreams(inputPath string) error {
 
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -89,7 +69,7 @@ func listContentStreams(inputPath string) error {
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
 
-		page, err := pdfReader.GetPageAsPdfPage(pageNum)
+		page, err := pdfReader.GetPage(pageNum)
 		if err != nil {
 			return err
 		}
@@ -98,16 +78,21 @@ func listContentStreams(inputPath string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Printf("Page %d has %d content streams:\n", pageNum, len(contentStreams))
-		for idx, cstream := range contentStreams {
-			fmt.Printf("Page %d - content stream %d:\n", pageNum, idx+1)
-			cstreamParser := unipdf.NewContentStreamParser(cstream)
-			txt, err := cstreamParser.ExtractText()
-			if err != nil {
-				return err
-			}
-			fmt.Printf("%s\n", txt)
+
+		// If the value is an array, the effect shall be as if all of the streams in the array were concatenated,
+		// in order, to form a single stream.
+		pageContentStr := ""
+		for _, cstream := range contentStreams {
+			pageContentStr += cstream
 		}
+
+		fmt.Printf("Page %d - content streams %d:\n", pageNum, len(contentStreams))
+		cstreamParser := pdfcontent.NewContentStreamParser(pageContentStr)
+		txt, err := cstreamParser.ExtractText()
+		if err != nil {
+			return err
+		}
+		fmt.Printf("\"%s\"\n", txt)
 	}
 
 	return nil
