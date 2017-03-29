@@ -1,3 +1,7 @@
+colorspace.go
+image.go
+xobject.go
+check all !@#$
 TODO
 ====
 p297 10.3 Conversions among Device Colour Spaces
