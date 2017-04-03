@@ -37,6 +37,7 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
+	"errors"
 	"flag"
 	"fmt"
 	"image"
@@ -57,9 +58,10 @@ import (
 	"time"
 
 	// unilicense "github.com/unidoc/unidoc/license"
-	unicommon "github.com/unidoc/unidoc/common"
-	unicontent "github.com/unidoc/unidoc/pdf/contentstream"
-	unipdf "github.com/unidoc/unidoc/pdf/model"
+	common "github.com/unidoc/unidoc/common"
+	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
+	pdfcore "github.com/unidoc/unidoc/pdf/core"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
 func initUniDoc(licenseKey string, debug bool) error {
@@ -73,10 +75,14 @@ func initUniDoc(licenseKey string, debug bool) error {
 	// }
 
 	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
+	// the common.Logger interface, common.DummyLogger is the default and
 	// does not do anything. Very easy to implement your own.
-	// unicommon.SetLogger(unicommon.DummyLogger{})
-	unicommon.SetLogger(unicommon.ConsoleLogger{LogLevel: unicommon.LogLevelDebug})
+	// common.SetLogger(common.DummyLogger{})
+	logLevel := common.LogLevelInfo
+	if debug {
+		logLevel = common.LogLevelDebug
+	}
+	common.SetLogger(common.ConsoleLogger{LogLevel: logLevel})
 
 	return nil
 }
@@ -99,22 +105,20 @@ var testStats = statistics{
 	// imageInfoPath:  "xform.image.info.csv",
 }
 
+const gVerbose = false
+
 var allOpCounts = map[string]int{}
 
 func main() {
-	debug := false                // Write debug level info to stdout?
-	keep := false                 // Keep the rasters used for PDF comparison"
-	noContentTransforms := false  // Don't parse stream contents?
-	doGrayscaleTransform := false // Apply the grayscale transform?
-	compareGrayscale := false     // Do PDF raster comparison on grayscale rasters?
-	runAllTests := false          // Don't stop when a PDF file fails to process?
-	outputDir := ""               // Transformed PDFs are written here
-	var minSize int64 = -1        // Minimum size for an input PDF to be processed.
-	var maxSize int64 = -1        // Maximum size for an input PDF to be processed.
+	debug := false            // Write debug level info to stdout?
+	keep := false             // Keep the rasters used for PDF comparison"
+	compareGrayscale := false // Do PDF raster comparison on grayscale rasters?
+	runAllTests := false      // Don't stop when a PDF file fails to process?
+	outputDir := ""           // Transformed PDFs are written here
+	var minSize int64 = -1    // Minimum size for an input PDF to be processed.
+	var maxSize int64 = -1    // Maximum size for an input PDF to be processed.
 	flag.BoolVar(&debug, "d", false, "Enable debug logging")
 	flag.BoolVar(&keep, "k", false, "Keep the rasters used for PDF comparison")
-	flag.BoolVar(&noContentTransforms, "x", false, "Don't transform streams")
-	flag.BoolVar(&doGrayscaleTransform, "t", false, "Do grayscale transform")
 	flag.BoolVar(&compareGrayscale, "g", false, "Do PDF raster comparison on grayscale rasters")
 	flag.BoolVar(&runAllTests, "a", false, "Run all tests. Don't stop at first failure")
 	flag.StringVar(&outputDir, "o", "", "Output directory")
@@ -132,11 +136,11 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
-	unicontent.ValidatingOperations = true
+	// pdfcontent.ValidatingOperations = true
 
 	err = os.MkdirAll(outputDir, 0777)
 	if err != nil {
-		unicommon.Log.Error("MkdirAll failed. outputDir=%#q err=%v", outputDir, err)
+		common.Log.Error("MkdirAll failed. outputDir=%#q err=%v", outputDir, err)
 		os.Exit(1)
 	}
 
@@ -148,7 +152,7 @@ func main() {
 
 	pdfList, err := patternsToPaths(args)
 	if err != nil {
-		unicommon.Log.Error("patternsToPaths failed. args=%#q err=%v", args, err)
+		common.Log.Error("patternsToPaths failed. args=%#q err=%v", args, err)
 		os.Exit(1)
 	}
 	pdfList = sortFiles(pdfList, minSize, maxSize)
@@ -156,7 +160,7 @@ func main() {
 	failFiles := []string{}
 
 	if err = testStats.load(); err != nil {
-		unicommon.Log.Error("stats.load failed. testStats=%+v err=%v", testStats, err)
+		common.Log.Error("stats.load failed. testStats=%+v err=%v", testStats, err)
 		os.Exit(1)
 	}
 	defer testStats._save()
@@ -174,7 +178,7 @@ func main() {
 		numPages, err := transformPdfFile(inputPath, outputPath)
 		dt := time.Since(t0)
 		if err != nil {
-			unicommon.Log.Error("transformPdfFile failed. err=%v", err)
+			common.Log.Error("transformPdfFile failed. err=%v", err)
 			failFiles = append(failFiles, inputPath)
 			if runAllTests {
 				continue
@@ -187,14 +191,26 @@ func main() {
 			outputSize, int(float64(outputSize)/float64(inputSize)*100.0+0.5),
 			numPages, dt.Seconds(), outputPath)
 
+		err = runPdfToPs(outputPath, compDir)
+		if err != nil {
+			common.Log.Error("Transform has damaged PDF. err=%v\n\tinputPath=%#q\n\toutputPath=%#q",
+				err, inputPath, outputPath)
+
+			failFiles = append(failFiles, inputPath)
+			if runAllTests {
+				continue
+			}
+			os.Exit(1)
+		}
+
 		isColorOut, colorPagesOut, err := isPdfColor(outputPath, compDir, true, keep)
 
 		if err != nil || isColorOut {
 			if err != nil {
-				unicommon.Log.Error("Transform has damaged PDF. err=%v\n\tinputPath=%#q\n\toutputPath=%#q",
+				common.Log.Error("Transform has damaged PDF. err=%v\n\tinputPath=%#q\n\toutputPath=%#q",
 					err, inputPath, outputPath)
 			} else {
-				unicommon.Log.Error("isPdfColor: %d Color pages", len(colorPagesOut))
+				common.Log.Error("isPdfColor: %d Color pages", len(colorPagesOut))
 			}
 			failFiles = append(failFiles, inputPath)
 			if runAllTests {
@@ -231,7 +247,7 @@ func transformPdfFile(inputPath, outputPath string) (int, error) {
 	}
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return 0, err
 	}
@@ -252,15 +268,15 @@ func transformPdfFile(inputPath, outputPath string) (int, error) {
 		return numPages, err
 	}
 
-	pdfWriter := unipdf.NewPdfWriter()
+	pdfWriter := pdf.NewPdfWriter()
 
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
 		page := pdfReader.PageList[i]
-		unicommon.Log.Debug("^^^^page %d", pageNum)
+		common.Log.Debug("^^^^page %d", pageNum)
 
 		desc := fmt.Sprintf("%s:page%d", filepath.Base(inputPath), pageNum)
-		err = transformPdfPage(page, desc)
+		err = convertPageToGrayscale(page, desc)
 		if err != nil {
 			return numPages, err
 		}
@@ -269,6 +285,7 @@ func transformPdfFile(inputPath, outputPath string) (int, error) {
 		if err != nil {
 			return numPages, err
 		}
+		//  break !@#$ Single page mode
 	}
 
 	fWrite, err := os.Create(outputPath)
@@ -296,7 +313,7 @@ func modifyPath(inputPath, outputDir string) string {
 		panic(err)
 	}
 	if strings.ToLower(in) == strings.ToLower(out) {
-		unicommon.Log.Error("modifyPath: Cannot modify path to itself. inputPath=%#q outputDir=%#q",
+		common.Log.Error("modifyPath: Cannot modify path to itself. inputPath=%#q outputDir=%#q",
 			inputPath, outputDir)
 		panic("Don't write over test files")
 	}
@@ -407,7 +424,7 @@ var (
 // runGhostscript runs Ghostscript on file `pdf` to create file one png file per page in directory
 // `outputDir`
 func runGhostscript(pdf, outputDir string, grayscale bool) error {
-	unicommon.Log.Debug("runGhostscript: pdf=%#q outputDir=%#q", pdf, outputDir)
+	common.Log.Debug("runGhostscript: pdf=%#q outputDir=%#q", pdf, outputDir)
 	outputPath := filepath.Join(outputDir, gsImageFormat)
 	output := fmt.Sprintf("-sOutputFile=%s", outputPath)
 	pngDevices := map[bool]string{
@@ -425,25 +442,43 @@ func runGhostscript(pdf, outputDir string, grayscale bool) error {
 		"-dGraphicsAlphaBits=1",
 		output,
 		pdf)
-	unicommon.Log.Debug("runGhostscript: cmd=%#q", cmd.Args)
+	common.Log.Debug("runGhostscript: cmd=%#q", cmd.Args)
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
-		unicommon.Log.Error("runGhostscript: Could not process pdf=%q err=%v\nstdout=\n%s\nstderr=\n%s\n",
+		common.Log.Error("runGhostscript: Could not process pdf=%q err=%v\nstdout=\n%s\nstderr=\n%s\n",
 			pdf, err, stdout, stderr)
 	}
 	return err
 }
 
-// ghostscriptName returns the name of the Ghostscipt binary on this OS
+// ghostscriptName returns the name of the Ghostscript binary on this OS
 func ghostscriptName() string {
 	if runtime.GOOS == "windows" {
 		return "gswin64c.exe"
 	}
 	return "gs"
+}
+
+// runGhostscript runs pdftops on file `pdf` to create a PostScript file in directory `outputDir`
+func runPdfToPs(pdf, outputDir string) error {
+	common.Log.Debug("pdf=%#q outputDir=%#q", pdf, outputDir)
+	ps := changeDir(pdf, outputDir)
+	cmd := exec.Command("pdftops", pdf, ps)
+	common.Log.Debug("cmd=%#q", cmd.Args)
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		common.Log.Error("Could not process pdf=%q err=%v\nstdout=\n%s\nstderr=\n%s\n",
+			pdf, err, stdout, stderr)
+	}
+	return err
 }
 
 // directoriesEqual compares image files that match `mask` in directories `dir1` and `dir2` and
@@ -510,7 +545,7 @@ func imagesEqual(path1, path2 string, threshold imageThreshold) (bool, error) {
 	w1, h1 := img1.Bounds().Max.X, img1.Bounds().Max.Y
 	w2, h2 := img2.Bounds().Max.X, img2.Bounds().Max.Y
 	if w1 != w2 || h1 != h2 {
-		unicommon.Log.Error("compareImages: Different dimensions. img1=%dx%d img2=%dx%d",
+		common.Log.Error("compareImages: Different dimensions. img1=%dx%d img2=%dx%d",
 			w1, h1, w2, h2)
 		return false, nil
 	}
@@ -544,7 +579,7 @@ func imagesEqual(path1, path2 string, threshold imageThreshold) (bool, error) {
 	if n > 10 {
 		n = 10
 	}
-	unicommon.Log.Error("compareImages: Different pixels. different=%d/(%dx%d)=%e mean=%.1f %.0f",
+	common.Log.Error("compareImages: Different pixels. different=%d/(%dx%d)=%e mean=%.1f %.0f",
 		len(different), w1, h1, fracPixels, mean, different[:n])
 
 	return equal, nil
@@ -594,7 +629,7 @@ func isColorDirectory(mask, dir string) (bool, error) {
 	pattern := filepath.Join(dir, mask)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
-		unicommon.Log.Error("isColorDirectory: Glob failed. pattern=%#q err=%v", pattern, err)
+		common.Log.Error("isColorDirectory: Glob failed. pattern=%#q err=%v", pattern, err)
 		return false, err
 	}
 
@@ -613,7 +648,7 @@ func colorDirectoryPages(mask, dir string, keep bool) ([]int, error) {
 	pattern := filepath.Join(dir, mask)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
-		unicommon.Log.Error("isColorDirectory: Glob failed. pattern=%#q err=%v", pattern, err)
+		common.Log.Error("isColorDirectory: Glob failed. pattern=%#q err=%v", pattern, err)
 		return nil, err
 	}
 
@@ -628,16 +663,16 @@ func colorDirectoryPages(mask, dir string, keep bool) ([]int, error) {
 			panic(err)
 			return colorPages, err
 		}
-		// unicommon.Log.Error("isColorDirectory:  path=%#q", path)
+		// common.Log.Error("isColorDirectory:  path=%#q", path)
 		isColor, err := isColorImage(path, keep)
-		// unicommon.Log.Error("isColorDirectory: isColor=%t path=%#q", isColor, path)
+		// common.Log.Error("isColorDirectory: isColor=%t path=%#q", isColor, path)
 		if err != nil {
 			panic(err)
 			return colorPages, err
 		}
 		if isColor {
 			colorPages = append(colorPages, pageNum)
-			// unicommon.Log.Error("isColorDirectory: colorPages=%d %d", len(colorPages), colorPages)
+			// common.Log.Error("isColorDirectory: colorPages=%d %d", len(colorPages), colorPages)
 		}
 	}
 	return colorPages, nil
@@ -653,7 +688,7 @@ func isColorImage(path string, keep bool) (bool, error) {
 	if isColor && keep {
 		markedPath := fmt.Sprintf("%s.marked.png", path)
 		markedImg, summary := imgMarkColor(img)
-		unicommon.Log.Error("markedPath=%#q %s", markedPath, summary)
+		common.Log.Error("markedPath=%#q %s", markedPath, summary)
 		err = writeImage(markedPath, markedImg)
 	}
 	return isColor, err
@@ -733,7 +768,7 @@ func summarizeSeries(data []float64) string {
 func readImage(path string) (image.Image, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		unicommon.Log.Error("readImage: Could not open file. path=%#q err=%v", path, err)
+		common.Log.Error("readImage: Could not open file. path=%#q err=%v", path, err)
 		return nil, err
 	}
 	defer f.Close()
@@ -746,7 +781,7 @@ func readImage(path string) (image.Image, error) {
 func writeImage(path string, img image.Image) error {
 	f, err := os.Create(path)
 	if err != nil {
-		unicommon.Log.Error("writeImage: Could not create file. path=%#q err=%v", path, err)
+		common.Log.Error("writeImage: Could not create file. path=%#q err=%v", path, err)
 		return err
 	}
 	defer f.Close()
@@ -788,7 +823,7 @@ func patternsToPaths(patternList []string) ([]string, error) {
 	for _, pattern := range patternList {
 		files, err := filepath.Glob(pattern)
 		if err != nil {
-			unicommon.Log.Error("patternsToPaths: Glob failed. pattern=%#q err=%v", pattern, err)
+			common.Log.Error("patternsToPaths: Glob failed. pattern=%#q err=%v", pattern, err)
 			return pathList, err
 		}
 		for _, path := range files {
@@ -896,7 +931,7 @@ func testResultRead(path string) ([]testResult, error) {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			unicommon.Log.Error("testResultRead: i=%d err=%v", i, err)
+			common.Log.Error("testResultRead: i=%d err=%v", i, err)
 			return results, err
 		}
 		if i == 0 {
@@ -939,7 +974,7 @@ func testResultWrite(path string, results []testResult) error {
 			fmt.Sprintf("%d", e.xobjForm),
 		}
 		if err := w.Write(row); err != nil {
-			unicommon.Log.Error("testResultWrite: Error writing record. i=%d path=%#q err=%v",
+			common.Log.Error("testResultWrite: Error writing record. i=%d path=%#q err=%v",
 				i, path, err)
 		}
 	}
@@ -970,13 +1005,301 @@ func toFloat(s string) float64 {
 	return x
 }
 
-// ==============================================================
-// Page transform code goes here
+func changeDir(path, dir string) string {
+	_, name := filepath.Split(path)
+	return filepath.Join(dir, name)
+}
 
-// transformPdfPage
-//	- parses the contents of streams in `page` into a slice of operations
-//	- converts the slice of operations into a stream
-//	- replaces the streams in `page` with the new stream
-func transformPdfPage(page *unipdf.PdfPage, desc string) error {
+// =================================================================================================
+// Page transform code goes here
+// =================================================================================================
+
+// Replaces color objects on the page with grayscale ones.  Also references XObject Images and Forms
+// to convert those to grayscale.
+func convertPageToGrayscale(page *pdf.PdfPage, desc string) error {
+	// For each page, we go through the resources and look for the images.
+	resources, err := page.GetResources()
+	if err != nil {
+		return err
+	}
+
+	contents, err := page.GetAllContentStreams()
+	if err != nil {
+		return err
+	}
+
+	grayContent, err := transformContentStreamToGrayscale(contents, resources)
+	if err != nil {
+		return err
+	}
+	page.SetContentStreams([]string{string(grayContent)}, pdfcore.NewFlateEncoder())
+
+	if gVerbose {
+		fmt.Printf("Processed contents: %s\n", grayContent)
+	}
+
 	return nil
+}
+
+func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageResources) ([]byte, error) {
+	cstreamParser := pdfcontent.NewContentStreamParser(contents)
+	operations, err := cstreamParser.Parse()
+	if err != nil {
+		return nil, err
+	}
+	processedOperations := &pdfcontent.ContentStreamOperations{}
+
+	// The content stream processor keeps track of the graphics state and we can make our own
+	// handlers to process certain commands, using the AddHandler method.  In this case, we hook up
+	// to color related operands, and for image and form handling.
+	processor := pdfcontent.NewContentStreamProcessor(operations)
+	// Add handlers for colorspace related functionality.
+	processor.AddHandler(pdfcontent.HandlerConditionEnumAllOperands, "",
+		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState,
+			resources *pdf.PdfPageResources) error {
+			operand := op.Operand
+			switch operand {
+			case "CS", "cs": // Set colorspace operands.
+				op := pdfcontent.ContentStreamOperation{}
+				op.Operand = operand
+				op.Params = []pdfcore.PdfObject{pdfcore.MakeName("DeviceGray")}
+				*processedOperations = append(*processedOperations, &op)
+				return nil
+			case "SC", "SCN": // Set stroking color.
+				color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
+				if err != nil {
+					fmt.Printf("Error: %v\n", err)
+					return err
+				}
+				rgbColor := color.(*pdf.PdfColorDeviceRGB)
+				grayColor := rgbColor.ToGray()
+
+				op := pdfcontent.ContentStreamOperation{}
+				op.Operand = operand
+				op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
+
+				*processedOperations = append(*processedOperations, &op)
+				return nil
+			case "sc", "scn": // Set nonstroking color.
+				color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
+				if err != nil {
+					fmt.Printf("Error: %v\n", err)
+					return err
+				}
+				rgbColor := color.(*pdf.PdfColorDeviceRGB)
+				grayColor := rgbColor.ToGray()
+
+				op := pdfcontent.ContentStreamOperation{}
+				op.Operand = operand
+				op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
+
+				*processedOperations = append(*processedOperations, &op)
+				return nil
+			case "RG", "K": // Set RGB or CMYK stroking color.
+				color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
+				if err != nil {
+					fmt.Printf("Error: %v\n", err)
+					return err
+				}
+				rgbColor := color.(*pdf.PdfColorDeviceRGB)
+				grayColor := rgbColor.ToGray()
+
+				op := pdfcontent.ContentStreamOperation{}
+				op.Operand = "G"
+				op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
+
+				*processedOperations = append(*processedOperations, &op)
+				return nil
+			case "rg", "k": // Set RGB or CMYK as nonstroking color.
+				color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
+				if err != nil {
+					fmt.Printf("Error: %v\n", err)
+					return err
+				}
+				rgbColor := color.(*pdf.PdfColorDeviceRGB)
+				grayColor := rgbColor.ToGray()
+
+				op := pdfcontent.ContentStreamOperation{}
+				op.Operand = "g"
+				op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
+
+				*processedOperations = append(*processedOperations, &op)
+				return nil
+			}
+			// default:  !@#$
+			*processedOperations = append(*processedOperations, op)
+			return nil
+		})
+	// Add handler for image related handling.  Note that inline images are completely stored with a
+	// ContentStreamInlineImage object as the parameter for BI.
+	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "BI",
+		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
+			if len(op.Params) != 1 {
+				common.Log.Error("BI Error invalid number of params")
+				return errors.New("invalid number of parameters")
+			}
+			// Inline image.
+			iimg, ok := op.Params[0].(*pdfcontent.ContentStreamInlineImage)
+			if !ok {
+				common.Log.Error("Invalid handling for inline image")
+				return errors.New("Invalid inline image parameter")
+			}
+
+			img, err := iimg.ToImage(resources)
+			if err != nil {
+				common.Log.Error("Error converting inline image to image: %v", err)
+				return err
+			}
+
+			cs, err := iimg.GetColorSpace(resources)
+			if err != nil {
+				common.Log.Error("Error getting color space for inline image: %v", err)
+				return err
+			}
+			rgbImg, err := cs.ImageToRGB(*img)
+			if err != nil {
+				common.Log.Error("Error converting image to rgb: %v", err)
+				return err
+			}
+			rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
+			grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
+			if err != nil {
+				common.Log.Error("Error converting img to gray: %v", err)
+				return err
+			}
+			grayInlineImg, err := pdfcontent.NewInlineImageFromImage(grayImage, nil)
+			if err != nil {
+				common.Log.Error("Error making a new inline image object: %v", err)
+				return err
+			}
+
+			// Replace inline image data with the gray image.
+			pOp := pdfcontent.ContentStreamOperation{}
+			pOp.Operand = "BI"
+			pOp.Params = []pdfcore.PdfObject{grayInlineImg}
+			*processedOperations = append(*processedOperations, &pOp)
+
+			return nil
+		})
+
+	// Handler for XObject Image and Forms.
+	processedXObjects := map[string]bool{} // Keep track of processed XObjects to avoid repetition.
+
+	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "Do",
+		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
+			operand := op.Operand
+			if gVerbose {
+				fmt.Printf("Do handler: %s\n", operand)
+			}
+			if len(op.Params) < 1 {
+				fmt.Printf("ERROR: Invalid number of params for Do object.\n")
+				return errors.New("Range check")
+			}
+
+			// XObject.
+			name := op.Params[0].(*pdfcore.PdfObjectName)
+
+			// Only process each one once.
+			_, has := processedXObjects[string(*name)]
+			if has {
+				return nil
+			}
+			processedXObjects[string(*name)] = true
+
+			_, xtype := resources.GetXObjectByName(string(*name))
+			if xtype == pdf.XObjectTypeImage {
+				if gVerbose {
+					fmt.Printf(" XObject Image: %s\n", *name)
+				}
+
+				ximg, err := resources.GetXObjectImageByName(string(*name))
+				if err != nil {
+					fmt.Printf("Error : %v\n", err)
+					return err
+				}
+
+				img, err := ximg.ToImage()
+				if err != nil {
+					fmt.Printf("Error : %v\n", err)
+					return err
+				}
+
+				rgbImg, err := ximg.ColorSpace.ImageToRGB(*img)
+				if err != nil {
+					fmt.Printf("Error : %v\n", err)
+					return err
+				}
+
+				rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
+				grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
+				if err != nil {
+					fmt.Printf("Error : %v\n", err)
+					return err
+				}
+
+				// Update the XObject image.
+				err = ximg.SetImage(&grayImage, nil)
+				if err != nil {
+					fmt.Printf("Error : %v\n", err)
+					return err
+				}
+
+				// Update the container.
+				_ = ximg.ToPdfObject()
+			} else if xtype == pdf.XObjectTypeForm {
+				// Go through the XObject Form content stream.
+				xform, err := resources.GetXObjectFormByName(string(*name))
+				if err != nil {
+					fmt.Printf("Error : %v\n", err)
+					return err
+				}
+
+				formContent, err := xform.GetContentStream()
+				if err != nil {
+					fmt.Printf("Error : %v\n", err)
+					return err
+				}
+
+				// Process the content stream in the Form object too:
+				// XXX/TODO: Use either form resources (priority) and fall back to page resources
+				// alternatively if not found.
+				formResources := xform.FormResources
+				if formResources == nil {
+					formResources = resources
+				}
+
+				// Process the content stream in the Form object too:
+				grayContent, err := transformContentStreamToGrayscale(string(formContent), formResources)
+				if err != nil {
+					common.Log.Error("%v", err)
+					return err
+				}
+
+				xform.SetContentStream(grayContent)
+				// Update the container.
+				_ = xform.ToPdfObject()
+			}
+
+			return nil
+		})
+
+	err = processor.Process(resources)
+	if err != nil {
+		common.Log.Error("Error processing: %v", err)
+		return nil, err
+	}
+
+	if gVerbose {
+		// For debug purposes: (high level logging).
+		fmt.Printf("=== Unprocessed - Full list\n")
+		for idx, op := range operations {
+			fmt.Printf("U. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
+		}
+		fmt.Printf("=== Processed - Full list\n")
+		for idx, op := range *processedOperations {
+			fmt.Printf("P. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
+		}
+	}
+
+	return processedOperations.Bytes(), nil
 }
