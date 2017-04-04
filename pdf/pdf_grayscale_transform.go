@@ -1,8 +1,8 @@
 /*
  * Convert PDF including images and content stream data to grayscale.
  *
- * This example demonstrates some of the more complex capabilities of UniDoc, showing the capability to process and transform
- * objects and contents.
+ * This advanced example demonstrates some of the more complex capabilities of UniDoc, showing the capability to process
+ * and transform objects and contents.
  *
  * Run as: go run pdf_grayscale_transform.go input.pdf output.pdf
  */
@@ -14,19 +14,20 @@ import (
 	"fmt"
 	"os"
 
-	common "github.com/unidoc/unidoc/common"
+	unicommon "github.com/unidoc/unidoc/common"
 	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
+	"github.com/unidoc/unidoc/pdf/ps"
 )
 
 func init() {
 	// To make the library log we just have to initialise the logger which satisfies
 	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
 	// does not do anything. Very easy to implement your own.
-	//common.SetLogger(common.DummyLogger{})
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
-	// common.SetLogger(common.NewConsoleLogger(common.LogLevelTrace))
+	//unicommon.SetLogger(unicommon.DummyLogger{})
+	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
 }
 
 func main() {
@@ -141,6 +142,12 @@ func convertPageToGrayscale(page *pdf.PdfPage) error {
 	return nil
 }
 
+// Check if colorspace represents a Pattern colorspace.
+func isPatternCS(cs pdf.PdfColorspace) bool {
+	_, isPattern := cs.(*pdf.PdfColorspaceSpecialPattern)
+	return isPattern
+}
+
 func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageResources) ([]byte, error) {
 	cstreamParser := pdfcontent.NewContentStreamParser(contents)
 	operations, err := cstreamParser.Parse()
@@ -148,6 +155,9 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 		return nil, err
 	}
 	processedOperations := &pdfcontent.ContentStreamOperations{}
+
+	transformedPatterns := map[string]bool{} // List of already transformed patterns. Avoid multiple conversions.
+	transformedShadings := map[string]bool{} // List of already transformed shadings. Avoid multiple conversions.
 
 	// The content stream processor keeps track of the graphics state and we can make our own handlers to process certain commands,
 	// using the AddHandler method.  In this case, we hook up to color related operands, and for image and form handling.
@@ -157,26 +167,140 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
 			operand := op.Operand
 			switch operand {
-			case "CS", "cs": // Set colorspace operands.
+			case "CS": // Set colorspace operands (stroking).
+				if isPatternCS(gs.ColorspaceStroking) {
+					// If referring to a pattern colorspace with an external definition, need to update the definition.
+					// If has an underlying colorspace, then go and change it to DeviceGray.
+					// Needs to be specified externally in the colorspace resources.
+
+					csname := op.Params[0].(*pdfcore.PdfObjectName)
+					if *csname != "Pattern" {
+						// Update if referring to an external colorspace in resources.
+						cs, ok := resources.ColorSpace.Colorspaces[string(*csname)]
+						if !ok {
+							unicommon.Log.Debug("Undefined colorspace for pattern (%s)", csname)
+							return errors.New("Colorspace not defined")
+						}
+
+						patternCS, ok := cs.(*pdf.PdfColorspaceSpecialPattern)
+						if !ok {
+							return errors.New("Type error")
+						}
+
+						if patternCS.UnderlyingCS != nil {
+							// Swap out for a gray colorspace.
+							patternCS.UnderlyingCS = pdf.NewPdfColorspaceDeviceGray()
+						}
+
+						resources.ColorSpace.Colorspaces[string(*csname)] = patternCS
+					}
+					*processedOperations = append(*processedOperations, op)
+					return nil
+				}
+
 				op := pdfcontent.ContentStreamOperation{}
 				op.Operand = operand
 				op.Params = []pdfcore.PdfObject{pdfcore.MakeName("DeviceGray")}
 				*processedOperations = append(*processedOperations, &op)
 				return nil
-			case "SC", "SCN": // Set stroking color.
-				color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
-				if err != nil {
-					fmt.Printf("Error: %v\n", err)
-					return err
+			case "cs": // Set colorspace operands (non-stroking).
+				if isPatternCS(gs.ColorspaceNonStroking) {
+					// If referring to a pattern colorspace with an external definition, need to update the definition.
+					// If has an underlying colorspace, then go and change it to DeviceGray.
+					// Needs to be specified externally in the colorspace resources.
+
+					csname := op.Params[0].(*pdfcore.PdfObjectName)
+					if *csname != "Pattern" {
+						// Update if referring to an external colorspace in resources.
+						cs, ok := resources.ColorSpace.Colorspaces[string(*csname)]
+						if !ok {
+							unicommon.Log.Debug("Undefined colorspace for pattern (%s)", csname)
+							return errors.New("Colorspace not defined")
+						}
+
+						patternCS, ok := cs.(*pdf.PdfColorspaceSpecialPattern)
+						if !ok {
+							return errors.New("Type error")
+						}
+
+						if patternCS.UnderlyingCS != nil {
+							// Swap out for a gray colorspace.
+							patternCS.UnderlyingCS = pdf.NewPdfColorspaceDeviceGray()
+						}
+
+						resources.ColorSpace.Colorspaces[string(*csname)] = patternCS
+					}
+					*processedOperations = append(*processedOperations, op)
+					return nil
 				}
-				rgbColor := color.(*pdf.PdfColorDeviceRGB)
-				grayColor := rgbColor.ToGray()
 
 				op := pdfcontent.ContentStreamOperation{}
 				op.Operand = operand
-				op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
-
+				op.Params = []pdfcore.PdfObject{pdfcore.MakeName("DeviceGray")}
 				*processedOperations = append(*processedOperations, &op)
+				return nil
+
+			case "SC", "SCN": // Set stroking color.  Includes pattern colors.
+				if isPatternCS(gs.ColorspaceStroking) {
+					op := pdfcontent.ContentStreamOperation{}
+					op.Operand = operand
+					op.Params = []pdfcore.PdfObject{}
+
+					patternColor, ok := gs.ColorStroking.(*pdf.PdfColorPattern)
+					if !ok {
+						return errors.New("Invalid stroking color type")
+					}
+
+					if patternColor.Color != nil {
+						color, err := gs.ColorspaceStroking.ColorToRGB(patternColor.Color)
+						if err != nil {
+							fmt.Printf("Error: %v\n", err)
+							return err
+						}
+						rgbColor := color.(*pdf.PdfColorDeviceRGB)
+						grayColor := rgbColor.ToGray()
+
+						op.Params = append(op.Params, pdfcore.MakeFloat(grayColor.Val()))
+					}
+
+					if _, has := transformedPatterns[patternColor.PatternName]; has {
+						// Already processed, need not change anything, except underlying color if used.
+						op.Params = append(op.Params, pdfcore.MakeName(patternColor.PatternName))
+						*processedOperations = append(*processedOperations, &op)
+						return nil
+					}
+					transformedPatterns[patternColor.PatternName] = true
+
+					// Look up the pattern name and convert it.
+					pattern, found := resources.GetPatternByName(patternColor.PatternName)
+					if !found {
+						return errors.New("Undefined pattern name")
+					}
+
+					grayPattern, err := convertPatternToGray(pattern)
+					if err != nil {
+						unicommon.Log.Debug("Unable to convert pattern to grayscale: %v", err)
+						return err
+					}
+					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
+
+					op.Params = append(op.Params, pdfcore.MakeName(patternColor.PatternName))
+					*processedOperations = append(*processedOperations, &op)
+				} else {
+					color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
+					if err != nil {
+						fmt.Printf("Error: %v\n", err)
+						return err
+					}
+					rgbColor := color.(*pdf.PdfColorDeviceRGB)
+					grayColor := rgbColor.ToGray()
+
+					op := pdfcontent.ContentStreamOperation{}
+					op.Operand = operand
+					op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
+					*processedOperations = append(*processedOperations, &op)
+				}
+
 				return nil
 			case "sc", "scn": // Set nonstroking color.
 				color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
@@ -223,6 +347,32 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 				*processedOperations = append(*processedOperations, &op)
 				return nil
+			case "sh":
+				if len(op.Params) != 1 {
+					return errors.New("Params to sh operator should be 1")
+				}
+				shname, ok := op.Params[0].(*pdfcore.PdfObjectName)
+				if !ok {
+					return errors.New("sh parameter should be a name")
+				}
+				if _, has := transformedShadings[string(*shname)]; has {
+					// Already processed, no need to do anything.
+					*processedOperations = append(*processedOperations, op)
+					return nil
+				}
+				transformedShadings[string(*shname)] = true
+
+				shading, found := resources.GetShadingByName(string(*shname))
+				if !found {
+					return errors.New("Shading not defined in resources")
+				}
+
+				grayShading, err := convertShadingToGray(shading)
+				if err != nil {
+					return err
+				}
+
+				resources.SetShadingByName(string(*shname), grayShading.GetContext().ToPdfObject())
 			}
 			*processedOperations = append(*processedOperations, op)
 
@@ -393,4 +543,133 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 	}
 
 	return processedOperations.Bytes(), nil
+}
+
+// grayPattern, err := convertPatternToGray(pattern)
+func convertPatternToGray(pattern *pdf.PdfPattern) (*pdf.PdfPattern, error) {
+	// Case 1: Colored tiling patterns.  Need to process the content stream and replace.
+	if pattern.IsTiling() {
+		tilingPattern := pattern.GetAsTilingPattern()
+
+		if tilingPattern.IsColored() {
+			// A colored tiling pattern can use color operators in its stream, need to process the stream.
+
+			content, err := tilingPattern.GetContentStream()
+			if err != nil {
+				return nil, err
+			}
+
+			grayContents, err := transformContentStreamToGrayscale(string(content), tilingPattern.Resources)
+			if err != nil {
+				return nil, err
+			}
+
+			tilingPattern.SetContentStream(grayContents, nil)
+
+			// Update in-memory pdf objects.
+			_ = tilingPattern.ToPdfObject()
+		}
+	} else if pattern.IsShading() {
+		// Case 2: Shading patterns.  Need to create a new colorspace that can map from N=3,4 colorspaces to grayscale.
+		shadingPattern := pattern.GetAsShadingPattern()
+
+		grayShading, err := convertShadingToGray(shadingPattern.Shading)
+		if err != nil {
+			return nil, err
+		}
+		shadingPattern.Shading = grayShading
+
+		// Update in-memory pdf objects.
+		_ = shadingPattern.ToPdfObject()
+	}
+
+	return pattern, nil
+}
+
+// Convert shading to grayscale.
+// This one is slightly involved as a shading defines a color as function of position, i.e. color(x,y) = F(x,y).
+// Since the function can be challenging to change, we define new DeviceN colorspace with a color conversion
+// function.
+func convertShadingToGray(shading *pdf.PdfShading) (*pdf.PdfShading, error) {
+	cs := shading.ColorSpace
+
+	if cs.GetNumComponents() == 1 {
+		// Already grayscale, should be fine. No action taken.
+		return shading, nil
+	} else if cs.GetNumComponents() == 3 {
+		// Create a new DeviceN colorspace that converts R,G,B -> Grayscale
+		// Use: gray := 0.3*R + 0.59G + 0.11B
+		// PS program: { 0.11 mul exch 0.59 mul add exch 0.3 mul add }.
+		transformFunc := &pdf.PdfFunctionType4{}
+		transformFunc.Domain = []float64{0, 1, 0, 1, 0, 1}
+		transformFunc.Range = []float64{0, 1}
+		rgbToGrayPsProgram := ps.NewPSProgram()
+		rgbToGrayPsProgram.Append(ps.MakeReal(0.11))
+		rgbToGrayPsProgram.Append(ps.MakeOperand("mul"))
+		rgbToGrayPsProgram.Append(ps.MakeOperand("exch"))
+		rgbToGrayPsProgram.Append(ps.MakeReal(0.59))
+		rgbToGrayPsProgram.Append(ps.MakeOperand("mul"))
+		rgbToGrayPsProgram.Append(ps.MakeOperand("add"))
+		rgbToGrayPsProgram.Append(ps.MakeOperand("exch"))
+		rgbToGrayPsProgram.Append(ps.MakeReal(0.3))
+		rgbToGrayPsProgram.Append(ps.MakeOperand("mul"))
+		rgbToGrayPsProgram.Append(ps.MakeOperand("add"))
+		transformFunc.Program = rgbToGrayPsProgram
+
+		// Define the DeviceN colorspace that performs the R,G,B -> Gray conversion for us.
+		transformcs := pdf.NewPdfColorspaceDeviceN()
+		transformcs.AlternateSpace = pdf.NewPdfColorspaceDeviceGray()
+		transformcs.ColorantNames = pdfcore.MakeArray(pdfcore.MakeName("R"), pdfcore.MakeName("G"), pdfcore.MakeName("B"))
+		transformcs.TintTransform = transformFunc
+
+		// Replace the old colorspace with the new.
+		shading.ColorSpace = transformcs
+
+		return shading, nil
+	} else if cs.GetNumComponents() == 4 {
+		// Create a new DeviceN colorspace that converts C,M,Y,K -> Grayscale.
+		// Use: gray = 1.0 - min(1.0, 0.3*C + 0.59*M + 0.11*Y + K)  ; where BG(k) = k simply.
+		// PS program: {exch 0.11 mul add exch 0.59 mul add exch 0.3 mul add dup 1.0 ge { pop 1.0 } if}
+		transformFunc := &pdf.PdfFunctionType4{}
+		transformFunc.Domain = []float64{0, 1, 0, 1, 0, 1, 0, 1}
+		transformFunc.Range = []float64{0, 1}
+
+		cmykToGrayPsProgram := ps.NewPSProgram()
+		cmykToGrayPsProgram.Append(ps.MakeOperand("exch"))
+		cmykToGrayPsProgram.Append(ps.MakeReal(0.11))
+		cmykToGrayPsProgram.Append(ps.MakeOperand("mul"))
+		cmykToGrayPsProgram.Append(ps.MakeOperand("add"))
+		cmykToGrayPsProgram.Append(ps.MakeOperand("exch"))
+		cmykToGrayPsProgram.Append(ps.MakeReal(0.59))
+		cmykToGrayPsProgram.Append(ps.MakeOperand("mul"))
+		cmykToGrayPsProgram.Append(ps.MakeOperand("add"))
+		cmykToGrayPsProgram.Append(ps.MakeOperand("exch"))
+		cmykToGrayPsProgram.Append(ps.MakeReal(0.30))
+		cmykToGrayPsProgram.Append(ps.MakeOperand("mul"))
+		cmykToGrayPsProgram.Append(ps.MakeOperand("add"))
+		cmykToGrayPsProgram.Append(ps.MakeOperand("dup"))
+		cmykToGrayPsProgram.Append(ps.MakeReal(1.0))
+		cmykToGrayPsProgram.Append(ps.MakeOperand("ge"))
+		// Add sub procedure.
+		subProc := ps.NewPSProgram()
+		subProc.Append(ps.MakeOperand("pop"))
+		subProc.Append(ps.MakeReal(1.0))
+		cmykToGrayPsProgram.Append(subProc)
+		cmykToGrayPsProgram.Append(ps.MakeOperand("if"))
+		transformFunc.Program = cmykToGrayPsProgram
+
+		// Define the DeviceN colorspace that performs the R,G,B -> Gray conversion for us.
+		transformcs := pdf.NewPdfColorspaceDeviceN()
+		transformcs.AlternateSpace = pdf.NewPdfColorspaceDeviceGray()
+		transformcs.ColorantNames = pdfcore.MakeArray(pdfcore.MakeName("C"), pdfcore.MakeName("M"), pdfcore.MakeName("Y"), pdfcore.MakeName("K"))
+		transformcs.TintTransform = transformFunc
+
+		// Replace the old colorspace with the new.
+		shading.ColorSpace = transformcs
+
+		return shading, nil
+	} else {
+		unicommon.Log.Debug("Cannot convert to shading pattern grayscale, color space N = %d", cs.GetNumComponents())
+		return nil, errors.New("Unsupported pattern colorspace for grayscale conversion")
+	}
 }
