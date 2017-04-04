@@ -22,10 +22,6 @@ import (
 )
 
 func init() {
-	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
-	// does not do anything. Very easy to implement your own.
-	//unicommon.SetLogger(unicommon.DummyLogger{})
 	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
 }
@@ -435,8 +431,6 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "Do",
 		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
-			operand := op.Operand
-			fmt.Printf("Do handler: %s\n", operand)
 			if len(op.Params) < 1 {
 				fmt.Printf("ERROR: Invalid number of params for Do object.\n")
 				return errors.New("Range check")
@@ -491,6 +485,8 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				// Update the container.
 				_ = ximg.ToPdfObject()
 			} else if xtype == pdf.XObjectTypeForm {
+				fmt.Printf(" XObject Form: %s\n", *name)
+
 				// Go through the XObject Form content stream.
 				xform, err := resources.GetXObjectFormByName(string(*name))
 				if err != nil {
@@ -505,8 +501,9 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				}
 
 				// Process the content stream in the Form object too:
-				// XXX/TODO: Use either form resources (priority) and fall back to page resources alternatively if not found.
-				formResources := xform.FormResources
+				// XXX/TODO/Consider: Use either form resources (priority) and fall back to page resources alternatively if not found.
+				// Have not come into cases where needed yet.
+				formResources := xform.Resources
 				if formResources == nil {
 					formResources = resources
 				}
@@ -519,8 +516,9 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				}
 
 				xform.SetContentStream(grayContent)
-				// Update the container.
-				_ = xform.ToPdfObject()
+
+				// Update the resource entry.
+				resources.SetXObjectFormByName(string(*name), xform)
 			}
 
 			return nil
@@ -545,7 +543,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 	return processedOperations.Bytes(), nil
 }
 
-// grayPattern, err := convertPatternToGray(pattern)
+// Convert a pattern to grayscale (tiling or shading pattern).
 func convertPatternToGray(pattern *pdf.PdfPattern) (*pdf.PdfPattern, error) {
 	// Case 1: Colored tiling patterns.  Need to process the content stream and replace.
 	if pattern.IsTiling() {
