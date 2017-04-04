@@ -299,19 +299,66 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 				return nil
 			case "sc", "scn": // Set nonstroking color.
-				color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
-				if err != nil {
-					fmt.Printf("Error: %v\n", err)
-					return err
+				if isPatternCS(gs.ColorspaceNonStroking) {
+					op := pdfcontent.ContentStreamOperation{}
+					op.Operand = operand
+					op.Params = []pdfcore.PdfObject{}
+
+					patternColor, ok := gs.ColorNonStroking.(*pdf.PdfColorPattern)
+					if !ok {
+						return errors.New("Invalid stroking color type")
+					}
+
+					if patternColor.Color != nil {
+						color, err := gs.ColorspaceNonStroking.ColorToRGB(patternColor.Color)
+						if err != nil {
+							fmt.Printf("Error: %v\n", err)
+							return err
+						}
+						rgbColor := color.(*pdf.PdfColorDeviceRGB)
+						grayColor := rgbColor.ToGray()
+
+						op.Params = append(op.Params, pdfcore.MakeFloat(grayColor.Val()))
+					}
+
+					if _, has := transformedPatterns[patternColor.PatternName]; has {
+						// Already processed, need not change anything, except underlying color if used.
+						op.Params = append(op.Params, pdfcore.MakeName(patternColor.PatternName))
+						*processedOperations = append(*processedOperations, &op)
+						return nil
+					}
+					transformedPatterns[patternColor.PatternName] = true
+
+					// Look up the pattern name and convert it.
+					pattern, found := resources.GetPatternByName(patternColor.PatternName)
+					if !found {
+						return errors.New("Undefined pattern name")
+					}
+
+					grayPattern, err := convertPatternToGray(pattern)
+					if err != nil {
+						unicommon.Log.Debug("Unable to convert pattern to grayscale: %v", err)
+						return err
+					}
+					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
+
+					op.Params = append(op.Params, pdfcore.MakeName(patternColor.PatternName))
+					*processedOperations = append(*processedOperations, &op)
+				} else {
+					color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
+					if err != nil {
+						fmt.Printf("Error: %v\n", err)
+						return err
+					}
+					rgbColor := color.(*pdf.PdfColorDeviceRGB)
+					grayColor := rgbColor.ToGray()
+
+					op := pdfcontent.ContentStreamOperation{}
+					op.Operand = operand
+					op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
+
+					*processedOperations = append(*processedOperations, &op)
 				}
-				rgbColor := color.(*pdf.PdfColorDeviceRGB)
-				grayColor := rgbColor.ToGray()
-
-				op := pdfcontent.ContentStreamOperation{}
-				op.Operand = operand
-				op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
-
-				*processedOperations = append(*processedOperations, &op)
 				return nil
 			case "RG", "K": // Set RGB or CMYK stroking color.
 				color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
@@ -343,7 +390,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 				*processedOperations = append(*processedOperations, &op)
 				return nil
-			case "sh":
+			case "sh": // Paints the shape and color defined by shading dict.
 				if len(op.Params) != 1 {
 					return errors.New("Params to sh operator should be 1")
 				}
