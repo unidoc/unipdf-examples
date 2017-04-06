@@ -37,7 +37,6 @@ package main
 import (
 	"bytes"
 	"encoding/csv"
-	"errors"
 	"flag"
 	"fmt"
 	"image"
@@ -59,8 +58,6 @@ import (
 
 	// unilicense "github.com/unidoc/unidoc/license"
 	common "github.com/unidoc/unidoc/common"
-	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
-	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
@@ -105,7 +102,7 @@ var testStats = statistics{
 	// imageInfoPath:  "xform.image.info.csv",
 }
 
-const gVerbose = false
+var gVerbose = false
 
 var allOpCounts = map[string]int{}
 
@@ -131,6 +128,9 @@ func main() {
 			os.Args[0])
 		os.Exit(1)
 	}
+
+	gVerbose = debug
+	fmt.Printf("gVerbose=%t\n", gVerbose)
 
 	err := initUniDoc("", debug)
 	if err != nil {
@@ -1008,298 +1008,4 @@ func toFloat(s string) float64 {
 func changeDir(path, dir string) string {
 	_, name := filepath.Split(path)
 	return filepath.Join(dir, name)
-}
-
-// =================================================================================================
-// Page transform code goes here
-// =================================================================================================
-
-// Replaces color objects on the page with grayscale ones.  Also references XObject Images and Forms
-// to convert those to grayscale.
-func convertPageToGrayscale(page *pdf.PdfPage, desc string) error {
-	// For each page, we go through the resources and look for the images.
-	resources, err := page.GetResources()
-	if err != nil {
-		return err
-	}
-
-	contents, err := page.GetAllContentStreams()
-	if err != nil {
-		return err
-	}
-
-	grayContent, err := transformContentStreamToGrayscale(contents, resources)
-	if err != nil {
-		return err
-	}
-	page.SetContentStreams([]string{string(grayContent)}, pdfcore.NewFlateEncoder())
-
-	if gVerbose {
-		fmt.Printf("Processed contents: %s\n", grayContent)
-	}
-
-	return nil
-}
-
-func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageResources) ([]byte, error) {
-	cstreamParser := pdfcontent.NewContentStreamParser(contents)
-	operations, err := cstreamParser.Parse()
-	if err != nil {
-		return nil, err
-	}
-	processedOperations := &pdfcontent.ContentStreamOperations{}
-
-	// The content stream processor keeps track of the graphics state and we can make our own
-	// handlers to process certain commands, using the AddHandler method.  In this case, we hook up
-	// to color related operands, and for image and form handling.
-	processor := pdfcontent.NewContentStreamProcessor(operations)
-	// Add handlers for colorspace related functionality.
-	processor.AddHandler(pdfcontent.HandlerConditionEnumAllOperands, "",
-		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState,
-			resources *pdf.PdfPageResources) error {
-			operand := op.Operand
-			switch operand {
-			case "CS", "cs": // Set colorspace operands.
-				op := pdfcontent.ContentStreamOperation{}
-				op.Operand = operand
-				op.Params = []pdfcore.PdfObject{pdfcore.MakeName("DeviceGray")}
-				*processedOperations = append(*processedOperations, &op)
-				return nil
-			case "SC", "SCN": // Set stroking color.
-				color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
-				if err != nil {
-					fmt.Printf("Error: %v\n", err)
-					return err
-				}
-				rgbColor := color.(*pdf.PdfColorDeviceRGB)
-				grayColor := rgbColor.ToGray()
-
-				op := pdfcontent.ContentStreamOperation{}
-				op.Operand = operand
-				op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
-
-				*processedOperations = append(*processedOperations, &op)
-				return nil
-			case "sc", "scn": // Set nonstroking color.
-				color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
-				if err != nil {
-					fmt.Printf("Error: %v\n", err)
-					return err
-				}
-				rgbColor := color.(*pdf.PdfColorDeviceRGB)
-				grayColor := rgbColor.ToGray()
-
-				op := pdfcontent.ContentStreamOperation{}
-				op.Operand = operand
-				op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
-
-				*processedOperations = append(*processedOperations, &op)
-				return nil
-			case "RG", "K": // Set RGB or CMYK stroking color.
-				color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
-				if err != nil {
-					fmt.Printf("Error: %v\n", err)
-					return err
-				}
-				rgbColor := color.(*pdf.PdfColorDeviceRGB)
-				grayColor := rgbColor.ToGray()
-
-				op := pdfcontent.ContentStreamOperation{}
-				op.Operand = "G"
-				op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
-
-				*processedOperations = append(*processedOperations, &op)
-				return nil
-			case "rg", "k": // Set RGB or CMYK as nonstroking color.
-				color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
-				if err != nil {
-					fmt.Printf("Error: %v\n", err)
-					return err
-				}
-				rgbColor := color.(*pdf.PdfColorDeviceRGB)
-				grayColor := rgbColor.ToGray()
-
-				op := pdfcontent.ContentStreamOperation{}
-				op.Operand = "g"
-				op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
-
-				*processedOperations = append(*processedOperations, &op)
-				return nil
-			}
-			// default:  !@#$
-			*processedOperations = append(*processedOperations, op)
-			return nil
-		})
-	// Add handler for image related handling.  Note that inline images are completely stored with a
-	// ContentStreamInlineImage object as the parameter for BI.
-	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "BI",
-		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
-			if len(op.Params) != 1 {
-				common.Log.Error("BI Error invalid number of params")
-				return errors.New("invalid number of parameters")
-			}
-			// Inline image.
-			iimg, ok := op.Params[0].(*pdfcontent.ContentStreamInlineImage)
-			if !ok {
-				common.Log.Error("Invalid handling for inline image")
-				return errors.New("Invalid inline image parameter")
-			}
-
-			img, err := iimg.ToImage(resources)
-			if err != nil {
-				common.Log.Error("Error converting inline image to image: %v", err)
-				return err
-			}
-
-			cs, err := iimg.GetColorSpace(resources)
-			if err != nil {
-				common.Log.Error("Error getting color space for inline image: %v", err)
-				return err
-			}
-			rgbImg, err := cs.ImageToRGB(*img)
-			if err != nil {
-				common.Log.Error("Error converting image to rgb: %v", err)
-				return err
-			}
-			rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
-			grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
-			if err != nil {
-				common.Log.Error("Error converting img to gray: %v", err)
-				return err
-			}
-			grayInlineImg, err := pdfcontent.NewInlineImageFromImage(grayImage, nil)
-			if err != nil {
-				common.Log.Error("Error making a new inline image object: %v", err)
-				return err
-			}
-
-			// Replace inline image data with the gray image.
-			pOp := pdfcontent.ContentStreamOperation{}
-			pOp.Operand = "BI"
-			pOp.Params = []pdfcore.PdfObject{grayInlineImg}
-			*processedOperations = append(*processedOperations, &pOp)
-
-			return nil
-		})
-
-	// Handler for XObject Image and Forms.
-	processedXObjects := map[string]bool{} // Keep track of processed XObjects to avoid repetition.
-
-	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "Do",
-		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
-			operand := op.Operand
-			if gVerbose {
-				fmt.Printf("Do handler: %s\n", operand)
-			}
-			if len(op.Params) < 1 {
-				fmt.Printf("ERROR: Invalid number of params for Do object.\n")
-				return errors.New("Range check")
-			}
-
-			// XObject.
-			name := op.Params[0].(*pdfcore.PdfObjectName)
-
-			// Only process each one once.
-			_, has := processedXObjects[string(*name)]
-			if has {
-				return nil
-			}
-			processedXObjects[string(*name)] = true
-
-			_, xtype := resources.GetXObjectByName(string(*name))
-			if xtype == pdf.XObjectTypeImage {
-				if gVerbose {
-					fmt.Printf(" XObject Image: %s\n", *name)
-				}
-
-				ximg, err := resources.GetXObjectImageByName(string(*name))
-				if err != nil {
-					fmt.Printf("Error : %v\n", err)
-					return err
-				}
-
-				img, err := ximg.ToImage()
-				if err != nil {
-					fmt.Printf("Error : %v\n", err)
-					return err
-				}
-
-				rgbImg, err := ximg.ColorSpace.ImageToRGB(*img)
-				if err != nil {
-					fmt.Printf("Error : %v\n", err)
-					return err
-				}
-
-				rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
-				grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
-				if err != nil {
-					fmt.Printf("Error : %v\n", err)
-					return err
-				}
-
-				// Update the XObject image.
-				err = ximg.SetImage(&grayImage, nil)
-				if err != nil {
-					fmt.Printf("Error : %v\n", err)
-					return err
-				}
-
-				// Update the container.
-				_ = ximg.ToPdfObject()
-			} else if xtype == pdf.XObjectTypeForm {
-				// Go through the XObject Form content stream.
-				xform, err := resources.GetXObjectFormByName(string(*name))
-				if err != nil {
-					fmt.Printf("Error : %v\n", err)
-					return err
-				}
-
-				formContent, err := xform.GetContentStream()
-				if err != nil {
-					fmt.Printf("Error : %v\n", err)
-					return err
-				}
-
-				// Process the content stream in the Form object too:
-				// XXX/TODO: Use either form resources (priority) and fall back to page resources
-				// alternatively if not found.
-				formResources := xform.FormResources
-				if formResources == nil {
-					formResources = resources
-				}
-
-				// Process the content stream in the Form object too:
-				grayContent, err := transformContentStreamToGrayscale(string(formContent), formResources)
-				if err != nil {
-					common.Log.Error("%v", err)
-					return err
-				}
-
-				xform.SetContentStream(grayContent)
-				// Update the container.
-				_ = xform.ToPdfObject()
-			}
-
-			return nil
-		})
-
-	err = processor.Process(resources)
-	if err != nil {
-		common.Log.Error("Error processing: %v", err)
-		return nil, err
-	}
-
-	if gVerbose {
-		// For debug purposes: (high level logging).
-		fmt.Printf("=== Unprocessed - Full list\n")
-		for idx, op := range operations {
-			fmt.Printf("U. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
-		}
-		fmt.Printf("=== Processed - Full list\n")
-		for idx, op := range *processedOperations {
-			fmt.Printf("P. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
-		}
-	}
-
-	return processedOperations.Bytes(), nil
 }
