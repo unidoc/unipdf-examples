@@ -149,12 +149,14 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 	}
 	processedOperations := &pdfcontent.ContentStreamOperations{}
 
-	// The content stream processor keeps track of the graphics state and we can make our own handlers to process certain commands,
-	// using the AddHandler method.  In this case, we hook up to color related operands, and for image and form handling.
+	// The content stream processor keeps track of the graphics state and we can make our own
+	// handlers to process certain commands, using the AddHandler method.  In this case, we hook up
+	// to color related operands, and for image and form handling.
 	processor := pdfcontent.NewContentStreamProcessor(operations)
 	// Add handlers for colorspace related functionality.
 	processor.AddHandler(pdfcontent.HandlerConditionEnumAllOperands, "",
-		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
+		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState,
+			resources *pdf.PdfPageResources) error {
 			operand := op.Operand
 			switch operand {
 			case "CS", "cs": // Set colorspace operands.
