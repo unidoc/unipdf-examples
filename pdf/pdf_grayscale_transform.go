@@ -432,35 +432,35 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			// Inline image.
 			iimg, ok := op.Params[0].(*pdfcontent.ContentStreamInlineImage)
 			if !ok {
-				fmt.Printf("Error: Invalid handling for inline image\n")
+				common.Log.Error("Invalid handling for inline image")
 				return errors.New("Invalid inline image parameter")
 			}
 
 			img, err := iimg.ToImage(resources)
 			if err != nil {
-				fmt.Printf("Error converting inline image to image: %v\n", err)
+				common.Log.Error("Error converting inline image to image: %v", err)
 				return err
 			}
 
 			cs, err := iimg.GetColorSpace(resources)
 			if err != nil {
-				fmt.Printf("Error getting color space for inline image: %v\n", err)
+				common.Log.Error("Error getting color space for inline image: %v", err)
 				return err
 			}
 			rgbImg, err := cs.ImageToRGB(*img)
 			if err != nil {
-				fmt.Printf("Error converting image to rgb: %v\n", err)
+				common.Log.Error("Error converting image to rgb: %v", err)
 				return err
 			}
 			rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
 			grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
 			if err != nil {
-				fmt.Printf("Error converting img to gray: %v\n", err)
+				common.Log.Error("Error converting img to gray: %v", err)
 				return err
 			}
 			grayInlineImg, err := pdfcontent.NewInlineImageFromImage(grayImage, nil)
 			if err != nil {
-				fmt.Printf("Error making a new inline image object: %v\n", err)
+				common.Log.Error("Error making a new inline image object: %v", err)
 				return err
 			}
 
@@ -558,7 +558,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				// Process the content stream in the Form object too:
 				grayContent, err := transformContentStreamToGrayscale(string(formContent), formResources)
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					common.Log.Error("%v", err)
 					return err
 				}
 
@@ -573,7 +573,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 	err = processor.Process(resources)
 	if err != nil {
-		fmt.Printf("Error processing: %v\n", err)
+		common.Log.Error("Error processing: %v", err)
 		return nil, err
 	}
 

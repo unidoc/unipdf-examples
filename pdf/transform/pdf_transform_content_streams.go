@@ -365,6 +365,8 @@ func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bo
 		return err
 	}
 
+<<<<<<< HEAD
+=======
 	return nil
 }
 
@@ -372,6 +374,52 @@ func transformColorspaces(page unipdf.PdfFormPage, desc string, doGrayscaleTrans
 	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
 
 	resources, err := page.GetResources()
+	if err != nil {
+		return err
+	}
+	colorspaces := resources.ColorSpace
+	if colorspaces == nil {
+		return nil
+	}
+	names := colorspaces.Names
+	sort.Strings(names)
+	for _, name := range names {
+		obj := colorspaces.Colorspaces[name]
+		// For indexed color spaces, we just modify the lookup table to grayscale
+		if cs, isIndexed := obj.(*unipdf.PdfColorspaceSpecialIndexed); isIndexed {
+			err := cs.ColorspaceToGray()
+			if err != nil {
+				return err
+			}
+		}
+	}
+	// err = transformImageXObjects(page, desc, doGrayscaleTransform)
+	// if err != nil {
+	// 	return err
+	// }
+	// err = transformFormXObjects(page, desc, doGrayscaleTransform)
+	// if err != nil {
+	// 	return err
+	// }
+
+	// xobjs, err = unipdf.GetXObjects(page)
+	// if err != nil {
+	// 	return nil
+	// }
+	// unicommon.Log.Info("+XObjects=%s", xobjs)
+
+>>>>>>> 36c6fdb26c9b204a9635d1649692d7c89802d26c
+	return nil
+}
+
+func transformColorspaces(page unipdf.PdfFormPage, desc string, doGrayscaleTransform bool) error {
+	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
+
+<<<<<<< HEAD
+	resources, err := page.GetResources()
+=======
+	xobjs, err := unipdf.GetXObjects(page)
+>>>>>>> 36c6fdb26c9b204a9635d1649692d7c89802d26c
 	if err != nil {
 		return err
 	}
@@ -596,6 +644,11 @@ func transformColorToGrayscale(page unipdf.PdfFormPage, //*unipdf.PdfPage,
 
 	noContentColor := false
 
+<<<<<<< HEAD
+=======
+	// op0 := unicontent.ContentStreamOperation{Operand: "sc"}
+	// op0 := unicontent.ContentStreamOperation{Operand: "SC"}
+>>>>>>> 36c6fdb26c9b204a9635d1649692d7c89802d26c
 	badOps := map[string]bool{
 	// "l":  true,
 	// "BX": true,
