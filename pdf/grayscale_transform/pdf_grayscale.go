@@ -56,20 +56,14 @@ import (
 	"strings"
 	"time"
 
-	// unilicense "github.com/unidoc/unidoc/license"
 	common "github.com/unidoc/unidoc/common"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
 func initUniDoc(licenseKey string, debug bool) error {
-	// PETER: I can't find github.com/unidoc/unidoc/license so I have comment out the license code
-	//        in this example program.
-	// if len(licenseKey) > 0 {
-	// 	err := unilicense.SetLicenseKey(licenseKey)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
+
+	pdf.SetPdfProducer("PaperCut Mobility")
+	pdf.SetPdfCreator("PaperCut Software")
 
 	// To make the library log we just have to initialise the logger which satisfies
 	// the common.Logger interface, common.DummyLogger is the default and

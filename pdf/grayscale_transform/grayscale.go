@@ -16,8 +16,8 @@ import (
 // Page transform code goes here
 // =================================================================================================
 
-// Replaces color objects on the page with grayscale ones.  Also references XObject Images and Forms
-// to convert those to grayscale.
+// convertPageToGrayscale replaces color objects on the page with grayscale ones. It also references
+// XObject Images and Forms to convert those to grayscale.
 func convertPageToGrayscale(page *pdf.PdfPage, desc string) error {
 	// For each page, we go through the resources and look for the images.
 	resources, err := page.GetResources()
@@ -45,7 +45,7 @@ func convertPageToGrayscale(page *pdf.PdfPage, desc string) error {
 	return nil
 }
 
-// Check if colorspace represents a Pattern colorspace.
+// isPatternCS returns true if `colorspace` represents a Pattern colorspace.
 func isPatternCS(cs pdf.PdfColorspace) bool {
 	_, isPattern := cs.(*pdf.PdfColorspaceSpecialPattern)
 	return isPattern
@@ -454,7 +454,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					return err
 				}
 
-				xform.SetContentStream(grayContent)
+				xform.SetContentStream(grayContent, nil)
 				// Update the resource entry.
 				resources.SetXObjectFormByName(string(*name), xform)
 			}
