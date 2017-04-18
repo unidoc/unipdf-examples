@@ -293,6 +293,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 				shading, found := resources.GetShadingByName(string(*shname))
 				if !found {
+					common.Log.Error("Shading not defined in resources. shname=%#q", string(*shname))
 					return errors.New("Shading not defined in resources")
 				}
 				grayShading, err := convertShadingToGray(shading)
