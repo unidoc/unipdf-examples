@@ -458,10 +458,30 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				fmt.Printf("Error converting img to gray: %v\n", err)
 				return err
 			}
-			grayInlineImg, err := pdfcontent.NewInlineImageFromImage(grayImage, nil)
+
+			// Update the XObject image.
+			// Use same encoder as input data.  Make sure for DCT filter it is updated to 1 color component.
+			encoder, err := iimg.GetEncoder()
 			if err != nil {
-				fmt.Printf("Error making a new inline image object: %v\n", err)
+				fmt.Printf("Error getting encoder for inline image: %v\n", err)
 				return err
+			}
+			if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
+				dctEncoder.ColorComponents = 1
+			}
+
+			grayInlineImg, err := pdfcontent.NewInlineImageFromImage(grayImage, encoder)
+			if err != nil {
+				if err == pdfcore.ErrUnsupportedEncodingParameters {
+					// Unsupported encoding parameters, revert to a basic flate encoder without predictor.
+					encoder = pdfcore.NewFlateEncoder()
+				}
+				// Try again, fail on error.
+				grayInlineImg, err = pdfcontent.NewInlineImageFromImage(grayImage, encoder)
+				if err != nil {
+					fmt.Printf("Error making a new inline image object: %v\n", err)
+					return err
+				}
 			}
 
 			// Replace inline image data with the gray image.
@@ -523,11 +543,25 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				}
 
 				// Update the XObject image.
-				// If the filter not supported for encoding, then switch to a basic flate encoder without predictor.
-				ximgGray, err := pdf.NewXObjectImageFromImage(*name, &grayImage, nil)
+				// Use same encoder as input data.  Make sure for DCT filter it is updated to 1 color component.
+				encoder := ximg.Filter
+				if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
+					dctEncoder.ColorComponents = 1
+				}
+
+				ximgGray, err := pdf.NewXObjectImageFromImage(*name, &grayImage, nil, encoder)
 				if err != nil {
-					fmt.Printf("Error creating image: %v\n", err)
-					return err
+					if err == pdfcore.ErrUnsupportedEncodingParameters {
+						// Unsupported encoding parameters, revert to a basic flate encoder without predictor.
+						encoder = pdfcore.NewFlateEncoder()
+					}
+
+					// Try again, fail if error.
+					ximgGray, err = pdf.NewXObjectImageFromImage(*name, &grayImage, nil, encoder)
+					if err != nil {
+						fmt.Printf("Error creating image: %v\n", err)
+						return err
+					}
 				}
 
 				// Update the entry.
