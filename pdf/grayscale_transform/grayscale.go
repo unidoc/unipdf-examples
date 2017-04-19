@@ -58,7 +58,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 		return nil, err
 	}
 
-	addIccColorspaces(resources)
+	// addIccColorspaces(resources)
 
 	processedOperations := &pdfcontent.ContentStreamOperations{}
 
@@ -178,7 +178,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				} else {
 					color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
 					if err != nil {
-						fmt.Printf("Error: %v\n", err)
+						fmt.Printf("Error with ColorToRGB: %v\n", err)
 						return err
 					}
 					rgbColor := color.(*pdf.PdfColorDeviceRGB)
@@ -392,38 +392,43 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 				ximg, err := resources.GetXObjectImageByName(string(*name))
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					fmt.Printf("Error w/GetXObjectImageByName : %v\n", err)
 					return err
 				}
 
 				img, err := ximg.ToImage()
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					fmt.Printf("Error w/ToImage: %v\n", err)
 					return err
 				}
 
 				rgbImg, err := ximg.ColorSpace.ImageToRGB(*img)
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					fmt.Printf("Error ImageToRGB: %v\n", err)
 					return err
 				}
 
 				rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
 				grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					fmt.Printf("Error ImageToGray: %v\n", err)
 					return err
 				}
 
 				// Update the XObject image.
-				err = ximg.SetImage(&grayImage, nil)
+				// If the filter not supported for encoding, then switch to a basic flate encoder without predictor.
+				ximgGray, err := pdf.NewXObjectImageFromImage(*name, &grayImage, nil)
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					fmt.Printf("Error creating image: %v\n", err)
 					return err
 				}
 
-				// Update the container.
-				_ = ximg.ToPdfObject()
+				// Update the entry.
+				err = resources.SetXObjectImageByName(string(*name), ximgGray)
+				if err != nil {
+					fmt.Printf("Failed setting x object: %v (%s)\n", err, string(*name))
+					return err
+				}
 			} else if xtype == pdf.XObjectTypeForm {
 				fmt.Printf(" XObject Form: %s\n", *name)
 				// Go through the XObject Form content stream.
@@ -440,9 +445,8 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				}
 
 				// Process the content stream in the Form object too:
-				// XXX/TODO: Use either form resources (priority) and fall back to page resources
-				// alternatively if not found.
-				// formResources := xform.FormResources
+				// XXX/TODO/Consider: Use either form resources (priority) and fall back to page resources alternatively if not found.
+				// Have not come into cases where needed yet.
 				formResources := xform.Resources
 				if formResources == nil {
 					formResources = resources

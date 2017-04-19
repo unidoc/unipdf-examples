@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unidoc/common"
+	common "github.com/unidoc/unidoc/common"
 	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
@@ -22,8 +22,8 @@ import (
 )
 
 func init() {
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	//common.SetLogger(common.NewConsoleLogger(common.LogLevelTrace))
 }
 
 func main() {
@@ -160,7 +160,8 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 	processor := pdfcontent.NewContentStreamProcessor(operations)
 	// Add handlers for colorspace related functionality.
 	processor.AddHandler(pdfcontent.HandlerConditionEnumAllOperands, "",
-		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
+		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState,
+			resources *pdf.PdfPageResources) error {
 			operand := op.Operand
 			switch operand {
 			case "CS": // Set colorspace operands (stroking).
@@ -174,7 +175,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						// Update if referring to an external colorspace in resources.
 						cs, ok := resources.ColorSpace.Colorspaces[string(*csname)]
 						if !ok {
-							unicommon.Log.Debug("Undefined colorspace for pattern (%s)", csname)
+							common.Log.Debug("Undefined colorspace for pattern (%s)", csname)
 							return errors.New("Colorspace not defined")
 						}
 
@@ -210,7 +211,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						// Update if referring to an external colorspace in resources.
 						cs, ok := resources.ColorSpace.Colorspaces[string(*csname)]
 						if !ok {
-							unicommon.Log.Debug("Undefined colorspace for pattern (%s)", csname)
+							common.Log.Debug("Undefined colorspace for pattern (%s)", csname)
 							return errors.New("Colorspace not defined")
 						}
 
@@ -275,7 +276,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 					grayPattern, err := convertPatternToGray(pattern)
 					if err != nil {
-						unicommon.Log.Debug("Unable to convert pattern to grayscale: %v", err)
+						common.Log.Debug("Unable to convert pattern to grayscale: %v", err)
 						return err
 					}
 					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
@@ -285,7 +286,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				} else {
 					color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
 					if err != nil {
-						fmt.Printf("Error: %v\n", err)
+						fmt.Printf("Error with ColorToRGB: %v\n", err)
 						return err
 					}
 					rgbColor := color.(*pdf.PdfColorDeviceRGB)
@@ -312,7 +313,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					if patternColor.Color != nil {
 						color, err := gs.ColorspaceNonStroking.ColorToRGB(patternColor.Color)
 						if err != nil {
-							fmt.Printf("Error: %v\n", err)
+							fmt.Printf("Error : %v\n", err)
 							return err
 						}
 						rgbColor := color.(*pdf.PdfColorDeviceRGB)
@@ -337,7 +338,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 					grayPattern, err := convertPatternToGray(pattern)
 					if err != nil {
-						unicommon.Log.Debug("Unable to convert pattern to grayscale: %v", err)
+						common.Log.Debug("Unable to convert pattern to grayscale: %v", err)
 						return err
 					}
 					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
@@ -500,51 +501,56 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 				ximg, err := resources.GetXObjectImageByName(string(*name))
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					fmt.Printf("Error w/GetXObjectImageByName : %v\n", err)
 					return err
 				}
 
 				img, err := ximg.ToImage()
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					fmt.Printf("Error w/ToImage: %v\n", err)
 					return err
 				}
 
 				rgbImg, err := ximg.ColorSpace.ImageToRGB(*img)
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					fmt.Printf("Error ImageToRGB: %v\n", err)
 					return err
 				}
 
 				rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
 				grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					fmt.Printf("Error ImageToGray: %v\n", err)
 					return err
 				}
 
 				// Update the XObject image.
-				err = ximg.SetImage(&grayImage, nil)
+				// If the filter not supported for encoding, then switch to a basic flate encoder without predictor.
+				ximgGray, err := pdf.NewXObjectImageFromImage(*name, &grayImage, nil)
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					fmt.Printf("Error creating image: %v\n", err)
 					return err
 				}
 
-				// Update the container.
-				_ = ximg.ToPdfObject()
+				// Update the entry.
+				err = resources.SetXObjectImageByName(string(*name), ximgGray)
+				if err != nil {
+					fmt.Printf("Failed setting x object: %v (%s)\n", err, string(*name))
+					return err
+				}
 			} else if xtype == pdf.XObjectTypeForm {
 				fmt.Printf(" XObject Form: %s\n", *name)
 
 				// Go through the XObject Form content stream.
 				xform, err := resources.GetXObjectFormByName(string(*name))
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					fmt.Printf("Error: %v\n", err)
 					return err
 				}
 
 				formContent, err := xform.GetContentStream()
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					fmt.Printf("Error: %v\n", err)
 					return err
 				}
 
@@ -563,7 +569,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					return err
 				}
 
-				xform.SetContentStream(grayContent)
+				xform.SetContentStream(grayContent, nil)
 
 				// Update the resource entry.
 				resources.SetXObjectFormByName(string(*name), xform)
@@ -715,7 +721,7 @@ func convertShadingToGray(shading *pdf.PdfShading) (*pdf.PdfShading, error) {
 
 		return shading, nil
 	} else {
-		unicommon.Log.Debug("Cannot convert to shading pattern grayscale, color space N = %d", cs.GetNumComponents())
+		common.Log.Debug("Cannot convert to shading pattern grayscale, color space N = %d", cs.GetNumComponents())
 		return nil, errors.New("Unsupported pattern colorspace for grayscale conversion")
 	}
 }
