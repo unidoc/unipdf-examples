@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	// unilicense "github.com/unidoc/unidoc/license"
 	common "github.com/unidoc/unidoc/common"
 	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
@@ -110,6 +109,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					// If referring to a pattern colorspace with an external definition, need to update the definition.
 					// If has an underlying colorspace, then go and change it to DeviceGray.
 					// Needs to be specified externally in the colorspace resources.
+
 					csname := op.Params[0].(*pdfcore.PdfObjectName)
 					if *csname != "Pattern" {
 						// Update if referring to an external colorspace in resources.
@@ -118,33 +118,40 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 							common.Log.Debug("Undefined colorspace for pattern (%s)", csname)
 							return errors.New("Colorspace not defined")
 						}
+
 						patternCS, ok := cs.(*pdf.PdfColorspaceSpecialPattern)
 						if !ok {
 							return errors.New("Type error")
 						}
+
 						if patternCS.UnderlyingCS != nil {
 							// Swap out for a gray colorspace.
 							patternCS.UnderlyingCS = pdf.NewPdfColorspaceDeviceGray()
 						}
+
 						resources.ColorSpace.Colorspaces[string(*csname)] = patternCS
 					}
 					*processedOperations = append(*processedOperations, op)
 					return nil
 				}
+
 				op := pdfcontent.ContentStreamOperation{}
 				op.Operand = operand
 				op.Params = []pdfcore.PdfObject{pdfcore.MakeName("DeviceGray")}
 				*processedOperations = append(*processedOperations, &op)
 				return nil
+
 			case "SC", "SCN": // Set stroking color.  Includes pattern colors.
 				if isPatternCS(gs.ColorspaceStroking) {
 					op := pdfcontent.ContentStreamOperation{}
 					op.Operand = operand
 					op.Params = []pdfcore.PdfObject{}
+
 					patternColor, ok := gs.ColorStroking.(*pdf.PdfColorPattern)
 					if !ok {
 						return errors.New("Invalid stroking color type")
 					}
+
 					if patternColor.Color != nil {
 						color, err := gs.ColorspaceStroking.ColorToRGB(patternColor.Color)
 						if err != nil {
@@ -153,8 +160,10 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						}
 						rgbColor := color.(*pdf.PdfColorDeviceRGB)
 						grayColor := rgbColor.ToGray()
+
 						op.Params = append(op.Params, pdfcore.MakeFloat(grayColor.Val()))
 					}
+
 					if _, has := transformedPatterns[patternColor.PatternName]; has {
 						// Already processed, need not change anything, except underlying color if used.
 						op.Params = append(op.Params, pdfcore.MakeName(patternColor.PatternName))
@@ -162,6 +171,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						return nil
 					}
 					transformedPatterns[patternColor.PatternName] = true
+
 					// Look up the pattern name and convert it.
 					pattern, found := resources.GetPatternByName(patternColor.PatternName)
 					if !found {
@@ -342,10 +352,28 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				common.Log.Error("Error converting img to gray: %v", err)
 				return err
 			}
-			grayInlineImg, err := pdfcontent.NewInlineImageFromImage(grayImage, nil)
+			// Update the XObject image.
+			// Use same encoder as input data.  Make sure for DCT filter it is updated to 1 color component.
+			encoder, err := iimg.GetEncoder()
 			if err != nil {
-				common.Log.Error("Error making a new inline image object: %v", err)
+				common.Log.Error("Error getting encoder for inline image: %v", err)
 				return err
+			}
+			if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
+				dctEncoder.ColorComponents = 1
+			}
+			grayInlineImg, err := pdfcontent.NewInlineImageFromImage(grayImage, encoder)
+			if err != nil {
+				if err == pdfcore.ErrUnsupportedEncodingParameters {
+					// Unsupported encoding parameters, revert to a basic flate encoder without predictor.
+					encoder = pdfcore.NewFlateEncoder()
+				}
+				// Try again, fail on error.
+				grayInlineImg, err = pdfcontent.NewInlineImageFromImage(grayImage, encoder)
+				if err != nil {
+					fmt.Printf("Error making a new inline image object: %v\n", err)
+					return err
+				}
 			}
 
 			// Replace inline image data with the gray image.
@@ -416,11 +444,23 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				}
 
 				// Update the XObject image.
-				// If the filter not supported for encoding, then switch to a basic flate encoder without predictor.
-				ximgGray, err := pdf.NewXObjectImageFromImage(*name, &grayImage, nil)
+				// Use same encoder as input data.  Make sure for DCT filter it is updated to 1 color component.
+				encoder := ximg.Filter
+				if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
+					dctEncoder.ColorComponents = 1
+				}
+				ximgGray, err := pdf.NewXObjectImageFromImage(*name, &grayImage, nil, encoder)
 				if err != nil {
-					fmt.Printf("Error creating image: %v\n", err)
-					return err
+					if err == pdfcore.ErrUnsupportedEncodingParameters {
+						// Unsupported encoding parameters, revert to a basic flate encoder without predictor.
+						encoder = pdfcore.NewFlateEncoder()
+					}
+					// Try again, fail if error.
+					ximgGray, err = pdf.NewXObjectImageFromImage(*name, &grayImage, nil, encoder)
+					if err != nil {
+						fmt.Printf("Error creating image: %v\n", err)
+						return err
+					}
 				}
 
 				// Update the entry.
@@ -430,7 +470,9 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					return err
 				}
 			} else if xtype == pdf.XObjectTypeForm {
-				fmt.Printf(" XObject Form: %s\n", *name)
+				if gVerbose {
+					fmt.Printf(" XObject Form: %s\n", *name)
+				}
 				// Go through the XObject Form content stream.
 				xform, err := resources.GetXObjectFormByName(string(*name))
 				if err != nil {
