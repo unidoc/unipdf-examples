@@ -551,7 +551,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					dctEncoder.ColorComponents = 1
 				}
 
-				ximgGray, err := pdf.NewXObjectImageFromImage(*name, &grayImage, nil, encoder)
+				ximgGray, err := pdf.UpdateXObjectImageFromImage(ximg, *name, &grayImage, nil, encoder)
 				if err != nil {
 					if err == pdfcore.ErrUnsupportedEncodingParameters {
 						// Unsupported encoding parameters, revert to a basic flate encoder without predictor.
