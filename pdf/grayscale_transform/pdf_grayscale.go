@@ -97,6 +97,7 @@ var testStats = statistics{
 }
 
 var gVerbose = false
+var gVerbose2 = true
 
 var allOpCounts = map[string]int{}
 

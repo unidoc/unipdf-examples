@@ -21,19 +21,19 @@ func convertPageToGrayscale(page *pdf.PdfPage, desc string) error {
 	// For each page, we go through the resources and look for the images.
 	resources, err := page.GetResources()
 	if err != nil {
-		panic(err)
+		common.Log.Error("GetResources failed. err=%v", err)
 		return err
 	}
 
 	contents, err := page.GetAllContentStreams()
 	if err != nil {
-		panic(err)
+		common.Log.Error("GetAllContentStreams failed. err=%v", err)
 		return err
 	}
 
 	grayContent, err := transformContentStreamToGrayscale(contents, resources)
 	if err != nil {
-		// panic(err)
+		common.Log.Error("transformContentStreamToGrayscale failed. err=%v", err)
 		return err
 	}
 	page.SetContentStreams([]string{string(grayContent)}, pdfcore.NewFlateEncoder())
@@ -315,6 +315,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			*processedOperations = append(*processedOperations, op)
 			return nil
 		})
+
 	// Add handler for image related handling.  Note that inline images are completely stored with a ContentStreamInlineImage
 	// object as the parameter for BI.
 	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "BI",
@@ -385,13 +386,14 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			return nil
 		})
 
+	// !@#$% Black background is here
 	// Handler for XObject Image and Forms.
 	processedXObjects := map[string]bool{} // Keep track of processed XObjects to avoid repetition.
 
 	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "Do",
 		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
 			// operand := op.Operand
-			if gVerbose {
+			if gVerbose2 {
 				fmt.Printf("Do handler: %s\n", op)
 			}
 			if len(op.Params) < 1 {
@@ -414,7 +416,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			_, xtype := resources.GetXObjectByName(string(*name))
 			common.Log.Debug("xtype=%+v pdf.XObjectTypeImage=%v", xtype, pdf.XObjectTypeImage)
 			if xtype == pdf.XObjectTypeImage {
-				if gVerbose {
+				if gVerbose2 {
 					fmt.Printf(" XObject Image: %s\n", *name)
 				}
 
@@ -449,7 +451,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
 					dctEncoder.ColorComponents = 1
 				}
-				ximgGray, err := pdf.NewXObjectImageFromImage(*name, &grayImage, nil, encoder)
+				ximgGray, err := pdf.UpdateXObjectImageFromImage(ximg, *name, &grayImage, nil, encoder)
 				if err != nil {
 					if err == pdfcore.ErrUnsupportedEncodingParameters {
 						// Unsupported encoding parameters, revert to a basic flate encoder without predictor.
@@ -463,6 +465,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					}
 				}
 
+
 				// Update the entry.
 				err = resources.SetXObjectImageByName(string(*name), ximgGray)
 				if err != nil {
@@ -470,7 +473,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					return err
 				}
 			} else if xtype == pdf.XObjectTypeForm {
-				if gVerbose {
+				if gVerbose2 {
 					fmt.Printf(" XObject Form: %s\n", *name)
 				}
 				// Go through the XObject Form content stream.
