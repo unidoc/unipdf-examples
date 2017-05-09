@@ -1,3 +1,5 @@
+frege.pdf gs hangs
+
 Black in background
 -------------------
 000008.pdf Black outline box appears around "Mar 27, 2017, 2K50 pm AEDT"
