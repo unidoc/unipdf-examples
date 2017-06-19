@@ -2,7 +2,7 @@
  * Annotate/mark up pages of a PDF file.
  * Add a rectangle annotation to a specified location on a page.
  *
- * Run as: go run pdf_annotate_add_rectangle.go input.pdf output.pdf <x> <y> <width> <height>
+ * Run as: go run pdf_annotate_add_rectangle.go input.pdf <page> <x> <y> <width> <height> output.pdf
  * The x, y, width and height coordinates are in the PDF coordinate's system, where 0,0 is in the lower left corner.
  */
 
@@ -15,7 +15,7 @@ import (
 	"strconv"
 
 	unicommon "github.com/unidoc/unidoc/common"
-	pdfcore "github.com/unidoc/unidoc/pdf/core"
+	"github.com/unidoc/unidoc/pdf/annotator"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
@@ -25,39 +25,46 @@ func init() {
 }
 
 func main() {
-	if len(os.Args) < 7 {
-		fmt.Printf("go run pdf_annotate_add_rectangle.go input.pdf output.pdf <x> <y> <width> <height>\n")
+	if len(os.Args) < 8 {
+		fmt.Printf("go run pdf_annotate_add_rectangle.go input.pdf <page> <x> <y> <width> <height> output.pdf\n")
 		os.Exit(1)
 	}
 
 	inputPath := os.Args[1]
-	outputPath := os.Args[2]
 
-	x, err := strconv.ParseInt(os.Args[3], 10, 64)
+	pageNum, err := strconv.ParseInt(os.Args[2], 10, 64)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
-	y, err := strconv.ParseInt(os.Args[4], 10, 64)
+	x, err := strconv.ParseFloat(os.Args[3], 64)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
-	width, err := strconv.ParseInt(os.Args[5], 10, 64)
+	y, err := strconv.ParseFloat(os.Args[4], 64)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
-	height, err := strconv.ParseInt(os.Args[6], 10, 64)
+	width, err := strconv.ParseFloat(os.Args[5], 64)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
-	err = annotatePdfAddRectAnnotation(inputPath, outputPath, x, y, width, height)
+	height, err := strconv.ParseFloat(os.Args[6], 64)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	outputPath := os.Args[7]
+
+	err = annotatePdfAddRectAnnotation(inputPath, pageNum, outputPath, x, y, width, height)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
@@ -67,7 +74,7 @@ func main() {
 }
 
 // Annotate pdf file.
-func annotatePdfAddRectAnnotation(inputPath string, outputPath string, x, y, width, height int64) error {
+func annotatePdfAddRectAnnotation(inputPath string, pageNum int64, outputPath string, x, y, width, height float64) error {
 	unicommon.Log.Debug("Input PDF: %v", inputPath)
 
 	pdfWriter := pdf.NewPdfWriter()
@@ -90,27 +97,35 @@ func annotatePdfAddRectAnnotation(inputPath string, outputPath string, x, y, wid
 	}
 
 	for i := 0; i < numPages; i++ {
-		pageNum := i + 1
-
 		// Read the page.
-		page, err := pdfReader.GetPage(pageNum)
+		page, err := pdfReader.GetPage(i + 1)
 		if err != nil {
 			return err
 		}
 
-		// Rectangle annotation.
-		rectAnnotation := pdf.NewPdfAnnotationSquare()
-		rectAnnotation.C = pdfcore.MakeArrayFromFloats([]float64{1.0, 0.0, 0.0}) // Red border.
-		rectAnnotation.IC = pdfcore.MakeArrayFromIntegers([]int{})               // No fill.
-		bs := pdf.NewBorderStyle()
-		bs.SetBorderWidth(3) // Width: 3 points.
-		rectAnnotation.BS = bs.ToPdfObject()
+		// Add only to the specific page.
+		if int64(i+1) == pageNum {
+			// Define a semi-transparent yellow rectangle with black borders at the specified location.
+			rectDef := annotator.RectangleAnnotationDef{}
+			rectDef.X = x
+			rectDef.Y = y
+			rectDef.Width = width
+			rectDef.Height = height
+			rectDef.Opacity = 0.5 // Semi transparent.
+			rectDef.FillEnabled = false
+			rectDef.FillColor = pdf.NewPdfColorDeviceRGB(1, 1, 0) // Yellow fill.
+			rectDef.BorderEnabled = true
+			rectDef.BorderWidth = 30
+			rectDef.BorderColor = pdf.NewPdfColorDeviceRGB(0, 0, 0) // Black border.
 
-		// The rect specifies the location of the markup.
-		rectAnnotation.Rect = pdfcore.MakeArrayFromIntegers([]int{int(x), int(y), int(x + width), int(y + height)})
+			rectAnnotation, err := annotator.CreateRectangleAnnotation(rectDef)
+			if err != nil {
+				return err
+			}
 
-		// Add to the page annotations.
-		page.Annotations = append(page.Annotations, rectAnnotation.PdfAnnotation)
+			// Add to the page annotations.
+			page.Annotations = append(page.Annotations, rectAnnotation)
+		}
 
 		err = pdfWriter.AddPage(page)
 		if err != nil {

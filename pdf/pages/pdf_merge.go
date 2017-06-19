@@ -1,6 +1,7 @@
 /*
- * Merges PDF files, tries to decrypt encrypted documents with an empty password
- * as best effort.
+ * Basic merging of PDF files.
+ * Simply loads all pages for each file and writes to the output file.
+ * See pdf_merge_advanced.go for a more advanced version which handles merging document forms (acro forms) also.
  *
  * Run as: go run pdf_merge.go output.pdf input1.pdf input2.pdf input3.pdf ...
  */
@@ -8,6 +9,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -73,9 +75,12 @@ func mergePdf(inputPaths []string, outputPath string) error {
 		}
 
 		if isEncrypted {
-			_, err = pdfReader.Decrypt([]byte(""))
+			auth, err := pdfReader.Decrypt([]byte(""))
 			if err != nil {
 				return err
+			}
+			if !auth {
+				return errors.New("Cannot merge encrypted, password protected document")
 			}
 		}
 

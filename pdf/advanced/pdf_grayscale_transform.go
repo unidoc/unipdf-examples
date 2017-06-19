@@ -1,10 +1,10 @@
 /*
- * Convert PDF including images and content stream data to grayscale.
+ * Convert a PDF to grayscale in a vectorized fashion, including images and all content.
  *
  * This advanced example demonstrates some of the more complex capabilities of UniDoc, showing the capability to process
  * and transform objects and contents.
  *
- * Run as: go run pdf_grayscale_transform.go input.pdf output.pdf
+ * Run as: go run pdf_grayscale_transform.go color.pdf output.pdf
  */
 
 package main
@@ -23,7 +23,6 @@ import (
 
 func init() {
 	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
 }
 
 func main() {
@@ -83,6 +82,7 @@ func convertPdfToGrayscale(inputPath, outputPath string) error {
 	fmt.Printf("PDF Num Pages: %d\n", numPages)
 
 	for i := 0; i < numPages; i++ {
+		fmt.Printf("Processing page %d/%d\n", i+1, numPages)
 		page, err := pdfReader.GetPage(i + 1)
 		if err != nil {
 			return err
@@ -133,7 +133,7 @@ func convertPageToGrayscale(page *pdf.PdfPage) error {
 	}
 	page.SetContentStreams([]string{string(grayContent)}, pdfcore.NewFlateEncoder())
 
-	fmt.Printf("Processed contents: %s\n", grayContent)
+	//fmt.Printf("Processed contents: %s\n", grayContent)
 
 	return nil
 }
@@ -515,7 +515,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 			_, xtype := resources.GetXObjectByName(string(*name))
 			if xtype == pdf.XObjectTypeImage {
-				fmt.Printf(" XObject Image: %s\n", *name)
+				//fmt.Printf(" XObject Image: %s\n", *name)
 
 				ximg, err := resources.GetXObjectImageByName(string(*name))
 				if err != nil {
@@ -571,7 +571,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					return err
 				}
 			} else if xtype == pdf.XObjectTypeForm {
-				fmt.Printf(" XObject Form: %s\n", *name)
+				//fmt.Printf(" XObject Form: %s\n", *name)
 
 				// Go through the XObject Form content stream.
 				xform, err := resources.GetXObjectFormByName(string(*name))
@@ -617,14 +617,15 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 	}
 
 	// For debug purposes: (high level logging).
-	fmt.Printf("=== Unprocessed - Full list\n")
-	for idx, op := range operations {
-		fmt.Printf("U. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
-	}
-	fmt.Printf("=== Processed - Full list\n")
-	for idx, op := range *processedOperations {
-		fmt.Printf("P. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
-	}
+	//
+	//fmt.Printf("=== Unprocessed - Full list\n")
+	//for idx, op := range operations {
+	//	fmt.Printf("U. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
+	//}
+	//fmt.Printf("=== Processed - Full list\n")
+	//for idx, op := range *processedOperations {
+	//	fmt.Printf("P. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
+	//}
 
 	return processedOperations.Bytes(), nil
 }

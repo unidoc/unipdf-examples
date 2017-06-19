@@ -23,6 +23,7 @@ func init() {
 
 	//Or can use a debug-level console logger:
 	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
 }
 
 func main() {

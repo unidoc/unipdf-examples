@@ -23,7 +23,7 @@ type PdfProperties struct {
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Printf("Print out basic properties of PDF files\n")
-		fmt.Printf("Usage: go run pdf_extract_metadata.go input.pdf [input2.pdf] ...\n")
+		fmt.Printf("Usage: go run pdf_info.go input.pdf [input2.pdf] ...\n")
 		os.Exit(1)
 	}
 

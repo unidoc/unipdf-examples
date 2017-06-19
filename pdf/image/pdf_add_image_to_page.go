@@ -19,6 +19,7 @@ import (
 	"strconv"
 
 	unicommon "github.com/unidoc/unidoc/common"
+	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
@@ -121,7 +122,11 @@ func addImageToPdf(inputPath string, outputPath string, imagePath string, pageNu
 	selPage := pages[pageNum-1]
 
 	fmt.Printf("Page: %+v\n", selPage)
-	fmt.Printf("Page mediabox: %+v\n", selPage.MediaBox)
+	mediabox, err := selPage.GetMediaBox()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Page mediabox: %+v\n", mediabox)
 
 	// Find a free name for the image.
 	num := 1
@@ -131,47 +136,48 @@ func addImageToPdf(inputPath string, outputPath string, imagePath string, pageNu
 		imgName = pdfcore.PdfObjectName(fmt.Sprintf("Img%d", num))
 	}
 
+	encoder := pdfcore.NewFlateEncoder()
+
 	// Create the XObject image.
-	ximg, err := pdf.NewXObjectImageFromImage(imgName, img, nil)
+	ximg, err := pdf.NewXObjectImageFromImage(img, nil, encoder)
 	if err != nil {
 		unicommon.Log.Error("Failed to create xobject image: %s", err)
 		return err
 	}
-	// Compress with default options.
-	err = ximg.Compress()
-	if err != nil {
-		fmt.Printf("Compress error: %v", err)
-		return err
-	}
-	// Add to the page resurces.
+
+	// Add to the page resources.
 	err = selPage.AddImageResource(imgName, ximg)
 	if err != nil {
 		return err
 	}
 
-	// TODO: Better interface for creating a graphics state.
+	// Find an available GS name.
+	i := 0
+	gsName := pdfcore.PdfObjectName(fmt.Sprintf("GS%d", i))
+	for selPage.HasExtGState(gsName) {
+		i++
+		gsName = pdfcore.PdfObjectName(fmt.Sprintf("GS%d", i))
+	}
+
+	// Create a normal graphics state.
 	gs0 := pdfcore.PdfObjectDictionary{}
 	gs0[pdfcore.PdfObjectName("BM")] = pdfcore.MakeName("Normal")
-	selPage.AddExtGState("GSABC", &gs0)
+	selPage.AddExtGState(gsName, &gs0)
 
 	imWidth := iwidth
 	imHeight := float64(img.Height) / float64(img.Width) * iwidth
 
-	/*
-		Desired interface:
-		creator := pdfcontent.NewContentStreamCreator()
-		content := creator.Bytes()
-		creator.q().gs("GSABC").cm([1 0 0 1 ...]).cm().Do("Im1").Q()
-	*/
-	contentStr := fmt.Sprintf("q\n"+
-		"/GSABC gs\n"+
-		"1 0 0 1 %.0f %.0f cm\n"+ // Translate
-		"%.0f 0 0 %.0f 0 0 cm\n"+ // Scale
-		"/%s Do\n"+ // Print image
-		"Q", xPos, yPos, imWidth, imHeight, imgName)
+	// Create content stream to add to the page contents.
+	creator := pdfcontent.NewContentCreator()
+	creator.
+		Add_q().                               // Wrap.
+		Add_gs(gsName).                        // Set graphics state.
+		Add_cm(1, 0, 0, 1, xPos, yPos).        // Set position.
+		Add_cm(imWidth, 0, 0, imHeight, 0, 0). // Scale to desired image size.
+		Add_Do(imgName).                       // Draw the image.
+		Add_Q()                                // Unwrap (go to prior graphics stack).
 
-	fmt.Printf("Content Str: %s\n", contentStr)
-	selPage.AddContentStreamByString(contentStr)
+	selPage.AddContentStreamByString(creator.String())
 
 	// Write output.
 	pdfWriter := pdf.NewPdfWriter()

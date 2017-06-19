@@ -78,15 +78,10 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 		return err
 	}
 
-	imgName := pdfcore.PdfObjectName("Imw0")
-	ximg, err := pdf.NewXObjectImageFromImage(imgName, watermarkImg, nil)
+	encoder := pdfcore.NewFlateEncoder()
+	ximg, err := pdf.NewXObjectImageFromImage(watermarkImg, nil, encoder)
 	if err != nil {
 		unicommon.Log.Error("Failed to create xobject image: %s", err)
-		return err
-	}
-	err = ximg.Compress()
-	if err != nil {
-		unicommon.Log.Error("Failed to compress: %v", err)
 		return err
 	}
 
