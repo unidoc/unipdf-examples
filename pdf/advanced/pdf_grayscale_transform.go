@@ -152,12 +152,12 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 	}
 	processedOperations := &pdfcontent.ContentStreamOperations{}
 
-	transformedPatterns := map[string]bool{} // List of already transformed patterns. Avoid multiple conversions.
-	transformedShadings := map[string]bool{} // List of already transformed shadings. Avoid multiple conversions.
+	transformedPatterns := map[pdfcore.PdfObjectName]bool{} // List of already transformed patterns. Avoid multiple conversions.
+	transformedShadings := map[pdfcore.PdfObjectName]bool{} // List of already transformed shadings. Avoid multiple conversions.
 
 	// The content stream processor keeps track of the graphics state and we can make our own handlers to process certain commands,
 	// using the AddHandler method.  In this case, we hook up to color related operands, and for image and form handling.
-	processor := pdfcontent.NewContentStreamProcessor(operations)
+	processor := pdfcontent.NewContentStreamProcessor(*operations)
 	// Add handlers for colorspace related functionality.
 	processor.AddHandler(pdfcontent.HandlerConditionEnumAllOperands, "",
 		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
@@ -261,7 +261,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 					if _, has := transformedPatterns[patternColor.PatternName]; has {
 						// Already processed, need not change anything, except underlying color if used.
-						op.Params = append(op.Params, pdfcore.MakeName(patternColor.PatternName))
+						op.Params = append(op.Params, pdfcore.MakeName(string(patternColor.PatternName)))
 						*processedOperations = append(*processedOperations, &op)
 						return nil
 					}
@@ -280,7 +280,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					}
 					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
 
-					op.Params = append(op.Params, pdfcore.MakeName(patternColor.PatternName))
+					op.Params = append(op.Params, pdfcore.MakeName(string(patternColor.PatternName)))
 					*processedOperations = append(*processedOperations, &op)
 				} else {
 					color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
@@ -323,7 +323,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 					if _, has := transformedPatterns[patternColor.PatternName]; has {
 						// Already processed, need not change anything, except underlying color if used.
-						op.Params = append(op.Params, pdfcore.MakeName(patternColor.PatternName))
+						op.Params = append(op.Params, pdfcore.MakeName(string(patternColor.PatternName)))
 						*processedOperations = append(*processedOperations, &op)
 						return nil
 					}
@@ -342,7 +342,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					}
 					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
 
-					op.Params = append(op.Params, pdfcore.MakeName(patternColor.PatternName))
+					op.Params = append(op.Params, pdfcore.MakeName(string(patternColor.PatternName)))
 					*processedOperations = append(*processedOperations, &op)
 				} else {
 					color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
@@ -398,14 +398,14 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				if !ok {
 					return errors.New("sh parameter should be a name")
 				}
-				if _, has := transformedShadings[string(*shname)]; has {
+				if _, has := transformedShadings[*shname]; has {
 					// Already processed, no need to do anything.
 					*processedOperations = append(*processedOperations, op)
 					return nil
 				}
-				transformedShadings[string(*shname)] = true
+				transformedShadings[*shname] = true
 
-				shading, found := resources.GetShadingByName(string(*shname))
+				shading, found := resources.GetShadingByName(*shname)
 				if !found {
 					return errors.New("Shading not defined in resources")
 				}
@@ -415,7 +415,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					return err
 				}
 
-				resources.SetShadingByName(string(*shname), grayShading.GetContext().ToPdfObject())
+				resources.SetShadingByName(*shname, grayShading.GetContext().ToPdfObject())
 			}
 			*processedOperations = append(*processedOperations, op)
 
@@ -513,11 +513,11 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			}
 			processedXObjects[string(*name)] = true
 
-			_, xtype := resources.GetXObjectByName(string(*name))
+			_, xtype := resources.GetXObjectByName(*name)
 			if xtype == pdf.XObjectTypeImage {
 				//fmt.Printf(" XObject Image: %s\n", *name)
 
-				ximg, err := resources.GetXObjectImageByName(string(*name))
+				ximg, err := resources.GetXObjectImageByName(*name)
 				if err != nil {
 					fmt.Printf("Error w/GetXObjectImageByName : %v\n", err)
 					return err
@@ -549,7 +549,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					dctEncoder.ColorComponents = 1
 				}
 
-				ximgGray, err := pdf.NewXObjectImageFromImage(*name, &grayImage, nil, encoder)
+				ximgGray, err := pdf.NewXObjectImageFromImage(&grayImage, nil, encoder)
 				if err != nil {
 					if err == pdfcore.ErrUnsupportedEncodingParameters {
 						// Unsupported encoding parameters, revert to a basic flate encoder without predictor.
@@ -557,7 +557,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					}
 
 					// Try again, fail if error.
-					ximgGray, err = pdf.NewXObjectImageFromImage(*name, &grayImage, nil, encoder)
+					ximgGray, err = pdf.NewXObjectImageFromImage(&grayImage, nil, encoder)
 					if err != nil {
 						fmt.Printf("Error creating image: %v\n", err)
 						return err
@@ -565,7 +565,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				}
 
 				// Update the entry.
-				err = resources.SetXObjectImageByName(string(*name), ximgGray)
+				err = resources.SetXObjectImageByName(*name, ximgGray)
 				if err != nil {
 					fmt.Printf("Failed setting x object: %v (%s)\n", err, string(*name))
 					return err
@@ -574,7 +574,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				//fmt.Printf(" XObject Form: %s\n", *name)
 
 				// Go through the XObject Form content stream.
-				xform, err := resources.GetXObjectFormByName(string(*name))
+				xform, err := resources.GetXObjectFormByName(*name)
 				if err != nil {
 					fmt.Printf("Error: %v\n", err)
 					return err
@@ -604,7 +604,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				xform.SetContentStream(grayContent, nil)
 
 				// Update the resource entry.
-				resources.SetXObjectFormByName(string(*name), xform)
+				resources.SetXObjectFormByName(*name, xform)
 			}
 
 			return nil
