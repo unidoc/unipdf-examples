@@ -32,6 +32,7 @@ func main() {
 
 	// Use debug logging.
 	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
 
 	inputPath := os.Args[1]
 	outputPath := os.Args[2]
@@ -87,6 +88,18 @@ func addImageToPdf(inputPath string, outputPath string, imagePath string, pageNu
 		return err
 	}
 
+	/*
+		// When dealing with transparent images, sometimes need the following trick to make all the pixels
+		// transparent:
+		img.AlphaMap(func(alpha byte) byte {
+			if alpha > 50 {
+				return alpha
+			} else {
+				return 0 // Transparent
+			}
+		})
+	*/
+
 	// Read the input pdf file.
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -131,7 +144,7 @@ func addImageToPdf(inputPath string, outputPath string, imagePath string, pageNu
 	// Find a free name for the image.
 	num := 1
 	imgName := pdfcore.PdfObjectName(fmt.Sprintf("Img%d", num))
-	for selPage.HasImageResource(imgName) {
+	for selPage.Resources.HasXObjectByName(imgName) {
 		num++
 		imgName = pdfcore.PdfObjectName(fmt.Sprintf("Img%d", num))
 	}
