@@ -465,7 +465,6 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					}
 				}
 
-
 				// Update the entry.
 				err = resources.SetXObjectImageByName(string(*name), ximgGray)
 				if err != nil {
