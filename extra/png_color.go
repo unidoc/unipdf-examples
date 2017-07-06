@@ -22,7 +22,7 @@ func main() {
 	debug := false // Write debug level info to stdout?
 	keep := false  // Keep the rasters used for PDF comparison"
 	flag.BoolVar(&debug, "d", false, "Enable debug logging")
-	flag.BoolVar(&keep, "k", false, "Keep the rasters used for PDF comparison")
+	flag.BoolVar(&keep, "k", false, "Keep the difference rasters")
 	flag.Parse()
 	args := flag.Args()
 	if len(args) < 1 {
