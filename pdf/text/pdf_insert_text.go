@@ -106,11 +106,10 @@ func addTextToPdf(inputPath string, outputPath string, text string, pageNum int,
 	}
 
 	// Create the font dictionary using one of the standard 14 fonts.
-	fontDict := &pdfcore.PdfObjectDictionary{
-		"Type":     pdfcore.MakeName("Font"),
-		"Subtype":  pdfcore.MakeName("Type1"),
-		"BaseFont": pdfcore.MakeName("Helvetica"),
-	}
+	fontDict := pdfcore.MakeDict()
+	fontDict.Set("Type", pdfcore.MakeName("Font"))
+	fontDict.Set("Subtype", pdfcore.MakeName("Type1"))
+	fontDict.Set("BaseFont", pdfcore.MakeName("Helvetica"))
 
 	// Add to the page resources.
 	selPage.AddFont(fontName, fontDict)

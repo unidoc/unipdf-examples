@@ -79,7 +79,8 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 		xobjs := getDict(r.XObject)
 		if r2.XObject != nil {
 			xobjs2 := getDict(r2.XObject)
-			for key, val := range *xobjs2 {
+			for _, key := range xobjs2.Keys() {
+				val := xobjs2.Get(key)
 				// Add XObjects from r2.  Overwrite if existing...
 				// TODO: Handle overwrites properly.
 				xobjs.Set(key, val)
@@ -110,8 +111,9 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 
 		if r2.ExtGState != nil {
 			extgstates2 := getDict(r2.ExtGState)
-			for key, val := range *extgstates2 {
+			for _, key := range extgstates2.Keys() {
 				// TODO: Handle overwrites properly.
+				val := extgstates2.Get(key)
 				extgstates.Set(key, val)
 			}
 		}
@@ -123,7 +125,8 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 		shadings := getDict(r.Shading)
 		if r2.Shading != nil {
 			shadings2 := getDict(r2.Shading)
-			for key, val := range *shadings2 {
+			for _, key := range shadings2.Keys() {
+				val := shadings2.Get(key)
 				shadings.Set(key, val)
 			}
 		}
@@ -135,7 +138,8 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 		shadings := getDict(r.Pattern)
 		if r2.Pattern != nil {
 			patterns2 := getDict(r2.Pattern)
-			for key, val := range *patterns2 {
+			for _, key := range patterns2.Keys() {
+				val := patterns2.Get(key)
 				shadings.Set(key, val)
 			}
 		}
@@ -147,7 +151,8 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 		fonts := getDict(r.Font)
 		if r2.Font != nil {
 			fonts2 := getDict(r2.Font)
-			for key, val := range *fonts2 {
+			for _, key := range fonts2.Keys() {
+				val := fonts2.Get(key)
 				fonts.Set(key, val)
 			}
 		}
@@ -159,7 +164,8 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 		procsets := getDict(r.ProcSet)
 		if r2.ProcSet != nil {
 			procsets2 := getDict(r2.ProcSet)
-			for key, val := range *procsets2 {
+			for _, key := range procsets2.Keys() {
+				val := procsets2.Get(key)
 				procsets.Set(key, val)
 			}
 		}
@@ -171,7 +177,8 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 		props := getDict(r.Properties)
 		if r2.Properties != nil {
 			props2 := getDict(r2.Properties)
-			for key, val := range *props2 {
+			for _, key := range props2.Keys() {
+				val := props2.Get(key)
 				props.Set(key, val)
 			}
 		}

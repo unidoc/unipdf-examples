@@ -117,17 +117,12 @@ func convertPdfToGrayscale(inputPath, outputPath string) error {
 // to convert those to grayscale.
 func convertPageToGrayscale(page *pdf.PdfPage) error {
 	// For each page, we go through the resources and look for the images.
-	resources, err := page.GetResources()
-	if err != nil {
-		return err
-	}
-
 	contents, err := page.GetAllContentStreams()
 	if err != nil {
 		return err
 	}
 
-	grayContent, err := transformContentStreamToGrayscale(contents, resources)
+	grayContent, err := transformContentStreamToGrayscale(contents, page.Resources)
 	if err != nil {
 		return err
 	}

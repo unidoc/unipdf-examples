@@ -173,9 +173,9 @@ func addImageToPdf(inputPath string, outputPath string, imagePath string, pageNu
 	}
 
 	// Create a normal graphics state.
-	gs0 := pdfcore.PdfObjectDictionary{}
-	gs0[pdfcore.PdfObjectName("BM")] = pdfcore.MakeName("Normal")
-	selPage.AddExtGState(gsName, &gs0)
+	gs0 := pdfcore.MakeDict()
+	gs0.Set("BM", pdfcore.MakeName("Normal"))
+	selPage.AddExtGState(gsName, gs0)
 
 	imWidth := iwidth
 	imHeight := float64(img.Height) / float64(img.Width) * iwidth
