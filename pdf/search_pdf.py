@@ -2,6 +2,7 @@ from glob import glob
 import sys
 import os
 import re
+from collections import defaultdict
 
 
 def disjunct(*args):
@@ -35,7 +36,9 @@ def get_contexts(text, n=10):
 
 term = sys.argv[1]
 pattern = sys.argv[2:]
-term = br'\b%s\b' % from_str(disjunct('williams', 'smith', 'jones'))
+term = br'\b%s\b' % from_str(disjunct('fuck', 'shit', 'cunt', 'a[ser]{,4}hole'
+	                                  'booger', 'nutcase', 'kill'))
+term = br'\b%s\b' % from_str(disjunct('cheat', 'plagiarise', 'bomb'))
 pattern = sys.argv[1:]
 
 
@@ -56,14 +59,15 @@ for p in pattern:
         files.append(p)
 print('%d files' % len(files))
 
-all_contexts = set()
+all_contexts = defaultdict(set)
 for i, path in enumerate(files):
     text = get_text(path)
-    contexts = get_contexts(text)
+    contexts = get_contexts(text, n=40)
     if contexts:
         # print('%s %d bytes %d matches %s' % (path, len(text), len(contexts), contexts))
-        all_contexts = all_contexts.union(contexts)
+        for ctx in contexts:
+        	all_contexts[ctx].add(os.path.basename(path))
 
 print('=' * 80)
-for i, s in enumerate(sorted(all_contexts)):
-    print('%3d: "%s"' % (i, s))
+for i, ctx in enumerate(sorted(all_contexts)):
+    print('%3d: "%s" %s' % (i, ctx, sorted(all_contexts[ctx])))
