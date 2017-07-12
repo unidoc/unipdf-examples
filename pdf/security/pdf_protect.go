@@ -3,11 +3,15 @@
  * and opening password and hard-codes the protection bits here, but easily adjusted
  * in the code here although not on the command line.
  *
- * When reading the input it tries to decrypt with empty password if the input file
- * is encrypted, if that fails we fail also.
+ * The user-pass is a password required to view the file with the access specified by certain permission flags (specified
+ * in the code example below), whereas the owner pass is needed to have full access to the file.
+ * See pdf_check_permissions.go for an example about checking the permissions for a given PDF file.
  *
- * Run as: go run pdf_protect.go input.pdf password output.pdf
- * e.g.: go run pdf_protect.go my.pdf mypass my_protected.pdf
+ * If anyone is supposed to be able to read the PDF under the given access restrictions, then the user password should
+ * be left empty ("").
+ *
+ * Run as: go run pdf_protect.go input.pdf <user-pass> <owner-pass> output.pdf
+ * Sets a user and owner password for the PDF.
  */
 
 package main
@@ -21,16 +25,18 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 4 {
-		fmt.Printf("Usage: go run pdf_protect.go input.pdf password output.pdf\n")
+	if len(os.Args) < 5 {
+		fmt.Println("Usage: go run pdf_protect.go input.pdf <user-pass> <owner-pass> output.pdf")
+		fmt.Println("Sets a user and owner password for the PDF.")
 		os.Exit(1)
 	}
 
 	inputPath := os.Args[1]
-	password := os.Args[2]
-	outputPath := os.Args[3]
+	userPassword := os.Args[2]
+	ownerPassword := os.Args[3]
+	outputPath := os.Args[4]
 
-	err := protectPdf(inputPath, outputPath, password)
+	err := protectPdf(inputPath, outputPath, userPassword, ownerPassword)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
@@ -39,29 +45,29 @@ func main() {
 	fmt.Printf("Complete, see output file: %s\n", outputPath)
 }
 
-func protectPdf(inputPath string, outputPath string, password string) error {
+func protectPdf(inputPath string, outputPath string, userPassword, ownerPassword string) error {
 	pdfWriter := pdf.NewPdfWriter()
 
-	// Feel free to change these values when testing.
-	allowPrinting := false
-	allowModifications := true
-	allowCopying := true
-	allowForm := false
-
 	permissions := pdfcore.AccessPermissions{}
-	permissions.Printing = allowPrinting
-	permissions.Modify = allowModifications
-	permissions.Annotate = allowModifications
-	permissions.RotateInsert = allowModifications
-	permissions.ExtractGraphics = allowCopying
-	permissions.DisabilityExtract = allowCopying
-	permissions.FillForms = allowForm
-	permissions.LimitPrintQuality = false
+	// Allow printing with low quality
+	permissions.Printing = true
+	permissions.FullPrintQuality = false
+	// Allow modifications.
+	permissions.Modify = true
+	// Allow annotations.
+	permissions.Annotate = true
+	permissions.FillForms = true
+	// Allow modifying page order, rotating pages etc.
+	permissions.RotateInsert = true
+	// Allow extracting graphics.
+	permissions.ExtractGraphics = true
+	// Allow extracting graphics (accessibility)
+	permissions.DisabilityExtract = true
 
 	encryptOptions := &pdf.EncryptOptions{}
 	encryptOptions.Permissions = permissions
 
-	err := pdfWriter.Encrypt([]byte(password), []byte(password), encryptOptions)
+	err := pdfWriter.Encrypt([]byte(userPassword), []byte(ownerPassword), encryptOptions)
 	if err != nil {
 		return err
 	}
@@ -82,16 +88,8 @@ func protectPdf(inputPath string, outputPath string, password string) error {
 	if err != nil {
 		return err
 	}
-
-	// Try decrypting both with given password and an empty one if that fails.
 	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(password))
-		if err != nil {
-			return err
-		}
-		if !auth {
-			return fmt.Errorf("Wrong password")
-		}
+		return fmt.Errorf("The PDF is already locked (need to unlock first)")
 	}
 
 	numPages, err := pdfReader.GetNumPages()
