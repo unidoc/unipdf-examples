@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unidoc/common"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
@@ -21,7 +20,7 @@ func main() {
 	}
 
 	// Enable debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
 
 	for _, inputPath := range os.Args[1:len(os.Args)] {
@@ -84,6 +83,5 @@ func listAnnotations(inputPath string) error {
 func printAnnotations(annotations []*pdf.PdfAnnotation) {
 	for idx, annotation := range annotations {
 		fmt.Printf(" %d. %s\n", idx+1, annotation.String())
-
 	}
 }

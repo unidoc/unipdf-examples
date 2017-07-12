@@ -20,12 +20,10 @@ import (
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func init() {
-	// Debug log mode.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-}
-
 func main() {
+	// Debug log mode.
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
 	if len(os.Args) < 8 {
 		fmt.Printf("go run pdf_annotate_add_line.go input.pdf <page> <x1> <y1> <x2> <y2> output.pdf\n")
 		os.Exit(1)
