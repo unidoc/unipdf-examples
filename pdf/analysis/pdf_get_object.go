@@ -22,8 +22,7 @@ func init() {
 	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
 	// does not do anything. Very easy to implement your own.
 
-	//unicommon.SetLogger(unicommon.DummyLogger{})
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
+	// Load a console logger in debug mode.
 	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 }
 
