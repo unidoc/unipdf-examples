@@ -12,19 +12,9 @@ import (
 	"os"
 	"strconv"
 
-	unicommon "github.com/unidoc/unidoc/common"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
-	unipdf "github.com/unidoc/unidoc/pdf/model"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
-
-func init() {
-	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
-	// does not do anything. Very easy to implement your own.
-
-	// Load a console logger in debug mode.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -32,6 +22,9 @@ func main() {
 		fmt.Println("If num is not specified, will display the trailer dictionary")
 		os.Exit(1)
 	}
+
+	// Load a console logger in debug mode.
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	inputPath := os.Args[1]
 
@@ -61,7 +54,7 @@ func inspectPdfObject(inputPath string, objNum int) error {
 
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -71,8 +64,9 @@ func inspectPdfObject(inputPath string, objNum int) error {
 		return err
 	}
 
-	// Try decrypting with an empty one.
 	if isEncrypted {
+		// If encrypted, try decrypting with an empty one.
+		// Can also specify a user/owner password here by modifying the line below.
 		auth, err := pdfReader.Decrypt([]byte(""))
 		if err != nil {
 			fmt.Printf("Decryption error: %v\n", err)
