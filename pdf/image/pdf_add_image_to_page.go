@@ -1,7 +1,7 @@
 /*
  * Insert an image to a PDF file.
  *
- * Adds image to a specific page of a PDF.  xPos and yPos define the upper left corner of the image location, and iwidth
+ * Adds image to a specific page of a PDF.  xPos and yPos define the upper left corner of the image location, and width
  * is the width of the image in PDF coordinates (height/width ratio is maintained).
  *
  * Example go run pdf_add_image_to_page.go /tmp/input.pdf 1 /tmp/image.jpg 0 0 100 /tmp/output.pdf
@@ -24,13 +24,12 @@ import (
 
 func main() {
 	if len(os.Args) < 8 {
-		fmt.Printf("Usage: go run pdf_add_image_to_page.go input.pdf <page> image.jpg <xpos> <ypos> <width> output.pdfn")
+		fmt.Printf("Usage: go run pdf_add_image_to_page.go input.pdf <page> image.jpg <xpos> <ypos> <width> output.pdf\n")
 		os.Exit(1)
 	}
 
 	// Use debug logging.
 	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
 
 	inputPath := os.Args[1]
 	pageNumStr := os.Args[2]

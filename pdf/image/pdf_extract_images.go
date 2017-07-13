@@ -14,7 +14,6 @@ import (
 	"image/jpeg"
 	"os"
 
-	unicommon "github.com/unidoc/unidoc/common"
 	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
@@ -23,12 +22,10 @@ import (
 var xObjectImages = 0
 var inlineImages = 0
 
-func init() {
-	// Enable debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-}
-
 func main() {
+	// Enable debug-level console logging, when debuggingn:
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
 	if len(os.Args) < 3 {
 		fmt.Printf("Syntax: go run pdf_extract_images.go input.pdf output.zip\n")
 		os.Exit(1)
@@ -143,17 +140,12 @@ func extractImagesToArchive(inputPath, outputPath string) error {
 }
 
 func extractImagesOnPage(page *pdf.PdfPage) ([]*pdf.Image, error) {
-	resources, err := page.GetResources()
-	if err != nil {
-		return nil, err
-	}
-
 	contents, err := page.GetAllContentStreams()
 	if err != nil {
 		return nil, err
 	}
 
-	return extractImagesInContentStream(contents, resources)
+	return extractImagesInContentStream(contents, page.Resources)
 }
 
 func extractImagesInContentStream(contents string, resources *pdf.PdfPageResources) ([]*pdf.Image, error) {
@@ -166,9 +158,10 @@ func extractImagesInContentStream(contents string, resources *pdf.PdfPageResourc
 
 	processedXObjects := map[string]bool{}
 
-	for _, op := range operations {
+	// Range through all the content stream operations.
+	for _, op := range *operations {
 		if op.Operand == "BI" && len(op.Params) == 1 {
-			// Inline image.
+			// BI: Inline image.
 
 			iimg, ok := op.Params[0].(*pdfcontent.ContentStreamInlineImage)
 			if !ok {
@@ -198,7 +191,7 @@ func extractImagesInContentStream(contents string, resources *pdf.PdfPageResourc
 			rgbImages = append(rgbImages, &rgbImg)
 			inlineImages++
 		} else if op.Operand == "Do" && len(op.Params) == 1 {
-			// XObject.
+			// Do: XObject.
 			name := op.Params[0].(*pdfcore.PdfObjectName)
 
 			// Only process each one once.
@@ -208,11 +201,11 @@ func extractImagesInContentStream(contents string, resources *pdf.PdfPageResourc
 			}
 			processedXObjects[string(*name)] = true
 
-			_, xtype := resources.GetXObjectByName(string(*name))
+			_, xtype := resources.GetXObjectByName(*name)
 			if xtype == pdf.XObjectTypeImage {
 				fmt.Printf(" XObject Image: %s\n", *name)
 
-				ximg, err := resources.GetXObjectImageByName(string(*name))
+				ximg, err := resources.GetXObjectImageByName(*name)
 				if err != nil {
 					return nil, err
 				}
@@ -230,7 +223,7 @@ func extractImagesInContentStream(contents string, resources *pdf.PdfPageResourc
 				xObjectImages++
 			} else if xtype == pdf.XObjectTypeForm {
 				// Go through the XObject Form content stream.
-				xform, err := resources.GetXObjectFormByName(string(*name))
+				xform, err := resources.GetXObjectFormByName(*name)
 				if err != nil {
 					return nil, err
 				}
