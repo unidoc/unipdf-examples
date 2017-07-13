@@ -1,7 +1,7 @@
 /*
- * Basic PDF split example: Splitting by page range.
+ * Advanced PDF split example: Takes into account optional content - OCProperties (rarely used).
  *
- * Run as: go run pdf_split.go input.pdf <page_from> <page_to> output.pdf
+ * Run as: go run pdf_split_advanced.go input.pdf <page_from> <page_to> output.pdf
  * To get only page 1 and 2 from input.pdf and save as output.pdf run: go run pdf_split.go input.pdf 1 2 output.pdf
  */
 
@@ -23,7 +23,7 @@ func init() {
 
 func main() {
 	if len(os.Args) < 5 {
-		fmt.Printf("Usage: go run pdf_split.go input.pdf <page_from> <page_to> output.pdf\n")
+		fmt.Printf("Usage: go run pdf_split_advanced.go input.pdf <page_from> <page_to> output.pdf\n")
 		os.Exit(1)
 	}
 
@@ -89,6 +89,14 @@ func splitPdf(inputPath string, outputPath string, pageFrom int, pageTo int) err
 	if numPages < pageTo {
 		return err
 	}
+
+	// Keep the OC properties intact (optional content).
+	// Rarely used but can be relevant in certain cases.
+	ocProps, err := pdfReader.GetOCProperties()
+	if err != nil {
+		return err
+	}
+	pdfWriter.SetOCProperties(ocProps)
 
 	for i := pageFrom; i <= pageTo; i++ {
 		pageNum := i
