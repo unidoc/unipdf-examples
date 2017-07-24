@@ -11,24 +11,13 @@ import (
 	"os"
 
 	unicommon "github.com/unidoc/unidoc/common"
-	unilicense "github.com/unidoc/unidoc/license"
-	unipdf "github.com/unidoc/unidoc/pdf"
+	pdfcore "github.com/unidoc/unidoc/pdf/core"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func initUniDoc(licenseKey string) error {
-	if len(licenseKey) > 0 {
-		err := unilicense.SetLicenseKey(licenseKey)
-		if err != nil {
-			return err
-		}
-	}
-
-	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
-	// does not do anything. Very easy to implement your own.
-	unicommon.SetLogger(unicommon.DummyLogger{})
-
-	return nil
+func init() {
+	// Debug log level.
+	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 }
 
 func main() {
@@ -41,13 +30,7 @@ func main() {
 	outputPath := os.Args[2]
 	watermarkPath := os.Args[3]
 
-	err := initUniDoc("")
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
-
-	err = addWatermarkImage(inputPath, outputPath, watermarkPath)
+	err := addWatermarkImage(inputPath, outputPath, watermarkPath)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
@@ -62,7 +45,7 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 	unicommon.Log.Debug("Input PDF: %v", inputPath)
 	unicommon.Log.Debug("Watermark image: %s", watermarkPath)
 
-	pdfWriter := unipdf.NewPdfWriter()
+	pdfWriter := pdf.NewPdfWriter()
 
 	// Open the watermark image file.
 	reader, err := os.Open(watermarkPath)
@@ -72,7 +55,7 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 	}
 	defer reader.Close()
 
-	watermarkImg, err := unipdf.ImageHandling.Read(reader)
+	watermarkImg, err := pdf.ImageHandling.Read(reader)
 	if err != nil {
 		unicommon.Log.Error("Error loading image: %s", err)
 		return err
@@ -85,7 +68,7 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 	}
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -109,10 +92,15 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 		return err
 	}
 
-	imgName := unipdf.PdfObjectName("Imw0")
-	ximg, err := unipdf.NewXObjectImage(imgName, watermarkImg)
+	imgName := pdfcore.PdfObjectName("Imw0")
+	ximg, err := pdf.NewXObjectImageFromImage(imgName, watermarkImg, nil)
 	if err != nil {
 		unicommon.Log.Error("Failed to create xobject image: %s", err)
+		return err
+	}
+	err = ximg.Compress()
+	if err != nil {
+		unicommon.Log.Error("Failed to compress: %v", err)
 		return err
 	}
 
@@ -120,12 +108,12 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 		pageNum := i + 1
 
 		// Read the page.
-		page, err := pdfReader.GetPageAsPdfPage(pageNum)
+		page, err := pdfReader.GetPage(pageNum)
 		if err != nil {
 			return err
 		}
 
-		wmOpt := unipdf.WatermarkImageOptions{}
+		wmOpt := pdf.WatermarkImageOptions{}
 		wmOpt.Alpha = 0.5
 		wmOpt.FitToWidth = true
 		wmOpt.PreserveAspectRatio = true
@@ -135,7 +123,7 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 			return err
 		}
 
-		err = pdfWriter.AddPage(page.GetPageAsIndirectObject())
+		err = pdfWriter.AddPage(page)
 		if err != nil {
 			unicommon.Log.Error("Failed to add page: %s", err)
 			return err

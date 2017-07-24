@@ -1,5 +1,5 @@
 /*
- * Rotate pages in a PDF file.
+ * Rotate pages in a PDF file.  Degrees needs to be a multiple of 90.
  * Example of how to manipulate pages.
  *
  * Run as: go run pdf_rotate.go output.pdf input.pdf
@@ -11,45 +11,37 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 
 	unicommon "github.com/unidoc/unidoc/common"
-	unilicense "github.com/unidoc/unidoc/license"
-	unipdf "github.com/unidoc/unidoc/pdf"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func initUniDoc(licenseKey string) error {
-	if len(licenseKey) > 0 {
-		err := unilicense.SetLicenseKey(licenseKey)
-		if err != nil {
-			return err
-		}
-	}
-
-	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
-	// does not do anything. Very easy to implement your own.
-	unicommon.SetLogger(unicommon.DummyLogger{})
-
-	return nil
+func init() {
+	// Use debug-mode log level.
+	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 }
 
 func main() {
-	if len(os.Args) < 3 {
-		fmt.Printf("Requires at least 2 arguments: output.pdf input.pdf\n")
-		fmt.Printf("Usage: go run pdf_rotate.go output.pdf input.pdf\n")
+	if len(os.Args) < 4 {
+		fmt.Printf("Usage: go run pdf_rotate.go input.pdf <degrees> output.pdf\n")
 		os.Exit(1)
 	}
 
-	outputPath := os.Args[1]
-	inputPath := os.Args[2]
+	inputPath := os.Args[1]
+	outputPath := os.Args[3]
 
-	err := initUniDoc("")
+	degrees, err := strconv.ParseInt(os.Args[2], 10, 64)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+		fmt.Printf("Invalid degrees: %v\n", err)
+		os.Exit(1)
+	}
+	if degrees%90 != 0 {
+		fmt.Printf("Degrees needs to be a multiple of 90\n")
 		os.Exit(1)
 	}
 
-	err = rotatePdf(inputPath, outputPath)
+	err = rotatePdf(inputPath, degrees, outputPath)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
@@ -59,8 +51,8 @@ func main() {
 }
 
 // Rotate all pages by 90 degrees.
-func rotatePdf(inputPath string, outputPath string) error {
-	pdfWriter := unipdf.NewPdfWriter()
+func rotatePdf(inputPath string, degrees int64, outputPath string) error {
+	pdfWriter := pdf.NewPdfWriter()
 
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -69,7 +61,7 @@ func rotatePdf(inputPath string, outputPath string) error {
 
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -81,11 +73,11 @@ func rotatePdf(inputPath string, outputPath string) error {
 
 	// Try decrypting both with given password and an empty one if that fails.
 	if isEncrypted {
-		success, err := pdfReader.Decrypt([]byte(""))
+		auth, err := pdfReader.Decrypt([]byte(""))
 		if err != nil {
 			return err
 		}
-		if !success {
+		if !auth {
 			return errors.New("Unable to decrypt pdf with empty pass")
 		}
 	}
@@ -98,7 +90,7 @@ func rotatePdf(inputPath string, outputPath string) error {
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
 
-		page, err := pdfReader.GetPageAsPdfPage(pageNum)
+		page, err := pdfReader.GetPage(pageNum)
 		if err != nil {
 			return err
 		}
@@ -108,12 +100,10 @@ func rotatePdf(inputPath string, outputPath string) error {
 		if page.Rotate != nil {
 			rotation = *(page.Rotate)
 		}
-		rotation += 90 // Rotate by 90 deg.
+		rotation += degrees // Rotate by 90 deg.
 		page.Rotate = &rotation
 
-		// Swap out the page dictionary.
-		pageObj := page.GetPageAsIndirectObject()
-		err = pdfWriter.AddPage(pageObj)
+		err = pdfWriter.AddPage(page)
 		if err != nil {
 			return err
 		}
