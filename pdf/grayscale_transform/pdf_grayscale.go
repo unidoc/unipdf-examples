@@ -62,7 +62,7 @@ import (
 
 func initUniDoc(licenseKey string, debug bool) error {
 
-	pdf.SetPdfProducer("PaperCut Mobility")
+	// pdf.SetPdfProducer("PaperCut Mobility")
 	pdf.SetPdfCreator("PaperCut Software")
 
 	// To make the library log we just have to initialise the logger which satisfies
@@ -93,13 +93,20 @@ var identityThreshold = imageThreshold{
 var testStats = statistics{
 	enabled:        true,
 	testResultPath: "xform.test.results.csv",
-	// imageInfoPath:  "xform.image.info.csv",
 }
 
 var gVerbose = false
 var gVerbose2 = false
 
 var allOpCounts = map[string]int{}
+
+const usage = `Usage:
+%s -o <output directory> [-d][-g][-k][-a][-min <val>][-max <val>] <file1> <file2> ...
+-d: Debug level logging
+-k: Keep temp PNG files used for PDF grayscale test
+-g: Test that grayscale conversion works (takes longer)
+-a: Keep converting PDF files after failures.
+`
 
 func main() {
 	debug := false            // Write debug level info to stdout?
@@ -116,11 +123,11 @@ func main() {
 	flag.StringVar(&outputDir, "o", "", "Output directory")
 	flag.Int64Var(&minSize, "min", -1, "Minimum size of files to process (bytes)")
 	flag.Int64Var(&maxSize, "max", -1, "Maximum size of files to process (bytes)")
+
 	flag.Parse()
 	args := flag.Args()
 	if len(args) < 1 || len(outputDir) == 0 {
-		fmt.Fprintf(os.Stderr, "Usage: %s -o <output directory> [-d] <file1> <file2> ...\n",
-			os.Args[0])
+		fmt.Fprintf(os.Stderr, usage, os.Args[0])
 		os.Exit(1)
 	}
 

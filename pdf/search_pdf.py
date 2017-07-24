@@ -62,7 +62,7 @@ print('%d files' % len(files))
 all_contexts = defaultdict(set)
 for i, path in enumerate(files):
     text = get_text(path)
-    contexts = get_contexts(text, n=40)
+    contexts = get_contexts(text, n=20)
     if contexts:
         # print('%s %d bytes %d matches %s' % (path, len(text), len(contexts), contexts))
         for ctx in contexts:
