@@ -24,6 +24,7 @@ var filters = map[string]int{}
 func init() {
 	// Enable debug-level logging.
 	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
 }
 
 func main() {
@@ -240,13 +241,13 @@ func listImagesInContentStream(contents string, resources *pdf.PdfPageResources)
 					return err
 				}
 				fmt.Printf("xform: %#v\n", xform)
-				fmt.Printf("xform res: %#v\n", xform.Resources.String())
+				fmt.Printf("xform res: %#v\n", xform.Resources)
 				fmt.Printf("Content: %s\n", formContent)
 
 				// Process the content stream in the Form object too:
 				// XXX/TODO: Use either form resources (priority) and fall back to page resources alternatively if not found.
-				if xform.FormResources != nil {
-					err = listImagesInContentStream(string(formContent), xform.FormResources)
+				if xform.Resources != nil {
+					err = listImagesInContentStream(string(formContent), xform.Resources)
 				} else {
 					err = listImagesInContentStream(string(formContent), resources)
 				}

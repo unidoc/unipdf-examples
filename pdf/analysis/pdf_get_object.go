@@ -23,8 +23,8 @@ func init() {
 	// does not do anything. Very easy to implement your own.
 
 	//unicommon.SetLogger(unicommon.DummyLogger{})
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
+	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 }
 
 func main() {

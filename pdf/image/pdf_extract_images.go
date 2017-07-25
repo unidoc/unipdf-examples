@@ -20,15 +20,12 @@ import (
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-var colorspaces = map[string]int{}
-var filters = map[string]int{}
 var xObjectImages = 0
 var inlineImages = 0
 
 func init() {
 	// Enable debug-level logging.
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
+	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 }
 
 func main() {
@@ -46,11 +43,11 @@ func main() {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
+
 	fmt.Printf("-- Summary\n")
 	fmt.Printf("%d XObject images extracted\n", xObjectImages)
 	fmt.Printf("%d inline images extracted\n", inlineImages)
 	fmt.Printf("Total %d images\n", xObjectImages+inlineImages)
-
 }
 
 // Extracts images and properties of a PDF specified by inputPath.
@@ -244,8 +241,7 @@ func extractImagesInContentStream(contents string, resources *pdf.PdfPageResourc
 				}
 
 				// Process the content stream in the Form object too:
-				// XXX/TODO: Use either form resources (priority) and fall back to page resources alternatively if not found.
-				formResources := xform.FormResources
+				formResources := xform.Resources
 				if formResources == nil {
 					formResources = resources
 				}

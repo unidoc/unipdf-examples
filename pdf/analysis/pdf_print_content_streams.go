@@ -23,6 +23,7 @@ func init() {
 
 	//Or can use a debug-level console logger:
 	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
 }
 
 func main() {
@@ -113,7 +114,7 @@ func listContentStreams(inputPath string) error {
 		}
 
 		fmt.Printf("=== Full list\n")
-		for idx, op := range operations {
+		for idx, op := range *operations {
 			fmt.Printf("Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
 		}
 	}

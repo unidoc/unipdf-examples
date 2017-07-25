@@ -1,7 +1,7 @@
 /*
  * Lists annotations in a PDF file.
  *
- * Run as: go run pdf_list_annotations.go input.pdf
+ * Run as: go run pdf_list_annotations.go input.pdf [input2.pdf] ...
  */
 
 package main
@@ -16,7 +16,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("Usage: go run pdf_forms_list_fields.go input.pdf [input2.pdf] ...\n")
+		fmt.Printf("Usage: go run pdf_list_annotations.go input.pdf [input2.pdf] ...\n")
 		os.Exit(1)
 	}
 

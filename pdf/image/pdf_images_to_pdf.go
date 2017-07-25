@@ -1,7 +1,5 @@
 /*
  * Add images to a PDF file, one image per page.
- * Standard implementation, using native go image library for image handling.
- * For a faster implementation based on LibVIPS see pdf_images_to_pdf_fast.go.
  *
  * Run as: go run pdf_images_to_pdf.go output.pdf img1.jpg img2.jpg img3.png ...
  */
@@ -13,6 +11,7 @@ import (
 	"os"
 
 	unicommon "github.com/unidoc/unidoc/common"
+	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
@@ -58,7 +57,8 @@ func imagesToPdf(inputPaths []string, outputPath string) error {
 			return err
 		}
 
-		// Use page width of 612, and calculate the height proportionally based on the image.
+		// Use page width of 612 points, and calculate the height proportionally based on the image.
+		// Standard PPI is 72 points per inch.
 		height := 612 * float64(img.Height) / float64(img.Width)
 
 		// Make a page.
@@ -66,19 +66,19 @@ func imagesToPdf(inputPaths []string, outputPath string) error {
 		bbox := pdf.PdfRectangle{0, 0, 612, height}
 		page.MediaBox = &bbox
 
+		// Name for the image object.
 		imgName := pdfcore.PdfObjectName(fmt.Sprintf("Im%d", idx+1))
 
+		// Use flate decoding for the images.
+		encoder := pdfcore.NewFlateEncoder()
+
 		// Create an XObject Image for the PDF.
-		ximg, err := pdf.NewXObjectImageFromImage(imgName, img, nil)
+		ximg, err := pdf.NewXObjectImageFromImage(img, nil, encoder)
 		if err != nil {
 			unicommon.Log.Error("Failed to create xobject image: %s", err)
 			return err
 		}
-		err = ximg.Compress()
-		if err != nil {
-			unicommon.Log.Error("Failed: %v", err)
-			return err
-		}
+
 		// Add to the page resources.
 		err = page.AddImageResource(imgName, ximg)
 		if err != nil {
@@ -86,19 +86,21 @@ func imagesToPdf(inputPaths []string, outputPath string) error {
 			return err
 		}
 
-		// Make a default graphics state.
+		// Create a normal graphics state.
+		gsName := pdfcore.PdfObjectName(fmt.Sprintf("GS0"))
 		gs0 := pdfcore.PdfObjectDictionary{}
-		name := pdfcore.PdfObjectName("Normal")
-		gs0["BM"] = &name
-		page.AddExtGState("GS0", &gs0)
+		gs0[pdfcore.PdfObjectName("BM")] = pdfcore.MakeName("Normal")
+		page.AddExtGState(gsName, &gs0)
 
 		// Content stream to load the image.
-		contentStr := fmt.Sprintf("q\n"+
-			"/GS0 gs\n"+
-			"612 0 0 %.0f 0 0 cm\n"+
-			"/%s Do\n"+
-			"Q", height, imgName)
-		page.AddContentStreamByString(contentStr)
+		creator := pdfcontent.NewContentCreator()
+		creator.
+			Add_q().
+			Add_gs(gsName).
+			Add_cm(612, 0, 0, height, 0, 0).
+			Add_Do(imgName).
+			Add_Q()
+		page.AddContentStreamByString(creator.String())
 
 		err = pdfWriter.AddPage(page)
 		if err != nil {

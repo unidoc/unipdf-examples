@@ -11,6 +11,8 @@ import (
 	"os"
 	"sort"
 
+	"errors"
+
 	unicommon "github.com/unidoc/unidoc/common"
 	unipdf "github.com/unidoc/unidoc/pdf/model"
 )
@@ -54,10 +56,13 @@ func inspectPdf(inputPath string) error {
 
 	// Try decrypting with an empty one.
 	if isEncrypted {
-		_, err = pdfReader.Decrypt([]byte(""))
+		auth, err := pdfReader.Decrypt([]byte(""))
 		if err != nil {
-			// Encrypted and we cannot do anything about it.
 			return err
+		}
+
+		if !auth {
+			return errors.New("Unable to decrypt password protected file - need to specify pass to Decrypt")
 		}
 	}
 
