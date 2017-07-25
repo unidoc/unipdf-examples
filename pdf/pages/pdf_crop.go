@@ -1,8 +1,8 @@
 /*
- * Crop pages in a PDF file. Crops the view to a certain percentage
- * of the original.
+ * Crop pages in a PDF file. Crops the view to a certain percentage  of the original.
+ * The percentage specifies the trim-off percentage, both width- and heightwise.
  *
- * Run as: go run pdf_crop.go <percentage> output.pdf input.pdf
+ * Run as: go run pdf_crop.go input.pdf <percentage> output.pdf
  */
 
 package main
@@ -13,37 +13,21 @@ import (
 	"os"
 	"strconv"
 
-	unicommon "github.com/unidoc/unidoc/common"
-	unilicense "github.com/unidoc/unidoc/license"
-	unipdf "github.com/unidoc/unidoc/pdf"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func initUniDoc(licenseKey string) error {
-	if len(licenseKey) > 0 {
-		err := unilicense.SetLicenseKey(licenseKey)
-		if err != nil {
-			return err
-		}
-	}
-
-	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
-	// does not do anything. Very easy to implement your own.
-	unicommon.SetLogger(unicommon.DummyLogger{})
-
-	return nil
-}
-
 func main() {
+	// When debugging: log to console.
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
 	if len(os.Args) < 3 {
-		fmt.Printf("Requires at least 3 arguments: <percentage> output.pdf input.pdf\n")
-		fmt.Printf("Usage: go run pdf_crop.go <percentage> output.pdf input.pdf\n")
+		fmt.Printf("Usage: go run pdf_crop.go input.pdf <percentage> output.pdf\n")
 		os.Exit(1)
 	}
 
-	percentageStr := os.Args[1]
-	outputPath := os.Args[2]
-	inputPath := os.Args[3]
+	inputPath := os.Args[1]
+	percentageStr := os.Args[2]
+	outputPath := os.Args[3]
 
 	percentage, err := strconv.ParseInt(percentageStr, 10, 32)
 	if err != nil {
@@ -52,12 +36,6 @@ func main() {
 	}
 	if percentage < 0 || percentage > 100 {
 		fmt.Printf("Percentage should be in the range 0 - 100 (%)\n")
-		os.Exit(1)
-	}
-
-	err = initUniDoc("")
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
@@ -72,7 +50,7 @@ func main() {
 
 // Crop all pages by a given percentage.
 func cropPdf(inputPath string, outputPath string, percentage int64) error {
-	pdfWriter := unipdf.NewPdfWriter()
+	pdfWriter := pdf.NewPdfWriter()
 
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -81,7 +59,7 @@ func cropPdf(inputPath string, outputPath string, percentage int64) error {
 
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -93,11 +71,11 @@ func cropPdf(inputPath string, outputPath string, percentage int64) error {
 
 	// Try decrypting both with given password and an empty one if that fails.
 	if isEncrypted {
-		success, err := pdfReader.Decrypt([]byte(""))
+		auth, err := pdfReader.Decrypt([]byte(""))
 		if err != nil {
 			return err
 		}
-		if !success {
+		if !auth {
 			return errors.New("Unable to decrypt pdf with empty pass")
 		}
 	}
@@ -110,7 +88,7 @@ func cropPdf(inputPath string, outputPath string, percentage int64) error {
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
 
-		page, err := pdfReader.GetPageAsPdfPage(pageNum)
+		page, err := pdfReader.GetPage(pageNum)
 		if err != nil {
 			return err
 		}
@@ -129,11 +107,10 @@ func cropPdf(inputPath string, outputPath string, percentage int64) error {
 		(*bbox).Lly += newHeight / 2
 		(*bbox).Urx -= newWidth / 2
 		(*bbox).Ury -= newHeight / 2
+
 		page.MediaBox = bbox
 
-		pageObj := page.GetPageAsIndirectObject()
-
-		err = pdfWriter.AddPage(pageObj)
+		err = pdfWriter.AddPage(page)
 		if err != nil {
 			return err
 		}

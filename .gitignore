@@ -1,3 +1,4 @@
+.idea
 *.mdb
 *.userprefs
 *.pidb
@@ -45,3 +46,6 @@ gin-bin
 pkg/buildinfo/buildinfo.go
 temp/
 buildinfo.json
+
+*.sh
+pdf/bak

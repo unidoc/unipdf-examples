@@ -1,9 +1,8 @@
 /*
- * Splits PDF files, tries to decrypt encrypted documents with an empty password
- * as best effort.
+ * Advanced PDF split example: Takes into account optional content - OCProperties (rarely used).
  *
- * Run as: go run pdf_split.go page_from page_to output.pdf input.pdf
- * To get only page 1 and 2 from input.pdf and save as output.pdf run: go run pdf_split.go 1 2 output.pdf input.pdf
+ * Run as: go run pdf_split_advanced.go input.pdf <page_from> <page_to> output.pdf
+ * To get only page 1 and 2 from input.pdf and save as output.pdf run: go run pdf_split.go input.pdf 1 2 output.pdf
  */
 
 package main
@@ -13,56 +12,38 @@ import (
 	"os"
 	"strconv"
 
-	unicommon "github.com/unidoc/unidoc/common"
-	unilicense "github.com/unidoc/unidoc/license"
-	unipdf "github.com/unidoc/unidoc/pdf"
+	//unicommon "github.com/unidoc/unidoc/common"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func initUniDoc(licenseKey string) error {
-	if len(licenseKey) > 0 {
-		err := unilicense.SetLicenseKey(licenseKey)
-		if err != nil {
-			return err
-		}
-	}
-
-	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
-	// does not do anything. Very easy to implement your own.
-	unicommon.SetLogger(unicommon.DummyLogger{})
-
-	return nil
+func init() {
+	// When debugging: use debug-level console logger.
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 }
 
 func main() {
 	if len(os.Args) < 5 {
-		fmt.Printf("Requires at least 4 arguments: page_from page_to output.pdf input.pdf\n")
-		fmt.Printf("Usage: To get only page 1 and 2 from input.pdf and save as output.pdf run: go run pdf_split.go 1 2 output.pdf input.pdf\n")
+		fmt.Printf("Usage: go run pdf_split_advanced.go input.pdf <page_from> <page_to> output.pdf\n")
 		os.Exit(1)
 	}
 
-	strSplitFrom := os.Args[1]
+	inputPath := os.Args[1]
+
+	strSplitFrom := os.Args[2]
 	splitFrom, err := strconv.Atoi(strSplitFrom)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
-	strSplitTo := os.Args[2]
+	strSplitTo := os.Args[3]
 	splitTo, err := strconv.Atoi(strSplitTo)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
-	outputPath := os.Args[3]
-	inputPath := os.Args[4]
-
-	err = initUniDoc("")
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
+	outputPath := os.Args[4]
 
 	err = splitPdf(inputPath, outputPath, splitFrom, splitTo)
 	if err != nil {
@@ -74,7 +55,7 @@ func main() {
 }
 
 func splitPdf(inputPath string, outputPath string, pageFrom int, pageTo int) error {
-	pdfWriter := unipdf.NewPdfWriter()
+	pdfWriter := pdf.NewPdfWriter()
 
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -83,7 +64,7 @@ func splitPdf(inputPath string, outputPath string, pageFrom int, pageTo int) err
 
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -108,6 +89,14 @@ func splitPdf(inputPath string, outputPath string, pageFrom int, pageTo int) err
 	if numPages < pageTo {
 		return fmt.Errorf("numPages (%d) < pageTo (%d)", numPages, pageTo)
 	}
+
+	// Keep the OC properties intact (optional content).
+	// Rarely used but can be relevant in certain cases.
+	ocProps, err := pdfReader.GetOCProperties()
+	if err != nil {
+		return err
+	}
+	pdfWriter.SetOCProperties(ocProps)
 
 	for i := pageFrom; i <= pageTo; i++ {
 		pageNum := i
