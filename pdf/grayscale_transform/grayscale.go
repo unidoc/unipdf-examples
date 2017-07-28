@@ -31,9 +31,9 @@ func convertPageToGrayscale(page *pdf.PdfPage, desc string) error {
 		return err
 	}
 
-	grayContent, err := transformContentStreamToGrayscale(contents, resources)
+	grayContent, err := detectContentStreamColor(contents, resources)
 	if err != nil {
-		common.Log.Error("transformContentStreamToGrayscale failed. err=%v", err)
+		common.Log.Error("detectContentStreamColor    failed. err=%v", err)
 		return err
 	}
 	page.SetContentStreams([]string{string(grayContent)}, pdfcore.NewFlateEncoder())
@@ -50,22 +50,22 @@ func isPatternCS(cs pdf.PdfColorspace) bool {
 	return isPattern
 }
 
-func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageResources) ([]byte, error) {
+func detectContentStreamColor(contents string, resources *pdf.PdfPageResources) ([]byte, error) {
 	cstreamParser := pdfcontent.NewContentStreamParser(contents)
 	operations, err := cstreamParser.Parse()
 	if err != nil {
 		return nil, err
 	}
 
-	// addIccColorspaces(resources)
-
 	processedOperations := &pdfcontent.ContentStreamOperations{}
 
-	transformedPatterns := map[pdfcore.PdfObjectName]bool{} // List of already transformed patterns. Avoid multiple conversions.
-	transformedShadings := map[string]bool{}                // List of already transformed shadings. Avoid multiple conversions.
+	// Convention: in map => detected, false => grayscale, true => color
+	detectedPatterns := map[pdfcore.PdfObjectName]bool{} // List of already detected patterns. Avoid multiple detections.
+	detectedShadings := map[string]bool{}                // List of already detected shadings. Avoid multiple detections.
 
-	// The content stream processor keeps track of the graphics state and we can make our own handlers to process certain commands,
-	// using the AddHandler method.  In this case, we hook up to color related operands, and for image and form handling.
+	// The content stream processor keeps track of the graphics state and we can make our own handlers to process
+	// certain commands, using the AddHandler method.  In this case, we hook up to color related operands, and for image
+	// and form handling.
 	processor := pdfcontent.NewContentStreamProcessor(*operations)
 	// Add handlers for colorspace related functionality.
 	processor.AddHandler(pdfcontent.HandlerConditionEnumAllOperands, "",
@@ -164,13 +164,13 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						op.Params = append(op.Params, pdfcore.MakeFloat(grayColor.Val()))
 					}
 
-					if _, has := transformedPatterns[patternColor.PatternName]; has {
+					if _, has := detectedPatterns[patternColor.PatternName]; has {
 						// Already processed, need not change anything, except underlying color if used.
 						op.Params = append(op.Params, &patternColor.PatternName)
 						*processedOperations = append(*processedOperations, &op)
 						return nil
 					}
-					transformedPatterns[patternColor.PatternName] = true
+					detectedPatterns[patternColor.PatternName] = true
 
 					// Look up the pattern name and convert it.
 					pattern, found := resources.GetPatternByName(patternColor.PatternName)
@@ -220,13 +220,13 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						grayColor := rgbColor.ToGray()
 						op.Params = append(op.Params, pdfcore.MakeFloat(grayColor.Val()))
 					}
-					if _, has := transformedPatterns[patternColor.PatternName]; has {
+					if _, has := detectedPatterns[patternColor.PatternName]; has {
 						// Already processed, need not change anything, except underlying color if used.
 						op.Params = append(op.Params, &patternColor.PatternName)
 						*processedOperations = append(*processedOperations, &op)
 						return nil
 					}
-					transformedPatterns[patternColor.PatternName] = true
+					detectedPatterns[patternColor.PatternName] = true
 					// Look up the pattern name and convert it.
 					pattern, found := resources.GetPatternByName(patternColor.PatternName)
 					if !found {
@@ -294,12 +294,12 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				if !ok {
 					return errors.New("sh parameter should be a name")
 				}
-				if _, has := transformedShadings[string(*shname)]; has {
+				if _, has := detectedShadings[string(*shname)]; has {
 					// Already processed, no need to do anything.
 					*processedOperations = append(*processedOperations, op)
 					return nil
 				}
-				transformedShadings[string(*shname)] = true
+				detectedShadings[string(*shname)] = true
 
 				shading, found := resources.GetShadingByName(*shname)
 				if !found {
@@ -497,7 +497,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				}
 
 				// Process the content stream in the Form object too:
-				grayContent, err := transformContentStreamToGrayscale(string(formContent), formResources)
+				grayContent, err := detectContentStreamColor(string(formContent), formResources)
 				if err != nil {
 					common.Log.Error("%v", err)
 					return err
@@ -542,7 +542,7 @@ func convertPatternToGray(pattern *pdf.PdfPattern) (*pdf.PdfPattern, error) {
 			if err != nil {
 				return nil, err
 			}
-			grayContents, err := transformContentStreamToGrayscale(string(content), tilingPattern.Resources)
+			grayContents, err := detectContentStreamColor(string(content), tilingPattern.Resources)
 			if err != nil {
 				return nil, err
 			}

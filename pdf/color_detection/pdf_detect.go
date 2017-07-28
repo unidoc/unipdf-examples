@@ -168,7 +168,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "%3d of %d %#-30q  (%6d)", idx, len(pdfList), name, inputSize)
 
 		t0 := time.Now()
-		numPages, numColorPages, err := detectPdfFile(inputPath)
+		numPages, colorPages, err := detectPdfFile(inputPath)
 		dt := time.Since(t0)
 		if err != nil {
 			common.Log.Error("detectPdfFile failed. err=%v", err)
@@ -179,15 +179,16 @@ func main() {
 			os.Exit(1)
 		}
 
-		fmt.Fprintf(os.Stderr, " %d pages %d color %.3f sec\n", numPages, numColorPages, dt.Seconds())
+		fmt.Fprintf(os.Stderr, " %d pages %d color %.3f sec\n", numPages, len(colorPages), dt.Seconds())
 
 		_, colorPagesIn, err := isPdfColor(inputPath, compDir, true, keep)
 
-		if err != nil || len(colorPagesIn) != numColorPages {
+		if err != nil || !equalSlices(colorPagesIn, colorPages) {
 			if err != nil {
 				common.Log.Error("PDF is damaged. err=%v\n\tinputPath=%#q\n", err, inputPath)
 			} else {
-				common.Log.Error("isPdfColor: %d Color pages", len(colorPagesIn))
+				common.Log.Error("isPdfColor: \ncolorPagesIn=%d %v\ncolorPages  =%d %v",
+					len(colorPagesIn), colorPagesIn, len(colorPages), colorPages)
 			}
 			failFiles = append(failFiles, inputPath)
 			if runAllTests {
@@ -213,42 +214,54 @@ func main() {
 	}
 }
 
+func equalSlices(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, x := range a {
+		if x != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
 type ObjCounts struct {
 	xobjNameSubtype map[string]string
 }
 
 // detectPdfFile transforms PDF `inputPath` and writes the resulting PDF to `outputPath`
 // If `noContentTransforms` is true then stream contents are not parsed
-func detectPdfFile(inputPath string) (int, int, error) {
+func detectPdfFile(inputPath string) (int, []int, error) {
 
 	f, err := os.Open(inputPath)
 	if err != nil {
-		return 0, 0, err
+		return 0, []int{}, err
 	}
 	defer f.Close()
 
 	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
-		return 0, 0, err
+		return 0, []int{}, err
 	}
 
 	isEncrypted, err := pdfReader.IsEncrypted()
 	if err != nil {
-		return 0, 0, err
+		return 0, []int{}, err
 	}
 	if isEncrypted {
 		_, err = pdfReader.Decrypt([]byte(""))
 		if err != nil {
-			return 0, 0, err
+			return 0, []int{}, err
 		}
 	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
-		return numPages, 0, err
+		return numPages, []int{}, err
 	}
 
-	numColorPages := 0
+	colorPages := []int{}
 
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
@@ -256,17 +269,17 @@ func detectPdfFile(inputPath string) (int, int, error) {
 		common.Log.Debug("^^^^page %d", pageNum)
 
 		desc := fmt.Sprintf("%s:page%d", filepath.Base(inputPath), pageNum)
-		colored, err := isPageColored(page, desc)
+		colored, err := isPageColored(page, desc, pageNum == 0)
 		// fmt.Printf("$$$ %d %t %v\n", pageNum, colored, err)
 		if err != nil {
-			return numPages, numColorPages, err
+			return numPages, colorPages, err
 		}
 		if colored {
-			numColorPages++
+			colorPages = append(colorPages, pageNum)
 		}
 	}
 
-	return numPages, numColorPages, nil
+	return numPages, colorPages, nil
 }
 
 // sortFiles returns the paths of the files in `pathList` sorted by ascending size.

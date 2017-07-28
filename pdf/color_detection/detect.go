@@ -12,7 +12,7 @@ import (
 
 // isPageColored returns true if `page` contains color. It also references
 // XObject Images and Forms to _possibly_ record if they contain color
-func isPageColored(page *pdf.PdfPage, desc string) (bool, error) {
+func isPageColored(page *pdf.PdfPage, desc string, debug bool) (bool, error) {
 	// For each page, we go through the resources and look for the images.
 	resources, err := page.GetResources()
 	if err != nil {
@@ -26,11 +26,16 @@ func isPageColored(page *pdf.PdfPage, desc string) (bool, error) {
 		return false, err
 	}
 
-	// fmt.Println("==================================")
-	// fmt.Printf("%s\n", contents)
-	// fmt.Println("==================================")
+	if debug {
+		fmt.Println("\n==================================")
+		fmt.Printf("%s\n", contents)
+		fmt.Println("==================================")
+	}
 
 	colored, err := isContentStreamColored(contents, resources)
+	if debug {
+		fmt.Printf("colored=%t err=%v\n", colored, err)
+	}
 	if err != nil {
 		common.Log.Error("isContentStreamColored failed. err=%v", err)
 		return false, err

@@ -105,7 +105,9 @@ const usage = `Usage:
 -d: Debug level logging
 -k: Keep temp PNG files used for PDF grayscale test
 -g: Test that grayscale conversion works (takes longer)
--a: Keep converting PDF files after failures.
+-a: Keep converting PDF files after failures
+-min: Minimum PDF file size to test
+-max: Maximum PDF file size to test
 `
 
 func main() {
