@@ -12,17 +12,10 @@ import (
 	"os"
 
 	unicommon "github.com/unidoc/unidoc/common"
-	unilicense "github.com/unidoc/unidoc/license"
 	unipdf "github.com/unidoc/unidoc/pdf"
 )
 
 func initUniDoc(licenseKey string) error {
-	if len(licenseKey) > 0 {
-		err := unilicense.SetLicenseKey(licenseKey)
-		if err != nil {
-			return err
-		}
-	}
 
 	// To make the library log we just have to initialise the logger which satisfies
 	// the unicommon.Logger interface, unicommon.DummyLogger is the default and

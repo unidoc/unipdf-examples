@@ -185,9 +185,9 @@ func main() {
 
 		if err != nil || !equalSlices(colorPagesIn, colorPages) {
 			if err != nil {
-				common.Log.Error("PDF is damaged. err=%v\n\tinputPath=%#q\n", err, inputPath)
+				common.Log.Error("PDF is damaged. err=%v\n\tinputPath=%#q", err, inputPath)
 			} else {
-				common.Log.Error("isPdfColor: \ncolorPagesIn=%d %v\ncolorPages  =%d %v",
+				common.Log.Error("isPdfColor: \ncolorPagesIn=%d %v\ncolorPages=%d %v",
 					len(colorPagesIn), colorPagesIn, len(colorPages), colorPages)
 			}
 			failFiles = append(failFiles, inputPath)
