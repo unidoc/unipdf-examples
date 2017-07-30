@@ -87,13 +87,13 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					if patternColor.Color != nil {
 						color, err := gs.ColorspaceStroking.ColorToRGB(patternColor.Color)
 						if err != nil {
-							fmt.Printf("Error: %v\n", err)
+							common.Log.Error("err=%v", err)
 							return err
 						}
 						rgbColor := color.(*pdf.PdfColorDeviceRGB)
 						if rgbColor.IsColored() {
 							if debug {
-								common.Log.Error("col=%t", true)
+								common.Log.Info("col=%t", true)
 							}
 							colored = true
 							return nil
@@ -104,7 +104,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 						// Already processed, need not change anything, except underlying color if used.
 						if col {
 							if debug {
-								common.Log.Error("col=%t", true)
+								common.Log.Info("col=%t", true)
 							}
 							colored = true
 						}
@@ -339,12 +339,14 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					common.Log.Error("Error w/GetXObjectImageByName : %v", err)
 					return err
 				}
-				// fmt.Printf("!!%s\n", ximg.Filter.GetFilterName())
+				if debug {
+					common.Log.Info("!!%s", ximg.Filter.GetFilterName())
+				}
 				switch ximg.Filter.GetFilterName() {
 				case "JPXDecode":
 					colored = true
 					return nil
-				case "CCITTDecode", "JBIG2Decode":
+				case "CCITTDecode", "JBIG2Decode", "RunLengthDecode":
 					return nil
 				}
 
@@ -365,7 +367,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				colored = colored || col
 				// !@#$ Update XObj colored map
 				if debug {
-					common.Log.Error("col=%t", col)
+					common.Log.Info("col=%t", col)
 				}
 
 			} else if xtype == pdf.XObjectTypeForm {
@@ -401,7 +403,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				colored = colored || col
 				// !@#$ Update colored XObj map
 				if debug {
-					common.Log.Error("col=%t", col)
+					common.Log.Info("col=%t", col)
 				}
 
 			}
