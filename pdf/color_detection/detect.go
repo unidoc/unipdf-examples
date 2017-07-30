@@ -36,7 +36,7 @@ func isPageColored(page *pdf.PdfPage, desc string, debug bool) (bool, error) {
 
 	colored, err := isContentStreamColored(contents, resources, debug)
 	if debug {
-		fmt.Printf("colored=%t err=%v\n", colored, err)
+		common.Log.Info("colored=%t err=%v", colored, err)
 	}
 	if err != nil {
 		common.Log.Error("isContentStreamColored failed. err=%v", err)
@@ -124,7 +124,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					coloredPatterns[patternColor.PatternName] = col
 					colored = colored || col
 					if debug {
-						common.Log.Error("col=%t", col)
+						common.Log.Info("col=%t", col)
 					}
 
 				} else {
@@ -137,7 +137,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					col := rgbColor.IsColored()
 					colored = colored || col
 					if debug {
-						common.Log.Error("col=%t", col)
+						common.Log.Info("col=%t", col)
 					}
 				}
 				return nil
@@ -160,14 +160,14 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 						col := rgbColor.IsColored()
 						colored = colored || col
 						if debug {
-							common.Log.Error("col=%t", col)
+							common.Log.Info("col=%t", col)
 						}
 					}
 					if col, ok := coloredPatterns[patternColor.PatternName]; ok {
 						// Already processed, need not change anything, except underlying color if used.
 						colored = colored || col
 						if debug {
-							common.Log.Error("col=%t", col)
+							common.Log.Info("col=%t", col)
 						}
 						return nil
 					}
@@ -192,11 +192,11 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					rgbColor := color.(*pdf.PdfColorDeviceRGB)
 					col := rgbColor.IsColored()
 					if debug {
-						common.Log.Error("col=%t color=%#v rgbColor=%+v", col, color, rgbColor)
+						common.Log.Info("col=%t color=%#v rgbColor=%+v", col, color, rgbColor)
 					}
 					colored = colored || col
 					if debug {
-						common.Log.Error("col=%t", col)
+						common.Log.Info("col=%t", col)
 					}
 				}
 				return nil
@@ -209,7 +209,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				rgbColor := color.(*pdf.PdfColorDeviceRGB)
 				col := rgbColor.IsColored()
 				if debug {
-					common.Log.Error("col=%t", col)
+					common.Log.Info("col=%t", col)
 				}
 				colored = colored || col
 				return nil
@@ -224,7 +224,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				col := rgbColor.IsColored()
 				colored = colored || col
 				if debug {
-					common.Log.Error("col=%t", col)
+					common.Log.Info("col=%t", col)
 				}
 				return nil
 			case "sh": // Paints the shape and color defined by shading dict.
@@ -239,7 +239,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					// Already processed, no need to do anything.
 					colored = colored || col
 					if debug {
-						common.Log.Error("col=%t", col)
+						common.Log.Info("col=%t", col)
 					}
 					return nil
 				}
@@ -294,7 +294,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			col := rgbColorSpace.IsImageColored(rgbImg)
 			colored = colored || col
 			if debug {
-				common.Log.Error("col=%t", col)
+				common.Log.Info("col=%t", col)
 			}
 
 			return nil
