@@ -74,6 +74,10 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			operand := op.Operand
 			switch operand {
 			case "SC", "SCN": // Set stroking color.  Includes pattern colors.
+				if gs.ColorspaceStroking.GetNumComponents() != len((op.Params)) {
+					common.Log.Error("Mismatch cs=%#v op=%#v", gs.ColorspaceStroking, op)
+					panic("wtf")
+				}
 				if isPatternCS(gs.ColorspaceStroking) {
 					op := pdfcontent.ContentStreamOperation{}
 					op.Operand = operand
@@ -130,7 +134,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				} else {
 					color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
 					if err != nil {
-						fmt.Printf("Error with ColorToRGB: %v\n", err)
+						common.Log.Error("Error with ColorToRGB: %v", err)
 						return err
 					}
 					rgbColor := color.(*pdf.PdfColorDeviceRGB)
@@ -141,7 +145,11 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					}
 				}
 				return nil
-			case "sc", "scn": // Set nonstroking color.
+			case "sc", "scn": // Set non-stroking color.
+				if gs.ColorspaceNonStroking.GetNumComponents() != len((op.Params)) {
+					common.Log.Error("Mismatch cs=%s op=%s", gs.ColorspaceNonStroking, op)
+					panic("wtf")
+				}
 				if isPatternCS(gs.ColorspaceNonStroking) {
 					op := pdfcontent.ContentStreamOperation{}
 					op.Operand = operand
@@ -192,7 +200,10 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					rgbColor := color.(*pdf.PdfColorDeviceRGB)
 					col := rgbColor.IsColored()
 					if debug {
-						common.Log.Info("col=%t color=%#v rgbColor=%+v", col, color, rgbColor)
+						common.Log.Info("op=%s col=%t ColorNonStroking=%#v rgbColor=%+v",
+							op, col, gs.ColorNonStroking, rgbColor)
+						common.Log.Info("ColorspaceNonStroking=\n%#v\n%s",
+							gs.ColorspaceNonStroking, gs.ColorspaceNonStroking)
 					}
 					colored = colored || col
 					if debug {
@@ -306,10 +317,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 
 	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "Do",
 		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
-			// operand := op.Operand
-			if gVerbose2 {
-				fmt.Printf("Do handler: %s\n", op)
-			}
+
 			if len(op.Params) < 1 {
 				common.Log.Error("Invalid number of params for Do object")
 				return errors.New("Range check")
@@ -330,9 +338,6 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			_, xtype := resources.GetXObjectByName(*name)
 			common.Log.Debug("xtype=%+v pdf.XObjectTypeImage=%v", xtype, pdf.XObjectTypeImage)
 			if xtype == pdf.XObjectTypeImage {
-				if gVerbose2 {
-					fmt.Printf(" XObject Image: %s\n", *name)
-				}
 
 				ximg, err := resources.GetXObjectImageByName(*name)
 				if err != nil {

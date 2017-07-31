@@ -60,10 +60,9 @@ import (
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func initUniDoc(licenseKey string, debug bool) error {
+func initUniDoc(debug bool) error {
 
-	// pdf.SetPdfProducer("PaperCut Mobility")
-	pdf.SetPdfCreator("PaperCut Software")
+	pdf.SetPdfCreator("Peter Williams")
 
 	// To make the library log we just have to initialise the logger which satisfies
 	// the common.Logger interface, common.DummyLogger is the default and
@@ -94,9 +93,6 @@ var testStats = statistics{
 	enabled:        true,
 	testResultPath: "xform.test.results.csv",
 }
-
-var gVerbose = false
-var gVerbose2 = false
 
 var allOpCounts = map[string]int{}
 
@@ -132,10 +128,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	gVerbose = debug
-	fmt.Printf("gVerbose=%t\n", gVerbose)
-
-	err := initUniDoc("", debug)
+	err := initUniDoc(debug)
 	if err != nil {
 		os.Exit(1)
 	}
