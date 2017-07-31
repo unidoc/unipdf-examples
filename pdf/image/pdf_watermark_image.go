@@ -1,7 +1,7 @@
 /*
- * Add watermark to each page of a PDF file.
+ * Add watermark image to each page of a PDF file.
  *
- * Run as: go run pdf_watermark_image.go input.pdf output.pdf watermark.jpg
+ * Run as: go run pdf_watermark_image.go input.pdf watermark.jpg output.pdf
  */
 
 package main
@@ -11,24 +11,22 @@ import (
 	"os"
 
 	unicommon "github.com/unidoc/unidoc/common"
-	pdfcore "github.com/unidoc/unidoc/pdf/core"
+	"github.com/unidoc/unidoc/pdf/creator"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func init() {
-	// Debug log level.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-}
-
 func main() {
+	// Enable console-level debug-mode logging when debugging:
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
 	if len(os.Args) < 4 {
-		fmt.Printf("go run pdf_watermark_image.go input.pdf output.pdf watermark.jpg\n")
+		fmt.Printf("go run pdf_watermark_image.go input.pdf watermark.jpg output.pdf\n")
 		os.Exit(1)
 	}
 
 	inputPath := os.Args[1]
-	outputPath := os.Args[2]
-	watermarkPath := os.Args[3]
+	watermarkPath := os.Args[2]
+	outputPath := os.Args[3]
 
 	err := addWatermarkImage(inputPath, outputPath, watermarkPath)
 	if err != nil {
@@ -41,23 +39,13 @@ func main() {
 
 // Watermark pdf file based on an image.
 func addWatermarkImage(inputPath string, outputPath string, watermarkPath string) error {
-
 	unicommon.Log.Debug("Input PDF: %v", inputPath)
 	unicommon.Log.Debug("Watermark image: %s", watermarkPath)
 
-	pdfWriter := pdf.NewPdfWriter()
+	c := creator.New()
 
-	// Open the watermark image file.
-	reader, err := os.Open(watermarkPath)
+	watermarkImg, err := creator.NewImageFromFile(watermarkPath)
 	if err != nil {
-		unicommon.Log.Error("Error opening file: %s", err)
-		return err
-	}
-	defer reader.Close()
-
-	watermarkImg, err := pdf.ImageHandling.Read(reader)
-	if err != nil {
-		unicommon.Log.Error("Error loading image: %s", err)
 		return err
 	}
 
@@ -92,13 +80,6 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 		return err
 	}
 
-	encoder := pdfcore.NewFlateEncoder()
-	ximg, err := pdf.NewXObjectImageFromImage(watermarkImg, nil, encoder)
-	if err != nil {
-		unicommon.Log.Error("Failed to create xobject image: %s", err)
-		return err
-	}
-
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
 
@@ -108,34 +89,15 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 			return err
 		}
 
-		wmOpt := pdf.WatermarkImageOptions{}
-		wmOpt.Alpha = 0.5
-		wmOpt.FitToWidth = true
-		wmOpt.PreserveAspectRatio = true
+		// Add to creator.
+		c.AddPage(page)
 
-		err = page.AddWatermarkImage(ximg, wmOpt)
-		if err != nil {
-			return err
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			unicommon.Log.Error("Failed to add page: %s", err)
-			return err
-		}
+		watermarkImg.ScaleToWidth(c.Context().PageWidth)
+		watermarkImg.SetPos(0, (c.Context().PageHeight-watermarkImg.Height())/2)
+		watermarkImg.SetOpacity(0.5)
+		_ = c.Draw(watermarkImg)
 	}
 
-	fWrite, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	err = c.WriteToFile(outputPath)
+	return err
 }

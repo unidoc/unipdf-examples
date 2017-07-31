@@ -19,12 +19,10 @@ import (
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func init() {
-	// Debug log mode.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-}
-
 func main() {
+	// Debug log mode.
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
 	if len(os.Args) < 8 {
 		fmt.Printf("go run pdf_annotate_add_ellipse.go input.pdf <page> <x> <y> <xRad> <yRad> output.pdf\n")
 		os.Exit(1)

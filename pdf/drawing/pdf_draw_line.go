@@ -2,8 +2,7 @@
  * Draw a line in a new PDF file.
  *
  * Run as: go run pdf_draw_line.go <x1> <y1> <x2> <y2> output.pdf
- * The dimensions of the PDF file are 595.276 x 841.89 px.
- * The x, y coordinates are in the PDF coordinate's system, where 0,0 is in the lower left corner.
+ * The x, y coordinates start from the upper left corner at (0,0) and increase going right, down respectively.
  */
 
 package main
@@ -13,18 +12,13 @@ import (
 	"os"
 	"strconv"
 
-	unicommon "github.com/unidoc/unidoc/common"
-	"github.com/unidoc/unidoc/pdf/contentstream/draw"
-	pdfcore "github.com/unidoc/unidoc/pdf/core"
-	unipdf "github.com/unidoc/unidoc/pdf/model"
+	"github.com/unidoc/unidoc/pdf/creator"
 )
 
-func init() {
-	// Debug log mode.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-}
-
 func main() {
+	// If debugging:
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
 	if len(os.Args) < 6 {
 		fmt.Printf("go run pdf_draw_line.go <x1> <y1> <x2> <y2> output.pdf\n")
 		os.Exit(1)
@@ -66,50 +60,18 @@ func main() {
 }
 
 func drawPdfLineToFile(x1, y1, x2, y2 float64, outputPath string) error {
-	pdfWriter := unipdf.NewPdfWriter()
+	// New creator with default properties (pagesize letter default).
+	c := creator.New()
 
-	// TODO: Inteface enhancments: what about unipdf.NewPdfPage(x, y, width, height) ?
-	page := unipdf.NewPdfPage()
-	bbox := unipdf.PdfRectangle{0, 0, 595.276, 841.89}
-	page.MediaBox = &bbox
+	c.NewPage()
+	line := creator.NewLine(x1, y1, x2, y2)
+	line.SetLineWidth(1.5)
+	// Draw a red line, use hex color util to get r,g,b codes from html hex color.
+	r, g, b, _ := creator.ColorRGBFromHex("#ff0000")
+	// Alternatively could do line.SetColorRGB(1.0,0,0)
+	line.SetColorRGB(r, g, b)
+	c.Draw(line)
 
-	// Define line path and style.
-	line := draw.Line{
-		X1:               x1,
-		Y1:               y1,
-		X2:               x2,
-		Y2:               y2,
-		Opacity:          1.0,
-		LineEndingStyle1: draw.LineEndingStyleNone,
-		LineEndingStyle2: draw.LineEndingStyleArrow,
-		LineColor:        unipdf.NewPdfColorDeviceRGB(1, 0, 0),
-		LineWidth:        2.0,
-	}
-
-	content, linebbox, err := line.Draw("")
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Line bbox: %v\n", linebbox)
-
-	page.SetContentStreams([]string{string(content)}, pdfcore.NewFlateEncoder())
-
-	err = pdfWriter.AddPage(page)
-	if err != nil {
-		return err
-	}
-
-	fWrite, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	err := c.WriteToFile(outputPath)
+	return err
 }

@@ -1,8 +1,9 @@
 /*
  * Insert text to a specific page, location in a PDF file.
- * If unsure about position, try getting the dimensions of a PDF with pdf_page_info.go first.
+ * If unsure about position, try getting the dimensions of a PDF with pdf/pages/pdf_page_info.go first or start with
+ * 0,0 (upper left corner) and increase to move right, down.
  *
- * Run as: go run pdf_insert_text.go input.pdf page xpos ypos "text" output.pdf
+ * Run as: go run pdf_insert_text.go input.pdf <page> <xpos> <ypos> "text" output.pdf
  */
 
 package main
@@ -12,20 +13,20 @@ import (
 	"os"
 	"strconv"
 
-	unicommon "github.com/unidoc/unidoc/common"
-	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
-	pdfcore "github.com/unidoc/unidoc/pdf/core"
+	//unicommon "github.com/unidoc/unidoc/common"
+	"github.com/unidoc/unidoc/pdf/creator"
 	pdf "github.com/unidoc/unidoc/pdf/model"
+	"github.com/unidoc/unidoc/pdf/model/fonts"
 )
 
 func main() {
 	if len(os.Args) < 7 {
-		fmt.Printf("Usage: go run pdf_insert_text.go input.pdf page xpos ypos \"text\" output.pdf\n")
+		fmt.Printf("Usage: go run pdf_insert_text.go input.pdf <page> <xpos> <ypos> \"text\" output.pdf\n")
 		os.Exit(1)
 	}
 
-	// Use debug logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// When debugging, log to console:
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	inputPath := os.Args[1]
 	pageNumStr := os.Args[2]
@@ -76,79 +77,32 @@ func addTextToPdf(inputPath string, outputPath string, text string, pageNum int,
 	if err != nil {
 		return err
 	}
-	if pageNum <= 0 || pageNum > numPages {
-		return fmt.Errorf("Page number out of range (%d/%d)", pageNum, numPages)
-	}
+
+	c := creator.New()
 
 	// Load the pages.
-	pages := []*pdf.PdfPage{}
 	for i := 0; i < numPages; i++ {
 		page, err := pdfReader.GetPage(i + 1)
 		if err != nil {
 			return err
 		}
 
-		pages = append(pages, page)
-	}
-
-	// Add the image to the selected page.
-	selPage := pages[pageNum-1]
-
-	fmt.Printf("Page: %+v\n", selPage)
-	fmt.Printf("Page mediabox: %+v\n", selPage.MediaBox)
-
-	// Find a free name for the font.
-	num := 1
-	fontName := pdfcore.PdfObjectName(fmt.Sprintf("Font%d", num))
-	for selPage.HasFontByName(fontName) {
-		num++
-		fontName = pdfcore.PdfObjectName(fmt.Sprintf("Img%d", num))
-	}
-
-	// Create the font dictionary using one of the standard 14 fonts.
-	fontDict := pdfcore.MakeDict()
-	fontDict.Set("Type", pdfcore.MakeName("Font"))
-	fontDict.Set("Subtype", pdfcore.MakeName("Type1"))
-	fontDict.Set("BaseFont", pdfcore.MakeName("Helvetica"))
-
-	// Add to the page resources.
-	selPage.AddFont(fontName, fontDict)
-
-	fontSize := float64(16)
-
-	// NextTextWriter..  textwriter package.
-	creator := pdfcontent.NewContentCreator()
-	creator.
-		Add_BT().
-		Add_Tf(fontName, fontSize).
-		Add_Tm(1, 0, 0, 1, xPos, yPos).
-		Add_Tj(pdfcore.PdfObjectString(text)).
-		Add_ET()
-
-	fmt.Printf("Content Str: %s\n", creator.Bytes())
-	selPage.AddContentStreamByString(string(creator.Bytes()))
-
-	// Write output.
-	pdfWriter := pdf.NewPdfWriter()
-	for _, page := range pages {
-		err = pdfWriter.AddPage(page)
+		err = c.AddPage(page)
 		if err != nil {
-			unicommon.Log.Error("Failed to add page: %s", err)
 			return err
 		}
+
+		if i == pageNum || pageNum == -1 {
+			p := creator.NewParagraph(text)
+			// Change to times bold font (default is helvetica).
+			p.SetFont(fonts.NewFontTimesBold())
+			p.SetPos(xPos, yPos)
+
+			_ = c.Draw(p)
+		}
+
 	}
 
-	fWrite, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	err = c.WriteToFile(outputPath)
+	return err
 }

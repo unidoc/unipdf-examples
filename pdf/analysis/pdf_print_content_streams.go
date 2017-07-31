@@ -1,7 +1,8 @@
 /*
  * List all content streams for all pages in a pdf file.
  *
- * Run as: go run pdf_print_content_streams.go input.pdf
+ * Run as: go run pdf_print_content_streams.go input.pdf [page]
+ * The page number is optional (by default all pages are processed).
  */
 
 package main
@@ -10,42 +11,42 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unidoc/common"
+	"strconv"
+
 	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func init() {
-	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
-	// does not do anything. Very easy to implement your own.
-	unicommon.SetLogger(unicommon.DummyLogger{})
-
-	//Or can use a debug-level console logger:
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
-}
-
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("Usage: go run pdf_list_content_streams.go input.pdf\n")
+		fmt.Printf("Usage: go run pdf_list_content_streams.go input.pdf [page]\n")
 		os.Exit(1)
 	}
 
-	for i := 1; i < len(os.Args); i++ {
-		inputPath := os.Args[i]
-		fmt.Println(inputPath)
+	inputPath := os.Args[1]
+	pageNum := -1
 
-		err := listContentStreams(inputPath)
+	if len(os.Args) >= 3 {
+		val, err := strconv.ParseInt(os.Args[2], 10, 64)
 		if err != nil {
-			fmt.Println(inputPath)
 			fmt.Printf("Error: %v\n", err)
 			os.Exit(1)
 		}
+		pageNum = int(val)
+	}
+
+	//When debugging:
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
+	fmt.Println(inputPath)
+	err := listContentStreams(inputPath, pageNum)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
 	}
 }
 
-func listContentStreams(inputPath string) error {
+func listContentStreams(inputPath string, targetPageNum int) error {
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return err
@@ -65,6 +66,7 @@ func listContentStreams(inputPath string) error {
 
 	if isEncrypted {
 		fmt.Println("Is encrypted!")
+		// Try decrypting with empty pass.  Or can specify user/owner password by modifying the line below.
 		ok, err := pdfReader.Decrypt([]byte(""))
 		if err != nil {
 			return err
@@ -85,6 +87,9 @@ func listContentStreams(inputPath string) error {
 	fmt.Printf("--------------------\n")
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
+		if pageNum != targetPageNum && targetPageNum != -1 {
+			continue
+		}
 		fmt.Printf("Page %d\n", pageNum)
 
 		page, err := pdfReader.GetPage(pageNum)

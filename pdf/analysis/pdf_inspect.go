@@ -7,14 +7,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"sort"
 
-	"errors"
-
-	unicommon "github.com/unidoc/unidoc/common"
-	unipdf "github.com/unidoc/unidoc/pdf/model"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
 func main() {
@@ -24,7 +22,7 @@ func main() {
 	}
 
 	// Enable debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	inputPath := os.Args[1]
 
@@ -44,7 +42,7 @@ func inspectPdf(inputPath string) error {
 
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return err
 	}

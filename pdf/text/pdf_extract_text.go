@@ -1,8 +1,7 @@
 /*
- * Example for UniDoc v2.
  * PDF to text: Extract all text for each page of a pdf file.
  *
- * N.B. Only outputs character codes as seen in the content stream.  Need to account for encoding to get readable
+ * N.B. Only outputs character codes as seen in the content stream.  Need to account for text encoding to get readable
  * text in many cases.
  *
  * Run as: go run pdf_extract_text.go input.pdf

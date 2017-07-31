@@ -13,21 +13,13 @@ import (
 	"os"
 	"strconv"
 
-	unicommon "github.com/unidoc/unidoc/common"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func init() {
-	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
-	// does not do anything. Very easy to implement your own.
-	//unicommon.SetLogger(unicommon.DummyLogger{})
-
-	// Use debug logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-}
-
 func main() {
+	// When debugging: log to console.
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
 	if len(os.Args) < 3 {
 		fmt.Printf("Usage: go run pdf_crop.go input.pdf <percentage> output.pdf\n")
 		os.Exit(1)

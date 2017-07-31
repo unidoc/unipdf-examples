@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unidoc/common"
 	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
@@ -21,13 +20,10 @@ import (
 var colorspaces = map[string]int{}
 var filters = map[string]int{}
 
-func init() {
-	// Enable debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
-}
-
 func main() {
+	// Enable console debug-level logging when debugging:.
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
 	if len(os.Args) < 2 {
 		fmt.Printf("Syntax: go run pdf_list_images.go input.pdf\n")
 		os.Exit(1)
@@ -72,15 +68,14 @@ func listImages(inputPath string) error {
 		return err
 	}
 
-	// Try decrypting with an empty one.
 	if isEncrypted {
+		// Try decrypting with an empty one.
 		auth, err := pdfReader.Decrypt([]byte(""))
 		if err != nil {
-			// Encrypted and we cannot do anything about it.
 			return err
 		}
 		if !auth {
-			fmt.Println("Need to decrypt with password")
+			fmt.Println("Need to decrypt with a specified user/owner password")
 			return nil
 		}
 	}
@@ -110,17 +105,12 @@ func listImages(inputPath string) error {
 }
 
 func listImagesOnPage(page *pdf.PdfPage) error {
-	resources, err := page.GetResources()
-	if err != nil {
-		return err
-	}
-
 	contents, err := page.GetAllContentStreams()
 	if err != nil {
 		return err
 	}
 
-	return listImagesInContentStream(contents, resources)
+	return listImagesInContentStream(contents, page.Resources)
 }
 
 func listImagesInContentStream(contents string, resources *pdf.PdfPageResources) error {
@@ -132,7 +122,7 @@ func listImagesInContentStream(contents string, resources *pdf.PdfPageResources)
 
 	processedXObjects := map[string]bool{}
 
-	for _, op := range operations {
+	for _, op := range *operations {
 		if op.Operand == "BI" && len(op.Params) == 1 {
 			// Inline image.
 
@@ -193,11 +183,11 @@ func listImagesInContentStream(contents string, resources *pdf.PdfPageResources)
 			}
 			processedXObjects[string(*name)] = true
 
-			_, xtype := resources.GetXObjectByName(string(*name))
+			_, xtype := resources.GetXObjectByName(*name)
 			if xtype == pdf.XObjectTypeImage {
 				fmt.Printf(" XObject Image: %s\n", *name)
 
-				ximg, err := resources.GetXObjectImageByName(string(*name))
+				ximg, err := resources.GetXObjectImageByName(*name)
 				if err != nil {
 					return err
 				}
@@ -231,7 +221,7 @@ func listImagesInContentStream(contents string, resources *pdf.PdfPageResources)
 			} else if xtype == pdf.XObjectTypeForm {
 				// Go through the XObject Form content stream.
 				fmt.Printf("--> XObject Form: %s\n", *name)
-				xform, err := resources.GetXObjectFormByName(string(*name))
+				xform, err := resources.GetXObjectFormByName(*name)
 				if err != nil {
 					return err
 				}

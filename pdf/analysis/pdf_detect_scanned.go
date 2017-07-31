@@ -10,8 +10,7 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unidoc/common"
-	unipdf "github.com/unidoc/unidoc/pdf/model"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
 func main() {
@@ -21,10 +20,9 @@ func main() {
 	}
 
 	// Enable debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	for _, inputPath := range os.Args[1:] {
-
 		err := detectScanned(inputPath)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
@@ -40,7 +38,7 @@ func detectScanned(inputPath string) error {
 
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -50,8 +48,8 @@ func detectScanned(inputPath string) error {
 		return err
 	}
 
-	// Try decrypting with an empty one.
 	if isEncrypted {
+		// Decrypt if needed.  Put your password in the empty string below.
 		auth, err := pdfReader.Decrypt([]byte(""))
 		if err != nil {
 			return err

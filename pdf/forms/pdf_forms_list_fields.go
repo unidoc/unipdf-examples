@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unidoc/common"
-	unipdf "github.com/unidoc/unidoc/pdf/model"
+	//unicommon "github.com/unidoc/unidoc/common"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
 func main() {
@@ -20,9 +20,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Enable debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
+	// When debugging, enable debug-level logging via console:
+	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	for _, inputPath := range os.Args[1:len(os.Args)] {
 		err := listFormFields(inputPath)
@@ -42,7 +41,7 @@ func listFormFields(inputPath string) error {
 
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -85,9 +84,9 @@ func listFormFields(inputPath string) error {
 		fmt.Printf(" -Field %d (%p): %+v\n", idx+1, field, *field)
 		for _, child := range field.KidsF {
 			switch c := child.(type) {
-			case *unipdf.PdfField:
+			case *pdf.PdfField:
 				fmt.Printf(" --Field: %+v\n", *c)
-			case *unipdf.PdfAnnotationWidget:
+			case *pdf.PdfAnnotationWidget:
 				fmt.Printf(" --Widget: %+v\n", *c)
 			default:
 				fmt.Printf(" f--UNKNOWN\n")

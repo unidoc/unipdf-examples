@@ -1,6 +1,5 @@
 /*
- * Example for UniDoc v2.
- * Retrieving position of a signature line in PDF where the signature line is given by
+ * Basic example for text searching: Retrieving position of a signature line in PDF where the signature line is given by
  * "__________________" text. And positioned with a Tm operation above.
  *
  * Run as: go run pdf_detect_signature.go input.pdf
@@ -110,7 +109,7 @@ func locateSignatureLine(page *pdf.PdfPage) (bool, float64, float64, error) {
 		return found, x, y, err
 	}
 
-	for _, op := range operations {
+	for _, op := range *operations {
 		if op.Operand == "Tm" && len(op.Params) == 6 {
 			if val, ok := op.Params[4].(*pdfcore.PdfObjectFloat); ok {
 				x = float64(*val)

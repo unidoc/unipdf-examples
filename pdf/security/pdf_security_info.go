@@ -15,11 +15,6 @@ import (
 )
 
 func init() {
-	// To make the library log we just have to initialise the logger which satisfies
-	// the unicommon.Logger interface, unicommon.DummyLogger is the default and
-	// does not do anything. Very easy to implement your own.
-	//unicommon.SetLogger(unicommon.DummyLogger{})
-
 	// Set debug-level logging.
 	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 

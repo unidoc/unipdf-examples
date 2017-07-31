@@ -19,12 +19,10 @@ import (
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func init() {
+func main() {
 	// Debug log mode.
 	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-}
 
-func main() {
 	if len(os.Args) < 8 {
 		fmt.Printf("go run pdf_annotate_add_rectangle.go input.pdf <page> <x> <y> <width> <height> output.pdf\n")
 		os.Exit(1)
