@@ -74,10 +74,12 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			operand := op.Operand
 			switch operand {
 			case "SC", "SCN": // Set stroking color.  Includes pattern colors.
-				if gs.ColorspaceStroking.GetNumComponents() != len((op.Params)) {
-					common.Log.Error("Mismatch cs=%#v op=%#v", gs.ColorspaceStroking, op)
-					panic("wtf")
-				}
+				// if gs.ColorspaceStroking != nil {
+				// 	if gs.ColorspaceStroking.GetNumComponents() != len((op.Params)) {
+				// 		common.Log.Error("Mismatch cs=%#v op=%#v", gs.ColorspaceStroking, op)
+				// 		panic("wtf")
+				// 	}
+				// }
 				if isPatternCS(gs.ColorspaceStroking) {
 					op := pdfcontent.ContentStreamOperation{}
 					op.Operand = operand
@@ -146,10 +148,12 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				}
 				return nil
 			case "sc", "scn": // Set non-stroking color.
-				if gs.ColorspaceNonStroking.GetNumComponents() != len((op.Params)) {
-					common.Log.Error("Mismatch cs=%s op=%s", gs.ColorspaceNonStroking, op)
-					panic("wtf")
-				}
+				// common.Log.Info("!!!*op=%s ColorspaceNonStroking=%s ColorNonStroking=%+v",
+				// 	op, gs.ColorspaceNonStroking, gs.ColorNonStroking)
+				// if gs.ColorspaceNonStroking.GetNumComponents() != len((op.Params)) {
+				// 	common.Log.Error("Mismatch cs=%s op=%s", gs.ColorspaceNonStroking, op)
+				// 	panic("wtf")
+				// }
 				if isPatternCS(gs.ColorspaceNonStroking) {
 					op := pdfcontent.ContentStreamOperation{}
 					op.Operand = operand
@@ -192,6 +196,8 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					}
 					coloredPatterns[patternColor.PatternName] = col
 				} else {
+					// common.Log.Info("!!!!op=%s ColorspaceNonStroking=%s ColorNonStroking=%+v",
+					// 	op, gs.ColorspaceNonStroking, gs.ColorNonStroking)
 					color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
 					if err != nil {
 						common.Log.Error("err=%v", err)
@@ -200,15 +206,16 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					rgbColor := color.(*pdf.PdfColorDeviceRGB)
 					col := rgbColor.IsColored()
 					if debug {
-						common.Log.Info("op=%s col=%t ColorNonStroking=%#v rgbColor=%+v",
-							op, col, gs.ColorNonStroking, rgbColor)
-						common.Log.Info("ColorspaceNonStroking=\n%#v\n%s",
-							gs.ColorspaceNonStroking, gs.ColorspaceNonStroking)
+						// common.Log.Info("op=%s col=%t ColorNonStroking=%#v rgbColor=%+v",
+						// 	op, col, gs.ColorNonStroking, rgbColor)
+						// common.Log.Info("ColorspaceNonStroking=\n%#v\n%s",
+						// 	gs.ColorspaceNonStroking, gs.ColorspaceNonStroking)
 					}
 					colored = colored || col
 					if debug {
 						common.Log.Info("col=%t", col)
 					}
+
 				}
 				return nil
 			case "RG", "K": // Set RGB or CMYK stroking color.
@@ -479,3 +486,44 @@ func isShadingColored(shading *pdf.PdfShading) (bool, error) {
 		return false, err
 	}
 }
+
+// sliceDiff returns the elements in a that aren't in b
+func sliceDiff(a, b []int) []int {
+	mb := map[int]bool{}
+	for _, x := range b {
+		mb[x] = true
+	}
+	ab := []int{}
+	for _, x := range a {
+		if _, ok := mb[x]; !ok {
+			ab = append(ab, x)
+		}
+	}
+	return ab
+}
+
+// func sliceDiff(a, b []int) ([]int, []int) {
+// 	ma := sliceMap(a)
+// 	mb := sliceMap(b)
+// 	ab := sliceMapDiff(a, mb)
+// 	ba := sliceMapDiff(b, ma)
+// 	return ab, ba
+// }
+
+// func sliceToMap(a []int) map[int]bool {
+// 	m := map[int]bool{}
+// 	for _, x := range a {
+// 		m[x] = true
+// 	}
+// 	return m
+// }
+
+// func sliceMapDiff(a []int, mb map[int]bool) []int {
+// 	ab := []int{}
+// 	for _, x := range a {
+// 		if _, ok := mb[x]; ok {
+// 			ab = append(ab, x)
+// 		}
+// 	}
+// 	return ab
+// }

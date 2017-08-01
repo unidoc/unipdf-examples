@@ -182,6 +182,14 @@ func main() {
 			} else {
 				common.Log.Error("isPdfColor: \ncolorPagesIn=%d %v\ncolorPages=%d %v",
 					len(colorPagesIn), colorPagesIn, len(colorPages), colorPages)
+				fp := sliceDiff(colorPages, colorPagesIn)
+				fn := sliceDiff(colorPagesIn, colorPages)
+				if len(fp) > 0 {
+					common.Log.Error("False positives=%d %+v", len(fp), fp)
+				}
+				if len(fn) > 0 {
+					common.Log.Error("False negatives=%d %+v", len(fn), fn)
+				}
 			}
 			failFiles = append(failFiles, inputPath)
 			if runAllTests {

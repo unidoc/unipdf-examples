@@ -1,5 +1,5 @@
 /*
- * Inspect PDF object types. This example shows the capability of assessing the object types in PDF files.
+ * Inspect PDF object types. This example shows the capability of accessing the object types in PDF files.
  *
  * Run as: go run pdf_inspect.go input.pdf
  */
