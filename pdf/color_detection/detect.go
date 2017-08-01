@@ -99,7 +99,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 						rgbColor := color.(*pdf.PdfColorDeviceRGB)
 						if rgbColor.IsColored() {
 							if debug {
-								common.Log.Info("col=%t", true)
+								common.Log.Info("op=%s col=%t", op, true)
 							}
 							colored = true
 							return nil
@@ -110,7 +110,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 						// Already processed, need not change anything, except underlying color if used.
 						if col {
 							if debug {
-								common.Log.Info("col=%t", true)
+								common.Log.Info("op=%s col=%t", op, col)
 							}
 							colored = true
 						}
@@ -130,7 +130,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					coloredPatterns[patternColor.PatternName] = col
 					colored = colored || col
 					if debug {
-						common.Log.Info("col=%t", col)
+						common.Log.Info("op=%s col=%t", op, col)
 					}
 
 				} else {
@@ -143,7 +143,11 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					col := rgbColor.IsColored()
 					colored = colored || col
 					if debug {
-						common.Log.Info("col=%t", col)
+						common.Log.Info("op=%s ColorspaceStroking=%T ColorStroking=%#v col=%t",
+							op, gs.ColorspaceStroking, gs.ColorStroking, col)
+						if col {
+							panic("Done")
+						}
 					}
 				}
 				return nil
@@ -172,14 +176,14 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 						col := rgbColor.IsColored()
 						colored = colored || col
 						if debug {
-							common.Log.Info("col=%t", col)
+							common.Log.Info("op=%#v col=%t", op, col)
 						}
 					}
 					if col, ok := coloredPatterns[patternColor.PatternName]; ok {
 						// Already processed, need not change anything, except underlying color if used.
 						colored = colored || col
 						if debug {
-							common.Log.Info("col=%t", col)
+							common.Log.Info("op=%#v col=%t", op, col)
 						}
 						return nil
 					}
@@ -213,7 +217,11 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					}
 					colored = colored || col
 					if debug {
-						common.Log.Info("col=%t", col)
+						common.Log.Info("op=%s ColorspaceNonStroking=%T ColorNonStroking=%#v col=%t",
+							op, gs.ColorspaceNonStroking, gs.ColorNonStroking, col)
+						if col {
+							panic("Done")
+						}
 					}
 
 				}
@@ -227,7 +235,11 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				rgbColor := color.(*pdf.PdfColorDeviceRGB)
 				col := rgbColor.IsColored()
 				if debug {
-					common.Log.Info("col=%t", col)
+					common.Log.Info("op=%s ColorspaceNonStroking=%T ColorNonStroking=%#v col=%t",
+						op, gs.ColorspaceNonStroking, gs.ColorNonStroking, col)
+					if col {
+						panic("Done")
+					}
 				}
 				colored = colored || col
 				return nil
@@ -242,7 +254,11 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				col := rgbColor.IsColored()
 				colored = colored || col
 				if debug {
-					common.Log.Info("col=%t", col)
+					common.Log.Info("op=%s ColorspaceStroking=%T ColorStroking=%#v col=%t",
+						op, gs.ColorspaceStroking, gs.ColorStroking, col)
+					if col {
+						panic("Done")
+					}
 				}
 				return nil
 			case "sh": // Paints the shape and color defined by shading dict.
@@ -291,11 +307,21 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				common.Log.Error("Invalid handling for inline image")
 				return errors.New("Invalid inline image parameter")
 			}
-
+			if debug {
+				common.Log.Info("iimg=%s", iimg)
+			}
 			img, err := iimg.ToImage(resources)
 			if err != nil {
 				common.Log.Error("Error converting inline image to image: %v", err)
 				return err
+			}
+
+			if debug {
+				common.Log.Info("img=%v %d", img.ColorComponents, img.BitsPerComponent)
+			}
+
+			if img.ColorComponents <= 1 {
+				return nil
 			}
 
 			cs, err := iimg.GetColorSpace(resources)
@@ -336,7 +362,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 
 			// Only process each one once.
 			_, has := processedXObjects[string(*name)]
-			common.Log.Debug("has=%t %+v", has, processedXObjects)
+			common.Log.Debug("name=%q has=%t processedXObjects=%+v", *name, has, processedXObjects)
 			if has {
 				return nil
 			}
@@ -352,7 +378,9 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					return err
 				}
 				if debug {
-					common.Log.Info("!!%s", ximg.Filter.GetFilterName())
+					common.Log.Info("!!Filter=%s ColorSpace=%s ImageMask=%v wxd=%dx%d",
+						ximg.Filter.GetFilterName(), ximg.ColorSpace,
+						ximg.ImageMask, *ximg.Width, *ximg.Height)
 				}
 				switch ximg.Filter.GetFilterName() {
 				case "JPXDecode":
@@ -372,6 +400,12 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				if err != nil {
 					common.Log.Error("Error ImageToRGB: %v", err)
 					return err
+				}
+
+				if debug {
+					common.Log.Info("img: ColorComponents=%d wxh=%dx%d", img.ColorComponents, img.Width, img.Height)
+					common.Log.Info("ximg: ColorSpace=%T=%s mask=%v", ximg.ColorSpace, ximg.ColorSpace, ximg.Mask)
+					common.Log.Info("rgbImg: ColorComponents=%d wxh=%dx%d", rgbImg.ColorComponents, rgbImg.Width, rgbImg.Height)
 				}
 
 				rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
@@ -486,44 +520,3 @@ func isShadingColored(shading *pdf.PdfShading) (bool, error) {
 		return false, err
 	}
 }
-
-// sliceDiff returns the elements in a that aren't in b
-func sliceDiff(a, b []int) []int {
-	mb := map[int]bool{}
-	for _, x := range b {
-		mb[x] = true
-	}
-	ab := []int{}
-	for _, x := range a {
-		if _, ok := mb[x]; !ok {
-			ab = append(ab, x)
-		}
-	}
-	return ab
-}
-
-// func sliceDiff(a, b []int) ([]int, []int) {
-// 	ma := sliceMap(a)
-// 	mb := sliceMap(b)
-// 	ab := sliceMapDiff(a, mb)
-// 	ba := sliceMapDiff(b, ma)
-// 	return ab, ba
-// }
-
-// func sliceToMap(a []int) map[int]bool {
-// 	m := map[int]bool{}
-// 	for _, x := range a {
-// 		m[x] = true
-// 	}
-// 	return m
-// }
-
-// func sliceMapDiff(a []int, mb map[int]bool) []int {
-// 	ab := []int{}
-// 	for _, x := range a {
-// 		if _, ok := mb[x]; ok {
-// 			ab = append(ab, x)
-// 		}
-// 	}
-// 	return ab
-// }

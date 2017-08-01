@@ -230,6 +230,7 @@ colorPages=17 [2 3 12 13 15 16 18 20 21 23 24 25 27 28 31 32 33]
 [ERROR]  pdf_detect.go:167 detectPdfFile failed. err=Invalid filter in multi filter array
 
 
+! Need real PdfColorspaceICCBased color
 211 of 766 `AcrobatDC_acrobat_digital_signature_appearances.pdf`  (248418) 13 pages 10 color 0.136 sec
 [ERROR]  pdf_detect.go:184 isPdfColor:
 colorPagesIn=9 [3 4 5 6 7 9 11 12 13]
@@ -242,7 +243,7 @@ colorPages=10 [1 3 4 5 6 7 9 11 12 13]
 [ERROR]  detect.go:42 isContentStreamColored failed. err=invalid JPEG format: bad Th value
 [ERROR]  pdf_detect.go:167 detectPdfFile failed. err=invalid JPEG format: bad Th value
 
-
+! Need real PdfColorspaceICCBased color
 221 of 766 `Little_niss_oct1014.pdf`       (256857) 40 pages 36 color 0.142 sec
 [ERROR]  pdf_detect.go:184 isPdfColor:
 colorPagesIn=12 [15 16 17 18 19 21 24 25 26 27 28 33]
@@ -259,7 +260,7 @@ colorPages=36 [2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 2
 [ERROR]  detect.go:25 GetAllContentStreams failed. err=Invalid content stream object holder (*core.PdfObjectNull)
 [ERROR]  pdf_detect.go:167 detectPdfFile failed. err=Invalid content stream object holder (*core.PdfObjectNull)
 
-
+! Need real PdfColorspaceICCBased color
 273 of 766 `offsets.pdf`                   (339234) 30 pages 30 color 0.174 sec
 [ERROR]  pdf_detect.go:184 isPdfColor:
 colorPagesIn=0 []
@@ -270,16 +271,24 @@ colorPages=30 [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
 [ERROR]  detect.go:42 isContentStreamColored failed. err=Type check error
 [ERROR]  pdf_detect.go:167 detectPdfFile failed. err=Type check error
 
-
+! PdfColorspaceCalRGB
 289 of 766 `science.pdf`                   (369252) 4 pages 4 color 2.817 sec
 [ERROR]  pdf_detect.go:184 isPdfColor:
 colorPagesIn=3 [1 2 3]
 colorPages=4 [1 2 3 4]
 
+! Need to add marking operator test
+0 0 1 rg
+35.96 0 TD
+0 Tc
+0 Tw
+( )Tj
+0 0 0 rg
+-35.96 -1.
 299 of 766 `privacysummary.pdf`            (381026) 25 pages 17 color 0.123 sec
 [ERROR]  pdf_detect.go:184 isPdfColor:
 colorPagesIn=16 [1 3 4 5 6 7 8 9 10 11 12 13 14 16 18 20]
-colorPages=17 [1 2 3 4 5 6 7 8 9 10 11 12 13 14 16 18 20]
+colorPages=17   [1 2 3 4 5 6 7 8 9 10 11 12 13 14 16 18 20]
 
 301 of 766 `icc32.pdf`                     (382889)[ERROR]  crossrefs.go:250 Failed reading xref (Unable to detect indirect object signature)
 [ERROR]  encoding.go:632 DecodeBytes: ReadFrom failed. err=unexpected EOF
@@ -287,6 +296,7 @@ colorPages=17 [1 2 3 4 5 6 7 8 9 10 11 12 13 14 16 18 20]
 [ERROR]  detect.go:25 GetAllContentStreams failed. err=unexpected EOF
 [ERROR]  pdf_detect.go:167 detectPdfFile failed. err=unexpected EOF
 
+! ICC
 305 of 766 `Artificiell Intelligens och machine learing för sjukvård och life science.pdf`  (392192) 26 pages 4 color 0.169 sec
 [ERROR]  pdf_detect.go:184 isPdfColor:
 colorPagesIn=2 [1 3]

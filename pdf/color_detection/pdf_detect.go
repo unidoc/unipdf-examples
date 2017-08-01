@@ -180,7 +180,7 @@ func main() {
 			if err != nil {
 				common.Log.Error("PDF is damaged. err=%v\n\tinputPath=%#q", err, inputPath)
 			} else {
-				common.Log.Error("isPdfColor: \ncolorPagesIn=%d %v\ncolorPages=%d %v",
+				common.Log.Error("isPdfColor: \ncolorPagesIn=%d %v\ncolorPages  =%d %v",
 					len(colorPagesIn), colorPagesIn, len(colorPages), colorPages)
 				fp := sliceDiff(colorPages, colorPagesIn)
 				fn := sliceDiff(colorPagesIn, colorPages)
@@ -231,8 +231,7 @@ type ObjCounts struct {
 	xobjNameSubtype map[string]string
 }
 
-// detectPdfFile transforms PDF `inputPath` and writes the resulting PDF to `outputPath`
-// If `noContentTransforms` is true then stream contents are not parsed
+// detectPdfFile reads PDF `inputPath` and returns number of pages, slice of color page numbers (1-offset)
 func detectPdfFile(inputPath string) (int, []int, error) {
 
 	f, err := os.Open(inputPath)
@@ -270,7 +269,11 @@ func detectPdfFile(inputPath string) (int, []int, error) {
 		common.Log.Debug("^^^^page %d", pageNum)
 
 		desc := fmt.Sprintf("%s:page%d", filepath.Base(inputPath), pageNum)
-		colored, err := isPageColored(page, desc, pageNum == 0)
+		debug := pageNum == 0
+		colored, err := isPageColored(page, desc, debug)
+		if debug {
+			panic("done")
+		}
 		// fmt.Printf("$$$ %d %t %v\n", pageNum, colored, err)
 		if err != nil {
 			return numPages, colorPages, err
@@ -971,4 +974,19 @@ func toFloat(s string) float64 {
 func changeDir(path, dir string) string {
 	_, name := filepath.Split(path)
 	return filepath.Join(dir, name)
+}
+
+// sliceDiff returns the elements in a that aren't in b
+func sliceDiff(a, b []int) []int {
+	mb := map[int]bool{}
+	for _, x := range b {
+		mb[x] = true
+	}
+	ab := []int{}
+	for _, x := range a {
+		if _, ok := mb[x]; !ok {
+			ab = append(ab, x)
+		}
+	}
+	return ab
 }
