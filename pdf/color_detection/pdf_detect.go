@@ -43,8 +43,6 @@ import (
 	"image/color"
 	"image/png"
 	"io"
-	"io/ioutil"
-	"math"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -341,46 +339,6 @@ func (x byFile) Less(i, j int) bool {
 	return x[i].path < x[j].path
 }
 
-// pdfsEqual compares PDF files `path1` and `path2`
-// `threshold` holds the threshold values for image comparison
-// If `grayscale` is true then the comparison is on grayscale and color hue may differ
-// If `keep` is true then the comparison rasters are retained
-// Returns equal, bad1, err where
-// 	equal: PDF files are equal
-//  bad1: error is in path1
-//  err: the error
-func pdfsEqual(path1, path2 string, threshold imageThreshold,
-	temp string, grayscale, keep bool) (bool, bool, error) {
-	dir1 := filepath.Join(temp, "1")
-	dir2 := filepath.Join(temp, "2")
-	err := os.MkdirAll(dir1, 0777)
-	if err != nil {
-		panic(err)
-	}
-	if !keep {
-		defer removeDir(dir1)
-	}
-	err = os.MkdirAll(dir2, 0777)
-	if err != nil {
-		panic(err)
-	}
-	if !keep {
-		defer removeDir(dir2)
-	}
-
-	err = runGhostscript(path1, dir1, grayscale)
-	if err != nil {
-		return false, true, err
-	}
-	err = runGhostscript(path2, dir2, grayscale)
-	if err != nil {
-		return false, false, err
-	}
-
-	equal, err := directoriesEqual("*.png", dir1, dir2, threshold)
-	return equal, false, nil
-}
-
 var (
 	gsImageFormat  = "doc-%03d.png"
 	gsImagePattern = `doc-(\d+).png$`
@@ -427,140 +385,6 @@ func ghostscriptName() string {
 		return "gswin64c.exe"
 	}
 	return "gs"
-}
-
-// runGhostscript runs pdftops on file `pdf` to create a PostScript file in directory `outputDir`
-func runPdfToPs(pdf, outputDir string) error {
-	common.Log.Debug("pdf=%#q outputDir=%#q", pdf, outputDir)
-	ps := changeDir(pdf, outputDir)
-	cmd := exec.Command("pdftops", pdf, ps)
-	common.Log.Debug("cmd=%#q", cmd.Args)
-
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	err := cmd.Run()
-	if err != nil {
-		common.Log.Error("Could not process pdf=%q err=%v\nstdout=\n%s\nstderr=\n%s\n",
-			pdf, err, stdout, stderr)
-	}
-	return err
-}
-
-// directoriesEqual compares image files that match `mask` in directories `dir1` and `dir2` and
-// returns true if they are the same within `threshold`.
-func directoriesEqual(mask, dir1, dir2 string, threshold imageThreshold) (bool, error) {
-	pattern1 := filepath.Join(dir1, mask)
-	pattern2 := filepath.Join(dir2, mask)
-	files1, err := filepath.Glob(pattern1)
-	if err != nil {
-		panic(err)
-	}
-	files2, err := filepath.Glob(pattern2)
-	if err != nil {
-		panic(err)
-	}
-	if len(files1) != len(files2) {
-		return false, nil
-	}
-	n := len(files1)
-	for i := 0; i < n; i++ {
-		equal, err := filesEqual(files1[i], files2[i], threshold)
-		if !equal || err != nil {
-			return equal, err
-		}
-	}
-	return true, nil
-}
-
-// filesEqual compares files `path1` and `path2` and returns true if they are the same within
-// `threshold`
-func filesEqual(path1, path2 string, threshold imageThreshold) (bool, error) {
-	equal, err := filesBinaryEqual(path1, path2)
-	if equal || err != nil {
-		return equal, err
-	}
-	return imagesEqual(path1, path2, threshold)
-}
-
-// filesBinaryEqual compares files `path1` and `path2` and returns true if they are identical.
-func filesBinaryEqual(path1, path2 string) (bool, error) {
-	f1, err := ioutil.ReadFile(path1)
-	if err != nil {
-		panic(err)
-	}
-	f2, err := ioutil.ReadFile(path2)
-	if err != nil {
-		panic(err)
-	}
-	return bytes.Equal(f1, f2), nil
-}
-
-// imagesEqual compares files `path1` and `path2` and returns true if they are the same within
-// `threshold`
-func imagesEqual(path1, path2 string, threshold imageThreshold) (bool, error) {
-	img1, err := readImage(path1)
-	if err != nil {
-		return false, err
-	}
-	img2, err := readImage(path2)
-	if err != nil {
-		return false, err
-	}
-
-	w1, h1 := img1.Bounds().Max.X, img1.Bounds().Max.Y
-	w2, h2 := img2.Bounds().Max.X, img2.Bounds().Max.Y
-	if w1 != w2 || h1 != h2 {
-		common.Log.Error("compareImages: Different dimensions. img1=%dx%d img2=%dx%d",
-			w1, h1, w2, h2)
-		return false, nil
-	}
-
-	// `different` contains the grayscale distance (scale 0...255) between pixels in img1 and
-	// img2 for pixels that differ between the two images
-	different := []float64{}
-	for x := 0; x < w1; x++ {
-		for y := 0; y < h1; y++ {
-			r1, g1, b1, _ := img1.At(x, y).RGBA()
-			r2, g2, b2, _ := img2.At(x, y).RGBA()
-			if r1 != r2 || g1 != g2 || b1 != b2 {
-				d1, d2, d3 := float64(r1)-float64(r2), float64(g1)-float64(g2), float64(b1)-float64(b2)
-				// Euclidean distance between pixels in rgb space with scale 0..0xffff
-				distance := math.Sqrt(d1*d1 + d2*d2 + d3*d3)
-				// Convert scale to 0..0xff and take average of r,g,b values to get grayscale value
-				distance = distance / float64(0xffff) * float64(0xff) / 3.0
-				different = append(different, distance)
-			}
-		}
-	}
-	if len(different) == 0 {
-		return true, nil
-	}
-
-	fracPixels := float64(len(different)) / float64(w1*h1)
-	mean := meanFloatSlice(different)
-	equal := fracPixels <= threshold.fracPixels && mean <= threshold.mean
-
-	n := len(different)
-	if n > 10 {
-		n = 10
-	}
-	common.Log.Error("compareImages: Different pixels. different=%d/(%dx%d)=%e mean=%.1f %.0f",
-		len(different), w1, h1, fracPixels, mean, different[:n])
-
-	return equal, nil
-}
-
-// meanFloatSlice returns the mean of the elements of `vals`
-func meanFloatSlice(vals []float64) float64 {
-	if len(vals) == 0 {
-		return 0.0
-	}
-	var total float64 = 0.0
-	for _, v := range vals {
-		total += v
-	}
-	return total / float64(len(vals))
 }
 
 // isPdfColor returns true if PDF files `path` has color marks on any page
@@ -614,7 +438,7 @@ func colorDirectoryPages(mask, dir string, keep bool) ([]int, error) {
 	pattern := filepath.Join(dir, mask)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
-		common.Log.Error("isColorDirectory: Glob failed. pattern=%#q err=%v", pattern, err)
+		common.Log.Error("colorDirectoryPages: Glob failed. pattern=%#q err=%v", pattern, err)
 		return nil, err
 	}
 
@@ -631,14 +455,12 @@ func colorDirectoryPages(mask, dir string, keep bool) ([]int, error) {
 		}
 		// common.Log.Error("isColorDirectory:  path=%#q", path)
 		isColor, err := isColorImage(path, keep)
-		// common.Log.Error("isColorDirectory: isColor=%t path=%#q", isColor, path)
 		if err != nil {
 			panic(err)
 			return colorPages, err
 		}
 		if isColor {
 			colorPages = append(colorPages, pageNum)
-			// common.Log.Error("isColorDirectory: colorPages=%d %d", len(colorPages), colorPages)
 		}
 	}
 	return colorPages, nil
@@ -712,6 +534,7 @@ func imgMarkColor(imgIn image.Image) (image.Image, string) {
 	return img, summarizeSeries(data)
 }
 
+// summarizeSeries returns a string with summary statistics of `data`
 func summarizeSeries(data []float64) string {
 	n := len(data)
 	total := 0.0
@@ -743,7 +566,7 @@ func readImage(path string) (image.Image, error) {
 	return img, err
 }
 
-// readImage reads image file `path` and returns its contents as an Image.
+// writeImage write image data `img` to file `path`
 func writeImage(path string, img image.Image) error {
 	f, err := os.Create(path)
 	if err != nil {
