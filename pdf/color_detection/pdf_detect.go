@@ -1,35 +1,17 @@
 /*
- * Transform all content streams in all pages in a list of pdf files.
+ * Detect the number of pages and the color pages (1-offset) all pages in a list of PDF files.
+ * Compares these results to running Ghostscript on the PDF files and reports an error if the results don't match.
  *
- * There are currently 2 transforms implemented.
- *	- Identity transform. No -t command line option
- *	- Grayscale transform. -t command line option
+ * Run as: ./pdf_detect -o output [-d] [-k] testdata/*.pdf > blah
  *
- * The identity transform
- *	- converts PDF files into our internal representation
- *	- converts the internal representation back to a PDF file
- *	- checks that the output PDF file is the same as the input PDF file
- *
- * The grayscale transform
- *	- converts PDF files into our internal representation
- *	- transforms the internal representation to grayscale
- *	- converts the internal representation back to a PDF file
- *	- checks that the output PDF file is grayscale
- *
- * Run as: ./pdf_transform_content_streams -o output [-d] [-t] testdata/*.pdf > blah
- *
- * This will transform all .pdf file in testdata and write the results to output.
  * The main results are written to stderr so you will see them in your console.
  * Detailed information is written to stdout and you will see them in blah.
  *
  *  See the other command line options in the top of main()
- *		-a tests all the input files. The default behavior is stop at the first failure. Use this
+ *      -d Write debug level logs to stdout
+ *		-k Keep rasters of for which detection was wrong
+ *		-a Tests all the input files. The default behavior is stop at the first failure. Use this
  *			to find out how many of your corpus files this program works for.
- *		-x will transform without parsing content streams. Use this to see which failures are due to
- *			problems in the content parsing code.
- *			Running -a then -a -x will tell you how well this code is performing on your corpus
- *			and which failures are due to content parsing.
- *			(-x will disable -g)
  */
 
 package main
@@ -453,7 +435,6 @@ func colorDirectoryPages(mask, dir string, keep bool) ([]int, error) {
 			panic(err)
 			return colorPages, err
 		}
-		// common.Log.Error("isColorDirectory:  path=%#q", path)
 		isColor, err := isColorImage(path, keep)
 		if err != nil {
 			panic(err)
@@ -472,14 +453,7 @@ func isColorImage(path string, keep bool) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	isColor := imgIsColor(img)
-	if isColor && keep {
-		markedPath := fmt.Sprintf("%s.marked.png", path)
-		markedImg, summary := imgMarkColor(img)
-		common.Log.Error("markedPath=%#q %s", markedPath, summary)
-		err = writeImage(markedPath, markedImg)
-	}
-	return isColor, err
+	return imgIsColor(img), nil
 }
 
 const colorThreshold = 5.0
