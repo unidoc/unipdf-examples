@@ -573,7 +573,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				}
 
 			} else if xtype == pdf.XObjectTypeForm {
-				common.Log.Debug(" XObject Form: %s")
+				common.Log.Debug(" XObject Form: %s", *name)
 
 				// Go through the XObject Form content stream.
 				xform, err := resources.GetXObjectFormByName(*name)
