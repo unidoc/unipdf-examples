@@ -318,9 +318,6 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					if debug {
 						common.Log.Info("op=%s ColorspaceStroking=%T ColorStroking=%#v col=%t",
 							op, gs.ColorspaceStroking, gs.ColorStroking, col)
-						if col {
-							panic("Done")
-						}
 					}
 				}
 				return nil
@@ -647,7 +644,6 @@ func isPatternColored(pattern *pdf.PdfPattern, debug bool) (bool, error) {
 		return colored, err
 	}
 	common.Log.Error("isPatternColored. pattern is neither tiling nor shading")
-	panic("wtf")
 	return false, nil
 }
 
