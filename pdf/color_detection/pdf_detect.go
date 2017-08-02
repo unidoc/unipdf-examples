@@ -2,14 +2,13 @@
  * Detect the number of pages and the color pages (1-offset) all pages in a list of PDF files.
  * Compares these results to running Ghostscript on the PDF files and reports an error if the results don't match.
  *
- * Run as: ./pdf_detect -o output [-d] [-k] testdata/*.pdf > blah
+ * Run as: ./pdf_detect -o output [-d] [-a] testdata/*.pdf > blah
  *
  * The main results are written to stderr so you will see them in your console.
  * Detailed information is written to stdout and you will see them in blah.
  *
  *  See the other command line options in the top of main()
  *      -d Write debug level logs to stdout
- *		-k Keep rasters of for which detection was wrong
  *		-a Tests all the input files. The default behavior is stop at the first failure. Use this
  *			to find out how many of your corpus files this program works for.
  */
@@ -18,13 +17,10 @@ package main
 
 import (
 	"bytes"
-	"encoding/csv"
 	"flag"
 	"fmt"
 	"image"
-	"image/color"
-	"image/png"
-	"io"
+	"math"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -33,7 +29,6 @@ import (
 	"runtime"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 
 	common "github.com/unidoc/unidoc/common"
@@ -57,30 +52,9 @@ func initUniDoc(debug bool) error {
 	return nil
 }
 
-// imageThreshold represents the threshold for image difference in image comparisons
-type imageThreshold struct {
-	fracPixels float64 // Fraction of pixels in page raster that may differ
-	mean       float64 // Max mean difference on scale 0..255 for pixels that differ
-}
-
-// identityThreshold is the imageThreshold for identity transforms in this program.
-var identityThreshold = imageThreshold{
-	fracPixels: 1.0e-4, // Fraction of pixels in page raster that may differ
-	mean:       10.0,   // Max mean difference on scale 0..255 for pixels that differ
-}
-
-var testStats = statistics{
-	enabled:        true,
-	testResultPath: "xform.test.results.csv",
-}
-
-var allOpCounts = map[string]int{}
-
 const usage = `Usage:
-%s -o <output directory> [-d][-g][-k][-a][-min <val>][-max <val>] <file1> <file2> ...
+%s -o <output directory> [-d][-a][-min <val>][-max <val>] <file1> <file2> ...
 -d: Debug level logging
--k: Keep temp PNG files used for PDF grayscale test
--g: Test that grayscale conversion works (takes longer)
 -a: Keep converting PDF files after failures
 -min: Minimum PDF file size to test
 -max: Maximum PDF file size to test
@@ -94,7 +68,6 @@ func main() {
 	var minSize int64 = -1    // Minimum size for an input PDF to be processed.
 	var maxSize int64 = -1    // Maximum size for an input PDF to be processed.
 	flag.BoolVar(&debug, "d", false, "Enable debug logging")
-	flag.BoolVar(&keep, "k", false, "Keep the rasters used for PDF comparison")
 	flag.BoolVar(&compareGrayscale, "g", false, "Do PDF raster comparison on grayscale rasters")
 	flag.BoolVar(&runAllTests, "a", false, "Run all tests. Don't stop at first failure")
 	flag.Int64Var(&minSize, "min", -1, "Minimum size of files to process (bytes)")
@@ -127,12 +100,6 @@ func main() {
 	badFiles := []string{}
 	failFiles := []string{}
 
-	if err = testStats.load(); err != nil {
-		common.Log.Error("stats.load failed. testStats=%+v err=%v", testStats, err)
-		os.Exit(1)
-	}
-	defer testStats._save()
-
 	for idx, inputPath := range pdfList {
 
 		_, name := filepath.Split(inputPath)
@@ -141,10 +108,10 @@ func main() {
 		fmt.Fprintf(os.Stderr, "%3d of %d %#-30q  (%6d)", idx, len(pdfList), name, inputSize)
 
 		t0 := time.Now()
-		numPages, colorPages, err := detectPdfFile(inputPath)
+		numPages, colorPages, err := describePdf(inputPath)
 		dt := time.Since(t0)
 		if err != nil {
-			common.Log.Error("detectPdfFile failed. err=%v", err)
+			common.Log.Error("describePdf failed. err=%v", err)
 			failFiles = append(failFiles, inputPath)
 			if runAllTests {
 				continue
@@ -154,13 +121,13 @@ func main() {
 
 		fmt.Fprintf(os.Stderr, " %d pages %d color %.3f sec\n", numPages, len(colorPages), dt.Seconds())
 
-		_, colorPagesIn, err := isPdfColor(inputPath, compDir, true, keep)
+		colorPagesIn, err := pdfColorPages(inputPath, compDir)
 
 		if err != nil || !equalSlices(colorPagesIn, colorPages) {
 			if err != nil {
 				common.Log.Error("PDF is damaged. err=%v\n\tinputPath=%#q", err, inputPath)
 			} else {
-				common.Log.Error("isPdfColor: \ncolorPagesIn=%d %v\ncolorPages  =%d %v",
+				common.Log.Error("pdfColorPages: \ncolorPagesIn=%d %v\ncolorPages  =%d %v",
 					len(colorPagesIn), colorPagesIn, len(colorPages), colorPages)
 				fp := sliceDiff(colorPages, colorPagesIn)
 				fn := sliceDiff(colorPagesIn, colorPages)
@@ -195,6 +162,7 @@ func main() {
 	}
 }
 
+// equalSlices returns true if `a` and `b` are identical
 func equalSlices(a, b []int) bool {
 	if len(a) != len(b) {
 		return false
@@ -207,12 +175,8 @@ func equalSlices(a, b []int) bool {
 	return true
 }
 
-type ObjCounts struct {
-	xobjNameSubtype map[string]string
-}
-
-// detectPdfFile reads PDF `inputPath` and returns number of pages, slice of color page numbers (1-offset)
-func detectPdfFile(inputPath string) (int, []int, error) {
+// describePdf reads PDF `inputPath` and returns number of pages, slice of color page numbers (1-offset)
+func describePdf(inputPath string) (int, []int, error) {
 
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -249,12 +213,7 @@ func detectPdfFile(inputPath string) (int, []int, error) {
 		common.Log.Debug("^^^^page %d", pageNum)
 
 		desc := fmt.Sprintf("%s:page%d", filepath.Base(inputPath), pageNum)
-		debug := pageNum == 0
-		colored, err := isPageColored(page, desc, debug)
-		if debug {
-			panic("done")
-		}
-		// fmt.Printf("$$$ %d %t %v\n", pageNum, colored, err)
+		colored, err := isPageColored(page, desc, false)
 		if err != nil {
 			return numPages, colorPages, err
 		}
@@ -321,29 +280,27 @@ func (x byFile) Less(i, j int) bool {
 	return x[i].path < x[j].path
 }
 
-var (
+const (
 	gsImageFormat  = "doc-%03d.png"
 	gsImagePattern = `doc-(\d+).png$`
-	gsImageRegex   = regexp.MustCompile(gsImagePattern)
 )
+
+var gsImageRegex = regexp.MustCompile(gsImagePattern)
 
 // runGhostscript runs Ghostscript on file `pdf` to create file one png file per page in directory
 // `outputDir`
-func runGhostscript(pdf, outputDir string, grayscale bool) error {
+func runGhostscript(pdf, outputDir string) error {
 	common.Log.Debug("runGhostscript: pdf=%#q outputDir=%#q", pdf, outputDir)
 	outputPath := filepath.Join(outputDir, gsImageFormat)
 	output := fmt.Sprintf("-sOutputFile=%s", outputPath)
-	pngDevices := map[bool]string{
-		false: "png16m",
-		true:  "pnggray",
-	}
+
 	cmd := exec.Command(
 		ghostscriptName(),
 		"-dSAFER",
 		"-dBATCH",
 		"-dNOPAUSE",
 		"-r150",
-		fmt.Sprintf("-sDEVICE=%s", pngDevices[grayscale]),
+		fmt.Sprintf("-sDEVICE=png16m"),
 		"-dTextAlphaBits=1",
 		"-dGraphicsAlphaBits=1",
 		output,
@@ -369,54 +326,26 @@ func ghostscriptName() string {
 	return "gs"
 }
 
-// isPdfColor returns true if PDF files `path` has color marks on any page
-// If `keep` is true then the page rasters are retained
-func isPdfColor(path, temp string, showPages, keep bool) (bool, []int, error) {
+// pdfColorPages returns a list of the (1-offset) page numbers of the colored pages in PDF at `path`
+func pdfColorPages(path, temp string) ([]int, error) {
 	dir := filepath.Join(temp, "color")
 	err := os.MkdirAll(dir, 0777)
 	if err != nil {
 		panic(err)
 	}
-	if !keep {
-		defer removeDir(dir)
-	}
+	defer removeDir(dir)
 
-	err = runGhostscript(path, dir, false)
+	err = runGhostscript(path, dir)
 	if err != nil {
-		return false, nil, err
+		return nil, err
 	}
 
-	if showPages {
-		colorPages, err := colorDirectoryPages("*.png", dir, keep)
-		return len(colorPages) > 0, colorPages, err
-	}
-
-	isColor, err := isColorDirectory("*.png", dir)
-	return isColor, nil, err
+	return colorDirectoryPages("*.png", dir)
 }
 
-// isColorDirectory returns true if any of the image files that match `mask` in directories `dir`
-// has any color pixels
-func isColorDirectory(mask, dir string) (bool, error) {
-	pattern := filepath.Join(dir, mask)
-	files, err := filepath.Glob(pattern)
-	if err != nil {
-		common.Log.Error("isColorDirectory: Glob failed. pattern=%#q err=%v", pattern, err)
-		return false, err
-	}
-
-	for _, path := range files {
-		isColor, err := isColorImage(path, false)
-		if isColor || err != nil {
-			return isColor, err
-		}
-	}
-	return false, nil
-}
-
-// colorDirectoryPages returns a lists of the page numbers of the image files that match `mask` in
+// colorDirectoryPages returns a list of the (1-offset) page numbers of the image files that match `mask` in
 // directories `dir` that have any color pixels.
-func colorDirectoryPages(mask, dir string, keep bool) ([]int, error) {
+func colorDirectoryPages(mask, dir string) ([]int, error) {
 	pattern := filepath.Join(dir, mask)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
@@ -435,7 +364,7 @@ func colorDirectoryPages(mask, dir string, keep bool) ([]int, error) {
 			panic(err)
 			return colorPages, err
 		}
-		isColor, err := isColorImage(path, keep)
+		isColor, err := isColorImage(path)
 		if err != nil {
 			panic(err)
 			return colorPages, err
@@ -448,7 +377,7 @@ func colorDirectoryPages(mask, dir string, keep bool) ([]int, error) {
 }
 
 // isColorImage returns true if image file `path` contains color
-func isColorImage(path string, keep bool) (bool, error) {
+func isColorImage(path string) (bool, error) {
 	img, err := readImage(path)
 	if err != nil {
 		return false, err
@@ -456,75 +385,24 @@ func isColorImage(path string, keep bool) (bool, error) {
 	return imgIsColor(img), nil
 }
 
-const colorThreshold = 5.0
+// colorThreshold is the total difference of r,g,b values for which a pixel is considered to be color
+// Color components are in range 0-0xFFFF
+// We make this 10x the PDF color threshold as guess
+const colorThreshold = pdf.ColorTolerance * float64(0xFFFF) * 10.0
 
 // imgIsColor returns true if image `img` contains color
 func imgIsColor(img image.Image) bool {
 	w, h := img.Bounds().Max.X, img.Bounds().Max.Y
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
-			r, g, b, _ := img.At(x, y).RGBA()
-			rg := int(r) - int(g)
-			gb := int(g) - int(b)
-			if rg < 0 {
-				rg = -rg
-			}
-			if gb < 0 {
-				gb = -gb
-			}
-			rgb := float64(rg+gb) / float64(0xFFFF) * float64(0xFF)
-			if rgb > colorThreshold {
+			rr, gg, bb, _ := img.At(x, y).RGBA()
+			r, g, b := float64(rr), float64(gg), float64(bb)
+			if math.Abs(r-g) > colorThreshold || math.Abs(r-b) > colorThreshold || math.Abs(g-b) > colorThreshold {
 				return true
 			}
 		}
 	}
 	return false
-}
-
-func imgMarkColor(imgIn image.Image) (image.Image, string) {
-	img := image.NewNRGBA(imgIn.Bounds())
-	black := color.RGBA{0, 0, 0, 255}
-	// white := color.RGBA{255, 255, 255, 255}
-	w, h := img.Bounds().Max.X, img.Bounds().Max.Y
-	data := []float64{}
-	for x := 0; x < w; x++ {
-		for y := 0; y < h; y++ {
-			r, g, b, _ := imgIn.At(x, y).RGBA()
-			rg := int(r) - int(g)
-			gb := int(g) - int(b)
-			if rg < 0 {
-				rg = -rg
-			}
-			if gb < 0 {
-				gb = -gb
-			}
-			rgb := float64(rg+gb) / float64(0xFFFF) * float64(0xFF)
-			if rgb > colorThreshold {
-				img.Set(x, y, black)
-				data = append(data, rgb)
-			}
-		}
-	}
-	return img, summarizeSeries(data)
-}
-
-// summarizeSeries returns a string with summary statistics of `data`
-func summarizeSeries(data []float64) string {
-	n := len(data)
-	total := 0.0
-	min := +1e20
-	max := -1e20
-	for _, x := range data {
-		total += x
-		if x < min {
-			min = x
-		}
-		if x > max {
-			max = x
-		}
-	}
-	mean := total / float64(n)
-	return fmt.Sprintf("n=%d min=%.3f mean=%.3f max=%.3f", n, min, mean, max)
 }
 
 // readImage reads image file `path` and returns its contents as an Image.
@@ -538,18 +416,6 @@ func readImage(path string) (image.Image, error) {
 
 	img, _, err := image.Decode(f)
 	return img, err
-}
-
-// writeImage write image data `img` to file `path`
-func writeImage(path string, img image.Image) error {
-	f, err := os.Create(path)
-	if err != nil {
-		common.Log.Error("writeImage: Could not create file. path=%#q err=%v", path, err)
-		return err
-	}
-	defer f.Close()
-
-	return png.Encode(f, img)
 }
 
 // makeUniqueDir creates a new directory inside `baseDir`
@@ -616,161 +482,6 @@ func fileSize(path string) int64 {
 		panic(err)
 	}
 	return fi.Size()
-}
-
-type statistics struct {
-	enabled        bool
-	testResultPath string
-	imageInfoPath  string
-	testResultList []testResult
-	testResultMap  map[string]int
-}
-
-func (s *statistics) load() error {
-	if !s.enabled {
-		return nil
-	}
-	s.testResultList = []testResult{}
-	s.testResultMap = map[string]int{}
-
-	testResultList, err := testResultRead(s.testResultPath)
-	if err != nil {
-		return err
-	}
-	for _, e := range testResultList {
-		s.addTestResult(e, true)
-	}
-
-	return nil
-}
-
-func (s *statistics) _save() error {
-	if !s.enabled {
-		return nil
-	}
-	return testResultWrite(s.testResultPath, s.testResultList)
-}
-
-func (s *statistics) addTestResult(e testResult, force bool) {
-	if !s.enabled {
-		return
-	}
-	i, ok := s.testResultMap[e.name]
-	if !ok {
-		s.testResultList = append(s.testResultList, e)
-		s.testResultMap[e.name] = len(s.testResultList) - 1
-	} else {
-		s.testResultList[i] = e
-	}
-	if force {
-		s._save()
-	}
-}
-
-type testResult struct {
-	name     string
-	colorIn  bool
-	colorOut bool
-	numPages int
-	duration float64
-	xobjImg  int
-	xobjForm int
-}
-
-func testResultRead(path string) ([]testResult, error) {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return []testResult{}, nil
-	}
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	r := csv.NewReader(f)
-
-	results := []testResult{}
-	for i := 0; ; i++ {
-		row, err := r.Read()
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			common.Log.Error("testResultRead: i=%d err=%v", i, err)
-			return results, err
-		}
-		if i == 0 {
-			continue
-		}
-		e := testResult{
-			name:     row[0],
-			colorIn:  toBool(row[1]),
-			colorOut: toBool(row[2]),
-			numPages: toInt(row[3]),
-			duration: toFloat(row[4]),
-			xobjImg:  toInt(row[5]),
-			xobjForm: toInt(row[6]),
-		}
-		results = append(results, e)
-	}
-	return results, nil
-}
-
-func testResultWrite(path string, results []testResult) error {
-	f, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0777)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	w := csv.NewWriter(f)
-
-	if err := w.Write([]string{"name", "colorIn", "colorOut", "numPages", "duration",
-		"imageXobj", "formXobj"}); err != nil {
-		return err
-	}
-	for i, e := range results {
-		row := []string{
-			e.name,
-			fmt.Sprintf("%t", e.colorIn),
-			fmt.Sprintf("%t", e.colorOut),
-			fmt.Sprintf("%d", e.numPages),
-			fmt.Sprintf("%.3f", e.duration),
-			fmt.Sprintf("%d", e.xobjImg),
-			fmt.Sprintf("%d", e.xobjForm),
-		}
-		if err := w.Write(row); err != nil {
-			common.Log.Error("testResultWrite: Error writing record. i=%d path=%#q err=%v",
-				i, path, err)
-		}
-	}
-
-	w.Flush()
-	return w.Error()
-}
-
-func toBool(s string) bool {
-	return strings.ToLower(strings.TrimSpace(s)) == "true"
-}
-
-func toInt(s string) int {
-	s = strings.TrimSpace(s)
-	x, err := strconv.Atoi(s)
-	if err != nil {
-		panic(err)
-	}
-	return x
-}
-
-func toFloat(s string) float64 {
-	s = strings.TrimSpace(s)
-	x, err := strconv.ParseFloat(s, 64)
-	if err != nil {
-		panic(err)
-	}
-	return x
-}
-
-func changeDir(path, dir string) string {
-	_, name := filepath.Split(path)
-	return filepath.Join(dir, name)
 }
 
 // sliceDiff returns the elements in a that aren't in b
