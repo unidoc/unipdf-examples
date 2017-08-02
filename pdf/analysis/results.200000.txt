@@ -1,0 +1,352 @@
+  0 of 174 `blank.pdf`                     (  2353) 1 pages 0 color 0.001 sec, pass
+  1 of 174 `legal_pages7_color3.pdf`       (  4722) 7 pages 3 color 0.002 sec, pass
+  2 of 174 `cmyk.pdf`                      (  5555) 9 pages 6 color 0.002 sec, pass
+  3 of 174 `convoluted_line.pdf`           (  6146) 1 pages 0 color 0.003 sec, pass
+  4 of 174 `fonts_in_form_xobject.pdf`     (  6744) 1 pages 0 color 0.004 sec, pass
+  5 of 174 `WEIß_pages6_color4.pdf`        (  7450) 6 pages 4 color 0.003 sec, pass
+  6 of 174 `SergueiOsokineProfile.pdf`     (  9629) 2 pages 1 color 0.007 sec, pass
+  7 of 174 `lines.pdf`                     ( 10763) 20 pages 12 color 0.004 sec, pass
+  8 of 174 `AnneMakauProfile.pdf`          ( 10788) 3 pages 1 color 0.006 sec, pass
+  9 of 174 `lines_over_black.pdf`          ( 11047) 20 pages 0 color 0.006 sec, pass
+ 10 of 174 `lines_over_black.pdf.pdf`      ( 11061) 20 pages 0 color 0.005 sec, pass
+ 11 of 174 `English Report.pdf`            ( 11627) 16 pages 4 color 0.006 sec, pass
+ 12 of 174 `Physics practical.pdf`         ( 11627) 16 pages 4 color 0.003 sec, pass
+ 13 of 174 `NLP_Obesity_Annotation_Sheet.pdf`  ( 13839) 1 pages 0 color 0.008 sec, pass
+ 14 of 174 `ERTA Sunday fixture 2017 Winter.pdf`  ( 15047) 7 pages 6 color 0.016 sec, pass
+ 15 of 174 `202 moot.pdf`                  ( 15141) 2 pages 0 color 0.015 sec, pass
+ 16 of 174 `word_bmp.pdf`                  ( 15557) 1 pages 0 color 0.088 sec, pass
+ 17 of 174 `word_jpeg_grayscale.pdf`       ( 15627) 1 pages 0 color 0.102 sec, pass
+ 18 of 174 `warnock_camelot.pdf`           ( 16691) 6 pages 0 color 0.005 sec, pass
+ 19 of 174 `pdl.pdf`                       ( 18440) 1 pages 0 color 0.008 sec, pass
+ 20 of 174 `pre-algebra_translate.pdf`     ( 19450) 2 pages 2 color 0.009 sec, pass
+ 21 of 174 `twitter_advertiser_list.pdf`   ( 22642) 20 pages 20 color 0.021 sec, pass
+ 22 of 174 `Sunday 2016 team Fixtures.pdf`  ( 25161) 12 pages 11 color 0.032 sec, pass
+ 23 of 174 `Jedi.pdf`                      ( 25587) 1 pages 0 color 0.016 sec, fail
+ 24 of 174 `VI-TUTORIAL.pdf`               ( 26257) 10 pages 0 color 0.020 sec, pass
+ 25 of 174 `How to Accuse the Other Guy of Lying with Statistics.pdf`  ( 26553) 3 pages 0 color 0.016 sec, pass
+ 26 of 174 `chickerur.pdf`                 ( 26981) 9 pages 0 color 0.018 sec, pass
+ 27 of 174 `vitae.pdf`                     ( 29977) 4 pages 1 color 0.022 sec, pass
+ 28 of 174 `ACS4PartnerQuotes.pdf`         ( 30065) 2 pages 2 color 0.007 sec, pass
+ 29 of 174 `pdf00050.pdf`                  ( 33553) 11 pages 3 color 0.020 sec, pass
+ 30 of 174 `49-7441.pdf`                   ( 39064) 1 pages 1 color 0.008 sec, pass
+ 31 of 174 `dense2_lines.pdf`              ( 41144) 3 pages 3 color 0.077 sec, pass
+ 32 of 174 `rfc6962.txt.pdf`               ( 42139) 27 pages 0 color 0.013 sec, pass
+ 33 of 174 `ColourNaming.pdf`              ( 43913) 12 pages 0 color 0.093 sec, pass
+ 34 of 174 `000109.pdf`                    ( 47401) 2 pages 2 color 0.012 sec, pass
+ 35 of 174 `Notes on Noise Contrastive Estimation and Negative Sampling.pdf`  ( 50157) 4 pages 0 color 0.032 sec, pass
+ 36 of 174 `kernel_trick.pdf`              ( 50231) 3 pages 0 color 0.021 sec, pass
+ 37 of 174 `ACFrOgCf6f4kzU-mNiolvkiOlADV6cnWfoWv_FZPB6kB4aBtGh68m8KVTc5q0t50Bian-2myr3AQvH0HLbHDFnyo3fY_BDudV1i3zI9i_g6S36lOesSvotIATPqvLF0= (1).pdf`  ( 50360) 9 pages 0 color 0.046 sec, pass
+ 38 of 174 `Case_Study_-_Childrens_Medical_Group_Improving_Interoperability_Between_Practices.pdf`  ( 54767) 0 pages 0 color 0.006 sec, bad
+ 39 of 174 `A Sunshine - IEP.pdf`          ( 54977) 9 pages 9 color 0.052 sec, fail
+ 40 of 174 `jarvisspec02.pdf`              ( 55366) 5 pages 0 color 0.033 sec, pass
+ 41 of 174 `pedersen-i2b2-2008.pdf`        ( 56816) 5 pages 0 color 0.061 sec, pass
+ 42 of 174 `hgff.pdf`                      ( 61802) 1 pages 1 color 0.013 sec, pass
+ 43 of 174 `killer_modelling.pdf`          ( 61854) 5 pages 5 color 0.051 sec, pass
+ 44 of 174 `000009.pdf`                    ( 61939) 1 pages 1 color 0.017 sec, pass
+ 45 of 174 `android.pdf`                   ( 61939) 1 pages 1 color 0.021 sec, pass
+ 46 of 174 `holmes-deconstruction-ebhc-06.pdf`  ( 66294) 7 pages 0 color 0.016 sec, pass
+ 47 of 174 `2017 Student Residential Address Collection.pdf`  ( 67585) 1 pages 1 color 0.292 sec, fail
+ 48 of 174 `unix-vi-editor.pdf`            ( 69358) 8 pages 3 color 0.083 sec, pass
+ 49 of 174 `10.235.1.2_SMTP_via_LDAP_05-16-2016_09-43-48.pdf.pdf`  ( 71038) 3 pages 1 color 0.226 sec, pass
+ 50 of 174 `gibbscrf3.pdf`                 ( 72667) 8 pages 0 color 0.086 sec, pass
+ 51 of 174 `MS Activities Term 3 2017 Letter.pdf`  ( 73658) 3 pages 1 color 0.019 sec, pass
+ 52 of 174 `symbiosis-provocation.pdf`     ( 74451) 8 pages 0 color 0.020 sec, pass
+ 53 of 174 `Whitepaper-XMP-metadata-in-PDFlib-products.pdf`  ( 74886) 4 pages 4 color 0.025 sec, pass
+ 54 of 174 `salsa20_spec.pdf`              ( 75332) 9 pages 0 color 0.074 sec, pass
+ 55 of 174 `2016 FOB Season Launch Breakfast.pdf`  ( 75807) 1 pages 1 color 0.015 sec, pass
+ 56 of 174 `Kahng_DAC_98.pdf`              ( 75912) 6 pages 0 color 0.099 sec, pass
+ 57 of 174 `docs.pdf`                      ( 77972) 1 pages 1 color 0.017 sec, pass
+ 58 of 174 `Exam timetable letter 2016.pdf`  ( 79048) 2 pages 2 color 0.030 sec, pass
+ 59 of 174 `unlexicalized-parsing.pdf`     ( 82601) 8 pages 0 color 0.080 sec, pass
+ 60 of 174 `4e.pdf`                        ( 84275) 5 pages 1 color 0.057 sec, pass
+ 61 of 174 `Ten ways to promote the natural genius in your child.pdf`  ( 85751) 2 pages 1 color 0.025 sec, pass
+ 62 of 174 `jonathan_mayer.pdf`            ( 86091) 2 pages 0 color 0.021 sec, pass
+ 63 of 174 `lec10.pdf`                     ( 87237) 4 pages 0 color 0.023 sec, pass
+ 64 of 174 `midtermF13secondSols.pdf`      ( 88761) 7 pages 0 color 0.025 sec, pass
+ 65 of 174 `keys2.pdf`                     ( 90070) 9 pages 0 color 0.022 sec, pass
+ 66 of 174 `cv.pdf`                        ( 92349) 10 pages 0 color 0.061 sec, pass
+ 67 of 174 `lecture16.pdf`                 ( 93322) 4 pages 2 color 0.023 sec, pass
+ 68 of 174 `pcfgs.pdf`                     ( 93775) 18 pages 0 color 0.083 sec, pass
+ 69 of 174 `multi_string_search.pdf`       ( 94054) 22 pages 0 color 0.048 sec, pass
+ 70 of 174 `lexpcfgs.pdf`                  ( 95903) 22 pages 0 color 0.078 sec, pass
+ 71 of 174 `MS Activities Term 2 2016 Letter.pdf`  ( 98664) 3 pages 1 color 0.018 sec, pass
+ 72 of 174 `SolvingEmail.pdf`              (100541) 3 pages 3 color 0.017 sec, pass
+ 73 of 174 `75.pdf`                        (101745) 10 pages 4 color 0.055 sec, pass
+ 74 of 174 `mh-guide-matrix.pdf`           (101929) 1 pages 1 color 0.033 sec, pass
+ 75 of 174 `letter to Parents re Telstra Phone Line.pdf`  (102790) 1 pages 1 color 0.023 sec, pass
+ 76 of 174 `Doc_Test_papercut.pdf`         (109503) 4 pages 1 color 0.025 sec, pass
+ 77 of 174 `stubbs-cv-2015-06.pdf`         (110996) 5 pages 0 color 0.014 sec, pass
+ 78 of 174 `ptrelnot.pdf`                  (111207) 5 pages 5 color 0.065 sec, pass
+ 79 of 174 `5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf`  (111997) 9 pages 1 color 0.101 sec, pass
+ 80 of 174 `COLOR_TEST0.pdf`               (114134) 1 pages 1 color 0.155 sec, fail
+ 81 of 174 `invoice88786339.pdf`           (114637) 2 pages 2 color 0.035 sec, pass
+ 82 of 174 `UMCP CITI Guidance 010814.pdf`  (114735) 2 pages 1 color 0.023 sec, pass
+ 83 of 174 `SyntaxNet Models for the CoNLL 2017 Shared Task.pdf`  (115449) 6 pages 0 color 0.016 sec, pass
+ 84 of 174 `lecture9.pdf`                  (115616) 5 pages 0 color 0.026 sec, pass
+ 85 of 174 `Addressing the Rare Word Problem in Neural Machine Translation.pdf`  (117438) 9 pages 2 color 0.083 sec, pass
+ 86 of 174 `Recurrent Neural Network Regularization.pdf`  (117777) 8 pages 0 color 0.088 sec, pass
+ 87 of 174 `yao1982-ocr.pdf`               (118398) 5 pages 0 color 0.040 sec, pass
+ 88 of 174 `lcs.pdf`                       (120300) 6 pages 0 color 0.073 sec, pass
+ 89 of 174 `IJIRAE_Survey_on_Text_Classification.pdf`  (121427) 6 pages 6 color 0.485 sec, pass
+ 90 of 174 `Peter W Power Pack - Thank You - Apple (AU).pdf`  (122146) 2 pages 2 color 0.044 sec, pass
+ 91 of 174 `docpro07aut.pdf`               (122752) 16 pages 3 color 0.070 sec, fail
+ 92 of 174 `lec04.pdf`                     (122841) 24 pages 24 color 0.048 sec, pass
+ 93 of 174 `HH factsheet.pdf`              (124167) 2 pages 2 color 0.143 sec, pass
+ 94 of 174 `SA_implementations.pdf`        (124552) 9 pages 0 color 0.107 sec, pass
+ 95 of 174 `fawkes.pdf`                    (124977) 13 pages 0 color 0.070 sec, pass
+ 96 of 174 `lec03-sp01.pdf`                (125143) 5 pages 5 color 0.034 sec, pass
+ 97 of 174 `lm.pdf`                        (126838) 12 pages 0 color 0.059 sec, pass
+ 98 of 174 `7600_Model355_ColorElectrostaticPlotter_TechnicalData_5959-9727-6pages_Jan90.pdf`  (127470) 6 pages 0 color 0.004 sec, pass
+ 99 of 174 `cbc02_e02d.pdf`                (128649) 12 pages 0 color 0.074 sec, pass
+100 of 174 `NitroReader_3_Release_Notes_en.pdf`  (128920) 7 pages 7 color 0.091 sec, pass
+101 of 174 `2017 Arts Festival Letter.pdf`  (130091) 1 pages 1 color 0.033 sec, pass
+102 of 174 `l1_logistic_reg_aaai.pdf`      (131964) 7 pages 1 color 0.216 sec, pass
+103 of 174 `broadcastEncryption.pdf`       (133154) 13 pages 0 color 0.093 sec, pass
+104 of 174 `Distributed Representations.pdf`  (133485) 24 pages 24 color 0.038 sec, pass
+105 of 174 `ICT Parent letter 7 2016.pdf`  (135971) 1 pages 1 color 0.031 sec, pass
+106 of 174 `cv14.pdf`                      (136428) 11 pages 0 color 0.045 sec, pass
+107 of 174 `Learning Distributed Representations of Sentences from Unlabelled Data.pdf`  (138413) 11 pages 0 color 0.123 sec, pass
+108 of 174 `Linguistic Regularities in Continuous Space Word Representations.pdf`  (138893) 6 pages 0 color 0.035 sec, fail
+109 of 174 `A Large-Scale Exploration of Effective Global Features for a Joint Entity Detection and Tracking Model.pdf`  (140946) 8 pages 1 color 0.103 sec, pass
+110 of 174 `WhatsApp-Security-Whitepaper.pdf`  (142710) 10 pages 10 color 0.030 sec, pass
+111 of 174 `nitro-pro-10.pdf`              (144261) 9 pages 9 color 0.167 sec, pass
+112 of 174 `outbreak.pdf`                  (144464) 7 pages 0 color 0.018 sec, pass
+113 of 174 `097af05e8de39370dd287c74653b715c8f6a.pdf`  (144818) 4 pages 0 color 0.021 sec, pass
+114 of 174 `database_03_abs.pdf`           (145505) 2 pages 0 color 0.009 sec, pass
+115 of 174 `8ca1c549e000ee0e22609412cfa00be9faa7.pdf`  (146557) 9 pages 0 color 0.034 sec, pass
+116 of 174 `icassp-draft.pdf`              (147705) 6 pages 0 color 0.033 sec, pass
+117 of 174 `Role of Team Manager Summer 2016.pdf`  (148377) 1 pages 1 color 0.011 sec, pass
+118 of 174 `recht11a.pdf`                  (148423) 18 pages 0 color 0.183 sec, pass
+119 of 174 `BSD 5 Roster 2017.pdf`         (148470) 1 pages 1 color 0.061 sec, pass
+120 of 174 `0165551514551903.pdf`          (151784) 17 pages 0 color 0.064 sec, pass
+121 of 174 `ahs-scn-bjh-quick-facts.pdf`   (153182) 1 pages 0 color 0.018 sec, bad
+122 of 174 `Letter to families 7 - 12  re report changes Semester 1 2017.pdf`  (154043) 1 pages 1 color 0.120 sec, pass
+123 of 174 `lecture5.pdf`                  (156242) 12 pages 0 color 0.148 sec, pass
+124 of 174 `P10-1040.pdf`                  (156874) 11 pages 0 color 0.059 sec, pass
+125 of 174 `WHY LAWYERS ARE UNHAPPY.pdf`   (157705) 18 pages 0 color 0.177 sec, pass
+126 of 174 `mehrotra_trick_final2.pdf`     (158836) 15 pages 0 color 0.067 sec, pass
+127 of 174 `kuksa08nips.pdf`               (158885) 8 pages 0 color 0.042 sec, pass
+128 of 174 `biau08a.pdf`                   (158945) 19 pages 0 color 0.130 sec, pass
+129 of 174 `se.pdf`                        (161655) 12 pages 0 color 0.124 sec, pass
+130 of 174 `Deep Neural Networks Do Not Recognize Negative Images.pdf`  (162447) 3 pages 0 color 0.039 sec, pass
+131 of 174 `designofasearchablesymmetrickeyciphersystem-120529001108-phpapp02.pdf`  (164082) 11 pages 11 color 0.052 sec, pass
+132 of 174 `Letter regarding School Lockdown 180517.pdf`  (167526) 1 pages 1 color 0.280 sec, pass
+133 of 174 `Automatic Evaluation of Chat-oriented Dialogue Systems using Large-scale Multi-references.pdf`  (168308) 11 pages 2 color 0.132 sec, bad
+134 of 174 `twitter_sentimenti.pdf`        (168320) 7 pages 5 color 0.051 sec, pass
+135 of 174 `resume.pdf`                    (168541) 8 pages 0 color 0.023 sec, pass
+136 of 174 `NAPLAN parent letter 2017 (1).pdf`  (169779) 1 pages 1 color 0.130 sec, pass
+137 of 174 `knn  v3.pdf`                   (171444) 1 pages 0 color 0.170 sec, pass
+138 of 174 `1502.03167.pdf`                (173548) 11 pages 2 color 0.156 sec, pass
+139 of 174 `Batch Normalization- Accelerating Deep Network Training by Reducing Internal Covariate Shift.pdf`  (173548) 11 pages 2 color 0.152 sec, pass
+140 of 174 `Yemeni_Laws92.pdf`             (174908) 14 pages 0 color 0.133 sec, pass
+141 of 174 `salsafamily-20071225.pdf`      (175956) 15 pages 0 color 0.060 sec, pass
+142 of 174 `IJCTT-V3I1P108.pdf`            (176824) 7 pages 7 color 0.100 sec, pass
+143 of 174 `Zendesk FAQ.pdf`               (177927) 3 pages 3 color 0.089 sec, pass
+144 of 174 `547.pdf`                       (178183) 19 pages 0 color 0.191 sec, pass
+145 of 174 `batsbzx201630-20.pdf`          (178415) 27 pages 11 color 0.156 sec, pass
+146 of 174 `Interview_with_Christine_Nixon_-_Report.pdf`  (178539) 16 pages 1 color 0.054 sec, pass
+147 of 174 `703eca3ce8c33c7651811d07e037d38d7a2e.pdf`  (179924) 8 pages 2 color 0.103 sec, fail
+148 of 174 `Suffix.pdf`                    (181187) 11 pages 0 color 0.136 sec, pass
+149 of 174 `RAND_PE198.pdf`                (181678) 16 pages 11 color 0.131 sec, pass
+150 of 174 `p.pdf`                         (183110) 18 pages 18 color 0.085 sec, pass
+151 of 174 `icnp12-qinghua.pdf`            (183380) 10 pages 5 color 0.091 sec, fail
+152 of 174 `SemanticStates201.pdf`         (183682) 17 pages 15 color 0.154 sec, pass
+153 of 174 `bitcoin.pdf`                   (184292) 9 pages 0 color 0.053 sec, pass
+154 of 174 `Alfa-College-EN.pdf`           (184693) 1 pages 1 color 0.053 sec, pass
+155 of 174 `encsearch.pdf`                 (185346) 15 pages 0 color 0.111 sec, pass
+156 of 174 `ICU-Round-Response.pdf`        (185892) 7 pages 0 color 0.023 sec, bad
+157 of 174 `Highway-LSTM and Recurrent Highway Networks for Speech Recognition.pdf`  (187005) 5 pages 0 color 0.065 sec, pass
+158 of 174 `Highway-LSTM.pdf`              (187005) 5 pages 0 color 0.058 sec, pass
+159 of 174 `a_outline.pdf`                 (187831) 1 pages 1 color 0.021 sec, pass
+160 of 174 `nips01-discriminativegenerative.pdf`  (188721) 8 pages 0 color 0.071 sec, pass
+161 of 174 `KEI_UT_Raessler.pdf`           (189167) 14 pages 14 color 0.061 sec, pass
+162 of 174 `Term One Sport Junior.pdf`     (189782) 1 pages 1 color 0.081 sec, pass
+163 of 174 `2744372.pdf`                   (192251) 10 pages 1 color 0.113 sec, pass
+164 of 174 `1603.06186v2.pdf`              (192440) 10 pages 0 color 0.167 sec, pass
+165 of 174 `suffix-icalp03.pdf`            (192716) 13 pages 0 color 0.054 sec, pass
+166 of 174 `explosion-database-choice.pdf`  (194167) 8 pages 8 color 0.072 sec, pass
+167 of 174 `shamirturing.pdf`              (194459) 2 pages 0 color 0.046 sec, pass
+168 of 174 `Random projections for the nonnegative least-squares problem.pdf`  (194795) 12 pages 11 color 0.099 sec, pass
+169 of 174 `expressions.pdf`               (197100) 6 pages 0 color 0.006 sec, bad
+170 of 174 `dcba-20040404.pdf`             (197230) 30 pages 0 color 0.245 sec, pass
+171 of 174 `a_solid.pdf`                   (197408) 1 pages 0 color 0.031 sec, pass
+172 of 174 `Letter to  Community re Age Story December 2016.pdf`  (198163) 1 pages 1 color 0.035 sec, pass
+173 of 174 `1206.6382.pdf`                 (199446) 8 pages 2 color 0.181 sec, pass
+174 files 5 bad 161 pass 8 fail
+5 bad
+  0 `/Users/pcadmin/go-work/src/trust-me/testdata/Case_Study_-_Childrens_Medical_Group_Improving_Interoperability_Between_Practices.pdf`
+  1 `/Users/pcadmin/go-work/src/trust-me/testdata/ahs-scn-bjh-quick-facts.pdf`
+  2 `/Users/pcadmin/go-work/src/trust-me/testdata/Automatic Evaluation of Chat-oriented Dialogue Systems using Large-scale Multi-references.pdf`
+  3 `/Users/pcadmin/go-work/src/trust-me/testdata/ICU-Round-Response.pdf`
+  4 `/Users/pcadmin/go-work/src/trust-me/testdata/expressions.pdf`
+161 pass
+  0 `/Users/pcadmin/go-work/src/trust-me/testdata/blank.pdf`
+  1 `/Users/pcadmin/go-work/src/trust-me/testdata/legal_pages7_color3.pdf`
+  2 `/Users/pcadmin/go-work/src/trust-me/testdata/cmyk.pdf`
+  3 `/Users/pcadmin/go-work/src/trust-me/testdata/convoluted_line.pdf`
+  4 `/Users/pcadmin/go-work/src/trust-me/testdata/fonts_in_form_xobject.pdf`
+  5 `/Users/pcadmin/go-work/src/trust-me/testdata/WEIß_pages6_color4.pdf`
+  6 `/Users/pcadmin/go-work/src/trust-me/testdata/SergueiOsokineProfile.pdf`
+  7 `/Users/pcadmin/go-work/src/trust-me/testdata/lines.pdf`
+  8 `/Users/pcadmin/go-work/src/trust-me/testdata/AnneMakauProfile.pdf`
+  9 `/Users/pcadmin/go-work/src/trust-me/testdata/lines_over_black.pdf`
+ 10 `/Users/pcadmin/go-work/src/trust-me/testdata/lines_over_black.pdf.pdf`
+ 11 `/Users/pcadmin/go-work/src/trust-me/testdata/English Report.pdf`
+ 12 `/Users/pcadmin/go-work/src/trust-me/testdata/Physics practical.pdf`
+ 13 `/Users/pcadmin/go-work/src/trust-me/testdata/NLP_Obesity_Annotation_Sheet.pdf`
+ 14 `/Users/pcadmin/go-work/src/trust-me/testdata/ERTA Sunday fixture 2017 Winter.pdf`
+ 15 `/Users/pcadmin/go-work/src/trust-me/testdata/202 moot.pdf`
+ 16 `/Users/pcadmin/go-work/src/trust-me/testdata/word_bmp.pdf`
+ 17 `/Users/pcadmin/go-work/src/trust-me/testdata/word_jpeg_grayscale.pdf`
+ 18 `/Users/pcadmin/go-work/src/trust-me/testdata/warnock_camelot.pdf`
+ 19 `/Users/pcadmin/go-work/src/trust-me/testdata/pdl.pdf`
+ 20 `/Users/pcadmin/go-work/src/trust-me/testdata/pre-algebra_translate.pdf`
+ 21 `/Users/pcadmin/go-work/src/trust-me/testdata/twitter_advertiser_list.pdf`
+ 22 `/Users/pcadmin/go-work/src/trust-me/testdata/Sunday 2016 team Fixtures.pdf`
+ 23 `/Users/pcadmin/go-work/src/trust-me/testdata/VI-TUTORIAL.pdf`
+ 24 `/Users/pcadmin/go-work/src/trust-me/testdata/How to Accuse the Other Guy of Lying with Statistics.pdf`
+ 25 `/Users/pcadmin/go-work/src/trust-me/testdata/chickerur.pdf`
+ 26 `/Users/pcadmin/go-work/src/trust-me/testdata/vitae.pdf`
+ 27 `/Users/pcadmin/go-work/src/trust-me/testdata/ACS4PartnerQuotes.pdf`
+ 28 `/Users/pcadmin/go-work/src/trust-me/testdata/pdf00050.pdf`
+ 29 `/Users/pcadmin/go-work/src/trust-me/testdata/49-7441.pdf`
+ 30 `/Users/pcadmin/go-work/src/trust-me/testdata/dense2_lines.pdf`
+ 31 `/Users/pcadmin/go-work/src/trust-me/testdata/rfc6962.txt.pdf`
+ 32 `/Users/pcadmin/go-work/src/trust-me/testdata/ColourNaming.pdf`
+ 33 `/Users/pcadmin/go-work/src/trust-me/testdata/000109.pdf`
+ 34 `/Users/pcadmin/go-work/src/trust-me/testdata/Notes on Noise Contrastive Estimation and Negative Sampling.pdf`
+ 35 `/Users/pcadmin/go-work/src/trust-me/testdata/kernel_trick.pdf`
+ 36 `/Users/pcadmin/go-work/src/trust-me/testdata/ACFrOgCf6f4kzU-mNiolvkiOlADV6cnWfoWv_FZPB6kB4aBtGh68m8KVTc5q0t50Bian-2myr3AQvH0HLbHDFnyo3fY_BDudV1i3zI9i_g6S36lOesSvotIATPqvLF0= (1).pdf`
+ 37 `/Users/pcadmin/go-work/src/trust-me/testdata/jarvisspec02.pdf`
+ 38 `/Users/pcadmin/go-work/src/trust-me/testdata/pedersen-i2b2-2008.pdf`
+ 39 `/Users/pcadmin/go-work/src/trust-me/testdata/hgff.pdf`
+ 40 `/Users/pcadmin/go-work/src/trust-me/testdata/killer_modelling.pdf`
+ 41 `/Users/pcadmin/go-work/src/trust-me/testdata/000009.pdf`
+ 42 `/Users/pcadmin/go-work/src/trust-me/testdata/android.pdf`
+ 43 `/Users/pcadmin/go-work/src/trust-me/testdata/holmes-deconstruction-ebhc-06.pdf`
+ 44 `/Users/pcadmin/go-work/src/trust-me/testdata/unix-vi-editor.pdf`
+ 45 `/Users/pcadmin/go-work/src/trust-me/testdata/10.235.1.2_SMTP_via_LDAP_05-16-2016_09-43-48.pdf.pdf`
+ 46 `/Users/pcadmin/go-work/src/trust-me/testdata/gibbscrf3.pdf`
+ 47 `/Users/pcadmin/go-work/src/trust-me/testdata/MS Activities Term 3 2017 Letter.pdf`
+ 48 `/Users/pcadmin/go-work/src/trust-me/testdata/symbiosis-provocation.pdf`
+ 49 `/Users/pcadmin/go-work/src/trust-me/testdata/Whitepaper-XMP-metadata-in-PDFlib-products.pdf`
+ 50 `/Users/pcadmin/go-work/src/trust-me/testdata/salsa20_spec.pdf`
+ 51 `/Users/pcadmin/go-work/src/trust-me/testdata/2016 FOB Season Launch Breakfast.pdf`
+ 52 `/Users/pcadmin/go-work/src/trust-me/testdata/Kahng_DAC_98.pdf`
+ 53 `/Users/pcadmin/go-work/src/trust-me/testdata/docs.pdf`
+ 54 `/Users/pcadmin/go-work/src/trust-me/testdata/Exam timetable letter 2016.pdf`
+ 55 `/Users/pcadmin/go-work/src/trust-me/testdata/unlexicalized-parsing.pdf`
+ 56 `/Users/pcadmin/go-work/src/trust-me/testdata/4e.pdf`
+ 57 `/Users/pcadmin/go-work/src/trust-me/testdata/Ten ways to promote the natural genius in your child.pdf`
+ 58 `/Users/pcadmin/go-work/src/trust-me/testdata/jonathan_mayer.pdf`
+ 59 `/Users/pcadmin/go-work/src/trust-me/testdata/lec10.pdf`
+ 60 `/Users/pcadmin/go-work/src/trust-me/testdata/midtermF13secondSols.pdf`
+ 61 `/Users/pcadmin/go-work/src/trust-me/testdata/keys2.pdf`
+ 62 `/Users/pcadmin/go-work/src/trust-me/testdata/cv.pdf`
+ 63 `/Users/pcadmin/go-work/src/trust-me/testdata/lecture16.pdf`
+ 64 `/Users/pcadmin/go-work/src/trust-me/testdata/pcfgs.pdf`
+ 65 `/Users/pcadmin/go-work/src/trust-me/testdata/multi_string_search.pdf`
+ 66 `/Users/pcadmin/go-work/src/trust-me/testdata/lexpcfgs.pdf`
+ 67 `/Users/pcadmin/go-work/src/trust-me/testdata/MS Activities Term 2 2016 Letter.pdf`
+ 68 `/Users/pcadmin/go-work/src/trust-me/testdata/SolvingEmail.pdf`
+ 69 `/Users/pcadmin/go-work/src/trust-me/testdata/75.pdf`
+ 70 `/Users/pcadmin/go-work/src/trust-me/testdata/mh-guide-matrix.pdf`
+ 71 `/Users/pcadmin/go-work/src/trust-me/testdata/letter to Parents re Telstra Phone Line.pdf`
+ 72 `/Users/pcadmin/go-work/src/trust-me/testdata/Doc_Test_papercut.pdf`
+ 73 `/Users/pcadmin/go-work/src/trust-me/testdata/stubbs-cv-2015-06.pdf`
+ 74 `/Users/pcadmin/go-work/src/trust-me/testdata/ptrelnot.pdf`
+ 75 `/Users/pcadmin/go-work/src/trust-me/testdata/5021-distributed-representations-of-words-and-phrases-and-their-compositionality.pdf`
+ 76 `/Users/pcadmin/go-work/src/trust-me/testdata/invoice88786339.pdf`
+ 77 `/Users/pcadmin/go-work/src/trust-me/testdata/UMCP CITI Guidance 010814.pdf`
+ 78 `/Users/pcadmin/go-work/src/trust-me/testdata/SyntaxNet Models for the CoNLL 2017 Shared Task.pdf`
+ 79 `/Users/pcadmin/go-work/src/trust-me/testdata/lecture9.pdf`
+ 80 `/Users/pcadmin/go-work/src/trust-me/testdata/Addressing the Rare Word Problem in Neural Machine Translation.pdf`
+ 81 `/Users/pcadmin/go-work/src/trust-me/testdata/Recurrent Neural Network Regularization.pdf`
+ 82 `/Users/pcadmin/go-work/src/trust-me/testdata/yao1982-ocr.pdf`
+ 83 `/Users/pcadmin/go-work/src/trust-me/testdata/lcs.pdf`
+ 84 `/Users/pcadmin/go-work/src/trust-me/testdata/IJIRAE_Survey_on_Text_Classification.pdf`
+ 85 `/Users/pcadmin/go-work/src/trust-me/testdata/Peter W Power Pack - Thank You - Apple (AU).pdf`
+ 86 `/Users/pcadmin/go-work/src/trust-me/testdata/lec04.pdf`
+ 87 `/Users/pcadmin/go-work/src/trust-me/testdata/HH factsheet.pdf`
+ 88 `/Users/pcadmin/go-work/src/trust-me/testdata/SA_implementations.pdf`
+ 89 `/Users/pcadmin/go-work/src/trust-me/testdata/fawkes.pdf`
+ 90 `/Users/pcadmin/go-work/src/trust-me/testdata/lec03-sp01.pdf`
+ 91 `/Users/pcadmin/go-work/src/trust-me/testdata/lm.pdf`
+ 92 `/Users/pcadmin/go-work/src/trust-me/testdata/7600_Model355_ColorElectrostaticPlotter_TechnicalData_5959-9727-6pages_Jan90.pdf`
+ 93 `/Users/pcadmin/go-work/src/trust-me/testdata/cbc02_e02d.pdf`
+ 94 `/Users/pcadmin/go-work/src/trust-me/testdata/NitroReader_3_Release_Notes_en.pdf`
+ 95 `/Users/pcadmin/go-work/src/trust-me/testdata/2017 Arts Festival Letter.pdf`
+ 96 `/Users/pcadmin/go-work/src/trust-me/testdata/l1_logistic_reg_aaai.pdf`
+ 97 `/Users/pcadmin/go-work/src/trust-me/testdata/broadcastEncryption.pdf`
+ 98 `/Users/pcadmin/go-work/src/trust-me/testdata/Distributed Representations.pdf`
+ 99 `/Users/pcadmin/go-work/src/trust-me/testdata/ICT Parent letter 7 2016.pdf`
+100 `/Users/pcadmin/go-work/src/trust-me/testdata/cv14.pdf`
+101 `/Users/pcadmin/go-work/src/trust-me/testdata/Learning Distributed Representations of Sentences from Unlabelled Data.pdf`
+102 `/Users/pcadmin/go-work/src/trust-me/testdata/A Large-Scale Exploration of Effective Global Features for a Joint Entity Detection and Tracking Model.pdf`
+103 `/Users/pcadmin/go-work/src/trust-me/testdata/WhatsApp-Security-Whitepaper.pdf`
+104 `/Users/pcadmin/go-work/src/trust-me/testdata/nitro-pro-10.pdf`
+105 `/Users/pcadmin/go-work/src/trust-me/testdata/outbreak.pdf`
+106 `/Users/pcadmin/go-work/src/trust-me/testdata/097af05e8de39370dd287c74653b715c8f6a.pdf`
+107 `/Users/pcadmin/go-work/src/trust-me/testdata/database_03_abs.pdf`
+108 `/Users/pcadmin/go-work/src/trust-me/testdata/8ca1c549e000ee0e22609412cfa00be9faa7.pdf`
+109 `/Users/pcadmin/go-work/src/trust-me/testdata/icassp-draft.pdf`
+110 `/Users/pcadmin/go-work/src/trust-me/testdata/Role of Team Manager Summer 2016.pdf`
+111 `/Users/pcadmin/go-work/src/trust-me/testdata/recht11a.pdf`
+112 `/Users/pcadmin/go-work/src/trust-me/testdata/BSD 5 Roster 2017.pdf`
+113 `/Users/pcadmin/go-work/src/trust-me/testdata/0165551514551903.pdf`
+114 `/Users/pcadmin/go-work/src/trust-me/testdata/Letter to families 7 - 12  re report changes Semester 1 2017.pdf`
+115 `/Users/pcadmin/go-work/src/trust-me/testdata/lecture5.pdf`
+116 `/Users/pcadmin/go-work/src/trust-me/testdata/P10-1040.pdf`
+117 `/Users/pcadmin/go-work/src/trust-me/testdata/WHY LAWYERS ARE UNHAPPY.pdf`
+118 `/Users/pcadmin/go-work/src/trust-me/testdata/mehrotra_trick_final2.pdf`
+119 `/Users/pcadmin/go-work/src/trust-me/testdata/kuksa08nips.pdf`
+120 `/Users/pcadmin/go-work/src/trust-me/testdata/biau08a.pdf`
+121 `/Users/pcadmin/go-work/src/trust-me/testdata/se.pdf`
+122 `/Users/pcadmin/go-work/src/trust-me/testdata/Deep Neural Networks Do Not Recognize Negative Images.pdf`
+123 `/Users/pcadmin/go-work/src/trust-me/testdata/designofasearchablesymmetrickeyciphersystem-120529001108-phpapp02.pdf`
+124 `/Users/pcadmin/go-work/src/trust-me/testdata/Letter regarding School Lockdown 180517.pdf`
+125 `/Users/pcadmin/go-work/src/trust-me/testdata/twitter_sentimenti.pdf`
+126 `/Users/pcadmin/go-work/src/trust-me/testdata/resume.pdf`
+127 `/Users/pcadmin/go-work/src/trust-me/testdata/NAPLAN parent letter 2017 (1).pdf`
+128 `/Users/pcadmin/go-work/src/trust-me/testdata/knn  v3.pdf`
+129 `/Users/pcadmin/go-work/src/trust-me/testdata/1502.03167.pdf`
+130 `/Users/pcadmin/go-work/src/trust-me/testdata/Batch Normalization- Accelerating Deep Network Training by Reducing Internal Covariate Shift.pdf`
+131 `/Users/pcadmin/go-work/src/trust-me/testdata/Yemeni_Laws92.pdf`
+132 `/Users/pcadmin/go-work/src/trust-me/testdata/salsafamily-20071225.pdf`
+133 `/Users/pcadmin/go-work/src/trust-me/testdata/IJCTT-V3I1P108.pdf`
+134 `/Users/pcadmin/go-work/src/trust-me/testdata/Zendesk FAQ.pdf`
+135 `/Users/pcadmin/go-work/src/trust-me/testdata/547.pdf`
+136 `/Users/pcadmin/go-work/src/trust-me/testdata/batsbzx201630-20.pdf`
+137 `/Users/pcadmin/go-work/src/trust-me/testdata/Interview_with_Christine_Nixon_-_Report.pdf`
+138 `/Users/pcadmin/go-work/src/trust-me/testdata/Suffix.pdf`
+139 `/Users/pcadmin/go-work/src/trust-me/testdata/RAND_PE198.pdf`
+140 `/Users/pcadmin/go-work/src/trust-me/testdata/p.pdf`
+141 `/Users/pcadmin/go-work/src/trust-me/testdata/SemanticStates201.pdf`
+142 `/Users/pcadmin/go-work/src/trust-me/testdata/bitcoin.pdf`
+143 `/Users/pcadmin/go-work/src/trust-me/testdata/Alfa-College-EN.pdf`
+144 `/Users/pcadmin/go-work/src/trust-me/testdata/encsearch.pdf`
+145 `/Users/pcadmin/go-work/src/trust-me/testdata/Highway-LSTM and Recurrent Highway Networks for Speech Recognition.pdf`
+146 `/Users/pcadmin/go-work/src/trust-me/testdata/Highway-LSTM.pdf`
+147 `/Users/pcadmin/go-work/src/trust-me/testdata/a_outline.pdf`
+148 `/Users/pcadmin/go-work/src/trust-me/testdata/nips01-discriminativegenerative.pdf`
+149 `/Users/pcadmin/go-work/src/trust-me/testdata/KEI_UT_Raessler.pdf`
+150 `/Users/pcadmin/go-work/src/trust-me/testdata/Term One Sport Junior.pdf`
+151 `/Users/pcadmin/go-work/src/trust-me/testdata/2744372.pdf`
+152 `/Users/pcadmin/go-work/src/trust-me/testdata/1603.06186v2.pdf`
+153 `/Users/pcadmin/go-work/src/trust-me/testdata/suffix-icalp03.pdf`
+154 `/Users/pcadmin/go-work/src/trust-me/testdata/explosion-database-choice.pdf`
+155 `/Users/pcadmin/go-work/src/trust-me/testdata/shamirturing.pdf`
+156 `/Users/pcadmin/go-work/src/trust-me/testdata/Random projections for the nonnegative least-squares problem.pdf`
+157 `/Users/pcadmin/go-work/src/trust-me/testdata/dcba-20040404.pdf`
+158 `/Users/pcadmin/go-work/src/trust-me/testdata/a_solid.pdf`
+159 `/Users/pcadmin/go-work/src/trust-me/testdata/Letter to  Community re Age Story December 2016.pdf`
+160 `/Users/pcadmin/go-work/src/trust-me/testdata/1206.6382.pdf`
+8 fail
+  0 `/Users/pcadmin/go-work/src/trust-me/testdata/Jedi.pdf`
+  1 `/Users/pcadmin/go-work/src/trust-me/testdata/A Sunshine - IEP.pdf`
+  2 `/Users/pcadmin/go-work/src/trust-me/testdata/2017 Student Residential Address Collection.pdf`
+  3 `/Users/pcadmin/go-work/src/trust-me/testdata/COLOR_TEST0.pdf`
+  4 `/Users/pcadmin/go-work/src/trust-me/testdata/docpro07aut.pdf`
+  5 `/Users/pcadmin/go-work/src/trust-me/testdata/Linguistic Regularities in Continuous Space Word Representations.pdf`
+  6 `/Users/pcadmin/go-work/src/trust-me/testdata/703eca3ce8c33c7651811d07e037d38d7a2e.pdf`
+  7 `/Users/pcadmin/go-work/src/trust-me/testdata/icnp12-qinghua.pdf`
