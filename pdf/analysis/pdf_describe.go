@@ -43,7 +43,7 @@ func initUniDoc(debug bool) error {
 
 	pdf.SetPdfCreator("Peter Williams")
 
-	// To make the library log we just have to initialise the logger which satisfies
+	// To make the library log we just have to initialize the logger which satisfies
 	// the common.Logger interface, common.DummyLogger is the default and
 	// does not do anything. Very easy to implement your own.
 	// common.SetLogger(common.DummyLogger{})
@@ -67,13 +67,14 @@ pdf_describe -o <output directory> [-d][-a][-min <val>][-max <val>] <file1> <fil
 
 func main() {
 	debug := false            // Write debug level info to stdout?
-	keep := false             // Keep the rasters used for PDF comparison"
+	strict := true            // panic immediately a page color detection error occurs"
 	compareGrayscale := false // Do PDF raster comparison on grayscale rasters?
 	runAllTests := false      // Don't stop when a PDF file fails to process?
 	var minSize int64 = -1    // Minimum size for an input PDF to be processed.
 	var maxSize int64 = -1    // Maximum size for an input PDF to be processed.
 	var results string        // Results file
 	flag.BoolVar(&debug, "d", false, "Enable debug logging")
+	flag.BoolVar(&strict, "s", false, "Enable strict checking")
 	flag.BoolVar(&compareGrayscale, "g", false, "Do PDF raster comparison on grayscale rasters")
 	flag.BoolVar(&runAllTests, "a", false, "Run all tests. Don't stop at first failure")
 	flag.Int64Var(&minSize, "min", -1, "Minimum size of files to process (bytes)")
@@ -93,9 +94,7 @@ func main() {
 	}
 	compDir := makeUniqueDir("compare.pdfs")
 	fmt.Fprintf(os.Stderr, "compDir=%#q\n", compDir)
-	if !keep {
-		defer removeDir(compDir)
-	}
+	defer removeDir(compDir)
 
 	writers := []io.Writer{os.Stderr}
 	if len(results) > 0 {
@@ -119,13 +118,24 @@ func main() {
 
 	for idx, inputPath := range pdfList {
 
+		colorPagesIn, err := pdfColorPages(inputPath, compDir)
+		if err != nil {
+			common.Log.Error("PDF is damaged. err=%v\n\tinputPath=%#q", err, inputPath)
+			continue
+		}
+		var strictColorPages []int = nil
+		if strict {
+			strictColorPages = colorPagesIn
+		}
+
 		_, name := filepath.Split(inputPath)
 		inputSize := fileSize(inputPath)
 		report(writers, "%3d of %d %#-30q  (%6d)", idx, len(pdfList), name, inputSize)
 
 		result := "pass"
 		t0 := time.Now()
-		numPages, colorPages, err := describePdf(inputPath)
+
+		numPages, colorPages, err := describePdf(inputPath, strictColorPages)
 		dt := time.Since(t0)
 		if err != nil {
 			common.Log.Error("describePdf failed. err=%v", err)
@@ -134,22 +144,16 @@ func main() {
 		report(writers, " %d pages %d color %.3f sec", numPages, len(colorPages), dt.Seconds())
 
 		if result == "pass" {
-			colorPagesIn, err := pdfColorPages(inputPath, compDir)
-
-			if err != nil || !equalSlices(colorPagesIn, colorPages) {
-				if err != nil {
-					common.Log.Error("PDF is damaged. err=%v\n\tinputPath=%#q", err, inputPath)
-				} else {
-					common.Log.Error("pdfColorPages: \ncolorPagesIn=%d %v\ncolorPages  =%d %v",
-						len(colorPagesIn), colorPagesIn, len(colorPages), colorPages)
-					fp := sliceDiff(colorPages, colorPagesIn)
-					fn := sliceDiff(colorPagesIn, colorPages)
-					if len(fp) > 0 {
-						common.Log.Error("False positives=%d %+v", len(fp), fp)
-					}
-					if len(fn) > 0 {
-						common.Log.Error("False negatives=%d %+v", len(fn), fn)
-					}
+			if !equalSlices(colorPagesIn, colorPages) {
+				common.Log.Error("pdfColorPages: \ncolorPagesIn=%d %v\ncolorPages  =%d %v",
+					len(colorPagesIn), colorPagesIn, len(colorPages), colorPages)
+				fp := sliceDiff(colorPages, colorPagesIn)
+				fn := sliceDiff(colorPagesIn, colorPages)
+				if len(fp) > 0 {
+					common.Log.Error("False positives=%d %+v", len(fp), fp)
+				}
+				if len(fn) > 0 {
+					common.Log.Error("False negatives=%d %+v", len(fn), fn)
 				}
 				result = "fail"
 			}
@@ -190,7 +194,7 @@ func main() {
 }
 
 // describePdf reads PDF `inputPath` and returns number of pages, slice of color page numbers (1-offset)
-func describePdf(inputPath string) (int, []int, error) {
+func describePdf(inputPath string, strictColorPages []int) (int, []int, error) {
 
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -231,9 +235,21 @@ func describePdf(inputPath string) (int, []int, error) {
 		if err != nil {
 			return numPages, colorPages, err
 		}
+		if strictColorPages != nil {
+			strictColored := contains(strictColorPages, pageNum)
+			if colored != strictColored {
+				common.Log.Error("$$$$$$# Mismatch: Redoing pageNum=%d strictColored=%t colored=%t",
+					pageNum, strictColored, colored)
+				colored, _ = isPageColored(page, desc, true)
+				common.Log.Error("$$$$$$* Mismatch: Redid inputPath=%q pageNum=%d strictColored=%t colored=%t",
+					inputPath, pageNum, strictColored, colored)
+				panic("Done")
+			}
+		}
 		if colored {
 			colorPages = append(colorPages, pageNum)
 		}
+
 	}
 
 	return numPages, colorPages, nil
@@ -300,6 +316,9 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 	processor.AddHandler(pdfcontent.HandlerConditionEnumAllOperands, "",
 		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState,
 			resources *pdf.PdfPageResources) error {
+			if colored {
+				return nil
+			}
 			operand := op.Operand
 			switch operand {
 			case "SC", "SCN": // Set stroking color.  Includes pattern colors.
@@ -456,6 +475,9 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 	// object as the parameter for BI.
 	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "BI",
 		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
+			if colored {
+				return nil
+			}
 			if len(op.Params) != 1 {
 				err := errors.New("invalid number of parameters")
 				common.Log.Error("BI error. err=%v")
@@ -494,7 +516,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				common.Log.Error("Error converting image to rgb: %v", err)
 				return err
 			}
-			hasCol := isRgbImageColored(rgbImg)
+			hasCol := isRgbImageColored(rgbImg, debug)
 			colored = colored || hasCol
 			if debug {
 				common.Log.Info("hasCol=%t", hasCol)
@@ -508,6 +530,9 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 
 	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "Do",
 		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
+			if colored {
+				return nil
+			}
 
 			if len(op.Params) < 1 {
 				common.Log.Error("Invalid number of params for Do object")
@@ -531,7 +556,6 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			common.Log.Debug("xtype=%+v pdf.XObjectTypeImage=%v", xtype, pdf.XObjectTypeImage)
 
 			if xtype == pdf.XObjectTypeImage {
-
 				ximg, err := resources.GetXObjectImageByName(*name)
 				if err != nil {
 					common.Log.Error("Error w/GetXObjectImageByName : %v", err)
@@ -542,8 +566,10 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 						ximg.Filter.GetFilterName(), ximg.ColorSpace,
 						ximg.ImageMask, *ximg.Width, *ximg.Height)
 				}
-				if ximg.ColorSpace.GetNumComponents() == 1 {
-					return nil
+				if _, isIndexed := ximg.ColorSpace.(*pdf.PdfColorspaceSpecialIndexed); !isIndexed {
+					if ximg.ColorSpace.GetNumComponents() == 1 {
+						return nil
+					}
 				}
 				switch ximg.Filter.GetFilterName() {
 				// TODO: Add JPEG2000 encoding/decoding. Until then we assume JPEG200 images are color
@@ -574,7 +600,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					common.Log.Info("rgbImg: ColorComponents=%d wxh=%dx%d", rgbImg.ColorComponents, rgbImg.Width, rgbImg.Height)
 				}
 
-				hasCol := isRgbImageColored(rgbImg)
+				hasCol := isRgbImageColored(rgbImg, debug)
 				processedXObjects[string(*name)] = hasCol
 				colored = colored || hasCol
 				if debug {
@@ -703,7 +729,7 @@ func isColorColored(color pdf.PdfColor) bool {
 }
 
 // isRgbImageColored returns true if `img` contains any color pixels
-func isRgbImageColored(img pdf.Image) bool {
+func isRgbImageColored(img pdf.Image, debug bool) bool {
 
 	samples := img.GetSamples()
 	maxVal := math.Pow(2, float64(img.BitsPerComponent)) - 1
@@ -714,6 +740,11 @@ func isRgbImageColored(img pdf.Image) bool {
 		g := float64(samples[i+1]) / maxVal
 		b := float64(samples[i+2]) / maxVal
 		if visible(r-g, r-b, g-b) {
+			if debug {
+				common.Log.Info("@@ colored pixel: i=%d rgb=%.3f %.3f %.3f", i, r, g, b)
+				common.Log.Info("                 delta rgb=%.3f %.3f %.3f", r-g, r-b, g-b)
+				common.Log.Info("            colorTolerance=%.3f", colorTolerance)
+			}
 			return true
 		}
 	}
@@ -722,7 +753,7 @@ func isRgbImageColored(img pdf.Image) bool {
 
 // ColorTolerance is the smallest color component that is visible on a typical mid-range color laser printer
 // cpts have values in range 0.0-1.0
-const colorTolerance = 0.5 / 255.0
+const colorTolerance = 3.1 / 255.0
 
 // visible returns true if any of color component `cpts` is visible on a typical mid-range color laser printer
 // cpts have values in range 0.0-1.0
@@ -918,10 +949,12 @@ func isColorImage(path string) (bool, error) {
 	return imgIsColor(img), nil
 }
 
+const F = 255.0 / float64(0xFFFF)
+
 // colorThreshold is the min difference of r,g,b values for which a pixel is considered to be color
 // Color components are in range 0-0xFFFF
-// We make this 10x the PDF color threshold as guess
-const colorThreshold = colorTolerance * float64(0xFFFF) * 10.0
+// We make this 5 on a 0-255 scale as a guess
+const colorThreshold = 5.0 // / F
 
 // imgIsColor returns true if image `img` contains color
 func imgIsColor(img image.Image) bool {
@@ -929,8 +962,9 @@ func imgIsColor(img image.Image) bool {
 	for x := 0; x < w; x++ {
 		for y := 0; y < h; y++ {
 			rr, gg, bb, _ := img.At(x, y).RGBA()
-			r, g, b := float64(rr), float64(gg), float64(bb)
+			r, g, b := float64(rr)*F, float64(gg)*F, float64(bb)*F
 			if math.Abs(r-g) > colorThreshold || math.Abs(r-b) > colorThreshold || math.Abs(g-b) > colorThreshold {
+				// fmt.Printf("@@@ xy=%d %d rgb=%.3f %.3f %.3f =%.3f %.3f %.3f\n", x, y, r, g, b, r-g, r-b, g-b)
 				return true
 			}
 		}
@@ -1017,7 +1051,7 @@ func fileSize(path string) int64 {
 	return fi.Size()
 }
 
-// sliceDiff returns the elements in a that aren't in b
+// sliceDiff returns the elements in `a` that aren't in `b`
 func sliceDiff(a, b []int) []int {
 	mb := map[int]bool{}
 	for _, x := range b {
@@ -1030,4 +1064,14 @@ func sliceDiff(a, b []int) []int {
 		}
 	}
 	return ab
+}
+
+// contains returns true if `s` contains `e`
+func contains(s []int, e int) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
