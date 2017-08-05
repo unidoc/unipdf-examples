@@ -259,12 +259,6 @@ func describePdf(inputPath string, strictColorPages []int) (int, []int, error) {
 // XObject Images and Forms to _possibly_ record if they contain color
 func isPageColored(page *pdf.PdfPage, desc string, debug bool) (bool, error) {
 	// For each page, we go through the resources and look for the images.
-	resources, err := page.GetResources()
-	if err != nil {
-		common.Log.Error("GetResources failed. err=%v", err)
-		return false, err
-	}
-
 	contents, err := page.GetAllContentStreams()
 	if err != nil {
 		common.Log.Error("GetAllContentStreams failed. err=%v", err)
@@ -279,7 +273,7 @@ func isPageColored(page *pdf.PdfPage, desc string, debug bool) (bool, error) {
 		fmt.Println("==================================")
 	}
 
-	colored, err := isContentStreamColored(contents, resources, debug)
+	colored, err := isContentStreamColored(contents, page.Resources, debug)
 	if debug {
 		common.Log.Info("colored=%t err=%v", colored, err)
 	}

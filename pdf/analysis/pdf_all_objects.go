@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"sort"
 
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
@@ -72,23 +71,12 @@ func inspectPdf(inputPath string) error {
 
 	fmt.Printf("PDF Num Pages: %d\n", numPages)
 
-	keyNum, err := pdfReader.GetObjectNums()
-	if err != nil {
-		return err
-	}
-
-	keys := []int{}
-	for k := range keyNum {
-		keys = append(keys, k)
-	}
-	// Give consistent ordering of PDF objects in output
-	sort.Ints(keys)
+	objNums := pdfReader.GetObjectNums()
 
 	// Output.
-	fmt.Printf("%d PDF objects:\n", len(keyNum))
-	for i, key := range keys {
-		objNum := keyNum[key]
-		obj, err := pdfReader.GetIndirectObjectByNumber(key)
+	fmt.Printf("%d PDF objects:\n", len(objNums))
+	for i, objNum := range objNums {
+		obj, err := pdfReader.GetIndirectObjectByNumber(objNum)
 		if err != nil {
 			return err
 		}
