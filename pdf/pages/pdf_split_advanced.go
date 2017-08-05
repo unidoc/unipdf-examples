@@ -87,7 +87,7 @@ func splitPdf(inputPath string, outputPath string, pageFrom int, pageTo int) err
 	}
 
 	if numPages < pageTo {
-		return err
+		return fmt.Errorf("numPages (%d) < pageTo (%d)", numPages, pageTo)
 	}
 
 	// Keep the OC properties intact (optional content).
