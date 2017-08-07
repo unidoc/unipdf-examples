@@ -133,7 +133,7 @@ func convertPageToGrayscale(page *pdf.PdfPage) error {
 	return nil
 }
 
-// Check if colorspace represents a Pattern colorspace.
+// isPatternCS returns true if `colorspace` represents a Pattern colorspace.
 func isPatternCS(cs pdf.PdfColorspace) bool {
 	_, isPattern := cs.(*pdf.PdfColorspaceSpecialPattern)
 	return isPattern
@@ -256,7 +256,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 					if _, has := transformedPatterns[patternColor.PatternName]; has {
 						// Already processed, need not change anything, except underlying color if used.
-						op.Params = append(op.Params, pdfcore.MakeName(string(patternColor.PatternName)))
+						op.Params = append(op.Params, &patternColor.PatternName)
 						*processedOperations = append(*processedOperations, &op)
 						return nil
 					}
@@ -275,7 +275,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					}
 					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
 
-					op.Params = append(op.Params, pdfcore.MakeName(string(patternColor.PatternName)))
+					op.Params = append(op.Params, &patternColor.PatternName)
 					*processedOperations = append(*processedOperations, &op)
 				} else {
 					color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
@@ -318,7 +318,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 					if _, has := transformedPatterns[patternColor.PatternName]; has {
 						// Already processed, need not change anything, except underlying color if used.
-						op.Params = append(op.Params, pdfcore.MakeName(string(patternColor.PatternName)))
+						op.Params = append(op.Params, &patternColor.PatternName)
 						*processedOperations = append(*processedOperations, &op)
 						return nil
 					}
@@ -336,8 +336,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						return err
 					}
 					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
-
-					op.Params = append(op.Params, pdfcore.MakeName(string(patternColor.PatternName)))
+					op.Params = append(op.Params, &patternColor.PatternName)
 					*processedOperations = append(*processedOperations, &op)
 				} else {
 					color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
@@ -402,6 +401,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 				shading, found := resources.GetShadingByName(*shname)
 				if !found {
+					unicommon.Log.Error("Shading not defined in resources. shname=%#q", string(*shname))
 					return errors.New("Shading not defined in resources")
 				}
 
@@ -431,36 +431,51 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				return errors.New("Invalid inline image parameter")
 			}
 
-			img, err := iimg.ToImage(resources)
+			cs, err := iimg.GetColorSpace(resources)
 			if err != nil {
-				fmt.Printf("Error converting inline image to image: %v\n", err)
+				unicommon.Log.Error("Error getting color space for inline image: %v", err)
 				return err
 			}
 
-			cs, err := iimg.GetColorSpace(resources)
+			if cs.GetNumComponents() == 1 {
+				return nil
+			}
+
+			encoder, err := iimg.GetEncoder()
 			if err != nil {
-				fmt.Printf("Error getting color space for inline image: %v\n", err)
+				unicommon.Log.Error("Error getting encoder for inline image: %v", err)
+				return err
+			}
+
+			switch encoder.GetFilterName() {
+			// TODO: Add JPEG2000 encoding/decoding. Until then we assume JPEG200 images are color
+			case "JPXDecode":
+				return nil
+			// These filters are only used with grayscale images
+			case "CCITTDecode", "JBIG2Decode", "RunLengthDecode":
+				return nil
+			}
+
+			img, err := iimg.ToImage(resources)
+			if err != nil {
+				unicommon.Log.Error("Error converting inline image to image: %v", err)
 				return err
 			}
 			rgbImg, err := cs.ImageToRGB(*img)
 			if err != nil {
-				fmt.Printf("Error converting image to rgb: %v\n", err)
+				unicommon.Log.Error("Error converting image to rgb: %v", err)
 				return err
 			}
 			rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
 			grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
 			if err != nil {
-				fmt.Printf("Error converting img to gray: %v\n", err)
+				unicommon.Log.Error("Error converting img to gray: %v", err)
 				return err
 			}
 
 			// Update the XObject image.
 			// Use same encoder as input data.  Make sure for DCT filter it is updated to 1 color component.
-			encoder, err := iimg.GetEncoder()
-			if err != nil {
-				fmt.Printf("Error getting encoder for inline image: %v\n", err)
-				return err
-			}
+
 			if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
 				dctEncoder.ColorComponents = 1
 			}
@@ -510,12 +525,23 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 			_, xtype := resources.GetXObjectByName(*name)
 			if xtype == pdf.XObjectTypeImage {
-				//fmt.Printf(" XObject Image: %s\n", *name)
 
 				ximg, err := resources.GetXObjectImageByName(*name)
 				if err != nil {
 					fmt.Printf("Error w/GetXObjectImageByName : %v\n", err)
 					return err
+				}
+
+				if ximg.ColorSpace.GetNumComponents() == 1 {
+					return nil
+				}
+				switch ximg.Filter.GetFilterName() {
+				// TODO: Add JPEG2000 encoding/decoding. Until then we assume JPEG200 images are color
+				case "JPXDecode":
+					return nil
+				// These filters are only used with grayscale images
+				case "CCITTDecode", "JBIG2Decode", "RunLengthDecode":
+					return nil
 				}
 
 				img, err := ximg.ToImage()
@@ -610,17 +636,6 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 		fmt.Printf("Error processing: %v\n", err)
 		return nil, err
 	}
-
-	// For debug purposes: (high level logging).
-	//
-	//fmt.Printf("=== Unprocessed - Full list\n")
-	//for idx, op := range operations {
-	//	fmt.Printf("U. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
-	//}
-	//fmt.Printf("=== Processed - Full list\n")
-	//for idx, op := range *processedOperations {
-	//	fmt.Printf("P. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
-	//}
 
 	return processedOperations.Bytes(), nil
 }
