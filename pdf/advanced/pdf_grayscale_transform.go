@@ -452,7 +452,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			case "JPXDecode":
 				return nil
 			// These filters are only used with grayscale images
-			case "CCITTDecode", "JBIG2Decode", "RunLengthDecode":
+			case "CCITTDecode", "JBIG2Decode":
 				return nil
 			}
 
@@ -540,7 +540,13 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				case "JPXDecode":
 					return nil
 				// These filters are only used with grayscale images
-				case "CCITTDecode", "JBIG2Decode", "RunLengthDecode":
+				case "CCITTDecode", "JBIG2Decode":
+					return nil
+				}
+
+				// Hacky workaround for Szegedy_Going_Deeper_With_2015_CVPR_paper.pdf that has a colored image
+				// that is completely masked
+				if ximg.Filter.GetFilterName() == "RunLengthDecode" && ximg.SMask != nil {
 					return nil
 				}
 
