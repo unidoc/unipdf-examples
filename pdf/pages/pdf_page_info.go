@@ -118,6 +118,11 @@ func processPage(page *pdf.PdfPage) error {
 	pageHeight := mBox.Ury - mBox.Lly
 
 	fmt.Printf(" Page: %+v\n", page)
+	if page.Rotate != nil {
+		fmt.Printf(" Page rotation: %v\n", *page.Rotate)
+	} else {
+		fmt.Printf(" Page rotation: 0\n")
+	}
 	fmt.Printf(" Page mediabox: %+v\n", page.MediaBox)
 	fmt.Printf(" Page height: %f\n", pageHeight)
 	fmt.Printf(" Page width: %f\n", pageWidth)
