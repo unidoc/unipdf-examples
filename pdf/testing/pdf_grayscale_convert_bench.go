@@ -904,6 +904,10 @@ func convertShadingToGray(shading *pdf.PdfShading) (*pdf.PdfShading, error) {
 
 	if cs.GetNumComponents() == 1 {
 		// Already grayscale, should be fine. No action taken.
+
+		// Make sure is device gray.
+		shading.ColorSpace = pdf.NewPdfColorspaceDeviceGray()
+
 		return shading, nil
 	} else if cs.GetNumComponents() == 3 {
 		// Create a new DeviceN colorspace that converts R,G,B -> Grayscale
