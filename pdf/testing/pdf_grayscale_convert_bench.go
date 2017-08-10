@@ -386,6 +386,16 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 	transformedPatterns := map[pdfcore.PdfObjectName]bool{} // List of already transformed patterns. Avoid multiple conversions.
 	transformedShadings := map[pdfcore.PdfObjectName]bool{} // List of already transformed shadings. Avoid multiple conversions.
 
+	// Make a map of pattern colorspaces. Once processed, changes UnderlyingCS to DeviceGray.
+	patternColorspaces := map[*pdf.PdfColorspaceSpecialPattern]bool{}
+	defer func() {
+		// At the very end, set the UnderlyingCS to DeviceGray.
+		// TODO: Needs to be global?  I.e. do this at the very end of the execution.
+		for patternCS, _ := range patternColorspaces {
+			patternCS.UnderlyingCS = pdf.NewPdfColorspaceDeviceGray()
+		}
+	}()
+
 	// The content stream processor keeps track of the graphics state and we can make our own handlers to process
 	// certain commands using the AddHandler method. In this case, we hook up to color related operands, and for image
 	// and form handling.
@@ -415,10 +425,8 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 							return errors.New("Type error")
 						}
 
-						if patternCS.UnderlyingCS != nil {
-							// Swap out for a gray colorspace.
-							patternCS.UnderlyingCS = pdf.NewPdfColorspaceDeviceGray()
-						}
+						// Mark for processing.
+						patternColorspaces[patternCS] = true
 
 						resources.ColorSpace.Colorspaces[string(*csname)] = patternCS
 					}
@@ -451,10 +459,8 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 							return errors.New("Type error")
 						}
 
-						if patternCS.UnderlyingCS != nil {
-							// Swap out for a gray colorspace.
-							patternCS.UnderlyingCS = pdf.NewPdfColorspaceDeviceGray()
-						}
+						// Mark for processing.
+						patternColorspaces[patternCS] = true
 
 						resources.ColorSpace.Colorspaces[string(*csname)] = patternCS
 					}
@@ -541,7 +547,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					}
 
 					if patternColor.Color != nil {
-						color, err := gs.ColorspaceNonStroking.ColorToRGB(patternColor.Color)
+						color, err := gs.ColorspaceNonStroking.ColorToRGB(patternColor) //.Color)
 						if err != nil {
 							common.Log.Error("err=%v", err)
 							return err
@@ -774,16 +780,6 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					return err
 				}
 
-				common.Log.Debug("ximg.ColorSpace: %#v", ximg.ColorSpace)
-				// XXX/FIXME: This is not the way to go for Indexed colorspace...
-				// Commenting out..
-				/*
-					if ximg.ColorSpace.GetNumComponents() == 1 {
-						common.Log.Debug("ximg.ColorSpace has components = 1 - return nil")
-						// FIXME: Make sure is DeviceGray?
-						return nil
-					}
-				*/
 				if ignoreGrayFilters {
 					switch ximg.Filter.GetFilterName() {
 					// TODO: Add JPEG2000 encoding/decoding. Until then we assume JPEG200 images are color
