@@ -67,12 +67,17 @@ pdf_grayscale_convert_bench -g <output directory> [-r <results>][-d][-k][-a][-mi
 -k: Keep temp PNG files used for PDF grayscale test
 `
 
+// Ignore CCITTFaxDecode, JBIG2 - that are always grayscale.
+// Change with -ignoregrayfilters=false
+var ignoreGrayFilters = true
+
 func initUniDoc(debug bool) {
 	pdf.SetPdfCreator("pdf_grayscale_convert_bench test suite")
 
 	logLevel := common.LogLevelInfo
 	if debug {
 		logLevel = common.LogLevelDebug
+		//logLevel = common.LogLevelTrace
 	}
 	common.SetLogger(common.ConsoleLogger{LogLevel: logLevel})
 }
@@ -87,11 +92,12 @@ func main() {
 	debug := false       // Write debug level info to stdout?
 	runAllTests := false // Don't stop when a PDF file fails to process?
 	compRoot := ""
-	var minSize int64 = -1 // Minimum size for an input PDF to be processed
-	var maxSize int64 = -1 // Maximum size for an input PDF to be processed
-	results := ""          // Results are written here
-	outputDir := ""        // Transformed PDFs are written here
-	keep := false          // Keep the rasters used for PDF comparison
+	var minSize int64 = -1   // Minimum size for an input PDF to be processed
+	var maxSize int64 = -1   // Maximum size for an input PDF to be processed
+	results := ""            // Results are written here
+	outputDir := ""          // Transformed PDFs are written here
+	keep := false            // Keep the rasters used for PDF comparison
+	ignoreGrayFilters = true // Ignore CCITTFaxDecode, JBIG2 - that are always grayscale.
 
 	flag.BoolVar(&debug, "d", false, "Enable debug logging")
 	flag.BoolVar(&runAllTests, "a", false, "Run all tests. Don't stop at first failure")
@@ -101,6 +107,7 @@ func main() {
 	flag.StringVar(&outputDir, "g", "", "Output directory")
 	flag.StringVar(&results, "r", "", "Results file")
 	flag.BoolVar(&keep, "k", false, "Keep the rasters used for PDF comparison")
+	flag.BoolVar(&ignoreGrayFilters, "ignoregrayfilters", true, "Ignore gray filters (CCITTFaxDecode, JPXDecode)")
 
 	flag.Parse()
 	args := flag.Args()
@@ -244,6 +251,31 @@ func main() {
 	report(writers, "%d fail\n", len(failFiles))
 	for i, path := range failFiles {
 		report(writers, "%3d %#q - %s\n", i, path, failErrors[i])
+	}
+
+	// Make a frequency count of error messages.
+	errFreqMap := map[string]int{}
+	for _, errstr := range failErrors {
+		if _, has := errFreqMap[errstr]; has {
+			errFreqMap[errstr]++
+		} else {
+			errFreqMap[errstr] = 1
+		}
+	}
+	type errFreqEntry struct {
+		errmsg string
+		count  int
+	}
+	entries := []errFreqEntry{}
+	for errstr, count := range errFreqMap {
+		entries = append(entries, errFreqEntry{errstr, count})
+	}
+	sort.Slice(entries, func(i, j int) bool {
+		return entries[i].count < entries[j].count
+	})
+	report(writers, "Error frequencies:\n")
+	for _, entry := range entries {
+		report(writers, "%d - %s\n", entry.count, entry.errmsg)
 	}
 }
 
@@ -652,13 +684,15 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				return err
 			}
 
-			switch encoder.GetFilterName() {
-			// TODO: Add JPEG2000 encoding/decoding. Until then we assume JPEG200 images are color
-			case "JPXDecode":
-				return nil
-			// These filters are only used with grayscale images
-			case "CCITTDecode", "JBIG2Decode":
-				return nil
+			if ignoreGrayFilters {
+				switch encoder.GetFilterName() {
+				// TODO: Add JPEG2000 encoding/decoding. Until then we assume JPEG200 images are color
+				//case "JPXDecode":
+				//	return nil
+				// These filters are only used with grayscale images
+				case "CCITTDecode", "CCITTFaxDecode", "JBIG2Decode":
+					return nil
+				}
 			}
 
 			img, err := iimg.ToImage(resources)
@@ -740,16 +774,25 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					return err
 				}
 
-				if ximg.ColorSpace.GetNumComponents() == 1 {
-					return nil
-				}
-				switch ximg.Filter.GetFilterName() {
-				// TODO: Add JPEG2000 encoding/decoding. Until then we assume JPEG200 images are color
-				case "JPXDecode":
-					return nil
-				// These filters are only used with grayscale images
-				case "CCITTDecode", "JBIG2Decode":
-					return nil
+				common.Log.Debug("ximg.ColorSpace: %#v", ximg.ColorSpace)
+				// XXX/FIXME: This is not the way to go for Indexed colorspace...
+				// Commenting out..
+				/*
+					if ximg.ColorSpace.GetNumComponents() == 1 {
+						common.Log.Debug("ximg.ColorSpace has components = 1 - return nil")
+						// FIXME: Make sure is DeviceGray?
+						return nil
+					}
+				*/
+				if ignoreGrayFilters {
+					switch ximg.Filter.GetFilterName() {
+					// TODO: Add JPEG2000 encoding/decoding. Until then we assume JPEG200 images are color
+					//case "JPXDecode":
+					//	return nil
+					// These filters are only used with grayscale images
+					case "CCITTDecode", "CCITTFaxDecode", "JBIG2Decode":
+						return nil
+					}
 				}
 
 				// Hacky workaround for Szegedy_Going_Deeper_With_2015_CVPR_paper.pdf that has a colored image
