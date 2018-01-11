@@ -49,3 +49,9 @@ buildinfo.json
 
 *.sh
 pdf/bak
+
+pdf/report/pdf_report
+
+pdf/outlines
+
+pdf/testing/pdf_count_color_pages_bench
