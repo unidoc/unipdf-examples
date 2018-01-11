@@ -546,7 +546,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					dctEncoder.ColorComponents = 1
 				}
 
-				ximgGray, err := pdf.NewXObjectImageFromImage(&grayImage, nil, encoder)
+				ximgGray, err := pdf.UpdateXObjectImageFromImage(ximg, &grayImage, nil, encoder)
 				if err != nil {
 					if err == pdfcore.ErrUnsupportedEncodingParameters {
 						// Unsupported encoding parameters, revert to a basic flate encoder without predictor.
@@ -636,7 +636,7 @@ func convertPatternToGray(pattern *pdf.PdfPattern) (*pdf.PdfPattern, error) {
 		if tilingPattern.IsColored() {
 			// A colored tiling pattern can use color operators in its stream, need to process the stream.
 
-			content, err := tilingPattern.GetContentStream()
+			content, encoder, err := tilingPattern.GetContentStream()
 			if err != nil {
 				return nil, err
 			}
@@ -646,7 +646,7 @@ func convertPatternToGray(pattern *pdf.PdfPattern) (*pdf.PdfPattern, error) {
 				return nil, err
 			}
 
-			tilingPattern.SetContentStream(grayContents, nil)
+			tilingPattern.SetContentStream(grayContents, encoder)
 
 			// Update in-memory pdf objects.
 			_ = tilingPattern.ToPdfObject()
