@@ -365,8 +365,6 @@ func transformPdfPage(page *unipdf.PdfPage, desc string, doGrayscaleTransform bo
 		return err
 	}
 
-<<<<<<< HEAD
-=======
 	return nil
 }
 
@@ -407,19 +405,13 @@ func transformColorspaces(page unipdf.PdfFormPage, desc string, doGrayscaleTrans
 	// 	return nil
 	// }
 	// unicommon.Log.Info("+XObjects=%s", xobjs)
-
->>>>>>> 36c6fdb26c9b204a9635d1649692d7c89802d26c
 	return nil
 }
 
 func transformColorspaces(page unipdf.PdfFormPage, desc string, doGrayscaleTransform bool) error {
 	unicommon.Log.Info("desc=%s doGrayscaleTransform=%t", desc, doGrayscaleTransform)
 
-<<<<<<< HEAD
-	resources, err := page.GetResources()
-=======
 	xobjs, err := unipdf.GetXObjects(page)
->>>>>>> 36c6fdb26c9b204a9635d1649692d7c89802d26c
 	if err != nil {
 		return err
 	}
@@ -644,11 +636,8 @@ func transformColorToGrayscale(page unipdf.PdfFormPage, //*unipdf.PdfPage,
 
 	noContentColor := false
 
-<<<<<<< HEAD
-=======
 	// op0 := unicontent.ContentStreamOperation{Operand: "sc"}
 	// op0 := unicontent.ContentStreamOperation{Operand: "SC"}
->>>>>>> 36c6fdb26c9b204a9635d1649692d7c89802d26c
 	badOps := map[string]bool{
 	// "l":  true,
 	// "BX": true,
