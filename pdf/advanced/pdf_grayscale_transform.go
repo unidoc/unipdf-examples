@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"os"
 
-	common "github.com/unidoc/unidoc/common"
+	unicommon "github.com/unidoc/unidoc/common"
 	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
@@ -22,7 +22,7 @@ import (
 )
 
 func init() {
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 }
 
 func main() {
@@ -155,8 +155,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 	processor := pdfcontent.NewContentStreamProcessor(*operations)
 	// Add handlers for colorspace related functionality.
 	processor.AddHandler(pdfcontent.HandlerConditionEnumAllOperands, "",
-		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState,
-			resources *pdf.PdfPageResources) error {
+		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
 			operand := op.Operand
 			switch operand {
 			case "CS": // Set colorspace operands (stroking).
@@ -170,7 +169,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						// Update if referring to an external colorspace in resources.
 						cs, ok := resources.ColorSpace.Colorspaces[string(*csname)]
 						if !ok {
-							common.Log.Debug("Undefined colorspace for pattern (%s)", csname)
+							unicommon.Log.Debug("Undefined colorspace for pattern (%s)", csname)
 							return errors.New("Colorspace not defined")
 						}
 
@@ -206,7 +205,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						// Update if referring to an external colorspace in resources.
 						cs, ok := resources.ColorSpace.Colorspaces[string(*csname)]
 						if !ok {
-							common.Log.Debug("Undefined colorspace for pattern (%s)", csname)
+							unicommon.Log.Debug("Undefined colorspace for pattern (%s)", csname)
 							return errors.New("Colorspace not defined")
 						}
 
@@ -271,7 +270,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 					grayPattern, err := convertPatternToGray(pattern)
 					if err != nil {
-						common.Log.Debug("Unable to convert pattern to grayscale: %v", err)
+						unicommon.Log.Debug("Unable to convert pattern to grayscale: %v", err)
 						return err
 					}
 					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
@@ -333,7 +332,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 					grayPattern, err := convertPatternToGray(pattern)
 					if err != nil {
-						common.Log.Debug("Unable to convert pattern to grayscale: %v", err)
+						unicommon.Log.Debug("Unable to convert pattern to grayscale: %v", err)
 						return err
 					}
 					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
@@ -403,7 +402,6 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 				shading, found := resources.GetShadingByName(*shname)
 				if !found {
-					common.Log.Error("Shading not defined in resources. shname=%#q", string(*shname))
 					return errors.New("Shading not defined in resources")
 				}
 
@@ -429,30 +427,30 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			// Inline image.
 			iimg, ok := op.Params[0].(*pdfcontent.ContentStreamInlineImage)
 			if !ok {
-				common.Log.Error("Invalid handling for inline image")
+				fmt.Printf("Error: Invalid handling for inline image\n")
 				return errors.New("Invalid inline image parameter")
 			}
 
 			img, err := iimg.ToImage(resources)
 			if err != nil {
-				common.Log.Error("Error converting inline image to image: %v", err)
+				fmt.Printf("Error converting inline image to image: %v\n", err)
 				return err
 			}
 
 			cs, err := iimg.GetColorSpace(resources)
 			if err != nil {
-				common.Log.Error("Error getting color space for inline image: %v", err)
+				fmt.Printf("Error getting color space for inline image: %v\n", err)
 				return err
 			}
 			rgbImg, err := cs.ImageToRGB(*img)
 			if err != nil {
-				common.Log.Error("Error converting image to rgb: %v", err)
+				fmt.Printf("Error converting image to rgb: %v\n", err)
 				return err
 			}
 			rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
 			grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
 			if err != nil {
-				common.Log.Error("Error converting img to gray: %v", err)
+				fmt.Printf("Error converting img to gray: %v\n", err)
 				return err
 			}
 
@@ -460,7 +458,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			// Use same encoder as input data.  Make sure for DCT filter it is updated to 1 color component.
 			encoder, err := iimg.GetEncoder()
 			if err != nil {
-				common.Log.Error("Error getting encoder for inline image: %v", err)
+				fmt.Printf("Error getting encoder for inline image: %v\n", err)
 				return err
 			}
 			if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
@@ -594,7 +592,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				// Process the content stream in the Form object too:
 				grayContent, err := transformContentStreamToGrayscale(string(formContent), formResources)
 				if err != nil {
-					common.Log.Error("%v", err)
+					fmt.Printf("Error: %v\n", err)
 					return err
 				}
 
@@ -609,7 +607,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 	err = processor.Process(resources)
 	if err != nil {
-		common.Log.Error("Error processing: %v", err)
+		fmt.Printf("Error processing: %v\n", err)
 		return nil, err
 	}
 
@@ -751,7 +749,7 @@ func convertShadingToGray(shading *pdf.PdfShading) (*pdf.PdfShading, error) {
 
 		return shading, nil
 	} else {
-		common.Log.Debug("Cannot convert to shading pattern grayscale, color space N = %d", cs.GetNumComponents())
+		unicommon.Log.Debug("Cannot convert to shading pattern grayscale, color space N = %d", cs.GetNumComponents())
 		return nil, errors.New("Unsupported pattern colorspace for grayscale conversion")
 	}
 }
