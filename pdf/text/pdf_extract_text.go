@@ -1,9 +1,6 @@
 /*
  * PDF to text: Extract all text for each page of a pdf file.
  *
- * N.B. Only outputs character codes as seen in the content stream.  Need to account for text encoding to get readable
- * text in many cases.
- *
  * Run as: go run pdf_extract_text.go input.pdf
  */
 
@@ -13,7 +10,7 @@ import (
 	"fmt"
 	"os"
 
-	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
+	"github.com/unidoc/unidoc/pdf/extractor"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
@@ -23,16 +20,31 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Make sure to enter a valid license key.
+	// Otherwise text is truncated and a watermark added to the text.
+	// License keys are available via: https://unidoc.io
+	/*
+			license.SetLicenseKey(`
+		-----BEGIN UNIDOC LICENSE KEY-----
+		...key contents...
+		-----END UNIDOC LICENSE KEY-----
+		`)
+	*/
+
+	// For debugging.
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+
 	inputPath := os.Args[1]
 
-	err := listContentStreams(inputPath)
+	err := outputPdfText(inputPath)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 }
 
-func listContentStreams(inputPath string) error {
+// outputPdfText prints out contents of PDF file to stdout.
+func outputPdfText(inputPath string) error {
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return err
@@ -43,18 +55,6 @@ func listContentStreams(inputPath string) error {
 	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	if isEncrypted {
-		_, err = pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
 	}
 
 	numPages, err := pdfReader.GetNumPages()
@@ -73,25 +73,20 @@ func listContentStreams(inputPath string) error {
 			return err
 		}
 
-		contentStreams, err := page.GetContentStreams()
+		ex, err := extractor.New(page)
 		if err != nil {
 			return err
 		}
 
-		// If the value is an array, the effect shall be as if all of the streams in the array were concatenated,
-		// in order, to form a single stream.
-		pageContentStr := ""
-		for _, cstream := range contentStreams {
-			pageContentStr += cstream
-		}
-
-		fmt.Printf("Page %d - content streams %d:\n", pageNum, len(contentStreams))
-		cstreamParser := pdfcontent.NewContentStreamParser(pageContentStr)
-		txt, err := cstreamParser.ExtractText()
+		text, err := ex.ExtractText()
 		if err != nil {
 			return err
 		}
-		fmt.Printf("\"%s\"\n", txt)
+
+		fmt.Println("------------------------------")
+		fmt.Printf("Page %d:\n", pageNum)
+		fmt.Printf("\"%s\"\n", text)
+		fmt.Println("------------------------------")
 	}
 
 	return nil
