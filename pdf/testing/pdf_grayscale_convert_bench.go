@@ -1047,9 +1047,9 @@ func convertShadingToGray(shading *pdf.PdfShading) (*pdf.PdfShading, error) {
 
 		return shading, nil
 	}
-		unicommon.Log.Debug("Cannot convert to shading pattern grayscale, color space N = %d", cs.GetNumComponents())
-		return nil, errors.New("Unsupported pattern colorspace for grayscale conversion")
-	}
+	unicommon.Log.Debug("Cannot convert to shading pattern grayscale, color space N = %d", cs.GetNumComponents())
+	return nil, errors.New("Unsupported pattern colorspace for grayscale conversion")
+
 }
 
 // modifyPath returns `inputPath` with its directory replaced by `outputDir`
