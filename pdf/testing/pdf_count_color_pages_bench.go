@@ -2,10 +2,7 @@
  * Detect the number of pages and the color pages (1-offset) all pages in a list of PDF files.
  * Compares these results to running Ghostscript on the PDF files and reports an error if the results don't match.
  *
- * Run as: ./pdf_count_color_pages_bench [-o processDir] [-d] [-a] testdata/*.pdf > blah
- *
- * The main results are written to stderr so you will see them in your console.
- * Detailed information is written to stdout and you will see them in blah.
+ * Run as: go run pdf_count_color_pages_bench [-o processDir] [-d][-a] testdata/*.pdf
  *
  *  See the other command line options in the top of main()
  *      -o processDir - Temporary processing directory (default compare.pdfs)
@@ -42,43 +39,48 @@ import (
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
-func initUniDoc(debug bool) error {
+const usage = `Usage:
+pdf_count_color_pages_bench [-r <results>][-o <processDir>][-d][-a][-min <val>][-max <val>] <file1> <file2> ...
+-r <resultsPath> - Results are written to resultsPath
+-o <processDir> - Temporary processing directory (default compare.pdfs)
+-d: Debug level logging
+-a: Keep converting PDF files after failures
+-min <val>: Minimum PDF file size to test
+-max <val>: Maximum PDF file size to test
+-s: Strict logging. Panic on error
+`
+
+func initUniDoc(debug bool) {
+
+	pdf.SetPdfCreator("Peter Williams")
+
+	// To make the library log we just have to initialise the logger which satisfies
+	// the common.Logger interface, common.DummyLogger is the default and
+	// does not do anything. Very easy to implement your own.
+	// common.SetLogger(common.DummyLogger{})
 	logLevel := common.LogLevelInfo
 	if debug {
 		logLevel = common.LogLevelDebug
 	}
 	common.SetLogger(common.ConsoleLogger{LogLevel: logLevel})
-
-	return nil
 }
 
-const usage = `Usage:
-pdf_count_color_pages_bench [-o <processDir>] [-d][-a][-min <val>][-max <val>] <file1> <file2> ...
--d: Debug level logging
--a: Keep converting PDF files after failures
--min <val>: Minimum PDF file size to test
--max <val>: Maximum PDF file size to test
--r <name>: Name of results file
-`
-
 func main() {
-	debug := false            // Write debug level info to stdout?
-	strict := true            // panic immediately a page color detection error occurs"
-	compareGrayscale := false // Do PDF raster comparison on grayscale rasters?
-	runAllTests := false      // Don't stop when a PDF file fails to process?
-	var minSize int64 = -1    // Minimum size for an input PDF to be processed.
-	var maxSize int64 = -1    // Maximum size for an input PDF to be processed.
-	var results string        // Results file
-	var outputDir string
+	debug := false       // Write debug level info to stdout?
+	runAllTests := false // Don't stop when a PDF file fails to process?
+	compRoot := ""
+	var minSize int64 = -1 // Minimum size for an input PDF to be processed
+	var maxSize int64 = -1 // Maximum size for an input PDF to be processed
+	results := ""          // Results are written here
+	strict := true         // panic immediately a page color detection error occurs"
 
-	flag.StringVar(&outputDir, "o", "compare.pdfs", "Set output dir for ghostscript")
 	flag.BoolVar(&debug, "d", false, "Enable debug logging")
-	flag.BoolVar(&strict, "s", false, "Enable strict checking")
-	flag.BoolVar(&compareGrayscale, "g", false, "Do PDF raster comparison on grayscale rasters")
 	flag.BoolVar(&runAllTests, "a", false, "Run all tests. Don't stop at first failure")
+	flag.StringVar(&compRoot, "o", "compare.pdfs", "Set output dir for ghostscript")
 	flag.Int64Var(&minSize, "min", -1, "Minimum size of files to process (bytes)")
 	flag.Int64Var(&maxSize, "max", -1, "Maximum size of files to process (bytes)")
 	flag.StringVar(&results, "r", "", "Results file")
+	flag.BoolVar(&strict, "s", false, "Enable strict checking")
 
 	flag.Parse()
 	args := flag.Args()
@@ -87,15 +89,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	err := initUniDoc(debug)
-	if err != nil {
-		os.Exit(1)
-	}
-	compDir := makeUniqueDir(outputDir)
-	fmt.Fprintf(os.Stderr, "compDir=%#q\n", compDir)
+	initUniDoc(debug)
+
+	compDir := makeUniqueDir(compRoot)
+	fmt.Printf("compDir=%#q\n", compDir)
 	defer removeDir(compDir)
 
-	writers := []io.Writer{os.Stderr}
+	writers := []io.Writer{os.Stdout}
 	if len(results) > 0 {
 		f, err := os.OpenFile(results, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0777)
 		if err != nil {
@@ -227,7 +227,7 @@ func describePdf(inputPath string, strictColorPages []int) (int, []int, error) {
 	for i := 0; i < numPages; i++ {
 		pageNum := i + 1
 		page := pdfReader.PageList[i]
-		common.Log.Debug("^^^^page %d", pageNum)
+		common.Log.Debug("page %d", pageNum)
 
 		desc := fmt.Sprintf("%s:page%d", filepath.Base(inputPath), pageNum)
 		colored, err := isPageColored(page, desc, false)
@@ -253,6 +253,10 @@ func describePdf(inputPath string, strictColorPages []int) (int, []int, error) {
 
 	return numPages, colorPages, nil
 }
+
+// =================================================================================================
+// Page color detection code goes here
+// =================================================================================================
 
 // isPageColored returns true if `page` contains color. It also references
 // XObject Images and Forms to _possibly_ record if they contain color
@@ -300,7 +304,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 
 	colored := false                                    // Has a colored mark been detected in the stream?
 	coloredPatterns := map[pdfcore.PdfObjectName]bool{} // List of already detected patterns. Re-use for subsequent detections.
-	coloredShadings := map[string]bool{}                // List of already detected shadings. Re-use for subsequent detections.
+	coloredShadings := map[pdfcore.PdfObjectName]bool{} // List of already detected shadings. Re-use for subsequent detections.
 
 	// The content stream processor keeps track of the graphics state and we can make our own handlers to process
 	// certain commands using the AddHandler method. In this case, we hook up to color related operands, and for image
@@ -442,7 +446,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				if !ok {
 					return errors.New("sh parameter should be a name")
 				}
-				if hasCol, has := coloredShadings[string(*shname)]; has {
+				if hasCol, has := coloredShadings[*shname]; has {
 					// Already processed, no need to do anything.
 					colored = colored || hasCol
 					if debug {
@@ -453,14 +457,14 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 
 				shading, found := resources.GetShadingByName(*shname)
 				if !found {
-					common.Log.Error("Shading not defined in resources. shname=%#q", string(*shname))
+					common.Log.Error("Shading not defined in resources. shname=%#q", *shname)
 					return errors.New("Shading not defined in resources")
 				}
 				hasCol, err := isShadingColored(shading)
 				if err != nil {
 					return err
 				}
-				coloredShadings[string(*shname)] = hasCol
+				coloredShadings[*shname] = hasCol
 			}
 			return nil
 		})
@@ -486,6 +490,32 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			if debug {
 				common.Log.Info("iimg=%s", iimg)
 			}
+
+			cs, err := iimg.GetColorSpace(resources)
+			if err != nil {
+				common.Log.Error("Error getting color space for inline image: %v", err)
+				return err
+			}
+
+			if cs.GetNumComponents() == 1 {
+				return nil
+			}
+
+			encoder, err := iimg.GetEncoder()
+			if err != nil {
+				common.Log.Error("Error getting encoder for inline image: %v", err)
+				return err
+			}
+
+			switch encoder.GetFilterName() {
+			// TODO: Add JPEG2000 encoding/decoding. Until then we assume JPEG200 images are color
+			case "JPXDecode":
+				return nil
+			// These filters are only used with grayscale images
+			case "CCITTDecode", "JBIG2Decode":
+				return nil
+			}
+
 			img, err := iimg.ToImage(resources)
 			if err != nil {
 				common.Log.Error("Error converting inline image to image: %v", err)
@@ -496,15 +526,6 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				common.Log.Info("img=%v %d", img.ColorComponents, img.BitsPerComponent)
 			}
 
-			if img.ColorComponents <= 1 {
-				return nil
-			}
-
-			cs, err := iimg.GetColorSpace(resources)
-			if err != nil {
-				common.Log.Error("Error getting color space for inline image: %v", err)
-				return err
-			}
 			rgbImg, err := cs.ImageToRGB(*img)
 			if err != nil {
 				common.Log.Error("Error converting image to rgb: %v", err)
@@ -560,6 +581,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 						ximg.Filter.GetFilterName(), ximg.ColorSpace,
 						ximg.ImageMask, *ximg.Width, *ximg.Height)
 				}
+				// Ignore gray color spaces
 				if _, isIndexed := ximg.ColorSpace.(*pdf.PdfColorspaceSpecialIndexed); !isIndexed {
 					if ximg.ColorSpace.GetNumComponents() == 1 {
 						return nil
@@ -572,7 +594,15 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					colored = true
 					return nil
 				// These filters are only used with grayscale images
-				case "CCITTDecode", "JBIG2Decode", "RunLengthDecode":
+				case "CCITTDecode", "JBIG2Decode":
+
+					return nil
+				}
+
+				// Hacky workaround for Szegedy_Going_Deeper_With_2015_CVPR_paper.pdf that has a colored image
+				// that is completely masked
+				if ximg.Filter.GetFilterName() == "RunLengthDecode" && ximg.SMask != nil {
+
 					return nil
 				}
 
@@ -607,7 +637,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				// Go through the XObject Form content stream.
 				xform, err := resources.GetXObjectFormByName(*name)
 				if err != nil {
-					fmt.Printf("Error : %v\n", err)
+					common.Log.Error("err=%v", err)
 					return err
 				}
 
@@ -760,16 +790,6 @@ func visible(cpts ...float64) bool {
 	return false
 }
 
-// report writes Sprintf formatted `format` ... to all writers in `writers`
-func report(writers []io.Writer, format string, a ...interface{}) {
-	msg := fmt.Sprintf(format, a...)
-	for _, w := range writers {
-		if _, err := io.WriteString(w, msg); err != nil {
-			common.Log.Error("report: write to %#v failed msg=%s err=%v", w, msg, err)
-		}
-	}
-}
-
 // equalSlices returns true if `a` and `b` are identical
 func equalSlices(a, b []int) bool {
 	if len(a) != len(b) {
@@ -848,7 +868,7 @@ var gsImageRegex = regexp.MustCompile(gsImagePattern)
 // runGhostscript runs Ghostscript on file `pdf` to create file one png file per page in directory
 // `outputDir`
 func runGhostscript(pdf, outputDir string) error {
-	common.Log.Debug("runGhostscript: pdf=%#q outputDir=%#q", pdf, outputDir)
+	common.Log.Trace("runGhostscript: pdf=%#q outputDir=%#q", pdf, outputDir)
 	outputPath := filepath.Join(outputDir, gsImageFormat)
 	output := fmt.Sprintf("-sOutputFile=%s", outputPath)
 
@@ -863,7 +883,7 @@ func runGhostscript(pdf, outputDir string) error {
 		"-dGraphicsAlphaBits=1",
 		output,
 		pdf)
-	common.Log.Debug("runGhostscript: cmd=%#q", cmd.Args)
+	common.Log.Trace("runGhostscript: cmd=%#q", cmd.Args)
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
@@ -958,7 +978,6 @@ func imgIsColor(img image.Image) bool {
 			rr, gg, bb, _ := img.At(x, y).RGBA()
 			r, g, b := float64(rr)*F, float64(gg)*F, float64(bb)*F
 			if math.Abs(r-g) > colorThreshold || math.Abs(r-b) > colorThreshold || math.Abs(g-b) > colorThreshold {
-				// fmt.Printf("@@@ xy=%d %d rgb=%.3f %.3f %.3f =%.3f %.3f %.3f\n", x, y, r, g, b, r-g, r-b, g-b)
 				return true
 			}
 		}
@@ -1018,7 +1037,7 @@ func patternsToPaths(patternList []string) ([]string, error) {
 		}
 		for _, path := range files {
 			if !regularFile(path) {
-				fmt.Fprintf(os.Stderr, "Not a regular file. %#q\n", path)
+				fmt.Printf("Not a regular file. %#q\n", path)
 				continue
 			}
 			pathList = append(pathList, path)
@@ -1068,4 +1087,14 @@ func contains(s []int, e int) bool {
 		}
 	}
 	return false
+}
+
+// report writes Sprintf formatted `format` ... to all writers in `writers`
+func report(writers []io.Writer, format string, a ...interface{}) {
+	msg := fmt.Sprintf(format, a...)
+	for _, w := range writers {
+		if _, err := io.WriteString(w, msg); err != nil {
+			common.Log.Error("report: write to %#v failed msg=%s err=%v", w, msg, err)
+		}
+	}
 }

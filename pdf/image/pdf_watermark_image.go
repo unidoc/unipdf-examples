@@ -61,20 +61,6 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 		return err
 	}
 
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// If encrypted, try to decrypt with an empty password.
-	if isEncrypted {
-		// Fails, try fallback with empty password.
-		_, err = pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-	}
-
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
 		return err
