@@ -926,7 +926,7 @@ func convertPatternToGray(pattern *pdf.PdfPattern) (*pdf.PdfPattern, error) {
 		if tilingPattern.IsColored() {
 			// A colored tiling pattern can use color operators in its stream, need to process the stream.
 
-			content, encoder, err := tilingPattern.GetContentStream()
+			content, encoder, err := tilingPattern.GetContentStreamWithEncoder()
 			if err != nil {
 				return nil, err
 			}
