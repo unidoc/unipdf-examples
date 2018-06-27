@@ -7,14 +7,11 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"sort"
-	"strings"
+
 	"github.com/unidoc/unidoc/common"
-	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	"github.com/unidoc/unidoc/pdf/extractor"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
@@ -41,76 +38,17 @@ func main() {
 	files := os.Args[1:]
 	sort.Strings(files)
 
-	exclusions := map[string]bool{
-		`The-Byzantine-Generals-Problem.pdf`: true,
-		`endosymbiotictheory_marguli.pdf`:    true,
-		`iverson.pdf`:                        true,
-		`p253-porter.pdf`:                    true,
-		`shamirturing.pdf`:                   true,
-		`warnock_camelot.pdf`:                true,
-		`B02.pdf`:                            true,
-
-		// [DEBUG]  text.go:617 getFont: NewPdfFontFromPdfObject failed. name=`C0_0` err=Bad state
-		// [DEBUG]  processor.go:279 Processor handler error: Bad state
-		// [ERROR]  text.go:212 Error processing: Bad state
-		`Data Classification For Dummies_Identity Finder_Special Edition_Todd_Feinman.pdf`: true,
-
-		// 0x29 ')' missing from encoding
-		`000018.pdf`: true,
-		// 0x3c '<' missing from encoding
-		`03-block-v2-annotated.pdf`: true,
-	}
-	files2 := []string{}
-	for _, inputPath := range files {
-		if _, ok := exclusions[filepath.Base(inputPath)]; ok {
-			continue
-		}
-		if strings.Contains(inputPath, "xxx.hard") {
-			continue
-		}
-		files2 = append(files2, inputPath)
-	}
-	files = files2
-
 	for i, inputPath := range files {
 		fmt.Println("======================== ^^^ ========================")
 		fmt.Printf("Pdf File %3d of %d %q\n", i+1, len(files), inputPath)
-		err := outputPdfTextRecover(i, len(files), inputPath)
+		err := outputPdfText(inputPath)
 		if err != nil {
-			marker := ""
-			if err != pdf.ErrEncrypted && err != pdfcore.ErrNoPdfVersion {
-				marker = "******"
-			}
-			fmt.Fprintf(os.Stderr, "Pdf File %3d of %d %q err=%v %s\n",
-				i+1, len(files), inputPath, err, marker)
-			if err == pdf.ErrEncrypted || err == pdfcore.ErrNoPdfVersion || true {
-				continue
-			}
-			os.Exit(1)
+			fmt.Fprintf(os.Stderr, "Pdf File %3d of %d %q err=%v\n",
+				i+1, len(files), inputPath, err)
 		}
 		fmt.Println("======================== ||| ========================")
 	}
 	fmt.Fprintf(os.Stderr, "Done %d files\n", len(files))
-}
-
-// outputPdfTextRecover prints out contents of PDF file to stdout and recovers from panics
-func outputPdfTextRecover(i, n int, inputPath string) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Fprintf(os.Stderr, "Recovered: %d of %d: %#q r=%#v\n", i, n, inputPath, r)
-			switch x := r.(type) {
-			case string:
-				err = errors.New(x)
-			case error:
-				err = x
-			default:
-				err = errors.New("Unknown panic")
-			}
-			panic(err)
-		}
-	}()
-	err = outputPdfText(inputPath)
-	return
 }
 
 // outputPdfText prints out contents of PDF file to stdout.
