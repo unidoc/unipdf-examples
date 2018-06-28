@@ -15,6 +15,7 @@ import (
 )
 
 type PdfProperties struct {
+	Version     string
 	IsEncrypted bool
 	CanView     bool // Is the document viewable without password?
 	NumPages    int
@@ -39,6 +40,7 @@ func main() {
 			os.Exit(1)
 		}
 
+		fmt.Printf(" PDF Version: %s\n", ret.Version)
 		fmt.Printf(" Num Pages: %d\n", ret.NumPages)
 		fmt.Printf(" Is Encrypted: %t\n", ret.IsEncrypted)
 		fmt.Printf(" Is Viewable (without pass): %t\n", ret.CanView)
@@ -77,6 +79,8 @@ func getPdfProperties(inputPath string) (*PdfProperties, error) {
 		ret.CanView = auth
 		return &ret, nil
 	}
+
+	ret.Version = pdfReader.PdfVersion()
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
