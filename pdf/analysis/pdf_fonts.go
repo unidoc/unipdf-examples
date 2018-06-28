@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
@@ -32,67 +33,101 @@ func main() {
 		os.Exit(1)
 	}
 
-	_, occurrences, uniques, err := fontsInPdfList(pathList)
+	occurrences, err := fontsInPdfList(pathList)
 	if err != nil {
 		os.Exit(1)
 	}
-	versionUniques := uniques.byVersion()
-	versions := versionKeys(versionUniques)
 	fmt.Printf("%d total font occurrences\n", len(occurrences))
+
+	uniques := occurrences.collapseBasefont()
+	versionOccurrences := uniques.byVersion()
+	versions := mapKeys(versionOccurrences)
 
 	fmt.Printf("%4d files total.\n", uniques.numFiles())
 	for _, version := range versions {
-		fmt.Printf("%4d files PDF version %s\n", versionUniques[version].numFiles(), version)
+		fmt.Printf("%4d files PDF version %s\n", versionOccurrences[version].numFiles(), version)
 	}
-	uniques.showCounts("All versions")
+	uniques.showSubtypeCounts("All versions")
 	for _, version := range versions {
-		versionUniques[version].showCounts(fmt.Sprintf("PDF version %s", version))
+		versionOccurrences[version].showSubtypeCounts(fmt.Sprintf("PDF version %s", version))
+	}
+
+	uniques.showEncodingCounts("All versions")
+	for _, version := range versions {
+		versionOccurrences[version].showEncodingCounts(fmt.Sprintf("PDF version %s", version))
 	}
 }
 
 // fontOccurence represents an occurrence of a font in a PDF file.
 type fontOccurence struct {
-	subtype  string
-	basefont string
 	filename string
 	version  string
+	subtype  string
+	encoding string
+	basefont string
 }
 
 // fontOccurence represents a list of fontOccurences.
 type occurrenceList []fontOccurence
 
-// showCounts prints a summary of the font counts in `occurrences`
-func (occurrences occurrenceList) showCounts(title string) {
+// showSubtypeCounts prints a summary of the font subtype counts in `occurrences`
+func (occurrences occurrenceList) showSubtypeCounts(title string) {
 	numFiles := occurrences.numFiles()
 
-	fmt.Println("=====================================================")
+	fmt.Println("===================================================== Subtypes")
 	fmt.Printf("%s\n", title)
 	fmt.Printf("%d files tested\n", numFiles)
 	fmt.Printf("%d font subtype occurrences\n", len(occurrences))
 
-	subtypeCounts := occurrences.subtypeCounts()
+	subtypeOccurrences := occurrences.bySubtype()
 
 	// Reduce the Type0`,`CIDFontType0` and `CIDFontType2` counts to
 	// to `CIDFontType0` and `CIDFontType2` subsets of Type0
-	cids := subtypeCounts[`CIDFontType0`] + subtypeCounts[`CIDFontType2`]
-	if cids < subtypeCounts[`Type0`] {
-		fmt.Fprintf(os.Stderr, "This is impossible: subtypeCounts=%+v\n", subtypeCounts)
+	numCIDs := len(subtypeOccurrences[`CIDFontType0`]) + len(subtypeOccurrences[`CIDFontType2`])
+	if numCIDs < len(subtypeOccurrences[`Type0`]) {
+		fmt.Fprintf(os.Stderr, "This is impossible\n")
 		return
 	}
-	delete(subtypeCounts, `Type0`)
+	delete(subtypeOccurrences, `Type0`)
 
-	subtypes := mapKeys(subtypeCounts)
+	subtypes := mapKeys(subtypeOccurrences)
 	sort.SliceStable(subtypes, func(i, j int) bool {
-		return subtypeCounts[subtypes[i]] > subtypeCounts[subtypes[j]]
+		return len(subtypeOccurrences[subtypes[i]]) > len(subtypeOccurrences[subtypes[j]])
 	})
 
 	fmt.Printf("%d subtypes\n", len(subtypes))
 	for i, subtype := range subtypes {
-		count := subtypeCounts[subtype]
-		percentSubtypes := float64(count) / float64(len(occurrences)-cids) * 100.0
+		count := len(subtypeOccurrences[subtype])
+		percentSubtypes := float64(count) / float64(len(occurrences)-numCIDs) * 100.0
 		percentFiles := float64(count) / float64(numFiles) * 100.0
-		fmt.Printf("%4d: %#-14q %4d files (%5.1f%%) Occurred in %.1f%% of files.\n",
+		fmt.Printf("%4d: %#-14q %4d files (%4.1f%%) Occurred in %4.1f%% of files.\n",
 			i, subtype, count, percentSubtypes, percentFiles)
+	}
+}
+
+// showEncodingCounts prints a summary of the font encoding counts in `occurrences`
+func (occurrences occurrenceList) showEncodingCounts(title string) {
+	numFiles := occurrences.numFiles()
+
+	fmt.Println("===================================================== Encodings")
+	fmt.Printf("%s\n", title)
+	fmt.Printf("%d files tested\n", numFiles)
+	fmt.Printf("%d font encoding occurrences\n", len(occurrences))
+
+	encodingOccurrences := occurrences.byEncoding()
+
+	encodings := mapKeys(encodingOccurrences)
+	sort.SliceStable(encodings, func(i, j int) bool {
+		return len(encodingOccurrences[encodings[i]]) > len(encodingOccurrences[encodings[j]])
+	})
+
+	fmt.Printf("%d encodings\n", len(encodings))
+	for i, encoding := range encodings {
+		count := len(encodingOccurrences[encoding])
+		percentEncodings := float64(count) / float64(len(occurrences)) * 100.0
+		percentFiles := float64(count) / float64(numFiles) * 100.0
+		fmt.Printf("%4d: %#-21q %4d files (%4.1f%%) Occurred in %4.1f%% of files.\n",
+			i, encoding, count, percentEncodings, percentFiles)
 	}
 }
 
@@ -105,26 +140,92 @@ func (occurrences occurrenceList) numFiles() int {
 	return len(counts)
 }
 
-// subtypeCounts returns the number of occurrences of each font subtype in `occurrences`.
-func (occurrences occurrenceList) subtypeCounts() map[string]int {
-	counts := map[string]int{}
-	for _, o := range occurrences {
-		counts[o.subtype]++
-	}
-	return counts
-}
-
-// versionCounts returns the number of occurrence of each PDF version in `occurrences`.
+// byVersion returns `occurrences` as a map of occurrenceLists keyed by PDF version.
 func (occurrences occurrenceList) byVersion() map[string]occurrenceList {
-	versionOccurrences := map[string]occurrenceList{}
+	keyedOccurrences := map[string]occurrenceList{}
 	for _, o := range occurrences {
-		versionOccurrences[o.version] = append(versionOccurrences[o.version], o)
+		keyedOccurrences[o.version] = append(keyedOccurrences[o.version], o)
 	}
-	return versionOccurrences
+	return keyedOccurrences
 }
 
-// fontsInPdfList returns the fonts used in the PDF files in `pathList`
-func fontsInPdfList(pathList []string) (numFiles int, occurrences, uniques occurrenceList, err error) {
+// bySubtype returns `occurrences` as a map of occurrenceLists keyed by font subtype.
+func (occurrences occurrenceList) bySubtype() map[string]occurrenceList {
+	keyedOccurrences := map[string]occurrenceList{}
+	for _, o := range occurrences {
+		keyedOccurrences[o.subtype] = append(keyedOccurrences[o.subtype], o)
+	}
+	return keyedOccurrences
+}
+
+// byEncoding returns `occurrences` as a map of occurrenceLists keyed by font encoding.
+func (occurrences occurrenceList) byEncoding() map[string]occurrenceList {
+	keyedOccurrences := map[string]occurrenceList{}
+	for _, o := range occurrences {
+		keyedOccurrences[o.encoding] = append(keyedOccurrences[o.encoding], o)
+	}
+	return keyedOccurrences
+}
+
+// collapseSubtype returns `occurrences` with all entries that differ only by subtype replaced by
+// a single entry.
+func (occurrences occurrenceList) collapseSubtype() occurrenceList {
+	fields := fontOccurence{subtype: "remove"}
+	return occurrences.reduce(fields)
+}
+
+// collapseEncoding returns `occurrences` with all entries that differ only by encoding replaced by
+// a single entry.
+func (occurrences occurrenceList) collapseEncoding() occurrenceList {
+	fields := fontOccurence{encoding: "remove"}
+	return occurrences.reduce(fields)
+}
+
+// collapseEncoding returns `occurrences` with all entries that differ only by encoding replaced by
+// a single entry.
+func (occurrences occurrenceList) collapseBasefont() occurrenceList {
+	fields := fontOccurence{basefont: "remove"}
+	return occurrences.reduce(fields)
+}
+
+// reduce returns `occurrences` with all entries that differ only by the fields with non-empty
+// fields in `fields` replaced by a single entry.
+func (occurrences occurrenceList) reduce(fields fontOccurence) occurrenceList {
+	keyOccurrence := map[string]fontOccurence{}
+	for _, o := range occurrences {
+		key := o.toKey(fields)
+		keyOccurrence[key] = o
+	}
+	collapsed := occurrenceList{}
+	for _, o := range keyOccurrence {
+		collapsed = append(collapsed, o)
+	}
+	return collapsed
+}
+
+// toKey returns a string containing the fields in `o` that aren't set in `fields`.
+func (o fontOccurence) toKey(fields fontOccurence) string {
+	parts := []string{"", "", "", "", ""}
+	if fields.filename == "" {
+		parts[0] = o.filename
+	}
+	if fields.version == "" {
+		parts[1] = o.version
+	}
+	if fields.subtype == "" {
+		parts[2] = o.subtype
+	}
+	if fields.encoding == "" {
+		parts[3] = o.encoding
+	}
+	if fields.basefont == "" {
+		parts[4] = o.basefont
+	}
+	return strings.Join(parts, ":")
+}
+
+// fontsInPdfList returns the fonts used in the PDF files in `pathList`.
+func fontsInPdfList(pathList []string) (occurrences occurrenceList, err error) {
 	for i, filename := range pathList {
 		version := ""
 		fonts := []pdf.PdfFont{}
@@ -133,18 +234,15 @@ func fontsInPdfList(pathList []string) (numFiles int, occurrences, uniques occur
 			fmt.Fprintf(os.Stderr, "error: %d of %d %q err=%v\n", i, len(pathList), filename, err)
 			continue
 		}
-		numFiles++
-		typeCount := map[string]int{}
 		for _, font := range fonts {
 			subtype := font.Subtype()
 			basefont := font.BaseFont()
-			o := fontOccurence{subtype, basefont, filename, version}
+			encoding := ""
+			if font.Encoder() != nil {
+				encoding = font.Encoder().String()
+			}
+			o := fontOccurence{filename, version, subtype, encoding, basefont}
 			occurrences = append(occurrences, o)
-			typeCount[subtype]++
-		}
-		for subtype := range typeCount {
-			o := fontOccurence{subtype, "", filename, version}
-			uniques = append(uniques, o)
 		}
 	}
 	return
@@ -198,7 +296,7 @@ func fontsInPdf(filename string) (version string, fonts []pdf.PdfFont, err error
 	return
 }
 
-// showOneFile prints the fonts used in PDF file `filename`
+// showOneFile prints the fonts used in PDF file `filename`.
 func showOneFile(filename string) {
 	fmt.Printf("Input file: %s\n", filename)
 	version, fonts, err := fontsInPdf(filename)
@@ -220,7 +318,7 @@ func showOneFile(filename string) {
 	}
 }
 
-// patternsToPaths returns a list of files matching the patterns in `patternList`
+// patternsToPaths returns a list of files matching the patterns in `patternList`.
 func patternsToPaths(patternList []string) ([]string, error) {
 	pathList := []string{}
 	for _, pattern := range patternList {
@@ -240,7 +338,7 @@ func patternsToPaths(patternList []string) ([]string, error) {
 	return pathList, nil
 }
 
-// regularFile returns true if file `path` is a regular file
+// regularFile returns true if file `path` is a regular file.
 func regularFile(path string) bool {
 	fi, err := os.Stat(path)
 	if err != nil {
@@ -250,16 +348,8 @@ func regularFile(path string) bool {
 	return fi.Mode().IsRegular()
 }
 
-// mapKeys returns the keys in `m`
-func mapKeys(m map[string]int) (keys []string) {
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-	return
-}
-
-func versionKeys(m map[string]occurrenceList) (keys []string) {
+// mapKeys returns the keys in `m` sorted alphabetically.
+func mapKeys(m map[string]occurrenceList) (keys []string) {
 	for k := range m {
 		keys = append(keys, k)
 	}
