@@ -1,8 +1,7 @@
-/*
- * Shows all fonts in a PDF file.
- *
- * Run as: go run pdf_fonts.go input.pdf
- */
+// Shows all fonts in a PDF file.
+//
+// Run as: go run pdf_fonts.go o testdata/*.pdf testdata/**/*.pdf
+//
 
 package main
 
@@ -34,29 +33,25 @@ func main() {
 		os.Exit(1)
 	}
 
-	numFiles, occurrences, uniques, err := fontsInPdfList(pathList)
+	_, occurrences, uniques, err := fontsInPdfList(pathList)
 	if err != nil {
 		os.Exit(1)
 	}
+	versionUniques := uniques.byVersion()
+	versions := versionKeys(versionUniques)
+	fmt.Printf("%d total font occurrences\n", len(occurrences))
 
-	fmt.Printf("%d files tested (of %d tried)\n", numFiles, len(pathList))
-	fmt.Printf("%d font occurences (not interesting)\n", len(occurrences))
-	fmt.Printf("%d font subtype occurrences\n", len(uniques))
-
-	subtypeCounts := uniques.typeCounts()
-	subtypes := mapKeys(subtypeCounts)
-
-	fmt.Printf("%d subtypes\n", len(subtypes))
-	for i, subtype := range subtypes {
-		count := subtypeCounts[subtype]
-		percentSubtypes := float64(count) / float64(len(uniques)) * 100.0
-		percentFiles := float64(count) / float64(numFiles) * 100.0
-		fmt.Printf("%4d: %#-14q %4d files (%5.1f%%) Occurred in %.1f%% of files.\n",
-			i, subtype, count, percentSubtypes, percentFiles)
+	fmt.Printf("%4d files total.\n", uniques.numFiles())
+	for _, version := range versions {
+		fmt.Printf("%4d files PDF version %s\n", versionUniques[version].numFiles(), version)
 	}
-
+	uniques.showCounts("All versions")
+	for _, version := range versions {
+		versionUniques[version].showCounts(fmt.Sprintf("PDF version %s", version))
+	}
 }
 
+// fontOccurence represents an occurrence of a font in a PDF file.
 type fontOccurence struct {
 	subtype  string
 	basefont string
@@ -64,9 +59,55 @@ type fontOccurence struct {
 	version  string
 }
 
-type compendium []fontOccurence
+// fontOccurence represents a list of fontOccurences.
+type occurrenceList []fontOccurence
 
-func (occurrences compendium) typeCounts() map[string]int {
+// showCounts prints a summary of the font counts in `occurrences`
+func (occurrences occurrenceList) showCounts(title string) {
+	numFiles := occurrences.numFiles()
+
+	fmt.Println("=====================================================")
+	fmt.Printf("%s\n", title)
+	fmt.Printf("%d files tested\n", numFiles)
+	fmt.Printf("%d font subtype occurrences\n", len(occurrences))
+
+	subtypeCounts := occurrences.subtypeCounts()
+
+	// Reduce the Type0`,`CIDFontType0` and `CIDFontType2` counts to
+	// to `CIDFontType0` and `CIDFontType2` subsets of Type0
+	cids := subtypeCounts[`CIDFontType0`] + subtypeCounts[`CIDFontType2`]
+	if cids < subtypeCounts[`Type0`] {
+		fmt.Fprintf(os.Stderr, "This is impossible: subtypeCounts=%+v\n", subtypeCounts)
+		return
+	}
+	delete(subtypeCounts, `Type0`)
+
+	subtypes := mapKeys(subtypeCounts)
+	sort.SliceStable(subtypes, func(i, j int) bool {
+		return subtypeCounts[subtypes[i]] > subtypeCounts[subtypes[j]]
+	})
+
+	fmt.Printf("%d subtypes\n", len(subtypes))
+	for i, subtype := range subtypes {
+		count := subtypeCounts[subtype]
+		percentSubtypes := float64(count) / float64(len(occurrences)-cids) * 100.0
+		percentFiles := float64(count) / float64(numFiles) * 100.0
+		fmt.Printf("%4d: %#-14q %4d files (%5.1f%%) Occurred in %.1f%% of files.\n",
+			i, subtype, count, percentSubtypes, percentFiles)
+	}
+}
+
+// numFiles returns the number of unique PDF files in `occurrences`.
+func (occurrences occurrenceList) numFiles() int {
+	counts := map[string]int{}
+	for _, o := range occurrences {
+		counts[o.filename]++
+	}
+	return len(counts)
+}
+
+// subtypeCounts returns the number of occurrences of each font subtype in `occurrences`.
+func (occurrences occurrenceList) subtypeCounts() map[string]int {
 	counts := map[string]int{}
 	for _, o := range occurrences {
 		counts[o.subtype]++
@@ -74,15 +115,16 @@ func (occurrences compendium) typeCounts() map[string]int {
 	return counts
 }
 
-func mapKeys(m map[string]int) (keys []string) {
-	for k := range m {
-		keys = append(keys, k)
+// versionCounts returns the number of occurrence of each PDF version in `occurrences`.
+func (occurrences occurrenceList) byVersion() map[string]occurrenceList {
+	versionOccurrences := map[string]occurrenceList{}
+	for _, o := range occurrences {
+		versionOccurrences[o.version] = append(versionOccurrences[o.version], o)
 	}
-	sort.Strings(keys)
-	return
+	return versionOccurrences
 }
 
-func fontsInPdfList(pathList []string) (numFiles int, occurrences, uniques compendium, err error) {
+func fontsInPdfList(pathList []string) (numFiles int, occurrences, uniques occurrenceList, err error) {
 	for i, filename := range pathList {
 		version := ""
 		fonts := []pdf.PdfFont{}
@@ -205,4 +247,21 @@ func regularFile(path string) bool {
 		return false
 	}
 	return fi.Mode().IsRegular()
+}
+
+// mapKeys returns the keys in `m`
+func mapKeys(m map[string]int) (keys []string) {
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return
+}
+
+func versionKeys(m map[string]occurrenceList) (keys []string) {
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return
 }
