@@ -18,15 +18,14 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "Syntax: go run pdf_fonts.go input.pdf")
+		fmt.Fprintln(os.Stderr, "Usage: go run pdf_fonts.go testdata/*.pdf")
 		os.Exit(1)
 	}
 
 	// Enable debug-level logging.
 	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
-	// filename := os.Args[1]
-	// showOneFile(filename)
+	// showOneFile(os.Args[1])
 
 	pathList, err := patternsToPaths(os.Args[1:])
 	if err != nil {
@@ -124,6 +123,7 @@ func (occurrences occurrenceList) byVersion() map[string]occurrenceList {
 	return versionOccurrences
 }
 
+// fontsInPdfList returns the fonts used in the PDF files in `pathList`
 func fontsInPdfList(pathList []string) (numFiles int, occurrences, uniques occurrenceList, err error) {
 	for i, filename := range pathList {
 		version := ""
@@ -198,6 +198,7 @@ func fontsInPdf(filename string) (version string, fonts []pdf.PdfFont, err error
 	return
 }
 
+// showOneFile prints the fonts used in PDF file `filename`
 func showOneFile(filename string) {
 	fmt.Printf("Input file: %s\n", filename)
 	version, fonts, err := fontsInPdf(filename)
