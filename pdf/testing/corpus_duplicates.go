@@ -25,14 +25,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	pdfList, err := patternsToPaths(args)
+	pathList, err := patternsToPaths(args)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "patternsToPaths failed. args=%#q err=%v\n", args, err)
 		os.Exit(1)
 	}
 
+	fmt.Printf("%d files\n", len(pathList))
+
 	hashPaths := map[string][]string{}
-	for _, path := range pdfList {
+	for _, path := range pathList {
 		if !regularFile(path) {
 			continue
 		}
@@ -50,7 +52,6 @@ func main() {
 		}
 	}
 	sort.Strings(duplicates)
-	fmt.Println("=================================")
 	fmt.Printf("%d duplicates\n", len(duplicates))
 	for i, hash := range duplicates {
 		paths := hashPaths[hash]
