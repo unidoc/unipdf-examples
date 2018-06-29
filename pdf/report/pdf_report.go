@@ -18,8 +18,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/wcharczuk/go-chart"
-
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
 
@@ -144,7 +142,7 @@ func RunPdfReport(outputPath string) error {
 }
 
 // Generates the front page.
-func DoFirstPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model.PdfFont) {
+func DoFirstPage(c *creator.Creator, fontRegular, fontBold *model.PdfFont) {
 	helvetica := fonts.NewFontHelvetica()
 	helveticaBold := fonts.NewFontHelveticaBold()
 
@@ -174,7 +172,7 @@ func DoFirstPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model
 }
 
 // Document control page.
-func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model.PdfFont) {
+func DoDocumentControl(c *creator.Creator, fontRegular, fontBold *model.PdfFont) {
 	ch := c.NewChapter("Document control")
 	ch.SetMargins(0, 0, 40, 0)
 	ch.GetHeading().SetFont(fontRegular)
@@ -328,7 +326,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 
 // Chapter giving an overview of features.
 // TODO: Add code snippets and show more styles and options.
-func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model.PdfFont) {
+func DoFeatureOverview(c *creator.Creator, fontRegular, fontBold *model.PdfFont) {
 	// Ensure that the chapter starts on a new page.
 	c.NewPage()
 

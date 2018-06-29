@@ -40,10 +40,10 @@ func main() {
 
 	for i, inputPath := range files {
 		fmt.Println("======================== ^^^ ========================")
-		fmt.Printf("Pdf File %3d of %d %q\n", i+1, len(files), inputPath)
+		fmt.Fprintf(os.Stderr, "Pdf File %3d of %d %q\n", i+1, len(files), inputPath)
 		err := outputPdfText(inputPath)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Pdf File %3d of %d %q err=%v\n",
+			fmt.Fprintf(os.Stderr, "====> Pdf File %3d of %d %q err=%v\n",
 				i+1, len(files), inputPath, err)
 		}
 		fmt.Println("======================== ||| ========================")

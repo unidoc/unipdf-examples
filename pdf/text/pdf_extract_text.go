@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/unidoc/unidoc/common"
 	"github.com/unidoc/unidoc/pdf/extractor"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
@@ -32,7 +33,7 @@ func main() {
 	*/
 
 	// For debugging.
-	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	inputPath := os.Args[1]
 

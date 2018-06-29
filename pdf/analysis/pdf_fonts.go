@@ -64,7 +64,7 @@ func main() {
 	for _, subtype := range subtypes {
 		subtypeOccurrences[subtype].showEncodingCounts(fmt.Sprintf("Font subtype %#q", subtype))
 	}
-	occurrences.showTounicodeCounts("All versions")
+	occurrences.showTounicodeCounts("All font subtypes")
 	for _, subtype := range subtypes {
 		subtypeOccurrences[subtype].showTounicodeCounts(fmt.Sprintf("Font subtype %#q", subtype))
 	}
@@ -130,7 +130,7 @@ func (occurrences occurrenceList) showEncodingCounts(title string) {
 	}
 }
 
-// showTounicodeCounts prints a summary of the font ToUnicode cmap name counts in `occurrences`
+// showTounicodeCounts prints a summary of the  ToUnicode cmap name counts in `occurrences`
 func (occurrences occurrenceList) showTounicodeCounts(title string) {
 	numFiles := occurrences.numFiles()
 
@@ -173,24 +173,22 @@ func (occurrences occurrenceList) numFiles() int {
 	return len(counts)
 }
 
-// topElements returns `n` elements of `keyOccurrences` with the most elements.
+// topElements returns the `n` elements of `keyOccurrences` with the occurrences that appear in the
+// most PDF files.
+// The remaining elements are consolidated in a new "[other]" element.
 func topElements(keyOccurrences map[string]occurrenceList, n int) map[string]occurrenceList {
 	if len(keyOccurrences) <= n {
 		return keyOccurrences
 	}
 	keys := mapKeysNumFiles(keyOccurrences)
-	sort.SliceStable(keys, func(i, j int) bool {
-		return len(keyOccurrences[keys[i]]) > len(keyOccurrences[keys[j]])
-	})
 	other := occurrenceList{}
 	for _, k := range keys[n:] {
 		other = append(other, keyOccurrences[k]...)
 	}
-	top := map[string]occurrenceList{}
+	top := map[string]occurrenceList{"[other]": other}
 	for _, k := range keys[:n] {
 		top[k] = keyOccurrences[k]
 	}
-	top["[other]"] = other
 	return top
 }
 
@@ -230,7 +228,7 @@ func (occurrences occurrenceList) byEncoding() map[string]occurrenceList {
 	return keyOccurrences
 }
 
-// byTounicode returns `occurrences` as a map of occurrenceLists keyed by font ToUnicode cmap name.
+// byTounicode returns `occurrences` as a map of occurrenceLists keyed by ToUnicode cmap name.
 func (occurrences occurrenceList) byTounicode() map[string]occurrenceList {
 	keyOccurrences := map[string]occurrenceList{}
 	for _, o := range occurrences {
@@ -240,7 +238,7 @@ func (occurrences occurrenceList) byTounicode() map[string]occurrenceList {
 }
 
 // mergeOccurrences returns the elements of the keyed `keyOccurrences` merged into a single
-// occurrenceList
+// occurrenceList.
 func mergeOccurrences(keyOccurrences map[string]occurrenceList) occurrenceList {
 	occurrences := occurrenceList{}
 	for _, occ := range keyOccurrences {
@@ -261,6 +259,10 @@ func fontsInPdfList(pathList []string) (occurrences occurrenceList, err error) {
 		}
 		for _, font := range fonts {
 			subtype := font.Subtype()
+			// CIDFontType? font objects aren't fonts.
+			if subtype == `CIDFontType0` || subtype == `CIDFontType2` {
+				continue
+			}
 			basefont := font.BaseFont()
 			encoding := "[none]"
 			if font.Encoder() != nil {
@@ -275,11 +277,6 @@ func fontsInPdfList(pathList []string) (occurrences occurrenceList, err error) {
 		}
 	}
 
-	// Remove the redundant entries
-	keyOccurrences := occurrences.bySubtype()
-	delete(keyOccurrences, `CIDFontType0`)
-	delete(keyOccurrences, `CIDFontType2`)
-	occurrences = mergeOccurrences(keyOccurrences)
 	return
 }
 
