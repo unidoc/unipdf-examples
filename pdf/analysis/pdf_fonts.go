@@ -11,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strings"
 
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
@@ -79,30 +78,6 @@ type fontOccurrence struct {
 	encoding  string
 	tounicode string
 	basefont  string
-}
-
-// toKey returns a string containing the fields in `o` that are empty in `fields`.
-func (o fontOccurrence) toKey(fields fontOccurrence) string {
-	parts := []string{"", "", "", "", "", ""}
-	if fields.filename == "" {
-		parts[0] = o.filename
-	}
-	if fields.version == "" {
-		parts[1] = o.version
-	}
-	if fields.subtype == "" {
-		parts[2] = o.subtype
-	}
-	if fields.encoding == "" {
-		parts[3] = o.encoding
-	}
-	if fields.tounicode == "" {
-		parts[4] = o.tounicode
-	}
-	if fields.basefont == "" {
-		parts[5] = o.basefont
-	}
-	return strings.Join(parts, ":")
 }
 
 // fontOccurrence represents a list of fontOccurences.
@@ -184,8 +159,8 @@ func (occurrences occurrenceList) showTounicodeCounts(title string) {
 		nFiles := keyOccurrences[k].numFiles()
 		percentOcc := float64(nOcc) / float64(len(occurrences)) * 100.0
 		percentFiles := float64(nFiles) / float64(numFiles) * 100.0
-		fmt.Printf("%2d: %-18s %4d occurrences (%2.0f%%) Occurred in %3d (%2.0f%%) of files.\n",
-			i, truncate(k, 30), nOcc, percentOcc, nFiles, percentFiles)
+		fmt.Printf("%2d: %-22s %4d occurrences (%2.0f%%) Occurred in %3d (%2.0f%%) of files.\n",
+			i, truncate(k, 22), nOcc, percentOcc, nFiles, percentFiles)
 	}
 }
 
@@ -211,7 +186,6 @@ func topElements(keyOccurrences map[string]occurrenceList, n int) map[string]occ
 	for _, k := range keys[n:] {
 		other = append(other, keyOccurrences[k]...)
 	}
-	other = other.collapseBasefont()
 	top := map[string]occurrenceList{}
 	for _, k := range keys[:n] {
 		top[k] = keyOccurrences[k]
@@ -273,36 +247,6 @@ func mergeOccurrences(keyOccurrences map[string]occurrenceList) occurrenceList {
 		occurrences = append(occurrences, occ...)
 	}
 	return occurrences
-}
-
-// collapseSubtype returns the elements of `occurrences` that differ in fields other than subtype.
-func (occurrences occurrenceList) collapseSubtype() occurrenceList {
-	return occurrences.collapse(fontOccurrence{subtype: "remove"})
-}
-
-// collapseEncoding returns the elements of `occurrences` that differ in fields other than encoding.
-func (occurrences occurrenceList) collapseEncoding() occurrenceList {
-	return occurrences.collapse(fontOccurrence{encoding: "remove"})
-}
-
-// collapseBasefont returns the elements of `occurrences` that differ in fields other than basefont.
-func (occurrences occurrenceList) collapseBasefont() occurrenceList {
-	return occurrences.collapse(fontOccurrence{basefont: "remove"})
-}
-
-// collapse returns the elements of `occurrences` that differ in the empty fields of `fields`.
-// This means that all elements of `occurrences`that differ only by the non-empty fields of `fields`
-// will be replaced a single element in the returned list.
-func (occurrences occurrenceList) collapse(fields fontOccurrence) occurrenceList {
-	keyOccurrence := map[string]fontOccurrence{}
-	for _, o := range occurrences {
-		keyOccurrence[o.toKey(fields)] = o
-	}
-	collapsed := occurrenceList{}
-	for _, o := range keyOccurrence {
-		collapsed = append(collapsed, o)
-	}
-	return collapsed
 }
 
 // fontsInPdfList returns the fonts used in the PDF files in `pathList`.
