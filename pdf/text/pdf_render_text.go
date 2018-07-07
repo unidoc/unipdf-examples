@@ -7,6 +7,7 @@
 package main
 
 import (
+	"encoding/csv"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -137,9 +138,20 @@ type testResult struct {
 	err      string
 }
 
+var testHeader = []string{"filename", "version", "pages", "error"}
+
 func (r *testResult) String() string {
 	return fmt.Sprintf("version=%s pages=%3d err=%-20s %q",
 		r.version, r.pages, r.err, r.filename)
+}
+
+func (r *testResult) asStrings() []string {
+	return []string{
+		r.filename,
+		r.version,
+		fmt.Sprintf("%d", r.pages),
+		r.err,
+	}
 }
 
 var ignoredErrors = map[string]bool{
@@ -180,9 +192,6 @@ func filesFromPreviousRun(filename string) ([]string, error) {
 			pages:    pages,
 			err:      groups[4],
 		}
-		if _, ok := ignoredErrors[r.err]; ok {
-			continue
-		}
 		if _, err := os.Stat(r.filename); err != nil {
 			fmt.Fprintf(os.Stderr, "Non-existant i=%d.\n\tgroups=%+v\n\tline=%q\n", i, groups, line)
 			return nil, err
@@ -214,12 +223,42 @@ func filesFromPreviousRun(filename string) ([]string, error) {
 	}
 	fmt.Println("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ End Results ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
 
+	err = saveAsCsv(filename+".csv", results)
+	if err != nil {
+		return nil, err
+	}
+
 	files := []string{}
 	for _, r := range results {
+		if _, ok := ignoredErrors[r.err]; ok {
+			continue
+		}
 		files = append(files, r.filename)
 	}
 	return files, nil
+}
 
+func saveAsCsv(filename string, results []testResult) error {
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	writer := csv.NewWriter(f)
+	defer writer.Flush()
+
+	err = writer.Write(testHeader)
+	if err != nil {
+		return err
+	}
+	for _, r := range results {
+		err := writer.Write(r.asStrings())
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // getReader returns a PdfReader and the number of pages for PDF file `inputPath`.
