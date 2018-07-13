@@ -107,7 +107,7 @@ func main() {
 
 	pdfList, err := patternsToPaths(args)
 	if err != nil {
-		common.Log.Error("patternsToPaths failed. args=%#q err=%v", args, err)
+		common.Log.Debug("ERROR: patternsToPaths failed. args=%#q err=%v", args, err)
 		os.Exit(1)
 	}
 	pdfList = sortFiles(pdfList, minSize, maxSize)
@@ -119,7 +119,7 @@ func main() {
 
 		colorPagesIn, err := pdfColorPages(inputPath, compDir)
 		if err != nil {
-			common.Log.Error("PDF is damaged. err=%v\n\tinputPath=%#q", err, inputPath)
+			common.Log.Debug("ERROR: PDF is damaged. err=%v\n\tinputPath=%#q", err, inputPath)
 			continue
 		}
 		var strictColorPages []int = nil
@@ -137,22 +137,22 @@ func main() {
 		numPages, colorPages, err := describePdf(inputPath, strictColorPages)
 		dt := time.Since(t0)
 		if err != nil {
-			common.Log.Error("describePdf failed. err=%v", err)
+			common.Log.Debug("ERROR: describePdf failed. err=%v", err)
 			result = "bad"
 		}
 		report(writers, " %d pages %d color %.3f sec", numPages, len(colorPages), dt.Seconds())
 
 		if result == "pass" {
 			if !equalSlices(colorPagesIn, colorPages) {
-				common.Log.Error("pdfColorPages: \ncolorPagesIn=%d %v\ncolorPages  =%d %v",
+				common.Log.Debug("ERROR: pdfColorPages: \ncolorPagesIn=%d %v\ncolorPages  =%d %v",
 					len(colorPagesIn), colorPagesIn, len(colorPages), colorPages)
 				fp := sliceDiff(colorPages, colorPagesIn)
 				fn := sliceDiff(colorPagesIn, colorPages)
 				if len(fp) > 0 {
-					common.Log.Error("False positives=%d %+v", len(fp), fp)
+					common.Log.Debug("ERROR: False positives=%d %+v", len(fp), fp)
 				}
 				if len(fn) > 0 {
-					common.Log.Error("False negatives=%d %+v", len(fn), fn)
+					common.Log.Debug("ERROR: False negatives=%d %+v", len(fn), fn)
 				}
 				result = "fail"
 			}
@@ -237,10 +237,10 @@ func describePdf(inputPath string, strictColorPages []int) (int, []int, error) {
 		if strictColorPages != nil {
 			strictColored := contains(strictColorPages, pageNum)
 			if colored != strictColored {
-				common.Log.Error("$$$$$$# Mismatch: Redoing pageNum=%d strictColored=%t colored=%t",
+				common.Log.Debug("ERROR: $$$$$$# Mismatch: Redoing pageNum=%d strictColored=%t colored=%t",
 					pageNum, strictColored, colored)
 				colored, _ = isPageColored(page, desc, true)
-				common.Log.Error("$$$$$$* Mismatch: Redid inputPath=%q pageNum=%d strictColored=%t colored=%t",
+				common.Log.Debug("ERROR: $$$$$$* Mismatch: Redid inputPath=%q pageNum=%d strictColored=%t colored=%t",
 					inputPath, pageNum, strictColored, colored)
 				panic("Done")
 			}
@@ -261,7 +261,7 @@ func isPageColored(page *pdf.PdfPage, desc string, debug bool) (bool, error) {
 
 	contents, err := page.GetAllContentStreams()
 	if err != nil {
-		common.Log.Error("GetAllContentStreams failed. err=%v", err)
+		common.Log.Debug("ERROR: GetAllContentStreams failed. err=%v", err)
 		return false, err
 	}
 
@@ -278,7 +278,7 @@ func isPageColored(page *pdf.PdfPage, desc string, debug bool) (bool, error) {
 		common.Log.Info("colored=%t err=%v", colored, err)
 	}
 	if err != nil {
-		common.Log.Error("isContentStreamColored failed. err=%v", err)
+		common.Log.Debug("ERROR: isContentStreamColored failed. err=%v", err)
 		return false, err
 	}
 	return colored, nil
@@ -354,7 +354,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					}
 					hasCol, err := isPatternColored(pattern, debug)
 					if err != nil {
-						common.Log.Error("isPatternColored failed. err=%v", err)
+						common.Log.Debug("ERROR: isPatternColored failed. err=%v", err)
 						return err
 					}
 					coloredPatterns[patternColor.PatternName] = hasCol
@@ -453,7 +453,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 
 				shading, found := resources.GetShadingByName(*shname)
 				if !found {
-					common.Log.Error("Shading not defined in resources. shname=%#q", string(*shname))
+					common.Log.Debug("ERROR: Shading not defined in resources. shname=%#q", string(*shname))
 					return errors.New("Shading not defined in resources")
 				}
 				hasCol, err := isShadingColored(shading)
@@ -474,13 +474,13 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			}
 			if len(op.Params) != 1 {
 				err := errors.New("invalid number of parameters")
-				common.Log.Error("BI error. err=%v")
+				common.Log.Debug("ERROR: BI error. err=%v")
 				return err
 			}
 			// Inline image.
 			iimg, ok := op.Params[0].(*pdfcontent.ContentStreamInlineImage)
 			if !ok {
-				common.Log.Error("Invalid handling for inline image")
+				common.Log.Debug("ERROR: Invalid handling for inline image")
 				return errors.New("Invalid inline image parameter")
 			}
 			if debug {
@@ -488,7 +488,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			}
 			img, err := iimg.ToImage(resources)
 			if err != nil {
-				common.Log.Error("Error converting inline image to image: %v", err)
+				common.Log.Debug("ERROR: Error converting inline image to image: %v", err)
 				return err
 			}
 
@@ -502,12 +502,12 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 
 			cs, err := iimg.GetColorSpace(resources)
 			if err != nil {
-				common.Log.Error("Error getting color space for inline image: %v", err)
+				common.Log.Debug("ERROR: Error getting color space for inline image: %v", err)
 				return err
 			}
 			rgbImg, err := cs.ImageToRGB(*img)
 			if err != nil {
-				common.Log.Error("Error converting image to rgb: %v", err)
+				common.Log.Debug("ERROR: Error converting image to rgb: %v", err)
 				return err
 			}
 			hasCol := isRgbImageColored(rgbImg, debug)
@@ -529,7 +529,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			}
 
 			if len(op.Params) < 1 {
-				common.Log.Error("Invalid number of params for Do object")
+				common.Log.Debug("ERROR: Invalid number of params for Do object")
 				return errors.New("Range check")
 			}
 
@@ -552,7 +552,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			if xtype == pdf.XObjectTypeImage {
 				ximg, err := resources.GetXObjectImageByName(*name)
 				if err != nil {
-					common.Log.Error("Error w/GetXObjectImageByName : %v", err)
+					common.Log.Debug("ERROR: Error w/GetXObjectImageByName : %v", err)
 					return err
 				}
 				if debug {
@@ -578,13 +578,13 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 
 				img, err := ximg.ToImage()
 				if err != nil {
-					common.Log.Error("Error w/ToImage: %v", err)
+					common.Log.Debug("ERROR: Error w/ToImage: %v", err)
 					return err
 				}
 
 				rgbImg, err := ximg.ColorSpace.ImageToRGB(*img)
 				if err != nil {
-					common.Log.Error("Error ImageToRGB: %v", err)
+					common.Log.Debug("ERROR: Error ImageToRGB: %v", err)
 					return err
 				}
 
@@ -613,7 +613,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 
 				formContent, err := xform.GetContentStream()
 				if err != nil {
-					common.Log.Error("err=%v")
+					common.Log.Debug("ERROR: err=%v")
 					return err
 				}
 
@@ -628,7 +628,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				// Process the content stream in the Form object too:
 				hasCol, err := isContentStreamColored(string(formContent), formResources, debug)
 				if err != nil {
-					common.Log.Error("err=%v", err)
+					common.Log.Debug("ERROR: err=%v", err)
 					return err
 				}
 				processedXObjects[string(*name)] = hasCol
@@ -644,7 +644,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 
 	err = processor.Process(resources)
 	if err != nil {
-		common.Log.Error("processor.Process returned: err=%v", err)
+		common.Log.Debug("ERROR: processor.Process returned: err=%v", err)
 		return false, err
 	}
 
@@ -671,7 +671,7 @@ func isPatternColored(pattern *pdf.PdfPattern, debug bool) (bool, error) {
 		colored, err := isShadingColored(shadingPattern.Shading)
 		return colored, err
 	}
-	common.Log.Error("isPatternColored. pattern is neither tiling nor shading")
+	common.Log.Debug("ERROR: isPatternColored. pattern is neither tiling nor shading")
 	return false, nil
 }
 
@@ -689,7 +689,7 @@ func isShadingColored(shading *pdf.PdfShading) (bool, error) {
 		return true, nil
 	} else {
 		err := errors.New("Unsupported pattern colorspace for color detection")
-		common.Log.Error("isShadingColored: colorpace N=%d err=%v", cs.GetNumComponents(), err)
+		common.Log.Debug("ERROR: isShadingColored: colorpace N=%d err=%v", cs.GetNumComponents(), err)
 		return false, err
 	}
 }
@@ -718,7 +718,7 @@ func isColorColored(color pdf.PdfColor) bool {
 		a, b := col.A(), col.B()
 		return visible(a, b)
 	}
-	common.Log.Error("isColorColored: Unknown color %T %s", color, color)
+	common.Log.Debug("ERROR: isColorColored: Unknown color %T %s", color, color)
 	panic("Unknown color type")
 }
 
@@ -765,7 +765,7 @@ func report(writers []io.Writer, format string, a ...interface{}) {
 	msg := fmt.Sprintf(format, a...)
 	for _, w := range writers {
 		if _, err := io.WriteString(w, msg); err != nil {
-			common.Log.Error("report: write to %#v failed msg=%s err=%v", w, msg, err)
+			common.Log.Debug("ERROR: report: write to %#v failed msg=%s err=%v", w, msg, err)
 		}
 	}
 }
@@ -870,7 +870,7 @@ func runGhostscript(pdf, outputDir string) error {
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
-		common.Log.Error("runGhostscript: Could not process pdf=%q err=%v\nstdout=\n%s\nstderr=\n%s\n",
+		common.Log.Debug("ERROR: runGhostscript: Could not process pdf=%q err=%v\nstdout=\n%s\nstderr=\n%s\n",
 			pdf, err, stdout, stderr)
 	}
 	return err
@@ -907,7 +907,7 @@ func colorDirectoryPages(mask, dir string) ([]int, error) {
 	pattern := filepath.Join(dir, mask)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
-		common.Log.Error("colorDirectoryPages: Glob failed. pattern=%#q err=%v", pattern, err)
+		common.Log.Debug("ERROR: colorDirectoryPages: Glob failed. pattern=%#q err=%v", pattern, err)
 		return nil, err
 	}
 
@@ -970,7 +970,7 @@ func imgIsColor(img image.Image) bool {
 func readImage(path string) (image.Image, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		common.Log.Error("readImage: Could not open file. path=%#q err=%v", path, err)
+		common.Log.Debug("ERROR: readImage: Could not open file. path=%#q err=%v", path, err)
 		return nil, err
 	}
 	defer f.Close()
@@ -1013,7 +1013,7 @@ func patternsToPaths(patternList []string) ([]string, error) {
 	for _, pattern := range patternList {
 		files, err := filepath.Glob(pattern)
 		if err != nil {
-			common.Log.Error("patternsToPaths: Glob failed. pattern=%#q err=%v", pattern, err)
+			common.Log.Debug("ERROR: patternsToPaths: Glob failed. pattern=%#q err=%v", pattern, err)
 			return pathList, err
 		}
 		for _, path := range files {

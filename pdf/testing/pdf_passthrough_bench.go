@@ -116,13 +116,13 @@ func main() {
 
 	pdfList, err := patternsToPaths(args)
 	if err != nil {
-		common.Log.Error("patternsToPaths failed. args=%#q err=%v", args, err)
+		common.Log.Debug("ERROR: patternsToPaths failed. args=%#q err=%v", args, err)
 		os.Exit(1)
 	}
 
 	err = benchmarkPDFs(pdfList, params)
 	if err != nil {
-		common.Log.Error("benchmarkPDFs failed err=%v", err)
+		common.Log.Debug("ERROR: benchmarkPDFs failed err=%v", err)
 		os.Exit(1)
 	}
 
@@ -140,7 +140,7 @@ func patternsToPaths(patternList []string) ([]string, error) {
 	for _, pattern := range patternList {
 		files, err := filepath.Glob(pattern)
 		if err != nil {
-			common.Log.Error("patternsToPaths: Glob failed. pattern=%#q err=%v", pattern, err)
+			common.Log.Debug("ERROR: patternsToPaths: Glob failed. pattern=%#q err=%v", pattern, err)
 			return pathList, err
 		}
 		for _, path := range files {
@@ -186,19 +186,19 @@ func validatePdf(path string, password string) (error, int) {
 	if err != nil {
 		common.Log.Debug("%s", out.String())
 		common.Log.Debug("%s", errOut.String())
-		common.Log.Error("GS failed with error %s", err)
+		common.Log.Debug("ERROR: GS failed with error %s", err)
 		return fmt.Errorf("GS failed with error (%s)", err), 0
 	}
 
 	outputErr := errOut.String()
 	warnings := strings.Count(outputErr, "****")
-	common.Log.Error(": - %d warnings %s", warnings, outputErr)
+	common.Log.Debug("ERROR: : - %d warnings %s", warnings, outputErr)
 
 	if warnings > 1 {
 		if len(outputErr) > 80 {
 			outputErr = outputErr[:80] // Trim the output.
 		}
-		common.Log.Error("Invalid - %d warnings %s", warnings, outputErr)
+		common.Log.Debug("ERROR: Invalid - %d warnings %s", warnings, outputErr)
 		return fmt.Errorf("Invalid - %d warnings (%s)", warnings, outputErr), warnings
 	}
 
@@ -314,7 +314,7 @@ func testPassthroughSinglePdf(path string, params benchParams) error {
 
 		err, warnings := validatePdf(params.processPath, "")
 		if err != nil && warnings > inputWarnings {
-			common.Log.Error("Input warnings %d vs output %d", inputWarnings, warnings)
+			common.Log.Debug("ERROR: Input warnings %d vs output %d", inputWarnings, warnings)
 			return fmt.Errorf("Invalid PDF input %d/ output %d warnings", inputWarnings, warnings)
 		}
 		common.Log.Debug("Valid PDF!")

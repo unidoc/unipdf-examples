@@ -136,13 +136,13 @@ func main() {
 
 	err := os.MkdirAll(outputDir, 0777)
 	if err != nil {
-		common.Log.Error("MkdirAll failed. outputDir=%#q err=%v", outputDir, err)
+		common.Log.Debug("ERROR: MkdirAll failed. outputDir=%#q err=%v", outputDir, err)
 		os.Exit(1)
 	}
 
 	pdfList, err := patternsToPaths(args)
 	if err != nil {
-		common.Log.Error("patternsToPaths failed. args=%#q err=%v", args, err)
+		common.Log.Debug("ERROR: patternsToPaths failed. args=%#q err=%v", args, err)
 		os.Exit(1)
 	}
 	pdfList = sortFiles(pdfList, minSize, maxSize)
@@ -169,7 +169,7 @@ func main() {
 		numPages, err := transformPdfFile(inputPath, outputPath)
 		dt := time.Since(t0)
 		if err != nil {
-			common.Log.Error("transformPdfFile failed. err=%v", err)
+			common.Log.Debug("ERROR: transformPdfFile failed. err=%v", err)
 			failFiles = append(failFiles, inputPath)
 			failErrors = append(failErrors, fmt.Sprintf("%v", err))
 			result = "bad"
@@ -187,7 +187,7 @@ func main() {
 
 			err = runPdfToPs(outputPath, compDir)
 			if err != nil {
-				common.Log.Error("Transform has damaged PDF. err=%v\n\tinputPath=%#q\n\toutputPath=%#q",
+				common.Log.Debug("ERROR: Transform has damaged PDF. err=%v\n\tinputPath=%#q\n\toutputPath=%#q",
 					err, inputPath, outputPath)
 				result = "fail"
 				errStr = "Transform -> damaged PDF"
@@ -200,11 +200,11 @@ func main() {
 
 			if err != nil || isColorOut {
 				if err != nil {
-					common.Log.Error("Transform has damaged PDF. err=%v\n\tinputPath=%#q\n\toutputPath=%#q",
+					common.Log.Debug("ERROR: Transform has damaged PDF. err=%v\n\tinputPath=%#q\n\toutputPath=%#q",
 						err, inputPath, outputPath)
 					errStr = fmt.Sprintf("isPdfColor check failed: %v", err)
 				} else {
-					common.Log.Error("isPdfColor: %d Color pages", len(colorPagesOut))
+					common.Log.Debug("ERROR: isPdfColor: %d Color pages", len(colorPagesOut))
 					errStr = fmt.Sprintf("color fail: %d color pages / %d total", len(colorPagesOut), numPages)
 				}
 				result = "fail"
@@ -354,13 +354,13 @@ func convertPageToGrayscale(page *pdf.PdfPage, desc string) error {
 	// For each page, we go through the resources and look for the images.
 	contents, err := page.GetAllContentStreams()
 	if err != nil {
-		common.Log.Error("GetAllContentStreams failed. err=%v", err)
+		common.Log.Debug("ERROR: GetAllContentStreams failed. err=%v", err)
 		return err
 	}
 
 	grayContent, err := transformContentStreamToGrayscale(contents, page.Resources)
 	if err != nil {
-		common.Log.Error("transformContentStreamToGrayscale failed. err=%v", err)
+		common.Log.Debug("ERROR: transformContentStreamToGrayscale failed. err=%v", err)
 		return err
 	}
 	page.SetContentStreams([]string{string(grayContent)}, pdfcore.NewFlateEncoder())
@@ -488,7 +488,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					if patternColor.Color != nil {
 						color, err := gs.ColorspaceStroking.ColorToRGB(patternColor.Color)
 						if err != nil {
-							common.Log.Error("err=%v", err)
+							common.Log.Debug("ERROR: err=%v", err)
 							return err
 						}
 						rgbColor := color.(*pdf.PdfColorDeviceRGB)
@@ -523,7 +523,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				} else {
 					color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
 					if err != nil {
-						common.Log.Error("Error with ColorToRGB: %v", err)
+						common.Log.Debug("ERROR: Error with ColorToRGB: %v", err)
 						return err
 					}
 					rgbColor := color.(*pdf.PdfColorDeviceRGB)
@@ -549,7 +549,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					if patternColor.Color != nil {
 						color, err := gs.ColorspaceNonStroking.ColorToRGB(patternColor) //.Color)
 						if err != nil {
-							common.Log.Error("err=%v", err)
+							common.Log.Debug("ERROR: err=%v", err)
 							return err
 						}
 						rgbColor := color.(*pdf.PdfColorDeviceRGB)
@@ -583,7 +583,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				} else {
 					color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
 					if err != nil {
-						common.Log.Error("err=%v", err)
+						common.Log.Debug("ERROR: err=%v", err)
 						return err
 					}
 					rgbColor := color.(*pdf.PdfColorDeviceRGB)
@@ -599,7 +599,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			case "RG", "K": // Set RGB or CMYK stroking color.
 				color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
 				if err != nil {
-					common.Log.Error("err=%v", err)
+					common.Log.Debug("ERROR: err=%v", err)
 					return err
 				}
 				rgbColor := color.(*pdf.PdfColorDeviceRGB)
@@ -614,7 +614,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			case "rg", "k": // Set RGB or CMYK as nonstroking color.
 				color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
 				if err != nil {
-					common.Log.Error("err=%v", err)
+					common.Log.Debug("ERROR: err=%v", err)
 					return err
 				}
 				rgbColor := color.(*pdf.PdfColorDeviceRGB)
@@ -643,7 +643,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 				shading, found := resources.GetShadingByName(*shname)
 				if !found {
-					common.Log.Error("Shading not defined in resources. shname=%#q", string(*shname))
+					common.Log.Debug("ERROR: Shading not defined in resources. shname=%#q", string(*shname))
 					return errors.New("Shading not defined in resources")
 				}
 
@@ -664,19 +664,19 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
 			if len(op.Params) != 1 {
 				err := errors.New("invalid number of parameters")
-				common.Log.Error("BI error. err=%v")
+				common.Log.Debug("ERROR: BI error. err=%v")
 				return err
 			}
 			// Inline image.
 			iimg, ok := op.Params[0].(*pdfcontent.ContentStreamInlineImage)
 			if !ok {
-				common.Log.Error("Invalid handling for inline image")
+				common.Log.Debug("ERROR: Invalid handling for inline image")
 				return errors.New("Invalid inline image parameter")
 			}
 
 			cs, err := iimg.GetColorSpace(resources)
 			if err != nil {
-				common.Log.Error("Error getting color space for inline image: %v", err)
+				common.Log.Debug("ERROR: Error getting color space for inline image: %v", err)
 				return err
 			}
 
@@ -686,7 +686,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 			encoder, err := iimg.GetEncoder()
 			if err != nil {
-				common.Log.Error("Error getting encoder for inline image: %v", err)
+				common.Log.Debug("ERROR: Error getting encoder for inline image: %v", err)
 				return err
 			}
 
@@ -703,18 +703,18 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 			img, err := iimg.ToImage(resources)
 			if err != nil {
-				common.Log.Error("Error converting inline image to image: %v", err)
+				common.Log.Debug("ERROR: Error converting inline image to image: %v", err)
 				return err
 			}
 			rgbImg, err := cs.ImageToRGB(*img)
 			if err != nil {
-				common.Log.Error("Error converting image to rgb: %v", err)
+				common.Log.Debug("ERROR: Error converting image to rgb: %v", err)
 				return err
 			}
 			rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
 			grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
 			if err != nil {
-				common.Log.Error("Error converting img to gray: %v", err)
+				common.Log.Debug("ERROR: Error converting img to gray: %v", err)
 				return err
 			}
 
@@ -734,7 +734,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				// Try again, fail on error.
 				grayInlineImg, err = pdfcontent.NewInlineImageFromImage(grayImage, encoder)
 				if err != nil {
-					common.Log.Error("Error making a new inline image object: %v", err)
+					common.Log.Debug("ERROR: Error making a new inline image object: %v", err)
 					return err
 				}
 			}
@@ -754,7 +754,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "Do",
 		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
 			if len(op.Params) < 1 {
-				common.Log.Error("Invalid number of params for Do object")
+				common.Log.Debug("ERROR: Invalid number of params for Do object")
 				return errors.New("Range check")
 			}
 
@@ -776,7 +776,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 				ximg, err := resources.GetXObjectImageByName(*name)
 				if err != nil {
-					common.Log.Error("Error w/GetXObjectImageByName : %v", err)
+					common.Log.Debug("ERROR: Error w/GetXObjectImageByName : %v", err)
 					return err
 				}
 
@@ -799,20 +799,20 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 				img, err := ximg.ToImage()
 				if err != nil {
-					common.Log.Error("Error w/ToImage: %v", err)
+					common.Log.Debug("ERROR: Error w/ToImage: %v", err)
 					return err
 				}
 
 				rgbImg, err := ximg.ColorSpace.ImageToRGB(*img)
 				if err != nil {
-					common.Log.Error("Error ImageToRGB: %v", err)
+					common.Log.Debug("ERROR: Error ImageToRGB: %v", err)
 					return err
 				}
 
 				rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
 				grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
 				if err != nil {
-					common.Log.Error("Error ImageToGray: %v", err)
+					common.Log.Debug("ERROR: Error ImageToGray: %v", err)
 					return err
 				}
 
@@ -833,7 +833,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					// Try again, fail if error.
 					ximgGray, err = pdf.NewXObjectImageFromImage(&grayImage, nil, encoder)
 					if err != nil {
-						common.Log.Error("Error creating image: %v", err)
+						common.Log.Debug("ERROR: Error creating image: %v", err)
 						return err
 					}
 				}
@@ -841,7 +841,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				// Update the entry.
 				err = resources.SetXObjectImageByName(*name, ximgGray)
 				if err != nil {
-					common.Log.Error("Failed setting x object: %v (%s)", err, string(*name))
+					common.Log.Debug("ERROR: Failed setting x object: %v (%s)", err, string(*name))
 					return err
 				}
 			} else if xtype == pdf.XObjectTypeForm {
@@ -850,13 +850,13 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				// Go through the XObject Form content stream.
 				xform, err := resources.GetXObjectFormByName(*name)
 				if err != nil {
-					common.Log.Error("err=%v", err)
+					common.Log.Debug("ERROR: err=%v", err)
 					return err
 				}
 
 				formContent, err := xform.GetContentStream()
 				if err != nil {
-					common.Log.Error("err=%v")
+					common.Log.Debug("ERROR: err=%v")
 					return err
 				}
 
@@ -871,7 +871,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				// Process the content stream in the Form object too:
 				grayContent, err := transformContentStreamToGrayscale(string(formContent), formResources)
 				if err != nil {
-					common.Log.Error("err=%v", err)
+					common.Log.Debug("ERROR: err=%v", err)
 					return err
 				}
 
@@ -886,7 +886,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 	err = processor.Process(resources)
 	if err != nil {
-		common.Log.Error("processor.Process returned: err=%v", err)
+		common.Log.Debug("ERROR: processor.Process returned: err=%v", err)
 		return nil, err
 	}
 
@@ -1041,7 +1041,7 @@ func modifyPath(inputPath, outputDir string) string {
 		panic(err)
 	}
 	if strings.ToLower(in) == strings.ToLower(out) {
-		common.Log.Error("modifyPath: Cannot modify path to itself. inputPath=%#q outputDir=%#q",
+		common.Log.Debug("ERROR: modifyPath: Cannot modify path to itself. inputPath=%#q outputDir=%#q",
 			inputPath, outputDir)
 		panic("Don't write over test files")
 	}
@@ -1135,7 +1135,7 @@ func runGhostscript(pdf, outputDir string) error {
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
-		common.Log.Error("runGhostscript: Could not process pdf=%q err=%v\nstdout=\n%s\nstderr=\n%s\n",
+		common.Log.Debug("ERROR: runGhostscript: Could not process pdf=%q err=%v\nstdout=\n%s\nstderr=\n%s\n",
 			pdf, err, stdout, stderr)
 	}
 	return err
@@ -1161,7 +1161,7 @@ func runPdfToPs(pdf, outputDir string) error {
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
-		common.Log.Error("Could not process pdf=%q err=%v\nstdout=\n%s\nstderr=\n%s\n",
+		common.Log.Debug("ERROR: Could not process pdf=%q err=%v\nstdout=\n%s\nstderr=\n%s\n",
 			pdf, err, stdout, stderr)
 	}
 	return err
@@ -1199,7 +1199,7 @@ func isColorDirectory(mask, dir string) (bool, error) {
 	pattern := filepath.Join(dir, mask)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
-		common.Log.Error("isColorDirectory: Glob failed. pattern=%#q err=%v", pattern, err)
+		common.Log.Debug("ERROR: isColorDirectory: Glob failed. pattern=%#q err=%v", pattern, err)
 		return false, err
 	}
 
@@ -1218,7 +1218,7 @@ func colorDirectoryPages(mask, dir string, keep bool) ([]int, error) {
 	pattern := filepath.Join(dir, mask)
 	files, err := filepath.Glob(pattern)
 	if err != nil {
-		common.Log.Error("isColorDirectory: Glob failed. pattern=%#q err=%v", pattern, err)
+		common.Log.Debug("ERROR: isColorDirectory: Glob failed. pattern=%#q err=%v", pattern, err)
 		return nil, err
 	}
 
@@ -1255,7 +1255,7 @@ func isColorImage(path string, keep bool) (bool, error) {
 	if isColor && keep {
 		markedPath := fmt.Sprintf("%s.marked.png", path)
 		markedImg, summary := imgMarkColor(img)
-		common.Log.Error("markedPath=%#q %s", markedPath, summary)
+		common.Log.Debug("ERROR: markedPath=%#q %s", markedPath, summary)
 		err = writeImage(markedPath, markedImg)
 	}
 	return isColor, err
@@ -1324,7 +1324,7 @@ func summarizeSeries(data []float64) string {
 func readImage(path string) (image.Image, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		common.Log.Error("readImage: Could not open file. path=%#q err=%v", path, err)
+		common.Log.Debug("ERROR: readImage: Could not open file. path=%#q err=%v", path, err)
 		return nil, err
 	}
 	defer f.Close()
@@ -1337,7 +1337,7 @@ func readImage(path string) (image.Image, error) {
 func writeImage(path string, img image.Image) error {
 	f, err := os.Create(path)
 	if err != nil {
-		common.Log.Error("writeImage: Could not create file. path=%#q err=%v", path, err)
+		common.Log.Debug("ERROR: writeImage: Could not create file. path=%#q err=%v", path, err)
 		return err
 	}
 	defer f.Close()
@@ -1379,7 +1379,7 @@ func patternsToPaths(patternList []string) ([]string, error) {
 	for _, pattern := range patternList {
 		files, err := filepath.Glob(pattern)
 		if err != nil {
-			common.Log.Error("patternsToPaths: Glob failed. pattern=%#q err=%v", pattern, err)
+			common.Log.Debug("ERROR: patternsToPaths: Glob failed. pattern=%#q err=%v", pattern, err)
 			return pathList, err
 		}
 		for _, path := range files {
@@ -1421,7 +1421,7 @@ func report(writers []io.Writer, format string, a ...interface{}) {
 	msg := fmt.Sprintf(format, a...)
 	for _, w := range writers {
 		if _, err := io.WriteString(w, msg); err != nil {
-			common.Log.Error("report: write to %#v failed msg=%s err=%v", w, msg, err)
+			common.Log.Debug("ERROR: report: write to %#v failed msg=%s err=%v", w, msg, err)
 		}
 	}
 }
