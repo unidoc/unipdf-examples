@@ -52,50 +52,6 @@ func normaliseFile(inFile, outFile string, width int) {
 	stringToFile(outFile, text)
 }
 
-// normalizeText returns `text` with runs of spaces of any kind (spaces, tabs, line breaks, etc)
-// reduced to a single space. `width` is the target line width.
-func normalizeText(text string, width int) string {
-	if width < 0 {
-		width = defaultNormalizeWidth
-	}
-	return splitLines(reduceSpaces(text), width)
-}
-
-// reduceSpaces returns `text` with runs of spaces of any kind (spaces, tabs, line breaks, etc)
-// reduced to a single space.
-func reduceSpaces(text string) string {
-	text = reSpace.ReplaceAllString(text, " ")
-	return strings.Trim(text, " \t\n\r\v")
-}
-
-var reSpace = regexp.MustCompile(`(?m)\s+`)
-
-// normalizeText inserts line breaks in string `text`. `width` is the target line width.
-func splitLines(text string, width int) string {
-	runes := []rune(text)
-	if len(runes) < 2 {
-		return text
-	}
-	lines := []string{}
-	chars := []rune{}
-	for i := 0; i < len(runes)-1; i++ {
-		r, r1 := runes[i], runes[i+1]
-		chars = append(chars, r)
-		if (r == ' ' && len(chars) >= width) || (r == '.' && unicode.IsSpace(r1)) {
-			lines = append(lines, string(chars))
-			chars = []rune{}
-		}
-	}
-	chars = append(chars, runes[len(runes)-1])
-	if len(chars) > 0 {
-		lines = append(lines, string(chars))
-	}
-	for i, ln := range lines {
-		lines[i] = strings.Trim(ln, " \t\n\r\v")
-	}
-	return strings.Join(lines, "\n")
-}
-
 // getReader returns a PdfReader and the number of pages for PDF file `inputPath`.
 func fileToString(filename string) string {
 	data, err := ioutil.ReadFile(filename)
@@ -119,4 +75,48 @@ func makeUsage(msg string) {
 		fmt.Fprintln(os.Stderr, msg)
 		usage()
 	}
+}
+
+// normalizeText returns `text` with runs of spaces of any kind (spaces, tabs, line breaks, etc)
+// reduced to a single space. `width` is the target line width.
+func normalizeText(text string, width int) string {
+	if width < 0 {
+		width = defaultNormalizeWidth
+	}
+	return splitLines(reduceSpaces(text), width)
+}
+
+// reduceSpaces returns `text` with runs of spaces of any kind (spaces, tabs, line breaks, etc)
+// reduced to a single space.
+func reduceSpaces(text string) string {
+	text = reSpace.ReplaceAllString(text, " ")
+	return strings.Trim(text, " \t\n\r\v")
+}
+
+var reSpace = regexp.MustCompile(`(?m)\s+`)
+
+// splitLines inserts line breaks in string `text`. `width` is the target line width.
+func splitLines(text string, width int) string {
+	runes := []rune(text)
+	if len(runes) < 2 {
+		return text
+	}
+	lines := []string{}
+	chars := []rune{}
+	for i := 0; i < len(runes)-1; i++ {
+		r, r1 := runes[i], runes[i+1]
+		chars = append(chars, r)
+		if (len(chars) >= width && unicode.IsSpace(r)) || (r == '.' && unicode.IsSpace(r1)) {
+			lines = append(lines, string(chars))
+			chars = []rune{}
+		}
+	}
+	chars = append(chars, runes[len(runes)-1])
+	if len(chars) > 0 {
+		lines = append(lines, string(chars))
+	}
+	for i, ln := range lines {
+		lines[i] = strings.Trim(ln, " \t\n\r\v")
+	}
+	return strings.Join(lines, "\n")
 }

@@ -449,7 +449,7 @@ func reduceSpaces(text string) string {
 
 var reSpace = regexp.MustCompile(`(?m)\s+`)
 
-// normalizeText inserts line breaks in string `text`. `width` is the target line width.
+// splitLines inserts line breaks in string `text`. `width` is the target line width.
 func splitLines(text string, width int) string {
 	runes := []rune(text)
 	if len(runes) < 2 {
@@ -460,7 +460,7 @@ func splitLines(text string, width int) string {
 	for i := 0; i < len(runes)-1; i++ {
 		r, r1 := runes[i], runes[i+1]
 		chars = append(chars, r)
-		if (r == ' ' && len(chars) >= width) || (r == '.' && unicode.IsSpace(r1)) {
+		if (len(chars) >= width && unicode.IsSpace(r)) || (r == '.' && unicode.IsSpace(r1)) {
 			lines = append(lines, string(chars))
 			chars = []rune{}
 		}
