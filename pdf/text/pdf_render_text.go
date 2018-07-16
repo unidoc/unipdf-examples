@@ -8,6 +8,7 @@ package main
 
 import (
 	"encoding/csv"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -17,6 +18,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/unidoc/unidoc/common"
 	"github.com/unidoc/unidoc/pdf/extractor"
@@ -24,9 +26,12 @@ import (
 )
 
 const (
-	usage        = "Usage: go run pdf_render_text.go testdata/*.pdf\n"
-	badFilesPath = "bad.files"
+	usage                 = "Usage: go run pdf_render_text.go testdata/*.pdf\n"
+	badFilesPath          = "bad.files"
+	defaultNormalizeWidth = 60
 )
+
+var ErrBadText = errors.New("could not decode text")
 
 func main() {
 	// Make sure to enter a valid license key.
@@ -39,15 +44,19 @@ func main() {
 		-----END UNIDOC LICENSE KEY-----
 		`)
 	*/
-	var showHelp, debug, trace bool
+	var showHelp, debug, trace, verbose bool
 	var filesPath string
 	var threshold float64
+	var width int
 	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
+	flag.BoolVar(&verbose, "v", false, "Print extra page information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
-	flag.Float64Var(&threshold, "m", 1.0,
+	flag.Float64Var(&threshold, "t", 1.0,
 		"Missclassification theshold. percentage of missclassified characters above this "+
 			"threshold are treated as errors.")
+	flag.IntVar(&width, "w", 1.0,
+		"Normalize text (remove runs of space) with this target output width.")
 	flag.StringVar(&filesPath, "@", "",
 		"File containing list of files to process. Usually a 'bad.files' from a previous test run.")
 	makeUsage(usage)
@@ -96,7 +105,9 @@ func main() {
 
 	for i, inputPath := range files {
 		sizeMB := fileSizeMB(inputPath)
-		fmt.Println("========================= ^^^ =========================")
+		if verbose {
+			fmt.Println("========================= ^^^ =========================")
+		}
 		t0 := time.Now()
 		pdfReader, numPages, err := getReader(inputPath)
 		if err != nil {
@@ -114,7 +125,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Pdf File %3d of %d (%3s) %4.1f MB %3d pages %q ",
 			i+1, len(files), pdfReader.PdfVersion(), sizeMB, numPages, inputPath)
 
-		numChars, numMisses, err := outputPdfText(inputPath, pdfReader, numPages)
+		numChars, numMisses, err := outputPdfText(inputPath, pdfReader, numPages, width, verbose)
 		dt := time.Since(t0)
 		if err == nil {
 			err = missclassificationError(threshold, numChars, numMisses)
@@ -128,7 +139,9 @@ func main() {
 			fmt.Fprintf(fBad, "%q version=%s MB=%.1f pages=%d secs=%.1f numChars=%d numMisses=%d err=%v\n",
 				inputPath, version, sizeMB, numPages, dt.Seconds(), numChars, numMisses, err)
 		}
-		fmt.Println("========================= ~~~ =========================")
+		if verbose {
+			fmt.Println("========================= ~~~ =========================")
+		}
 		if err != nil {
 			errorCounts[err.Error()]++
 		}
@@ -140,6 +153,7 @@ func main() {
 			fmt.Fprintf(os.Stderr, "%-30s %d (%.0f%%)\n", err, n, 100.0*float64(n)/float64(len(files)))
 		}
 		fmt.Fprintf(os.Stderr, "badFilesPath=%q\n", badFilesPath)
+		fmt.Fprintf(os.Stderr, "threshold=%.1f%%\n", threshold)
 	}
 }
 
@@ -149,11 +163,13 @@ func missclassificationError(threshold float64, numChars, numMisses int) error {
 	if numChars == 0 || numMisses == 0 {
 		return nil
 	}
-	pc := percentage(numChars, numMisses)
-	if pc*float64(numChars) >= 1.0 && pc < threshold {
+	if threshold*float64(numChars) >= 1.0 && percentage(numChars, numMisses) < threshold {
 		return nil
 	}
-	return pdf.ErrBadText
+	// if numChars >= 100 && percentage(numChars, numMisses) < threshold {
+	// 	return nil
+	// }
+	return ErrBadText
 }
 
 // percentage returns the percentage of missclassified characters.
@@ -164,7 +180,7 @@ func percentage(numChars, numMisses int) float64 {
 	return 100.0 * float64(numMisses) / float64(numChars)
 }
 
-// "/Users/pcadmin/testdata/2005JE002531.pdf" version=1.3 MB=1.3 pages=18 secs=0.0 numChars=484 numMisses=1 err=Could not decode text (ToUnicode)
+// "~/testdata/2005JE002531.pdf" version=1.3 MB=1.3 pages=18 secs=0.0 numChars=484 numMisses=1 err=Could not decode text (ToUnicode)
 var reFilename = regexp.MustCompile(`^\s*"(.+?)"\s*` +
 	`version=([\d\.]+)\s+` +
 	`MB=([\d\.]+)\s+` +
@@ -282,15 +298,17 @@ func filesFromPreviousRun(filename string) ([]string, error) {
 
 	sort.Slice(results, func(i, j int) bool {
 		ri, rj := results[i], results[j]
+		if ri.seconds != rj.seconds {
+			return ri.seconds < rj.seconds
+		}
+
 		if ri.err != rj.err {
 			return ri.err < rj.err
 		}
 		if ri.misses != rj.misses {
 			return ri.misses > rj.misses
 		}
-		if ri.seconds != rj.seconds {
-			return ri.seconds < rj.seconds
-		}
+
 		if ri.pages != rj.pages {
 			return ri.pages < rj.pages
 		}
@@ -362,7 +380,7 @@ func getReader(inputPath string) (pdfReader *pdf.PdfReader, numPages int, err er
 
 // outputPdfText prints out text of PDF file `inputPath` to stdout.
 // `pdfReader` is a previously opened PdfReader of `inputPath`
-func outputPdfText(inputPath string, pdfReader *pdf.PdfReader, numPages int) (int, int, error) {
+func outputPdfText(inputPath string, pdfReader *pdf.PdfReader, numPages, width int, verbose bool) (int, int, error) {
 	numChars, numMisses := 0, 0
 	for pageNum := 1; pageNum <= numPages; pageNum++ {
 
@@ -380,10 +398,17 @@ func outputPdfText(inputPath string, pdfReader *pdf.PdfReader, numPages int) (in
 		if err != nil {
 			return numChars, numMisses, err
 		}
+		if width != 0 {
+			text = normalizeText(text, width)
+		}
 
-		fmt.Printf("Page %d of %d: %q\n", pageNum, numPages, inputPath)
+		if verbose {
+			fmt.Printf("Page %d of %d: %q\n", pageNum, numPages, inputPath)
+		}
 		fmt.Printf("%s\n", text)
-		fmt.Println("------------------------- ... -------------------------")
+		if verbose {
+			fmt.Println("------------------------- ... -------------------------")
+		}
 	}
 
 	return numChars, numMisses, nil
@@ -404,4 +429,48 @@ func fileSizeMB(path string) float64 {
 		return -1.0
 	}
 	return float64(fi.Size()) / 1024.0 / 1024.0
+}
+
+// normalizeText returns `text` with runs of spaces of any kind (spaces, tabs, line breaks, etc)
+// reduced to a single space. `width` is the target line width.
+func normalizeText(text string, width int) string {
+	if width < 0 {
+		width = defaultNormalizeWidth
+	}
+	return splitLines(reduceSpaces(text), width)
+}
+
+// reduceSpaces returns `text` with runs of spaces of any kind (spaces, tabs, line breaks, etc)
+// reduced to a single space.
+func reduceSpaces(text string) string {
+	text = reSpace.ReplaceAllString(text, " ")
+	return strings.Trim(text, " \t\n\r\v")
+}
+
+var reSpace = regexp.MustCompile(`(?m)\s+`)
+
+// normalizeText inserts line breaks in string `text`. `width` is the target line width.
+func splitLines(text string, width int) string {
+	runes := []rune(text)
+	if len(runes) < 2 {
+		return text
+	}
+	lines := []string{}
+	chars := []rune{}
+	for i := 0; i < len(runes)-1; i++ {
+		r, r1 := runes[i], runes[i+1]
+		chars = append(chars, r)
+		if (r == ' ' && len(chars) >= width) || (r == '.' && unicode.IsSpace(r1)) {
+			lines = append(lines, string(chars))
+			chars = []rune{}
+		}
+	}
+	chars = append(chars, runes[len(runes)-1])
+	if len(chars) > 0 {
+		lines = append(lines, string(chars))
+	}
+	for i, ln := range lines {
+		lines[i] = strings.Trim(ln, " \t\n\r\v")
+	}
+	return strings.Join(lines, "\n")
 }
