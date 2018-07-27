@@ -117,11 +117,6 @@ func main() {
 		}
 
 		version := pdfReader.PdfVersion()
-		// We are currently not interested in old PDF files. If you are, comment out these lines.
-		if version == "1.0" || version == "1.1" || version == "1.2" {
-			continue
-		}
-
 		fmt.Fprintf(os.Stderr, "Pdf File %3d of %d (%3s) %4.1f MB %3d pages %q ",
 			i+1, len(files), pdfReader.PdfVersion(), sizeMB, numPages, inputPath)
 
@@ -155,6 +150,9 @@ func main() {
 		fmt.Fprintf(os.Stderr, "badFilesPath=%q\n", badFilesPath)
 		fmt.Fprintf(os.Stderr, "threshold=%.1f%%\n", threshold)
 	}
+
+	fmt.Fprintf(os.Stderr, "badFilesPath=%q\n", badFilesPath)
+	fmt.Fprintf(os.Stderr, "threshold=%.1f%%\n", threshold)
 }
 
 // missclassificationError returns an error if the percentage of misclassified characters exceeds
@@ -166,9 +164,6 @@ func missclassificationError(threshold float64, numChars, numMisses int) error {
 	if threshold*float64(numChars) >= 1.0 && percentage(numChars, numMisses) < threshold {
 		return nil
 	}
-	// if numChars >= 100 && percentage(numChars, numMisses) < threshold {
-	// 	return nil
-	// }
 	return ErrBadText
 }
 
@@ -366,16 +361,16 @@ func saveAsCsv(filename string, results []testResult) error {
 func getReader(inputPath string) (pdfReader *pdf.PdfReader, numPages int, err error) {
 	f, err := os.Open(inputPath)
 	if err != nil {
-		return
+		return nil, 0, err
 	}
 	defer f.Close()
 
 	pdfReader, err = pdf.NewPdfReader(f)
 	if err != nil {
-		return
+		return nil, 0, err
 	}
 	numPages, err = pdfReader.GetNumPages()
-	return
+	return pdfReader, numPages, err
 }
 
 // outputPdfText prints out text of PDF file `inputPath` to stdout.
