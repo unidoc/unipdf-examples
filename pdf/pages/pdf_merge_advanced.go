@@ -244,7 +244,6 @@ func mergeForms(form, form2 *pdf.PdfAcroForm, docNum int) (*pdf.PdfAcroForm, err
 				subfield.Parent = docfield // Update parent.
 				docfield.Kids = append(docfield.Kids, subfield)
 			}
-
 		}
 		*form.Fields = append(*form.Fields, docfield)
 	}
