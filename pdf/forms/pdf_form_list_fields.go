@@ -113,16 +113,35 @@ func listFormFields(inputPath string) error {
 		fmt.Printf(" Annotations: %d\n", len(field.Annotations))
 		for j, wa := range field.Annotations {
 			fmt.Printf(" - Annotation %d \n", j+1)
-			pageind, ok := wa.P.(*core.PdfIndirectObject)
-			if !ok {
-				return errors.New("Type check error")
-			}
-			_, pagenum, err := pdfReader.PageFromIndirectObject(pageind)
-			if err != nil {
-				return err
-			}
 
-			fmt.Printf(" - Page number: %d\n", pagenum)
+			// Note: The P field is optional
+			if wa.P != nil {
+
+				pageind, ok := wa.P.(*core.PdfIndirectObject)
+				if !ok {
+					fmt.Printf("not indirect, got: %v\n", pageind)
+					fmt.Printf("%")
+					return errors.New("Type check error")
+				}
+				_, pagenum, err := pdfReader.PageFromIndirectObject(pageind)
+				if err != nil {
+					return err
+				}
+				fmt.Printf(" - Page number: %d\n", pagenum)
+			} else {
+				// If P not set, go through pages and look for match.
+				// TODO: Make a map of widget annotations to page numbers a priori.
+				for pageidx, page := range pdfReader.PageList {
+					for _, annot := range page.Annotations {
+						switch t := annot.GetContext().(type) {
+						case *model.PdfAnnotationWidget:
+							if wa == t {
+								fmt.Printf(" - Page number: %d\n", pageidx+1)
+							}
+						}
+					}
+				}
+			}
 			fmt.Printf(" - Rect: %+v\n", wa.Rect)
 			fmt.Printf(" - wa.AS: %v\n", wa.AS)
 			fmt.Printf(" - wa.AP: %v\n", wa.AP)
