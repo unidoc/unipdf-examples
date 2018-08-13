@@ -323,13 +323,13 @@ func testPassthroughSinglePdf(path string, params benchParams) error {
 	return nil
 }
 
-// Test a single pdf file.
+// TestSinglePdf tests a single pdf file.
 func TestSinglePdf(target string, params benchParams) error {
 	err := testPassthroughSinglePdf(target, params)
 	return err
 }
 
-// Print the summary of the benchmark results.
+// printResults prints a summary of the benchmark results.
 func (this benchmarkResults) printResults(params benchParams) {
 	succeeded := 0
 	total := 0
@@ -368,7 +368,7 @@ func (this benchmarkResults) printResults(params benchParams) {
 	}
 }
 
-// Get file size in MB.
+// getFileSize returns the file size in MB.
 func getFileSize(path string) (float64, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -385,11 +385,13 @@ func getFileSize(path string) (float64, error) {
 	return sizeMB, nil
 }
 
+// isDirectory returns true if the path refers to a directory.
 func isDirectory(path string) (bool, error) {
 	fileInfo, err := os.Stat(path)
 	return fileInfo.IsDir(), err
 }
 
+// benchmarkPDFs runs a benchmark on a list of PDF files specified by path with a specified set of parameters.
 func benchmarkPDFs(paths []string, params benchParams) error {
 	benchmarkResults := benchmarkResults{}
 
