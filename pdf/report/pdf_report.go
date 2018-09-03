@@ -26,7 +26,6 @@ import (
 	unicommon "github.com/unidoc/unidoc/common"
 	"github.com/unidoc/unidoc/pdf/creator"
 	"github.com/unidoc/unidoc/pdf/model"
-	"github.com/unidoc/unidoc/pdf/model/fonts"
 )
 
 func main() {
@@ -145,8 +144,8 @@ func RunPdfReport(outputPath string) error {
 
 // Generates the front page.
 func DoFirstPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model.PdfFont) {
-	helvetica := fonts.NewFontHelvetica()
-	helveticaBold := fonts.NewFontHelveticaBold()
+	helvetica, _ := model.NewStandard14Font("Helvetica")
+	helveticaBold, _ := model.NewStandard14Font("Helvetica-Bold")
 
 	p := creator.NewParagraph("UniDoc")
 	p.SetFont(helvetica)
