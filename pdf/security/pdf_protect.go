@@ -66,6 +66,12 @@ func protectPdf(inputPath string, outputPath string, userPassword, ownerPassword
 
 	encryptOptions := &pdf.EncryptOptions{}
 	encryptOptions.Permissions = permissions
+	encryptOptions.Algorithm = pdf.RC4_128bit
+	// For better encryption algorithm use:
+	// encryptOptions.Algorithm = pdf.AES_128bit
+	// or
+	// encryptOptions.Algorithm = pdf.AES_256bit
+	// which is strongest but does not work in all viewers yet.
 
 	err := pdfWriter.Encrypt([]byte(userPassword), []byte(ownerPassword), encryptOptions)
 	if err != nil {
