@@ -80,6 +80,7 @@ type benchParams struct {
 	gsValidation bool
 	hangOnExit   bool
 	printRmList  bool
+	password     string
 }
 
 func main() {
@@ -98,6 +99,7 @@ func main() {
 	flag.BoolVar(&params.hangOnExit, "hang", false, "Hang when completed without exiting (memory profiling)")
 	flag.BoolVar(&params.printRmList, "rmlist", false, "Print rm list at end")
 	flag.StringVar(&params.processPath, "o", "/tmp/test.pdf", "Temporary output file path")
+	flag.StringVar(&params.password, "password", "", "PDF Password (empty default)")
 
 	flag.Parse()
 	args := flag.Args()
@@ -234,7 +236,7 @@ func testPassthroughSinglePdf(path string, params benchParams) error {
 	}
 
 	if isEncrypted {
-		valid, err := reader.Decrypt([]byte(""))
+		valid, err := reader.Decrypt([]byte(params.password))
 		if err != nil {
 			common.Log.Debug("Fail to decrypt: %v", err)
 			return err
