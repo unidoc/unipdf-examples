@@ -61,7 +61,11 @@ func listFormFields(inputPath string) error {
 	fmt.Printf(" DA: %v\n", acroForm.DA)
 	fmt.Printf(" Q: %v\n", acroForm.Q)
 	fmt.Printf(" XFA: %v\n", acroForm.XFA)
-	fmt.Printf(" #Fields: %d\n", len(*acroForm.Fields))
+	if acroForm.Fields != nil {
+		fmt.Printf(" #Fields: %d\n", len(*acroForm.Fields))
+	} else {
+		fmt.Printf("No fields set\n")
+	}
 	fmt.Printf(" =====\n")
 
 	fields := acroForm.AllFields()
@@ -116,7 +120,6 @@ func listFormFields(inputPath string) error {
 
 			// Note: The P field is optional
 			if wa.P != nil {
-
 				pageind, ok := wa.P.(*core.PdfIndirectObject)
 				if !ok {
 					fmt.Printf("not indirect, got: %v\n", pageind)
@@ -145,6 +148,7 @@ func listFormFields(inputPath string) error {
 			fmt.Printf(" - Rect: %+v\n", wa.Rect)
 			fmt.Printf(" - wa.AS: %v\n", wa.AS)
 			fmt.Printf(" - wa.AP: %v\n", wa.AP)
+			fmt.Printf(" - wa.F:  %v\n", wa.F)
 
 			// Example of how to fetch the appearance stream data.
 			if apDict, has := core.GetDict(wa.AP); has {
