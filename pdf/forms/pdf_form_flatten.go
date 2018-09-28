@@ -13,12 +13,14 @@ import (
 	"path/filepath"
 	"sort"
 
+	"github.com/unidoc/unidoc/common"
+	"github.com/unidoc/unidoc/pdf/annotator"
 	"github.com/unidoc/unidoc/pdf/model"
 )
 
 func main() {
 	// When debugging, enable debug-level logging via console:
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	if len(os.Args) < 3 {
 		fmt.Printf("Usage: go run pdf_form_flatten.go <outputdir> <input1.pdf> [input2.pdf] ...\n")
@@ -65,8 +67,8 @@ func flattenPdf(inputPath, outputPath string) error {
 		return err
 	}
 
-	err = pdfReader.FlattenFields(false)
-	//err = flatten(pdfReader, true, false)
+	fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: true}
+	err = pdfReader.FlattenFields(false, fieldAppearance)
 	if err != nil {
 		return err
 	}
