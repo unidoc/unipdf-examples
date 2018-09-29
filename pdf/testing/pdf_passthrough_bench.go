@@ -65,6 +65,7 @@ const usage = `Usage:
 pdf_passthrough_bench [options] <file1> <file2> ... > results
 Options:
 -o <processPath> - Temporary output file path (default /tmp/test.pdf)
+-odir <outputdir> - Output directory path (Optional, overrides -o)
 -d: Debug level logging
 -gsv: Validate with ghostscript
 -hang: Hang when completed (no exit) - for memory profiling
@@ -77,6 +78,7 @@ type benchParams struct {
 	debug        bool
 	runAllTests  bool
 	processPath  string
+	outputDir    string
 	gsValidation bool
 	hangOnExit   bool
 	printRmList  bool
@@ -88,6 +90,7 @@ func main() {
 	params.debug = false       // Write debug level info to stdout?
 	params.runAllTests = false // Don't stop when a PDF file fails to process?
 	params.processPath = ""    // Transformed PDFs are written here
+	params.outputDir = ""      // Alternatively, can store output files in an output directory.
 	params.gsValidation = false
 	params.hangOnExit = false
 	params.printRmList = false
@@ -98,10 +101,11 @@ func main() {
 	flag.BoolVar(&params.hangOnExit, "hang", false, "Hang when completed without exiting (memory profiling)")
 	flag.BoolVar(&params.printRmList, "rmlist", false, "Print rm list at end")
 	flag.StringVar(&params.processPath, "o", "/tmp/test.pdf", "Temporary output file path")
+	flag.StringVar(&params.outputDir, "odir", "/tmp/", "Output directory (optional)")
 
 	flag.Parse()
 	args := flag.Args()
-	if len(args) < 1 || len(params.processPath) == 0 {
+	if len(args) < 1 || (len(params.processPath) == 0 && len(params.outputDir) == 0) {
 		fmt.Fprintln(os.Stderr, usage)
 		os.Exit(1)
 	}
@@ -215,8 +219,8 @@ func ghostscriptName() string {
 }
 
 // testPassthroughSinglePdf tests loading a pdf file, and writing it back out (passthrough).
-func testPassthroughSinglePdf(path string, params benchParams) error {
-	file, err := os.Open(path)
+func testPassthroughSinglePdf(inputPath string, params benchParams) error {
+	file, err := os.Open(inputPath)
 	if err != nil {
 		return err
 	}
@@ -292,15 +296,22 @@ func testPassthroughSinglePdf(path string, params benchParams) error {
 		}
 	}
 
+	// By default: uses processPath, unless if output dir is specified, uses the basename of `path` and outputs
+	// to the output dir.
+	outputPath := params.processPath
+	if len(params.outputDir) > 0 {
+		outputPath = filepath.Join(params.outputDir, filepath.Base(inputPath))
+	}
+
 	common.Log.Debug("Write the file")
-	file, err = os.Create(params.processPath)
+	of, err := os.Create(outputPath)
 	if err != nil {
 		common.Log.Debug("Failed to create file (%s)", err)
 		return err
 	}
-	defer file.Close()
+	defer of.Close()
 
-	err = writer.Write(file)
+	err = writer.Write(of)
 	if err != nil {
 		common.Log.Debug("WriteFile error")
 		return err
@@ -309,10 +320,10 @@ func testPassthroughSinglePdf(path string, params benchParams) error {
 	// GS validation of input, output pdfs.
 	if params.gsValidation {
 		common.Log.Debug("Validating input file")
-		_, inputWarnings := validatePdf(path, "")
+		_, inputWarnings := validatePdf(inputPath, "")
 		common.Log.Debug("Validating output file")
 
-		err, warnings := validatePdf(params.processPath, "")
+		err, warnings := validatePdf(outputPath, "")
 		if err != nil && warnings > inputWarnings {
 			common.Log.Error("Input warnings %d vs output %d", inputWarnings, warnings)
 			return fmt.Errorf("Invalid PDF input %d/ output %d warnings", inputWarnings, warnings)

@@ -26,7 +26,6 @@ import (
 	unicommon "github.com/unidoc/unidoc/common"
 	"github.com/unidoc/unidoc/pdf/creator"
 	"github.com/unidoc/unidoc/pdf/model"
-	"github.com/unidoc/unidoc/pdf/model/fonts"
 )
 
 func main() {
@@ -145,8 +144,8 @@ func RunPdfReport(outputPath string) error {
 
 // Generates the front page.
 func DoFirstPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model.PdfFont) {
-	helvetica := fonts.NewFontHelvetica()
-	helveticaBold := fonts.NewFontHelveticaBold()
+	helvetica, _ := model.NewStandard14Font("Helvetica")
+	helveticaBold, _ := model.NewStandard14Font("Helvetica-Bold")
 
 	p := creator.NewParagraph("UniDoc")
 	p.SetFont(helvetica)
@@ -197,7 +196,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	p.SetFontSize(10)
 	p.SetColor(creator.ColorWhite)
 	cell := issuerTable.NewCell()
-	cell.SetBorder(creator.CellBorderStyleBox, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetBackgroundColor(bgColor)
 	cell.SetContent(p)
 
@@ -206,7 +205,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	p.SetFontSize(10)
 	p.SetColor(pColor)
 	cell = issuerTable.NewCell()
-	cell.SetBorder(creator.CellBorderStyleBox, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
 	p = creator.NewParagraph("Address")
@@ -214,7 +213,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	p.SetFontSize(10)
 	p.SetColor(creator.ColorWhite)
 	cell = issuerTable.NewCell()
-	cell.SetBorder(creator.CellBorderStyleBox, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetBackgroundColor(bgColor)
 	cell.SetContent(p)
 
@@ -223,7 +222,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	p.SetFontSize(10)
 	p.SetColor(pColor)
 	cell = issuerTable.NewCell()
-	cell.SetBorder(creator.CellBorderStyleBox, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
 	p = creator.NewParagraph("Email")
@@ -232,7 +231,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	p.SetColor(creator.ColorWhite)
 	cell = issuerTable.NewCell()
 	cell.SetBackgroundColor(bgColor)
-	cell.SetBorder(creator.CellBorderStyleBox, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
 	p = creator.NewParagraph("sales@unidoc.io")
@@ -240,7 +239,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	p.SetFontSize(10)
 	p.SetColor(pColor)
 	cell = issuerTable.NewCell()
-	cell.SetBorder(creator.CellBorderStyleBox, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
 	p = creator.NewParagraph("Web")
@@ -248,7 +247,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	p.SetFontSize(10)
 	p.SetColor(creator.ColorWhite)
 	cell = issuerTable.NewCell()
-	cell.SetBorder(creator.CellBorderStyleBox, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetBackgroundColor(bgColor)
 	cell.SetContent(p)
 
@@ -257,7 +256,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	p.SetFontSize(10)
 	p.SetColor(pColor)
 	cell = issuerTable.NewCell()
-	cell.SetBorder(creator.CellBorderStyleBox, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
 	p = creator.NewParagraph("Author")
@@ -265,7 +264,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	p.SetFontSize(10)
 	p.SetColor(creator.ColorWhite)
 	cell = issuerTable.NewCell()
-	cell.SetBorder(creator.CellBorderStyleBox, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetBackgroundColor(bgColor)
 	cell.SetContent(p)
 
@@ -274,7 +273,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	p.SetFontSize(10)
 	p.SetColor(pColor)
 	cell = issuerTable.NewCell()
-	cell.SetBorder(creator.CellBorderStyleBox, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
 	sc.Add(issuerTable)
@@ -297,7 +296,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 		p.SetColor(creator.ColorWhite)
 		cell = histTable.NewCell()
 		cell.SetBackgroundColor(bgColor)
-		cell.SetBorder(creator.CellBorderStyleBox, 1)
+		cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 		cell.SetHorizontalAlignment(creator.CellHorizontalAlignmentCenter)
 		cell.SetVerticalAlignment(creator.CellVerticalAlignmentMiddle)
 		cell.SetContent(p)
@@ -312,7 +311,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 		p.SetFontSize(10)
 		p.SetColor(pColor)
 		cell = histTable.NewCell()
-		cell.SetBorder(creator.CellBorderStyleBox, 1)
+		cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 		cell.SetHorizontalAlignment(creator.CellHorizontalAlignmentCenter)
 		cell.SetVerticalAlignment(creator.CellVerticalAlignmentMiddle)
 		cell.SetContent(p)
@@ -403,7 +402,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 		p.SetColor(creator.ColorWhite)
 		cell := priTable.NewCell()
 		cell.SetBackgroundColor(bgColor)
-		cell.SetBorder(creator.CellBorderStyleBox, 1)
+		cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 		cell.SetContent(p)
 	}
 	items := [][]string{
@@ -419,7 +418,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 			p.SetColor(creator.ColorWhite)
 			cell := priTable.NewCell()
 			cell.SetBackgroundColor(bgColor)
-			cell.SetBorder(creator.CellBorderStyleBox, 1)
+			cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 			cell.SetContent(p)
 		}
 	}
