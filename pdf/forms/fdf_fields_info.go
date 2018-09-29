@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unidoc/common"
+	"github.com/unidoc/unidoc/common"
 	"github.com/unidoc/unidoc/pdf/core"
 	"github.com/unidoc/unidoc/pdf/fdf"
 )
@@ -24,7 +24,7 @@ func main() {
 	}
 
 	// Enable debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	for _, inputPath := range os.Args[1:len(os.Args)] {
 		fmt.Printf("Input file: %s\n", inputPath)
