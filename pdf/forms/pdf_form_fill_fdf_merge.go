@@ -7,14 +7,11 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
-	"sort"
 
 	"github.com/unidoc/unidoc/common"
 	"github.com/unidoc/unidoc/pdf/annotator"
-	"github.com/unidoc/unidoc/pdf/core"
 	"github.com/unidoc/unidoc/pdf/fdf"
 	"github.com/unidoc/unidoc/pdf/model"
 )
@@ -46,7 +43,7 @@ func main() {
 // fdfMerge loads template PDF in `templatePath` and FDF form data from `fdfPath` and fills into the fields,
 // flattens and outputs as a PDF to `outputPath`.
 func fdfMerge(templatePath, fdfPath, outputPath string) error {
-	fieldMap, err := getFDFData(fdfPath)
+	fdfData, err := fdf.LoadFromPath(fdfPath)
 	if err != nil {
 		return err
 	}
@@ -62,64 +59,13 @@ func fdfMerge(templatePath, fdfPath, outputPath string) error {
 		return err
 	}
 
-	keys := []string{}
-	for fieldName := range fieldMap {
-		keys = append(keys, fieldName)
-	}
-	sort.Strings(keys)
-
-	// Fill in the values.
-	for _, fieldName := range keys {
-		fieldDict := fieldMap[fieldName]
-		val := core.TraceToDirectObject(fieldDict.Get("V"))
-		fmt.Printf("Filling: %s: %+v %T\n", fieldName, val, val)
-		found := false
-		for _, f := range pdfReader.AcroForm.AllFields() {
-			if f.PartialName() == fieldName {
-				switch f.GetContext().(type) {
-				case *model.PdfFieldText:
-					switch t := val.(type) {
-					case *core.PdfObjectName:
-						name := t
-						str := name.String()
-						if len(str) > 1 && str[0] == '{' && str[len(str)-1] == '}' {
-							fmt.Printf("%s - calculated field - skipping\n", fieldName)
-							continue
-						}
-						fmt.Printf("ERROR got V as name -> converting to string: '%s'\n", name.String())
-						f.V = core.MakeString(name.String())
-					case *core.PdfObjectString:
-						//string := t
-						//f.V = t
-						f.V = core.MakeEncodedString(t.String())
-					default:
-						fmt.Printf("Unsupported text field V: %T (%#v)\n", t, t)
-					}
-				case *model.PdfFieldButton, *model.PdfFieldChoice:
-					switch val.(type) {
-					case *core.PdfObjectName:
-						for _, wa := range f.Annotations {
-							wa.AS = val
-						}
-						f.V = val
-					default:
-						fmt.Printf("UNEXPECTED %s -> %v\n", fieldName, val)
-						f.V = val
-					}
-				case *model.PdfFieldSignature:
-					fmt.Printf("Signature not supported yet: %s/%v\n", fieldName, val)
-				}
-
-				found = true
-				break
-			}
-		}
-		if !found {
-			fmt.Printf("'%s' NOT FOUND - not filled\n", fieldName)
-		}
+	// Populate the form data.
+	err = pdfReader.AcroForm.Fill(fdfData)
+	if err != nil {
+		return err
 	}
 
-	// Flatten.
+	// Flatten form.
 	fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: false}
 	err = pdfReader.FlattenFields(true, fieldAppearance)
 	if err != nil {
@@ -145,43 +91,4 @@ func fdfMerge(templatePath, fdfPath, outputPath string) error {
 
 	err = pdfWriter.Write(fout)
 	return err
-
-}
-
-func getFDFData(fdfPath string) (map[string]*core.PdfObjectDictionary, error) {
-	f, err := os.Open(fdfPath)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	fieldDataMap := map[string]*core.PdfObjectDictionary{}
-
-	p, err := fdf.NewParser(f)
-	if err != nil {
-		return nil, err
-	}
-
-	fdfDict, err := p.Root()
-	if err != nil {
-		return nil, err
-	}
-
-	fields, found := core.GetArray(fdfDict.Get("Fields"))
-	if !found {
-		return nil, errors.New("Fields missing")
-	}
-
-	for i := 0; i < fields.Len(); i++ {
-		fieldDict, has := core.GetDict(fields.Get(i))
-		if has {
-			// Key value field data.
-			t, _ := core.GetString(fieldDict.Get("T"))
-			if t != nil {
-				fieldDataMap[t.Str()] = fieldDict
-			}
-		}
-	}
-
-	return fieldDataMap, nil
 }
