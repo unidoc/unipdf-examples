@@ -7,9 +7,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/unidoc/unidoc/common"
 	"github.com/unidoc/unidoc/pdf/core"
@@ -38,40 +38,32 @@ func main() {
 }
 
 func printFdfInfo(inputPath string) error {
-	f, err := os.Open(inputPath)
+	fdf, err := fdf.LoadFromPath(inputPath)
 	if err != nil {
 		return err
 	}
 
-	defer f.Close()
-
-	p, err := fdf.NewParser(f)
+	fieldMap, err := fdf.FieldDictionaries()
 	if err != nil {
 		return err
 	}
 
-	fdfDict, err := p.Root()
-	if err != nil {
-		return err
+	// Sort field names alphabetically.
+	keys := []string{}
+	for key, _ := range fieldMap {
+		keys = append(keys, key)
 	}
+	sort.Strings(keys)
 
-	fmt.Printf("FDF: %v\n", fdfDict)
-
-	fields, found := core.GetArray(fdfDict.Get("Fields"))
-	if !found {
-		return errors.New("Fields missing")
-	}
-
-	for i := 0; i < fields.Len(); i++ {
-		fieldDict, has := core.GetDict(fields.Get(i))
-		if has {
-			// Key value field data.
-			t, _ := core.GetString(fieldDict.Get("T"))
-			v := core.TraceToDirectObject(fieldDict.Get("V"))
-			if t != nil && v != nil {
-				fmt.Printf("Field T: %v, V: %v\n", t, v.String())
-			}
+	for _, key := range keys {
+		fieldDict := fieldMap[key]
+		// Key value field data.
+		t, _ := core.GetString(fieldDict.Get("T"))
+		v := core.TraceToDirectObject(fieldDict.Get("V"))
+		if t != nil && v != nil {
+			fmt.Printf("Field T: %v, V: %v\n", t, v.String())
 		}
+
 	}
 
 	return nil
