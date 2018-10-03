@@ -67,6 +67,12 @@ func fdfMerge(templatePath, fdfPath, outputPath string) error {
 
 	// Flatten form.
 	fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: false}
+	/*
+		To customize appearances try:
+			fieldAppearance.SetStyle(annotator.AppearanceStyle{
+				CheckmarkGlyph:       "a22",
+				AutoFontSizeFraction: 0.70,
+			})*/
 	err = pdfReader.FlattenFields(true, fieldAppearance)
 	if err != nil {
 		return err
