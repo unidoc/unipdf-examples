@@ -66,7 +66,7 @@ func fdfMerge(templatePath, fdfPath, outputPath string) error {
 	}
 
 	// Flatten form.
-	fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: false}
+	fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: true, RegenerateTextFields: true}
 	/*
 			To customize certain styles try:
 		    style := fieldAppearance.Style()
