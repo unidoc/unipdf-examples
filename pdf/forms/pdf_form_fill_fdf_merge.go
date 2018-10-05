@@ -74,7 +74,7 @@ func fdfMerge(templatePath, fdfPath, outputPath string) error {
 		    style.AutoFontSizeFraction = 0.70
 			fieldAppearance.SetStyle(style)
 
-			or for specifying fullset of appearance styles:
+			or for specifying a full set of appearance styles:
 			fieldAppearance.SetStyle(annotator.AppearanceStyle{
 				CheckmarkGlyph:       "a22",
 				AutoFontSizeFraction: 0.70,
