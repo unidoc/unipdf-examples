@@ -68,11 +68,23 @@ func fdfMerge(templatePath, fdfPath, outputPath string) error {
 	// Flatten form.
 	fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: false}
 	/*
-		To customize appearances try:
+			To customize certain styles try:
+		    style := fieldAppearance.Style()
+		    style.CheckmarkGlyph = "a22"
+		    style.AutoFontSizeFraction = 0.70
+			fieldAppearance.SetStyle(style)
+
+			or for specifying fullset of appearance styles:
 			fieldAppearance.SetStyle(annotator.AppearanceStyle{
 				CheckmarkGlyph:       "a22",
 				AutoFontSizeFraction: 0.70,
-			})*/
+				FillColor:            model.NewPdfColorDeviceGray(0.8),
+				BorderColor:          model.NewPdfColorDeviceRGB(1, 0, 0),
+				BorderSize:           2.0,
+				AllowMK:              false,
+			})
+	*/
+
 	err = pdfReader.FlattenFields(true, fieldAppearance)
 	if err != nil {
 		return err
