@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	pdfcore "github.com/unidoc/unidoc/pdf/core"
+	"github.com/unidoc/unidoc/pdf/core/security"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
@@ -48,24 +48,18 @@ func main() {
 func protectPdf(inputPath string, outputPath string, userPassword, ownerPassword string) error {
 	pdfWriter := pdf.NewPdfWriter()
 
-	permissions := pdfcore.AccessPermissions{}
-	// Allow printing with low quality
-	permissions.Printing = true
-	permissions.FullPrintQuality = false
-	// Allow modifications.
-	permissions.Modify = true
-	// Allow annotations.
-	permissions.Annotate = true
-	permissions.FillForms = true
-	// Allow modifying page order, rotating pages etc.
-	permissions.RotateInsert = true
-	// Allow extracting graphics.
-	permissions.ExtractGraphics = true
-	// Allow extracting graphics (accessibility)
-	permissions.DisabilityExtract = true
+	permissions := security.PermPrinting | // Allow printing with low quality
+		security.PermFullPrintQuality |
+		security.PermModify | // Allow modifications.
+		security.PermAnnotate | // Allow annotations.
+		security.PermFillForms |
+		security.PermRotateInsert | // Allow modifying page order, rotating pages etc.
+		security.PermExtractGraphics | // Allow extracting graphics.
+		security.PermDisabilityExtract // Allow extracting graphics (accessibility)
 
-	encryptOptions := &pdf.EncryptOptions{}
-	encryptOptions.Permissions = permissions
+	encryptOptions := &pdf.EncryptOptions{
+		Permissions: permissions,
+	}
 
 	err := pdfWriter.Encrypt([]byte(userPassword), []byte(ownerPassword), encryptOptions)
 	if err != nil {
