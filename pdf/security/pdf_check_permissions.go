@@ -11,6 +11,7 @@ import (
 	"os"
 
 	unicommon "github.com/unidoc/unidoc/common"
+	"github.com/unidoc/unidoc/pdf/core/security"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
@@ -67,19 +68,23 @@ func printAccessInfo(inputPath string, password string) error {
 
 	// Print a text summary of the flags.
 	booltext := map[bool]string{false: "No", true: "Yes"}
-	fmt.Printf("Printing allowed? - %s\n", booltext[perms.Printing])
-	if perms.Printing {
-		fmt.Printf("Full print quality (otherwise print in low res)? - %s\n", booltext[perms.FullPrintQuality])
+	allowed := func(p security.Permissions) string {
+		return booltext[perms.Allowed(p)]
 	}
-	fmt.Printf("Modifications allowed? - %s\n", booltext[perms.Modify])
-	fmt.Printf("Allow extracting graphics? %s\n", booltext[perms.ExtractGraphics])
-	fmt.Printf("Can annotate? - %s\n", booltext[perms.Annotate])
-	if perms.Annotate {
+
+	fmt.Printf("Printing allowed? - %s\n", allowed(security.PermPrinting))
+	if perms.Allowed(security.PermPrinting) {
+		fmt.Printf("Full print quality (otherwise print in low res)? - %s\n", allowed(security.PermFullPrintQuality))
+	}
+	fmt.Printf("Modifications allowed? - %s\n", allowed(security.PermModify))
+	fmt.Printf("Allow extracting graphics? %s\n", allowed(security.PermExtractGraphics))
+	fmt.Printf("Can annotate? - %s\n", allowed(security.PermAnnotate))
+	if perms.Allowed(security.PermAnnotate) {
 		fmt.Printf("Can fill forms? - Yes\n")
 	} else {
-		fmt.Printf("Can fill forms? - %s\n", booltext[perms.FillForms])
+		fmt.Printf("Can fill forms? - %s\n", allowed(security.PermFillForms))
 	}
-	fmt.Printf("Extract text, graphics for users with disabilities? - %s\n", booltext[perms.DisabilityExtract])
+	fmt.Printf("Extract text, graphics for users with disabilities? - %s\n", allowed(security.PermDisabilityExtract))
 
 	return nil
 }

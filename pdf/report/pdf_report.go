@@ -52,6 +52,17 @@ func RunPdfReport(outputPath string) error {
 	c := creator.New()
 	c.SetPageMargins(50, 50, 100, 70)
 
+	// Generate the table of contents.
+	c.AddTOC = true
+	toc := c.TOC()
+	hstyle := creator.NewTextStyle()
+	hstyle.Color = creator.ColorRGBFromArithmetic(0.2, 0.2, 0.2)
+	hstyle.FontSize = 28
+	toc.SetHeading("Table of Contents", hstyle)
+	lstyle := creator.NewTextStyle()
+	lstyle.FontSize = 14
+	toc.SetLineStyle(lstyle)
+
 	logoImg, err := creator.NewImageFromFile("./unidoc-logo.png")
 	if err != nil {
 		return err
@@ -92,46 +103,6 @@ func RunPdfReport(outputPath string) error {
 		p.SetPos(300, 20)
 		p.SetColor(creator.ColorRGBFrom8bit(63, 68, 76))
 		block.Draw(p)
-	})
-
-	// Generate the table of contents.
-	c.CreateTableOfContents(func(toc *creator.TableOfContents) (*creator.Chapter, error) {
-		ch := c.NewChapter("Table of contents")
-		ch.GetHeading().SetFontSize(28)
-		ch.GetHeading().SetMargins(0, 0, 0, 30)
-
-		// Arrange the TOC in a table with first column representing chapter number and title.
-		// and second column representing page number.
-		table := creator.NewTable(2)
-		table.SetColumnWidths(0.9, 0.1)
-
-		for _, entry := range toc.Entries() {
-			// Col 1. Chapter number, title.
-			var str string
-			if entry.Subchapter == 0 {
-				str = fmt.Sprintf("%d. %s", entry.Chapter, entry.Title)
-			} else {
-				str = fmt.Sprintf("        %d.%d. %s", entry.Chapter, entry.Subchapter, entry.Title)
-			}
-
-			p := creator.NewParagraph(str)
-			p.SetFontSize(14)
-			cell := table.NewCell()
-			cell.SetContent(p)
-
-			// Col 1. Page number.
-			p = creator.NewParagraph(fmt.Sprintf("%d", entry.PageNumber))
-			p.SetFontSize(14)
-			cell = table.NewCell()
-			cell.SetContent(p)
-		}
-		err := ch.Add(table)
-		if err != nil {
-			fmt.Printf("Error adding table: %v\n", err)
-			return nil, err
-		}
-
-		return ch, nil
 	})
 
 	err = c.WriteToFile(outputPath)
