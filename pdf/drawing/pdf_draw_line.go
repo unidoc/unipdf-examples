@@ -64,7 +64,7 @@ func drawPdfLineToFile(x1, y1, x2, y2 float64, outputPath string) error {
 	c := creator.New()
 
 	c.NewPage()
-	line := creator.NewLine(x1, y1, x2, y2)
+	line := c.NewLine(x1, y1, x2, y2)
 	line.SetLineWidth(1.5)
 	// Draw a red line, use hex color util to get r,g,b codes from html hex color.
 	red := creator.ColorRGBFromHex("#ff0000")
