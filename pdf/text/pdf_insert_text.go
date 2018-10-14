@@ -92,7 +92,7 @@ func addTextToPdf(inputPath string, outputPath string, text string, pageNum int,
 		}
 
 		if i == pageNum || pageNum == -1 {
-			p := creator.NewParagraph(text)
+			p := c.NewParagraph(text)
 			// Change to times bold font (default is helvetica).
 			timesBold, err := pdf.NewStandard14Font("Times-Bold")
 			if err != nil {

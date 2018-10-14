@@ -147,7 +147,7 @@ func addBarcodeToPdf(inputPath string, outputPath string, codeStr string, pageNu
 
 		if i+1 == pageNum || pageNum == -1 {
 			// Apply the barcode to the specified page or all pages if -1.
-			img, err := creator.NewImageFromGoImage(bcodeImg)
+			img, err := c.NewImageFromGoImage(bcodeImg)
 			if err != nil {
 				return err
 			}
@@ -156,7 +156,7 @@ func addBarcodeToPdf(inputPath string, outputPath string, codeStr string, pageNu
 			_ = c.Draw(img)
 
 			// Add the code below.
-			p := creator.NewParagraph(codeStr)
+			p := c.NewParagraph(codeStr)
 			p.SetWidth(width)
 			p.SetTextAlignment(creator.TextAlignmentCenter)
 			p.SetPos(xPos, yPos+img.Height())
