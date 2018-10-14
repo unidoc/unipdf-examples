@@ -75,7 +75,7 @@ func addImageToPdf(inputPath string, outputPath string, imagePath string, pageNu
 	c := creator.New()
 
 	// Prepare the image.
-	img, err := creator.NewImageFromFile(imagePath)
+	img, err := c.NewImageFromFile(imagePath)
 	if err != nil {
 		return err
 	}
