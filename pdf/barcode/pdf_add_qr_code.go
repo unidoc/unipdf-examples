@@ -133,7 +133,7 @@ func addQrCodeToPdf(inputPath string, outputPath string, qrContentStr string, pa
 
 		if i+1 == pageNum || pageNum == -1 {
 			// Apply the QR code to the specified page or all pages if -1.
-			img, err := creator.NewImageFromGoImage(qrCode)
+			img, err := c.NewImageFromGoImage(qrCode)
 			if err != nil {
 				return err
 			}

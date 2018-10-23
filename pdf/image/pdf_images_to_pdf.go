@@ -39,7 +39,7 @@ func imagesToPdf(inputPaths []string, outputPath string) error {
 	for _, imgPath := range inputPaths {
 		unicommon.Log.Debug("Image: %s", imgPath)
 
-		img, err := creator.NewImageFromFile(imgPath)
+		img, err := c.NewImageFromFile(imgPath)
 		if err != nil {
 			unicommon.Log.Debug("Error loading image: %v", err)
 			return err
