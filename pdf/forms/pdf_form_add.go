@@ -121,23 +121,10 @@ var choiceFieldDefs = []struct {
 func createForm(page *model.PdfPage) *model.PdfAcroForm {
 	form := model.NewPdfAcroForm()
 
-	// Add Helvetica font resource referenced by `Helv`.
-	/*
-		helvetica := fonts.NewFontHelvetica()
-		form.DR.SetFontByName(`Helv`, helvetica.ToPdfObject())
-		form.DR.ProcSet = core.MakeArray(core.MakeName("PDF"), core.MakeName("Text"), core.MakeName("ImageC"), core.MakeName("ImageI"), core.MakeName("ImageB"))
-	*/
+	// Add ZapfDingbats font.
 	zapfdb := fonts.NewFontZapfDingbats()
 	form.DR = model.NewPdfPageResources()
 	form.DR.SetFontByName(`ZaDb`, zapfdb.ToPdfObject())
-
-	// TODO: Ensure same font object is used...
-
-	// Default appearance of text.
-	/*
-			form.DA = core.MakeString(`/Helv 12 Tf 0 g`)
-		form.NeedAppearances = core.MakeBool(true)
-	*/
 
 	for _, fdef := range textFieldsDef {
 		opt := annotator.TextFieldOptions{}
@@ -148,9 +135,6 @@ func createForm(page *model.PdfPage) *model.PdfAcroForm {
 
 		*form.Fields = append(*form.Fields, textf.PdfField)
 		page.Annotations = append(page.Annotations, textf.Annotations[0].PdfAnnotation)
-
-		// TODO: form.AddField(text.PdfField)would be better
-		// TODO: page.Annotations = append(page.Annoations, textf.Annotations...) would be better?
 	}
 
 	for _, cbdef := range checkboxFieldDefs {
