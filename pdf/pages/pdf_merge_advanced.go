@@ -235,17 +235,17 @@ func mergeForms(form, form2 *pdf.PdfAcroForm, docNum int) (*pdf.PdfAcroForm, err
 	if form.Fields == nil {
 		form.Fields = form2.Fields
 	} else {
-		field := pdf.NewPdfField()
-		field.T = core.MakeString(fmt.Sprintf("doc%d", docNum))
-		field.KidsF = []pdf.PdfModel{}
+		// Make a top-level field for the doc (non-terminal field).
+		docfield := pdf.NewPdfField()
+		docfield.T = core.MakeString(fmt.Sprintf("doc%d", docNum))
+		docfield.Kids = []*pdf.PdfField{}
 		if form2.Fields != nil {
 			for _, subfield := range *form2.Fields {
-				subfield.Parent = field // Update parent.
-				field.KidsF = append(field.KidsF, subfield)
+				subfield.Parent = docfield // Update parent.
+				docfield.Kids = append(docfield.Kids, subfield)
 			}
-
 		}
-		*form.Fields = append(*form.Fields, field)
+		*form.Fields = append(*form.Fields, docfield)
 	}
 
 	return form, nil
