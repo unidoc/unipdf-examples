@@ -76,6 +76,8 @@ func main() {
 		common.SetLogger(common.NewConsoleLogger(common.LogLevelTrace))
 	} else if debug {
 		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	} else {
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelError))
 	}
 
 	files := args[:]
