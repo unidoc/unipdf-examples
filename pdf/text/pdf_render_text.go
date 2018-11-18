@@ -53,9 +53,9 @@ func main() {
 	flag.BoolVar(&verbose, "v", false, "Print extra page information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
 	flag.Float64Var(&threshold, "t", 1.0,
-		"Missclassification theshold. percentage of missclassified characters above this "+
+		"Missclassification threshold. percentage of missclassified characters above this "+
 			"threshold are treated as errors.")
-	flag.IntVar(&width, "w", 1.0,
+	flag.IntVar(&width, "w", 0,
 		"Normalize text (remove runs of space) with this target output width.")
 	flag.StringVar(&filesPath, "@", "",
 		"File containing list of files to process. Usually a 'bad.files' from a previous test run.")
@@ -82,6 +82,14 @@ func main() {
 
 	files := args[:]
 	sort.Strings(files)
+	sort.Slice(files, func(i, j int) bool {
+		fi, fj := files[i], files[j]
+		si, sj := fileSizeMB(fi), fileSizeMB(fj)
+		if si != sj {
+			return si < sj
+		}
+		return fi < fj
+	})
 	if filesPath != "" {
 		if filesPath == badFilesPath {
 			fmt.Fprintf(os.Stderr, "Setting files to %s will overwrite %s. Try a different name",
@@ -106,7 +114,14 @@ func main() {
 	errorCounts := map[string]int{}
 
 	for i, inputPath := range files {
+		if !isWanted(inputPath) {
+			continue
+		}
 		sizeMB := fileSizeMB(inputPath)
+		if sizeMB < minSizeMB {
+			fmt.Printf("%.3f MB, ", sizeMB)
+			continue
+		}
 		if verbose {
 			fmt.Println("========================= ^^^ =========================")
 		}
@@ -119,9 +134,15 @@ func main() {
 		}
 
 		version := pdfReader.PdfVersion()
+
 		fmt.Fprintf(os.Stderr, "Pdf File %3d of %d (%3s) %4.1f MB %3d pages %q ",
 			i+1, len(files), pdfReader.PdfVersion(), sizeMB, numPages, inputPath)
+		if version.Minor < minVersionMinor {
+			fmt.Fprintln(os.Stderr, "")
+			continue
+		}
 
+		// numPages = 1
 		numChars, numMisses, err := outputPdfText(inputPath, pdfReader, numPages, width, verbose)
 		dt := time.Since(t0)
 		if err == nil {
@@ -471,3 +492,51 @@ func splitLines(text string, width int) string {
 	}
 	return strings.Join(lines, "\n")
 }
+
+// isWanted is for customising test runs to include desired files.
+// It should return true for the files you want to process.
+// e.g.The commented core returns true for files containing Type0 font dicts in clear text.
+func isWanted(filename string) bool {
+	return true
+	for _, s := range exclusions {
+		if strings.Contains(filename, s) {
+			return false
+		}
+	}
+	return true
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	return strings.Contains(string(data), "/Type1") && !strings.Contains(string(data), "/Type0")
+}
+
+var (
+	minSizeMB       = 0.0
+	minVersionMinor = 2
+	exclusions      = []string{
+		"How to Accuse the Other Guy of Lying with Statistics.pdf",
+		"vRad_FinalReportSample_MR_Head_WithoutWithContrast_ImpressionLast_OnePage",
+		"z.pdf",
+		"Letter of His Holiness pope Francis to the People of God (1).pdf",
+		"2582cobden_sbs68_dtv_pubmap.pdf",
+		"24_CGPM_Resolution_1.pdf",            // Symbol with /Differences
+		"testdata/ergodicity/Ito_Formula.pdf", // Type1 with /Differences
+		"testdata/ergodicity/wp00-20.pdf",     // Symbol
+		"testdata/recht11a.pdf",               // Symbol
+		"testdata/crypto/B02.pdf",             // Symbol TrueType
+		"Tesseract", "300bw.pdf",
+		"database_03_abs.pdf", // Linearized
+		"JCLC_2007_V17_N2_04.pdf",
+		"acscentsci%2E6b00219.pdf",
+		"4622167.pdf",                     // <</Type/Font/Name/F0/Encoding/WinAnsiEncoding/BaseFont/TimesNewRoman,Bold/Subtype/TrueType>>
+		"endosymbiotictheory_marguli.pdf", // " "
+		"iverson.pdf",                     // " "
+		"fonts/interlacedVideo.pdf",       // " "
+		"The_Block_Cipher_Companion.pdf",
+		"xxx.hard",
+		"shamirturing.pdf",
+		"testdata/summarization/C96-2183.pdf",
+		"uk_bl_ethos_329208_vol2.pdf",
+	}
+)
