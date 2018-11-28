@@ -1,17 +1,18 @@
 /*
  * Passthrough benchmark for UniDoc, loads input PDF files and writes them back out. Has ghostscript validation.
  *
- * Run as: go run pdf_passhtrough_bench.go ...
+ * Run as: go run pdf_passthrough_bench.go ...
  *
  * This will perform the passthrough benchmark on all pdf files and write results to stdout.
  *
  * See the other command line options in the top of main()
- *      -o processDir - Temporary processing directory (default compare.pdfs)
- *      -d: Debug level logging
- *      -a: Keep converting PDF files after failures
- *      -min <val>: Minimum PDF file size to test
- *      -max <val>: Maximum PDF file size to test
- *      -r <name>: Name of results file
+ *     -o <processPath> - Temporary output file path (default /tmp/test.pdf)
+ *     -odir <outputdir> - Output directory path (Optional, overrides -o)
+ *     -d: Debug level logging
+ *     -a: Run all tests. Don't stop at first failure (This flag isn't used here)
+ *     -gsv: Validate with ghostscript
+ *     -hang: Hang when completed (no exit) - for memory profiling
+ *     -rmlist: Print out a list of files to rm to make fully compliant
  *
  * The passthrough benchmark
  * - Loads the input PDF with unidoc
