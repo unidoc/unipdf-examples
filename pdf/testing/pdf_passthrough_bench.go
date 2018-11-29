@@ -13,6 +13,7 @@
  *     -gsv: Validate with ghostscript
  *     -hang: Hang when completed (no exit) - for memory profiling
  *     -rmlist: Print out a list of files to rm to make fully compliant
+ *     -optimize: Use Use Pdf compression and optimization
  *
  * The passthrough benchmark
  * - Loads the input PDF with unidoc
@@ -27,6 +28,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/unidoc/unidoc/pdf/model/optimize"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -71,6 +73,7 @@ Options:
 -gsv: Validate with ghostscript
 -hang: Hang when completed (no exit) - for memory profiling
 -rmlist: Print out a list of files to rm to make fully compliant
+-optimize: Use Pdf compression and optimization
 
 Example: pdf_passthrough_bench -gsv ~/pdfdb/* >results_YYYY_MM_DD
 `
@@ -83,6 +86,7 @@ type benchParams struct {
 	gsValidation bool
 	hangOnExit   bool
 	printRmList  bool
+	optimize     bool
 }
 
 func main() {
@@ -95,6 +99,7 @@ func main() {
 	params.gsValidation = false
 	params.hangOnExit = false
 	params.printRmList = false
+	params.optimize = false
 
 	flag.BoolVar(&params.debug, "d", false, "Enable debug logging")
 	flag.BoolVar(&params.gsValidation, "gsv", false, "Enable ghostscript validation")
@@ -103,6 +108,7 @@ func main() {
 	flag.BoolVar(&params.printRmList, "rmlist", false, "Print rm list at end")
 	flag.StringVar(&params.processPath, "o", "/tmp/test.pdf", "Temporary output file path")
 	flag.StringVar(&params.outputDir, "odir", "/tmp/", "Output directory (optional)")
+	flag.BoolVar(&params.optimize, "optimize", false, "Use Pdf compression and optimization")
 
 	flag.Parse()
 	args := flag.Args()
@@ -262,7 +268,17 @@ func testPassthroughSinglePdf(inputPath string, params benchParams) error {
 	}
 
 	writer := unipdf.NewPdfWriter()
-
+	if params.optimize {
+		optimizer := optimize.New(optimize.Options{
+			CombineDuplicateDirectObjects:   true,
+			CombineIdenticalIndirectObjects: true,
+			ImageUpperPPI:                   300.0,
+			UseObjectStreams:                true,
+			ImageQuality:                    100,
+			CombineDuplicateStreams:         true,
+		})
+		writer.SetOptimizer(optimizer)
+	}
 	ocProps, err := reader.GetOCProperties()
 	if err != nil {
 		return err
