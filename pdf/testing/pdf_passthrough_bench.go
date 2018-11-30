@@ -389,7 +389,7 @@ func (this benchmarkResults) printResults(params benchParams) {
 	fmt.Printf("Failed: %d\n", total-succeeded)
 	fmt.Printf("Total time: %.1f secs (%.2f per file)\n", totalTime, totalTime/float64(succeeded))
 	if params.optimize {
-		fmt.Printf("Total tnput files size: %.3f MB\nTotal output files size: %.3f MB\nTotal compression ratio: %.3f\n",
+		fmt.Printf("Total input files size: %.3f MB\nTotal output files size: %.3f MB\nTotal compression ratio: %.3f\n",
 			totalInputSize, totalOutputSize, totalInputSize/totalOutputSize)
 	}
 
