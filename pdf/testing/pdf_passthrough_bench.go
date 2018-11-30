@@ -46,6 +46,7 @@ type benchmarkResult struct {
 	passed       bool
 	processTime  float64
 	sizeMB       float64
+	outputSizeMB float64
 	errorMessage string
 	rmList       bool
 }
@@ -118,6 +119,7 @@ func main() {
 	}
 
 	fmt.Printf("With GS validation: %t\n", params.gsValidation)
+	fmt.Printf("With compression and optimization: %t\n", params.optimize)
 
 	err := initUniDoc(params.debug)
 	if err != nil {
@@ -272,9 +274,9 @@ func testPassthroughSinglePdf(inputPath string, params benchParams) error {
 		optimizer := optimize.New(optimize.Options{
 			CombineDuplicateDirectObjects:   true,
 			CombineIdenticalIndirectObjects: true,
-			ImageUpperPPI:                   300.0,
+			ImageUpperPPI:                   100.0,
 			UseObjectStreams:                true,
-			ImageQuality:                    100,
+			ImageQuality:                    80,
 			CombineDuplicateStreams:         true,
 		})
 		writer.SetOptimizer(optimizer)
@@ -361,6 +363,8 @@ func TestSinglePdf(target string, params benchParams) error {
 func (this benchmarkResults) printResults(params benchParams) {
 	succeeded := 0
 	total := 0
+	totalInputSize := 0.0
+	totalOutputSize := 0.0
 	var totalTime float64 = 0.0
 
 	for _, result := range this {
@@ -369,6 +373,8 @@ func (this benchmarkResults) printResults(params benchParams) {
 			totalTime += result.processTime
 		}
 		total++
+		totalInputSize += result.sizeMB
+		totalOutputSize += result.outputSizeMB
 
 		if !result.passed {
 			// Only print ones that failed.
@@ -382,6 +388,10 @@ func (this benchmarkResults) printResults(params benchParams) {
 	fmt.Printf("Successes: %d\n", succeeded)
 	fmt.Printf("Failed: %d\n", total-succeeded)
 	fmt.Printf("Total time: %.1f secs (%.2f per file)\n", totalTime, totalTime/float64(succeeded))
+	if params.optimize {
+		fmt.Printf("Total input files size: %.3f MB\nTotal output files size: %.3f MB\nTotal compression ratio: %.3f\n",
+			totalInputSize, totalOutputSize, totalInputSize/totalOutputSize)
+	}
 
 	// Print list to remove
 	if params.printRmList {
@@ -446,7 +456,19 @@ func benchmarkPDFs(paths []string, params benchParams) error {
 			benchmark.errorMessage = fmt.Sprintf("%s", err)
 			fmt.Printf("%s - fail %s\n", path, err)
 		}
-
+		if params.optimize {
+			outputPath := params.processPath
+			if len(params.outputDir) > 0 {
+				outputPath = filepath.Join(params.outputDir, filepath.Base(path))
+			}
+			outputFileSizeMB, err := getFileSize(outputPath)
+			if err != nil {
+				return err
+			}
+			benchmark.outputSizeMB = outputFileSizeMB
+			fmt.Printf("Input file size: %.3f MB\nOutput file size: %.3f MB\nCompression ratio: %.3f\n",
+				benchmark.sizeMB, benchmark.outputSizeMB, benchmark.sizeMB/benchmark.outputSizeMB)
+		}
 		benchmarkResults = append(benchmarkResults, benchmark)
 	}
 
