@@ -203,7 +203,7 @@ func extractImagesOnPage(page *pdf.PdfPage) ([]imageData, error) {
 
 // extractImagesInContentStream returns a slice of all images in content stream `contents`.
 func extractImagesInContentStream(contents string, resources *pdf.PdfPageResources) ([]imageData, error) {
-	rgbImages := []imageData{}
+	images := []imageData{}
 	cstreamParser := pdfcontent.NewContentStreamParser(contents)
 	operations, err := cstreamParser.Parse()
 	if err != nil {
@@ -237,12 +237,7 @@ func extractImagesInContentStream(contents string, resources *pdf.PdfPageResourc
 			}
 			fmt.Printf("Cs: %T\n", cs)
 
-			// rgbImg, err := cs.ImageToRGB(*img)
-			// if err != nil {
-			// 	return nil, err
-			// }
-
-			rgbImages = append(rgbImages, imageData{img: img})
+			images = append(images, imageData{img: img})
 			inlineImages++
 		} else if op.Operand == "Do" && len(op.Params) == 1 {
 			// Do: XObject.
@@ -271,7 +266,7 @@ func extractImagesInContentStream(contents string, resources *pdf.PdfPageResourc
 				if err != nil {
 					return nil, err
 				}
-				rgbImages = append(rgbImages, imageData{img, ximg.Filter})
+				images = append(images, imageData{img, ximg.Filter})
 				xObjectImages++
 			} else if xtype == pdf.XObjectTypeForm {
 				// Go through the XObject Form content stream.
@@ -292,14 +287,14 @@ func extractImagesInContentStream(contents string, resources *pdf.PdfPageResourc
 				}
 
 				// Process the content stream in the Form object too:
-				formRgbImages, err := extractImagesInContentStream(string(formContent), formResources)
+				formImages, err := extractImagesInContentStream(string(formContent), formResources)
 				if err != nil {
 					return nil, err
 				}
-				rgbImages = append(rgbImages, formRgbImages...)
+				images = append(images, formImages...)
 			}
 		}
 	}
 
-	return rgbImages, nil
+	return images, nil
 }
