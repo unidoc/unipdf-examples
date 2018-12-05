@@ -1,10 +1,27 @@
 /*
  * Extract images from a PDF file. Passes through each page, goes through the content stream and
- *  finds instances of both XObject Images and inline images. Also handles images referred within
+ * finds instances of both XObject Images and inline images. Also handles images referred within
  * XObject Form content streams.
  * The output files are saved as a zip archive.
  *
- * Run as: go run pdf_extract_images.go input.pdf output.zip
+ * NOTE(peterwilliams97): Unlike pdf_extract_images.go,
+ *       1) Losslessly compressed PDF images are saved in PNG format. (Lossily compressed PDF images
+ *          still are saved in JPEG format)
+ *       2) Images are saved in the same color space as they occur in PDF files.
+ *
+ * XXX(peterwilliams97): This file fixes an apparent problem in the UniDoc resampling code with
+ *       handling 1 bit per component images. There is an additional problem that got6.DecodeBytes()
+ *       returns CCITTFax images as 8 bits per pixel while PDF expects these images to be 1 bit per
+ *       pixel. I tried modifying got.6 to fix this and found that ResampleBytes() didn't work with
+ *       1 bit per pixel, so I just set imgData.img.BitsPerComponent = 8 for CCITTFaxEncoder images.
+ *
+ * TODO: Handle JBIG images.
+ *       Handle CCITTFaxEncoder inline images?
+ *       Handle CCITTFaxEncoder Group 3 images?
+ *       Change got.6 to return 1 bit images.
+ *       Save images in orientation they appear in the PDF file.
+ *
+ * Run as: go run pdf_extract_native_images.go input.pdf output.zip
  */
 
 package main
@@ -16,6 +33,7 @@ import (
 	"image/png"
 	"os"
 
+	"github.com/unidoc/unidoc/common"
 	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
@@ -27,6 +45,7 @@ var inlineImages = 0
 func main() {
 	// Enable debug-level console logging, when debuggingn:
 	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	if len(os.Args) < 3 {
 		fmt.Printf("Syntax: go run pdf_extract_images.go input.pdf output.zip\n")
@@ -122,27 +141,38 @@ func extractImagesToArchive(inputPath, outputPath string) error {
 			img := imgData.img
 			fname := fmt.Sprintf("p%d_%d", i+1, idx)
 
-			fmt.Printf("Converting to go image: page %d img %d -> %q %s\n", i+1, idx+1, fname, img)
+			var lossless bool // Is image compressed losslessly?
+
+			switch imgData.filter.(type) {
+			case *pdfcore.FlateEncoder:
+				lossless = true
+			case *pdfcore.CCITTFaxEncoder:
+				lossless = true
+				// XXX(peterwilliams97) Hack to work around got6.DecodeBytes() returning an 8 bits
+				// per component raster and sampling.ResampleBytes() not working for 1 bits per
+				// pixel
+				imgData.img.BitsPerComponent = 8
+			}
+
 			gimg, err := img.ToGoImage()
 			if err != nil {
 				return err
 			}
 
-			_, isFlate := imgData.filter.(*pdfcore.FlateEncoder)
-
-			// fmt.Printf("gimg=%s\n", gimg.)
-
-			if isFlate {
+			if lossless {
 				fname += ".png"
 			} else {
 				fname += ".jpg"
 			}
 
+			fmt.Printf("Converting to go image: page %d img %d -> %q %s\n", i+1, idx+1, fname, img)
+
 			imgf, err := zipw.Create(fname)
 			if err != nil {
 				return err
 			}
-			if isFlate {
+
+			if lossless {
 				err = png.Encode(imgf, gimg)
 			} else {
 				opt := jpeg.Options{Quality: 100}
@@ -241,12 +271,6 @@ func extractImagesInContentStream(contents string, resources *pdf.PdfPageResourc
 				if err != nil {
 					return nil, err
 				}
-
-				// rgbImg, err := ximg.ColorSpace.ImageToRGB(*img)
-				// if err != nil {
-				// 	return nil, err
-				// }
-				// rgbImg := *img
 				rgbImages = append(rgbImages, imageData{img, ximg.Filter})
 				xObjectImages++
 			} else if xtype == pdf.XObjectTypeForm {
