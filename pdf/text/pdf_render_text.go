@@ -112,15 +112,19 @@ func main() {
 	defer fBad.Close()
 
 	errorCounts := map[string]int{}
+	numFiles := 0
 
-	for i, inputPath := range files {
-		if !isWanted(inputPath) {
+	for _, inputPath := range files {
+		if !isWanted(inputPath) && len(files) > 1 {
 			continue
 		}
 		sizeMB := fileSizeMB(inputPath)
-		if sizeMB < minSizeMB {
-			fmt.Printf("%.3f MB, ", sizeMB)
+		if !(minSizeMB <= sizeMB && sizeMB <= maxSizeMB) && len(files) > 1 {
+			// fmt.Fprintf(os.Stderr, "%.3f MB, ", sizeMB)
 			continue
+		}
+		if numFiles > maxFiles && len(files) > 1 {
+			break
 		}
 		if verbose {
 			fmt.Println("========================= ^^^ =========================")
@@ -129,15 +133,15 @@ func main() {
 		pdfReader, numPages, err := getReader(inputPath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "\to====> Pdf File %3d of %d %q err=%v\n",
-				i+1, len(files), inputPath, err)
+				numFiles, len(files), inputPath, err)
 			continue
 		}
 
 		version := pdfReader.PdfVersion()
 
-		fmt.Fprintf(os.Stderr, "Pdf File %3d of %d (%3s) %4.1f MB %3d pages %q ",
-			i+1, len(files), pdfReader.PdfVersion(), sizeMB, numPages, inputPath)
-		if version.Minor < minVersionMinor {
+		fmt.Fprintf(os.Stderr, "Pdf File %3d of %d (%3s) %5.2f MB %3d pages %q ",
+			numFiles, len(files), pdfReader.PdfVersion(), sizeMB, numPages, inputPath)
+		if version.Minor < minVersionMinor && len(files) > 1 {
 			fmt.Fprintln(os.Stderr, "")
 			continue
 		}
@@ -147,13 +151,16 @@ func main() {
 		dt := time.Since(t0)
 		if err == nil {
 			err = missclassificationError(threshold, numChars, numMisses)
+			// if err != nil {
+			// 	panic(err)
+			// }
 		}
 
 		fmt.Fprintf(os.Stderr, "%3.1f sec %d chars %d misses (%.1f%%)\n", dt.Seconds(),
 			numChars, numMisses, percentage(numChars, numMisses))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "\tx====> Pdf File %3d of %d %q numChars=%d numMisses=%d err=%v\n",
-				i+1, len(files), inputPath, numChars, numMisses, err)
+				numFiles, len(files), inputPath, numChars, numMisses, err)
 			fmt.Fprintf(fBad, "%q version=%s MB=%.1f pages=%d secs=%.1f numChars=%d numMisses=%d err=%v\n",
 				inputPath, version, sizeMB, numPages, dt.Seconds(), numChars, numMisses, err)
 		}
@@ -162,7 +169,9 @@ func main() {
 		}
 		if err != nil {
 			errorCounts[err.Error()]++
+
 		}
+		numFiles++
 	}
 	fmt.Fprintf(os.Stderr, "Done %d files \n", len(files))
 	if len(errorCounts) > 0 {
@@ -401,6 +410,7 @@ func getReader(inputPath string) (pdfReader *pdf.PdfReader, numPages int, err er
 func outputPdfText(inputPath string, pdfReader *pdf.PdfReader, numPages, width int, verbose bool) (int, int, error) {
 	numChars, numMisses := 0, 0
 	for pageNum := 1; pageNum <= numPages; pageNum++ {
+		common.Log.Debug("===========================~~~page %d", pageNum)
 
 		page, err := pdfReader.GetPage(pageNum)
 		if err != nil {
@@ -410,7 +420,7 @@ func outputPdfText(inputPath string, pdfReader *pdf.PdfReader, numPages, width i
 		if err != nil {
 			return 0, 0, err
 		}
-		text, nChars, nMisses, err := ex.ExtractText2()
+		text, nChars, nMisses, err := ex.ExtractTextWithStats()
 		numChars += nChars
 		numMisses += nMisses
 		if err != nil {
@@ -497,7 +507,6 @@ func splitLines(text string, width int) string {
 // It should return true for the files you want to process.
 // e.g.The commented core returns true for files containing Type0 font dicts in clear text.
 func isWanted(filename string) bool {
-	return true
 	for _, s := range exclusions {
 		if strings.Contains(filename, s) {
 			return false
@@ -508,35 +517,16 @@ func isWanted(filename string) bool {
 	if err != nil {
 		panic(err)
 	}
-	return strings.Contains(string(data), "/Type1") && !strings.Contains(string(data), "/Type0")
+	return strings.Contains(string(data), "/TrueType")
+	return (strings.Contains(string(data), "/Type1") &&
+		!strings.Contains(string(data), "/Type0") &&
+		!strings.Contains(string(data), "/Type1C"))
 }
 
 var (
+	maxFiles        = 1000000
 	minSizeMB       = 0.0
-	minVersionMinor = 2
-	exclusions      = []string{
-		"How to Accuse the Other Guy of Lying with Statistics.pdf",
-		"vRad_FinalReportSample_MR_Head_WithoutWithContrast_ImpressionLast_OnePage",
-		"z.pdf",
-		"Letter of His Holiness pope Francis to the People of God (1).pdf",
-		"2582cobden_sbs68_dtv_pubmap.pdf",
-		"24_CGPM_Resolution_1.pdf",            // Symbol with /Differences
-		"testdata/ergodicity/Ito_Formula.pdf", // Type1 with /Differences
-		"testdata/ergodicity/wp00-20.pdf",     // Symbol
-		"testdata/recht11a.pdf",               // Symbol
-		"testdata/crypto/B02.pdf",             // Symbol TrueType
-		"Tesseract", "300bw.pdf",
-		"database_03_abs.pdf", // Linearized
-		"JCLC_2007_V17_N2_04.pdf",
-		"acscentsci%2E6b00219.pdf",
-		"4622167.pdf",                     // <</Type/Font/Name/F0/Encoding/WinAnsiEncoding/BaseFont/TimesNewRoman,Bold/Subtype/TrueType>>
-		"endosymbiotictheory_marguli.pdf", // " "
-		"iverson.pdf",                     // " "
-		"fonts/interlacedVideo.pdf",       // " "
-		"The_Block_Cipher_Companion.pdf",
-		"xxx.hard",
-		"shamirturing.pdf",
-		"testdata/summarization/C96-2183.pdf",
-		"uk_bl_ethos_329208_vol2.pdf",
-	}
+	maxSizeMB       = 1.0e20
+	minVersionMinor = 3
+	exclusions      = []string{}
 )
