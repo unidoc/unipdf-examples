@@ -433,7 +433,6 @@ func fileSizeMB(path string) float64 {
 // It should return true for the files you want to process.
 // e.g.The commented core returns true for files containing Type0 font dicts in clear text.
 func isWanted(filename string) bool {
-	return true
 	for _, s := range exclusions {
 		if strings.Contains(filename, s) {
 			return false
@@ -451,15 +450,14 @@ func isWanted(filename string) bool {
 }
 
 var (
-	maxFiles        = 1000
-	minSizeMB       = 0.0
-	maxSizeMB       = 1.0 // 1.0e20
+	maxFiles        = 1000000
+	minSizeMB       = 0.60
+	maxSizeMB       = 1.0e20
 	minVersionMinor = 3
 	exclusions      = []string{
 		// Report to UniDoc
-		"pdf_text/1710.05703.pdf",                                  // err=Invalid DecodeParms
-		"port_of_hastings_handbook_and_harbour_masters_directions", // err=Invalid DecodeParms
-		"convoluted_line",
-		"rotated_hungarian",
+		"Presto_UserGuide.pdf",
+		"constrained_decoding.pdf",
+		"2_LarryTalk.pdf",
 	}
 )
