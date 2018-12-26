@@ -7,12 +7,16 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unidoc/common"
-	unipdf "github.com/unidoc/unidoc/pdf/model"
+	"github.com/unidoc/unidoc/common"
+	pdf "github.com/unidoc/unidoc/pdf/model"
 )
+
+const usage = "Print out basic properties of PDF files\n" +
+	"Usage: go run pdf_info.go input.pdf [input2.pdf] ...\n"
 
 type PdfProperties struct {
 	Version     string
@@ -22,16 +26,39 @@ type PdfProperties struct {
 }
 
 func main() {
+	var showHelp, debug, trace bool
+	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
+	flag.BoolVar(&debug, "d", false, "Print debugging information.")
+	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
+
 	if len(os.Args) < 2 {
 		fmt.Printf("Print out basic properties of PDF files\n")
 		fmt.Printf("Usage: go run pdf_info.go input.pdf [input2.pdf] ...\n")
 		os.Exit(1)
 	}
+	makeUsage(usage)
 
-	// Enable debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	flag.Parse()
+	args := flag.Args()
 
-	for _, inputPath := range os.Args[1:len(os.Args)] {
+	if showHelp {
+		flag.Usage()
+		os.Exit(0)
+	}
+	if len(args) < 1 {
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	if trace {
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelTrace))
+	} else if debug {
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	} else {
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelError))
+	}
+
+	for _, inputPath := range args {
 		fmt.Printf("Input file: %s\n", inputPath)
 
 		ret, err := getPdfProperties(inputPath)
@@ -57,7 +84,7 @@ func getPdfProperties(inputPath string) (*PdfProperties, error) {
 
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +107,7 @@ func getPdfProperties(inputPath string) (*PdfProperties, error) {
 		return &ret, nil
 	}
 
-	ret.Version = pdfReader.PdfVersion()
+	ret.Version = pdfReader.PdfVersion().String()
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
@@ -89,4 +116,13 @@ func getPdfProperties(inputPath string) (*PdfProperties, error) {
 	ret.NumPages = numPages
 
 	return &ret, nil
+}
+
+// makeUsage updates flag.Usage to include usage message `msg`.
+func makeUsage(msg string) {
+	usage := flag.Usage
+	flag.Usage = func() {
+		fmt.Fprintln(os.Stderr, msg)
+		usage()
+	}
 }

@@ -396,6 +396,7 @@ func extractImagesInContentStream(contents string, resources *pdf.PdfPageResourc
 	return images, nil
 }
 
+// makeUsage updates flag.Usage to include usage message `msg`.
 func makeUsage(msg string) {
 	usage := flag.Usage
 	flag.Usage = func() {

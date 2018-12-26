@@ -50,8 +50,8 @@ func main() {
 	var width int
 	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
-	flag.BoolVar(&verbose, "v", false, "Print extra page information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
+	flag.BoolVar(&verbose, "v", false, "Print extra page information.")
 	flag.Float64Var(&threshold, "t", 1.0,
 		"Missclassification threshold. percentage of missclassified characters above this "+
 			"threshold are treated as errors.")
@@ -410,7 +410,7 @@ func getReader(inputPath string) (pdfReader *pdf.PdfReader, numPages int, err er
 func outputPdfText(inputPath string, pdfReader *pdf.PdfReader, numPages, width int, verbose bool) (int, int, error) {
 	numChars, numMisses := 0, 0
 	for pageNum := 1; pageNum <= numPages; pageNum++ {
-		common.Log.Debug("===========================~~~page %d", pageNum)
+		// common.Log.Debug("===========================~~~page %d", pageNum)
 
 		page, err := pdfReader.GetPage(pageNum)
 		if err != nil {
@@ -431,7 +431,7 @@ func outputPdfText(inputPath string, pdfReader *pdf.PdfReader, numPages, width i
 		}
 
 		if verbose {
-			fmt.Printf("Page %d of %d: %q\n", pageNum, numPages, inputPath)
+			fmt.Printf("\nPage %d of %d: %q\n", pageNum, numPages, inputPath)
 		}
 		fmt.Printf("%s\n", text)
 		if verbose {
@@ -442,6 +442,7 @@ func outputPdfText(inputPath string, pdfReader *pdf.PdfReader, numPages, width i
 	return numChars, numMisses, nil
 }
 
+// makeUsage updates flag.Usage to include usage message `msg`.
 func makeUsage(msg string) {
 	usage := flag.Usage
 	flag.Usage = func() {
@@ -450,7 +451,7 @@ func makeUsage(msg string) {
 	}
 }
 
-// fileSizeMB returns the size of file `path` in megabytes
+// fileSizeMB returns the size of file `path` in megabytes.
 func fileSizeMB(path string) float64 {
 	fi, err := os.Stat(path)
 	if err != nil {
