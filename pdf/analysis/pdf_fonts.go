@@ -1,33 +1,56 @@
 // Shows all fonts in a PDF file.
 //
-// Run as: go run pdf_fonts.go o testdata/*.pdf testdata/**/*.pdf
+// Run as: go run pdf_fonts.go testdata/*.pdf testdata/**/*.pdf
 //
 
 package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 
+	"github.com/unidoc/unidoc/common"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 )
 
+const usage = "Usage: go run pdf_fonts.go testdata/*.pdf\n"
+
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "Usage: go run pdf_fonts.go testdata/*.pdf")
+	var showHelp, debug, trace bool
+	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
+	flag.BoolVar(&debug, "d", false, "Print debugging information.")
+	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
+	makeUsage(usage)
+
+	flag.Parse()
+	args := flag.Args()
+
+	if showHelp {
+		flag.Usage()
+		os.Exit(0)
+	}
+	if len(args) < 1 {
+		flag.Usage()
 		os.Exit(1)
 	}
 
-	// Enable debug-level logging.
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	if trace {
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelTrace))
+	} else if debug {
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	} else {
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelError))
+	}
 
 	// showOneFile(os.Args[1])
+	// os.Exit(0)
 
-	pathList, err := patternsToPaths(os.Args[1:])
+	pathList, err := patternsToPaths(args)
 	if err != nil {
 		os.Exit(1)
 	}
@@ -68,6 +91,7 @@ func main() {
 	for _, subtype := range subtypes {
 		subtypeOccurrences[subtype].showTounicodeCounts(fmt.Sprintf("Font subtype %#q", subtype))
 	}
+
 }
 
 // fontOccurrence represents an occurrence of a font in a PDF file.
@@ -125,8 +149,8 @@ func (occurrences occurrenceList) showEncodingCounts(title string) {
 		nFiles := keyOccurrences[k].numFiles()
 		percentOcc := float64(nOcc) / float64(len(occurrences)) * 100.0
 		percentFiles := float64(nFiles) / float64(numFiles) * 100.0
-		fmt.Printf("%4d: %-22s %4d occurrences (%2.0f%%) Occurred in %3d (%2.0f%%) of files.\n",
-			i, truncate(k, 22), nOcc, percentOcc, nFiles, percentFiles)
+		fmt.Printf("%4d: %-52s %4d occurrences (%2.0f%%) Occurred in %3d (%2.0f%%) of files.\n",
+			i, truncate(k, 52), nOcc, percentOcc, nFiles, percentFiles)
 	}
 }
 
@@ -310,17 +334,37 @@ func fontsInPdf(filename string) (version string, fonts []pdf.PdfFont, err error
 		}
 	}
 
-	version = pdfReader.PdfVersion()
+	version = pdfReader.PdfVersion().String()
 
+	// FIXME(peterwilliams97)  GetIndirectObjectByNumber doesn't resolve object references in objects
+	// referenced by the returned object. e.g. Stueckelberg6LV.pdf
 	for _, objNum := range pdfReader.GetObjectNums() {
 		var obj pdfcore.PdfObject
 		obj, err = pdfReader.GetIndirectObjectByNumber(objNum)
 		if err != nil {
-			return
-		}
-		font, err := pdf.NewPdfFontFromPdfObject(obj)
-		if err != nil {
 			continue
+		}
+
+		obj = pdfcore.TraceToDirectObject(obj)
+		if stream, is := obj.(*pdfcore.PdfObjectStream); is {
+			obj = stream.PdfObjectDictionary
+		}
+		if dict, is := obj.(*pdfcore.PdfObjectDictionary); !is {
+			continue
+		} else {
+			typ := dict.Get("Type")
+			if typ == nil {
+				continue
+			}
+			if n, ok := pdfcore.GetName(typ); !ok || string(*n) != "Font" {
+				continue
+			}
+		}
+
+		var font *pdf.PdfFont
+		font, err = pdf.NewPdfFontFromPdfObject(obj)
+		if err != nil && err != pdf.ErrType1CFontNotSupported && err != pdf.ErrType3FontNotSupported {
+			return
 		}
 		fonts = append(fonts, *font)
 	}
@@ -421,4 +465,13 @@ func truncateSlice(arr []string, n, m int) []string {
 		return truncated
 	}
 	return append(truncated[:m], "...")
+}
+
+// makeUsage updates flag.Usage to include usage message `msg`.
+func makeUsage(msg string) {
+	usage := flag.Usage
+	flag.Usage = func() {
+		fmt.Fprintln(os.Stderr, msg)
+		usage()
+	}
 }
