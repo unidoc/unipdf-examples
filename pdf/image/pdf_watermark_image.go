@@ -44,7 +44,7 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 
 	c := creator.New()
 
-	watermarkImg, err := creator.NewImageFromFile(watermarkPath)
+	watermarkImg, err := c.NewImageFromFile(watermarkPath)
 	if err != nil {
 		return err
 	}

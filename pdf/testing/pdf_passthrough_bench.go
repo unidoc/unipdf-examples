@@ -1,17 +1,19 @@
 /*
  * Passthrough benchmark for UniDoc, loads input PDF files and writes them back out. Has ghostscript validation.
  *
- * Run as: go run pdf_passhtrough_bench.go ...
+ * Run as: go run pdf_passthrough_bench.go ...
  *
  * This will perform the passthrough benchmark on all pdf files and write results to stdout.
  *
  * See the other command line options in the top of main()
- *      -o processDir - Temporary processing directory (default compare.pdfs)
- *      -d: Debug level logging
- *      -a: Keep converting PDF files after failures
- *      -min <val>: Minimum PDF file size to test
- *      -max <val>: Maximum PDF file size to test
- *      -r <name>: Name of results file
+ *     -o <processPath> - Temporary output file path (default /tmp/test.pdf)
+ *     -odir <outputdir> - Output directory path (Optional, overrides -o)
+ *     -d: Debug level logging
+ *     -a: Run all tests. Don't stop at first failure (This flag isn't used here)
+ *     -gsv: Validate with ghostscript
+ *     -hang: Hang when completed (no exit) - for memory profiling
+ *     -rmlist: Print out a list of files to rm to make fully compliant
+ *     -optimize: Use Use Pdf compression and optimization
  *
  * The passthrough benchmark
  * - Loads the input PDF with unidoc
@@ -26,6 +28,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/unidoc/unidoc/pdf/model/optimize"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -43,6 +46,7 @@ type benchmarkResult struct {
 	passed       bool
 	processTime  float64
 	sizeMB       float64
+	outputSizeMB float64
 	errorMessage string
 	rmList       bool
 }
@@ -65,10 +69,12 @@ const usage = `Usage:
 pdf_passthrough_bench [options] <file1> <file2> ... > results
 Options:
 -o <processPath> - Temporary output file path (default /tmp/test.pdf)
+-odir <outputdir> - Output directory path (Optional, overrides -o)
 -d: Debug level logging
 -gsv: Validate with ghostscript
 -hang: Hang when completed (no exit) - for memory profiling
 -rmlist: Print out a list of files to rm to make fully compliant
+-optimize: Use Pdf compression and optimization
 
 Example: pdf_passthrough_bench -gsv ~/pdfdb/* >results_YYYY_MM_DD
 `
@@ -77,9 +83,11 @@ type benchParams struct {
 	debug        bool
 	runAllTests  bool
 	processPath  string
+	outputDir    string
 	gsValidation bool
 	hangOnExit   bool
 	printRmList  bool
+	optimize     bool
 }
 
 func main() {
@@ -88,9 +96,11 @@ func main() {
 	params.debug = false       // Write debug level info to stdout?
 	params.runAllTests = false // Don't stop when a PDF file fails to process?
 	params.processPath = ""    // Transformed PDFs are written here
+	params.outputDir = ""      // Alternatively, can store output files in an output directory.
 	params.gsValidation = false
 	params.hangOnExit = false
 	params.printRmList = false
+	params.optimize = false
 
 	flag.BoolVar(&params.debug, "d", false, "Enable debug logging")
 	flag.BoolVar(&params.gsValidation, "gsv", false, "Enable ghostscript validation")
@@ -98,15 +108,18 @@ func main() {
 	flag.BoolVar(&params.hangOnExit, "hang", false, "Hang when completed without exiting (memory profiling)")
 	flag.BoolVar(&params.printRmList, "rmlist", false, "Print rm list at end")
 	flag.StringVar(&params.processPath, "o", "/tmp/test.pdf", "Temporary output file path")
+	flag.StringVar(&params.outputDir, "odir", "/tmp/", "Output directory (optional)")
+	flag.BoolVar(&params.optimize, "optimize", false, "Use Pdf compression and optimization")
 
 	flag.Parse()
 	args := flag.Args()
-	if len(args) < 1 || len(params.processPath) == 0 {
+	if len(args) < 1 || (len(params.processPath) == 0 && len(params.outputDir) == 0) {
 		fmt.Fprintln(os.Stderr, usage)
 		os.Exit(1)
 	}
 
 	fmt.Printf("With GS validation: %t\n", params.gsValidation)
+	fmt.Printf("With compression and optimization: %t\n", params.optimize)
 
 	err := initUniDoc(params.debug)
 	if err != nil {
@@ -215,8 +228,8 @@ func ghostscriptName() string {
 }
 
 // testPassthroughSinglePdf tests loading a pdf file, and writing it back out (passthrough).
-func testPassthroughSinglePdf(path string, params benchParams) error {
-	file, err := os.Open(path)
+func testPassthroughSinglePdf(inputPath string, params benchParams) error {
+	file, err := os.Open(inputPath)
 	if err != nil {
 		return err
 	}
@@ -257,7 +270,17 @@ func testPassthroughSinglePdf(path string, params benchParams) error {
 	}
 
 	writer := unipdf.NewPdfWriter()
-
+	if params.optimize {
+		optimizer := optimize.New(optimize.Options{
+			CombineDuplicateDirectObjects:   true,
+			CombineIdenticalIndirectObjects: true,
+			ImageUpperPPI:                   100.0,
+			UseObjectStreams:                true,
+			ImageQuality:                    80,
+			CombineDuplicateStreams:         true,
+		})
+		writer.SetOptimizer(optimizer)
+	}
 	ocProps, err := reader.GetOCProperties()
 	if err != nil {
 		return err
@@ -292,15 +315,22 @@ func testPassthroughSinglePdf(path string, params benchParams) error {
 		}
 	}
 
+	// By default: uses processPath, unless if output dir is specified, uses the basename of `path` and outputs
+	// to the output dir.
+	outputPath := params.processPath
+	if len(params.outputDir) > 0 {
+		outputPath = filepath.Join(params.outputDir, filepath.Base(inputPath))
+	}
+
 	common.Log.Debug("Write the file")
-	file, err = os.Create(params.processPath)
+	of, err := os.Create(outputPath)
 	if err != nil {
 		common.Log.Debug("Failed to create file (%s)", err)
 		return err
 	}
-	defer file.Close()
+	defer of.Close()
 
-	err = writer.Write(file)
+	err = writer.Write(of)
 	if err != nil {
 		common.Log.Debug("WriteFile error")
 		return err
@@ -309,10 +339,10 @@ func testPassthroughSinglePdf(path string, params benchParams) error {
 	// GS validation of input, output pdfs.
 	if params.gsValidation {
 		common.Log.Debug("Validating input file")
-		_, inputWarnings := validatePdf(path, "")
+		_, inputWarnings := validatePdf(inputPath, "")
 		common.Log.Debug("Validating output file")
 
-		err, warnings := validatePdf(params.processPath, "")
+		err, warnings := validatePdf(outputPath, "")
 		if err != nil && warnings > inputWarnings {
 			common.Log.Debug("ERROR: Input warnings %d vs output %d", inputWarnings, warnings)
 			return fmt.Errorf("Invalid PDF input %d/ output %d warnings", inputWarnings, warnings)
@@ -323,16 +353,18 @@ func testPassthroughSinglePdf(path string, params benchParams) error {
 	return nil
 }
 
-// Test a single pdf file.
+// TestSinglePdf tests a single pdf file.
 func TestSinglePdf(target string, params benchParams) error {
 	err := testPassthroughSinglePdf(target, params)
 	return err
 }
 
-// Print the summary of the benchmark results.
+// printResults prints a summary of the benchmark results.
 func (this benchmarkResults) printResults(params benchParams) {
 	succeeded := 0
 	total := 0
+	totalInputSize := 0.0
+	totalOutputSize := 0.0
 	var totalTime float64 = 0.0
 
 	for _, result := range this {
@@ -341,6 +373,8 @@ func (this benchmarkResults) printResults(params benchParams) {
 			totalTime += result.processTime
 		}
 		total++
+		totalInputSize += result.sizeMB
+		totalOutputSize += result.outputSizeMB
 
 		if !result.passed {
 			// Only print ones that failed.
@@ -354,6 +388,10 @@ func (this benchmarkResults) printResults(params benchParams) {
 	fmt.Printf("Successes: %d\n", succeeded)
 	fmt.Printf("Failed: %d\n", total-succeeded)
 	fmt.Printf("Total time: %.1f secs (%.2f per file)\n", totalTime, totalTime/float64(succeeded))
+	if params.optimize {
+		fmt.Printf("Total input files size: %.3f MB\nTotal output files size: %.3f MB\nTotal compression ratio: %.3f\n",
+			totalInputSize, totalOutputSize, totalInputSize/totalOutputSize)
+	}
 
 	// Print list to remove
 	if params.printRmList {
@@ -368,7 +406,7 @@ func (this benchmarkResults) printResults(params benchParams) {
 	}
 }
 
-// Get file size in MB.
+// getFileSize returns the file size in MB.
 func getFileSize(path string) (float64, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -385,11 +423,13 @@ func getFileSize(path string) (float64, error) {
 	return sizeMB, nil
 }
 
+// isDirectory returns true if the path refers to a directory.
 func isDirectory(path string) (bool, error) {
 	fileInfo, err := os.Stat(path)
 	return fileInfo.IsDir(), err
 }
 
+// benchmarkPDFs runs a benchmark on a list of PDF files specified by path with a specified set of parameters.
 func benchmarkPDFs(paths []string, params benchParams) error {
 	benchmarkResults := benchmarkResults{}
 
@@ -416,7 +456,19 @@ func benchmarkPDFs(paths []string, params benchParams) error {
 			benchmark.errorMessage = fmt.Sprintf("%s", err)
 			fmt.Printf("%s - fail %s\n", path, err)
 		}
-
+		if params.optimize {
+			outputPath := params.processPath
+			if len(params.outputDir) > 0 {
+				outputPath = filepath.Join(params.outputDir, filepath.Base(path))
+			}
+			outputFileSizeMB, err := getFileSize(outputPath)
+			if err != nil {
+				return err
+			}
+			benchmark.outputSizeMB = outputFileSizeMB
+			fmt.Printf("Input file size: %.3f MB\nOutput file size: %.3f MB\nCompression ratio: %.3f\n",
+				benchmark.sizeMB, benchmark.outputSizeMB, benchmark.sizeMB/benchmark.outputSizeMB)
+		}
 		benchmarkResults = append(benchmarkResults, benchmark)
 	}
 

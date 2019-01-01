@@ -16,7 +16,6 @@ import (
 	//unicommon "github.com/unidoc/unidoc/common"
 	"github.com/unidoc/unidoc/pdf/creator"
 	pdf "github.com/unidoc/unidoc/pdf/model"
-	"github.com/unidoc/unidoc/pdf/model/fonts"
 )
 
 func main() {
@@ -93,9 +92,13 @@ func addTextToPdf(inputPath string, outputPath string, text string, pageNum int,
 		}
 
 		if i == pageNum || pageNum == -1 {
-			p := creator.NewParagraph(text)
+			p := c.NewParagraph(text)
 			// Change to times bold font (default is helvetica).
-			p.SetFont(fonts.NewFontTimesBold())
+			timesBold, err := pdf.NewStandard14Font("Times-Bold")
+			if err != nil {
+				panic(err)
+			}
+			p.SetFont(timesBold)
 			p.SetPos(xPos, yPos)
 
 			_ = c.Draw(p)

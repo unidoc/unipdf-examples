@@ -110,18 +110,19 @@ func locateSignatureLine(page *pdf.PdfPage) (bool, float64, float64, error) {
 	}
 
 	for _, op := range *operations {
-		if op.Operand == "Tm" && len(op.Params) == 6 {
-			if val, ok := op.Params[4].(*pdfcore.PdfObjectFloat); ok {
-				x = float64(*val)
+		switch {
+		case op.Operand == "Tm" && len(op.Params) == 6:
+			if val, has := pdfcore.GetFloatVal(op.Params[4]); has {
+				x = val
 			}
 
-			if val, ok := op.Params[5].(*pdfcore.PdfObjectFloat); ok {
-				y = float64(*val)
+			if val, has := pdfcore.GetFloatVal(op.Params[5]); has {
+				y = val
 			}
-		} else if op.Operand == "Tj" && len(op.Params) == 1 {
-			val, ok := op.Params[0].(*pdfcore.PdfObjectString)
-			if ok {
-				str := string(*val)
+
+		case op.Operand == "Tj" && len(op.Params) == 1:
+			str, isStr := pdfcore.GetStringVal(op.Params[0])
+			if isStr {
 				if strings.Contains(str, "________________") {
 					fmt.Printf("Tj: %s\n", str)
 					found = true
