@@ -1,5 +1,5 @@
 /*
- * Summarize images in a list of PDF files.  For each PDF file, passes through each page, goes
+ * Summarize images in a corpus of PDF files.  For each PDF file, passes through each page, goes
  * through the content stream and finds instances of both XObject Images and inline images.  Also
  * handles images referred within XObject Form content streams.
  * Outputs a summary of the images found.
@@ -27,11 +27,10 @@ import (
 const usage = "Usage: go run pdf_summarize_images.go testdata/*.pdf\n"
 
 func main() {
-	var showHelp, debug, trace, verbose bool
+	var showHelp, debug, trace bool
 	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
-	flag.BoolVar(&verbose, "v", false, "Print extra page information.")
 	makeUsage(usage)
 
 	flag.Parse()
@@ -53,9 +52,9 @@ func main() {
 		common.SetLogger(common.NewConsoleLogger(common.LogLevelError))
 	}
 
-	files := args[:]
-	sort.Slice(files, func(i, j int) bool {
-		fi, fj := files[i], files[j]
+	corpus := args[:]
+	sort.Slice(corpus, func(i, j int) bool {
+		fi, fj := corpus[i], corpus[j]
 		si, sj := fileSizeMB(fi), fileSizeMB(fj)
 		if si != sj {
 			return si < sj
@@ -64,9 +63,9 @@ func main() {
 	})
 
 	corpusInfo := map[string][]imageInfo{}
-	for i, inputPath := range files {
-		fmt.Fprintf(os.Stderr, "%4d of %d %q", i, len(files), filepath.Base(inputPath))
-		fileInfo, err := listImages(inputPath)
+	for i, inputPath := range corpus {
+		fmt.Fprintf(os.Stderr, "%4d of %d %q", i, len(corpus), filepath.Base(inputPath))
+		fileInfo, err := fileImages(inputPath)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, " ERROR: %v\n", inputPath, err)
 			continue
@@ -75,12 +74,12 @@ func main() {
 		fmt.Fprintf(os.Stderr, "\n")
 	}
 
-	showSummary(files, corpusInfo)
-	saveAsCsv("results.csv", files, corpusInfo)
+	showSummary(corpus, corpusInfo)
+	saveAsCsv("results.csv", corpus, corpusInfo)
 }
 
-// listImages returns a list imageInfo entries for the images in the PDF file `inputPath`.
-func listImages(inputPath string) ([]imageInfo, error) {
+// fileImages returns a list of imageInfo entries for the images in the PDF file `inputPath`.
+func fileImages(inputPath string) ([]imageInfo, error) {
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return nil, err
@@ -126,7 +125,7 @@ func listImages(inputPath string) ([]imageInfo, error) {
 		}
 
 		// List images on the page.
-		pageInfo, err := listImagesOnPage(page)
+		pageInfo, err := pageImages(page)
 		if err != nil || len(pageInfo) == 0 {
 			continue
 		}
@@ -142,18 +141,20 @@ func listImages(inputPath string) ([]imageInfo, error) {
 	return fileInfo, nil
 }
 
-func listImagesOnPage(page *pdf.PdfPage) ([]imageInfo, error) {
+// pageImages returns a list of imageInfo entries for the images in the PDF page `page`.
+func pageImages(page *pdf.PdfPage) ([]imageInfo, error) {
 	contents, err := page.GetAllContentStreams()
 	if err != nil {
 		return nil, err
 	}
-	return listImagesInContentStream(contents, page.Resources)
+	return contentStreamImages(contents, page.Resources)
 }
 
 // errors records the errors seen so far. It is used to display each error only once.
 var errors = map[error]bool{nil: true}
 
-func listImagesInContentStream(contents string, resources *pdf.PdfPageResources) ([]imageInfo, error) {
+// contentStreamImages returns a list of imageInfo entries for the images in the content stream `contents`.
+func contentStreamImages(contents string, resources *pdf.PdfPageResources) ([]imageInfo, error) {
 	cstreamParser := pdfcontent.NewContentStreamParser(contents)
 	operations, err := cstreamParser.Parse()
 	showError(errors, err, "cstreamParser.Parse failed")
@@ -271,8 +272,8 @@ func listImagesInContentStream(contents string, resources *pdf.PdfPageResources)
 				if formResources == nil {
 					formResources = resources
 				}
-				formDescs, err := listImagesInContentStream(string(formContent), formResources)
-				showError(errors, err, "listImagesInContentStream failed: %q", *name)
+				formDescs, err := contentStreamImages(string(formContent), formResources)
+				showError(errors, err, "contentStreamImages failed: %q", *name)
 				if err != nil {
 					continue
 				}
@@ -348,7 +349,7 @@ var header = []string{
 }
 
 // saveAsCsv saves `fileInfo` as a CSV file.
-func saveAsCsv(filename string, files []string, corpusInfo map[string][]imageInfo) error {
+func saveAsCsv(filename string, corpus []string, corpusInfo map[string][]imageInfo) error {
 	f, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -363,7 +364,7 @@ func saveAsCsv(filename string, files []string, corpusInfo map[string][]imageInf
 		return err
 	}
 
-	for _, fn := range files {
+	for _, fn := range corpus {
 		infoList, ok := corpusInfo[fn]
 		if !ok {
 			continue
@@ -379,11 +380,11 @@ func saveAsCsv(filename string, files []string, corpusInfo map[string][]imageInf
 	return nil
 }
 
-func showSummary(files []string, corpusInfo map[string][]imageInfo) {
+func showSummary(corpus []string, corpusInfo map[string][]imageInfo) {
 	numFiles := len(corpusInfo)
 	numImages := sumVals(corpusInfo)
 	fmt.Println("=================================================")
-	fmt.Printf("Totals:%d of files contain images. %6d images\n", numFiles, len(files), numImages)
+	fmt.Printf("Totals:%d of files contain images. %6d images\n", numFiles, len(corpus), numImages)
 	boolSummary("inline", corpusInfo, func(info imageInfo) bool { return info.inline })
 	stringSummary("filter", corpusInfo, func(info imageInfo) string { return info.filter })
 	stringSummary("color", corpusInfo, func(info imageInfo) string { return info.colorspace })
@@ -397,11 +398,11 @@ func boolSummary(title string, corpusInfo map[string][]imageInfo, selector func(
 	numFiles := len(corpusInfo)
 	numImages := sumVals(corpusInfo)
 	byImage, byFile := boolCounts(corpusInfo, selector)
-	totKeys, fileKeys := boolKeys(byImage), boolKeys(byFile)
+	imageKeys, fileKeys := boolKeys(byImage), boolKeys(byFile)
 	fmt.Println("-----------------------------------------")
 	fmt.Printf("%s\n", title)
 	fmt.Printf("By image: %d\n", len(byImage))
-	for _, k := range totKeys {
+	for _, k := range imageKeys {
 		fmt.Printf("\t%+15v\t%s\n", k, percentage(byImage[k], numImages))
 	}
 	fmt.Printf("By file: %d\n", len(byFile))
@@ -414,11 +415,11 @@ func intSummary(title string, corpusInfo map[string][]imageInfo, selector func(i
 	numFiles := len(corpusInfo)
 	numImages := sumVals(corpusInfo)
 	byImage, byFile := intCounts(corpusInfo, selector)
-	totKeys, fileKeys := intKeys(byImage), intKeys(byFile)
+	imageKeys, fileKeys := intKeys(byImage), intKeys(byFile)
 	fmt.Println("-----------------------------------------")
 	fmt.Printf("%s\n", title)
 	fmt.Printf("By image: %d\n", len(byImage))
-	for _, k := range totKeys {
+	for _, k := range imageKeys {
 		fmt.Printf("\t%+15v\t%s\n", k, percentage(byImage[k], numImages))
 	}
 	fmt.Printf("By file: %d\n", len(byFile))
@@ -431,11 +432,11 @@ func stringSummary(title string, corpusInfo map[string][]imageInfo, selector fun
 	numFiles := len(corpusInfo)
 	numImages := sumVals(corpusInfo)
 	byImage, byFile := stringCounts(corpusInfo, selector)
-	totKeys, fileKeys := stringKeys(byImage), stringKeys(byFile)
+	imageKeys, fileKeys := stringKeys(byImage), stringKeys(byFile)
 	fmt.Println("-----------------------------------------")
 	fmt.Printf("%s\n", title)
 	fmt.Printf("By image: %d\n", len(byImage))
-	for _, k := range totKeys {
+	for _, k := range imageKeys {
 		fmt.Printf("\t%+15v\t%s\n", k, percentage(byImage[k], numImages))
 	}
 	fmt.Printf("By file: %d\n", len(byFile))
