@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/unidoc/unidoc/common"
 	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
@@ -31,6 +32,12 @@ func main() {
 	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
+	doSort := true
+	var byDoc, noDims bool
+	var csvPath string
+	flag.StringVar(&csvPath, "o", "results.csv", "CSV results file.")
+	flag.BoolVar(&byDoc, "p", false, "No page numbers specified in CSV file rows.")
+	flag.BoolVar(&noDims, "w", false, "No widths and heights specified in CSV file rows.")
 	makeUsage(usage)
 
 	flag.Parse()
@@ -53,6 +60,9 @@ func main() {
 	}
 
 	corpus := args[:]
+	if len(corpus) > 1000 {
+		corpus = corpus[:1000]
+	}
 	sort.Slice(corpus, func(i, j int) bool {
 		fi, fj := corpus[i], corpus[j]
 		si, sj := fileSizeMB(fi), fileSizeMB(fj)
@@ -64,18 +74,21 @@ func main() {
 
 	corpusInfo := map[string][]imageInfo{}
 	for i, inputPath := range corpus {
-		fmt.Fprintf(os.Stderr, "%4d of %d %q", i, len(corpus), filepath.Base(inputPath))
+		fmt.Fprintf(os.Stderr, "%4d of %d %q %.1f MB,", i, len(corpus), filepath.Base(inputPath),
+			fileSizeMB(inputPath))
+		t0 := time.Now()
 		fileInfo, err := fileImages(inputPath)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, " ERROR: %v\n", inputPath, err)
+			fmt.Fprintf(os.Stderr, " ERROR: %v\n", err)
 			continue
 		}
+		dt := time.Now().Sub(t0)
 		corpusInfo[inputPath] = fileInfo
-		fmt.Fprintf(os.Stderr, "\n")
+		fmt.Fprintf(os.Stderr, ", %.1f sec\n", dt.Seconds())
 	}
 
 	showSummary(corpus, corpusInfo)
-	saveAsCsv("results.csv", corpus, corpusInfo)
+	saveAsCsv(csvPath, corpus, corpusInfo, doSort, byDoc, noDims)
 }
 
 // fileImages returns a list of imageInfo entries for the images in the PDF file `inputPath`.
@@ -295,16 +308,17 @@ type imageInfo struct {
 	cpts       int
 	colorspace string
 	bpc        int
+	count      int
 }
 
 func (info imageInfo) String() string {
-	name := "XObject"
+	kind := "XObject"
 	if info.inline {
-		name = "Inline image"
+		kind = "Inline image"
 	}
 	return strings.Join([]string{
 		fmt.Sprintf("%q:%d", filepath.Base(info.path), info.page),
-		fmt.Sprintf("%s", name),
+		fmt.Sprintf("  %s", kind),
 		fmt.Sprintf("  Filter: %s", info.filter),
 		fmt.Sprintf("  Width: %d", info.width),
 		fmt.Sprintf("  Height: %d", info.height),
@@ -315,14 +329,15 @@ func (info imageInfo) String() string {
 }
 
 func (info imageInfo) asStrings() []string {
-	name := "XObject"
+	kind := "XObject"
 	if info.inline {
-		name = "Inline image"
+		kind = "Inline image"
 	}
 	parts := []string{
 		info.path,
 		fmt.Sprintf("%d", info.page),
-		name,
+		fmt.Sprintf("%d", info.count),
+		kind,
 		info.filter,
 		fmt.Sprintf("%d", info.width),
 		fmt.Sprintf("%d", info.height),
@@ -339,6 +354,7 @@ func (info imageInfo) asStrings() []string {
 var header = []string{
 	"Path",
 	"Page number",
+	"Count",
 	"Type",
 	"Filter",
 	"Width",
@@ -348,10 +364,67 @@ var header = []string{
 	"BPC",
 }
 
+func asList(corpus []string, corpusInfo map[string][]imageInfo, doSort, byDoc, noRes bool) []imageInfo {
+	var infoList []imageInfo
+	for _, fn := range corpus {
+		partList, ok := corpusInfo[fn]
+		if !ok {
+			continue
+		}
+		infoList = append(infoList, partList...)
+	}
+	infoList = coallesce(infoList, byDoc, noRes)
+	if doSort {
+		sort.Slice(infoList, func(i, j int) bool {
+			oi, oj := infoList[i], infoList[j]
+			ai := oi.width * oi.height
+			aj := oj.width * oj.height
+			if ai != aj {
+				return ai > aj
+			}
+			if oi.count != oj.count {
+				return oi.count > oj.count
+			}
+			if oi.page != oj.page {
+				return oi.page < oj.page
+			}
+			return oi.String() < oj.String()
+		})
+	}
+	return infoList
+}
+
+func coallesce(infoList []imageInfo, byDoc, noRes bool) []imageInfo {
+	uniques := map[string]imageInfo{}
+	for _, info := range infoList {
+		if byDoc {
+			info.page = 0
+		}
+		if noRes {
+			info.width = 0
+			info.height = 0
+		}
+		k := info.String()
+		if _, ok := uniques[k]; !ok {
+			uniques[k] = info
+		}
+		info := uniques[k]
+		info.count++
+		uniques[k] = info
+	}
+	var coallesced []imageInfo
+	for _, info := range uniques {
+		coallesced = append(coallesced, info)
+	}
+	return coallesced
+}
+
 // saveAsCsv saves `fileInfo` as a CSV file.
-func saveAsCsv(filename string, corpus []string, corpusInfo map[string][]imageInfo) error {
-	f, err := os.Create(filename)
+func saveAsCsv(csvPath string, corpus []string, corpusInfo map[string][]imageInfo,
+	doSort, byDoc, noRes bool) error {
+	f, err := os.Create(csvPath)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "Couldn't create %q. %v\n", csvPath, err)
 		return err
 	}
 	defer f.Close()
@@ -361,19 +434,17 @@ func saveAsCsv(filename string, corpus []string, corpusInfo map[string][]imageIn
 
 	err = w.Write(header)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "Couldn't write header %q. %v\n", csvPath, err)
 		return err
 	}
 
-	for _, fn := range corpus {
-		infoList, ok := corpusInfo[fn]
-		if !ok {
-			continue
-		}
-		for _, info := range infoList {
-			err := w.Write(info.asStrings())
-			if err != nil {
-				return err
-			}
+	infoList := asList(corpus, corpusInfo, doSort, byDoc, noRes)
+
+	for i, info := range infoList {
+		err := w.Write(info.asStrings())
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Couldn't write %q line %d. %v\n", csvPath, i+1, err)
+			return err
 		}
 	}
 
@@ -549,10 +620,9 @@ func stringCounts(corpusInfo map[string][]imageInfo, selector func(imageInfo) st
 func showError(errors map[error]bool, err error, format string, args ...interface{}) bool {
 	seen := false
 	if errors != nil {
-		_, ok := errors[err]
-		seen = seen || ok
+		_, seen = errors[err]
 	}
-	if seen && err != nil {
+	if !seen && err != nil {
 		msg := fmt.Sprintf(format, args...)
 		fmt.Printf("%s. err=%v\n", msg, err)
 	}
