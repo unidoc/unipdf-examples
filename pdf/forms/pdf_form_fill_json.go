@@ -44,7 +44,7 @@ func main() {
 
 	// Output path not specified: Export list of fields and data as JSON format.
 	if len(outputPath) == 0 {
-		fdata, err := fjson.LoadPDFFromPath(inputPath)
+		fdata, err := fjson.LoadFromPDFFile(inputPath)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			os.Exit(1)
@@ -74,7 +74,7 @@ func main() {
 // fillFields loads field data from `jsonPath` and used to fill in form data in `inputPath` and outputs
 // as PDF in `outputPath`. The output PDF form is flattened.
 func fillFields(inputPath, jsonPath, outputPath string) error {
-	fdata, err := fjson.LoadJSONFromPath(jsonPath)
+	fdata, err := fjson.LoadFromJSONFile(jsonPath)
 	if err != nil {
 		return err
 	}
