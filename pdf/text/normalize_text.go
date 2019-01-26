@@ -69,6 +69,7 @@ func stringToFile(filename, s string) {
 	}
 }
 
+// makeUsage updates flag.Usage to include usage message `msg`.
 func makeUsage(msg string) {
 	usage := flag.Usage
 	flag.Usage = func() {

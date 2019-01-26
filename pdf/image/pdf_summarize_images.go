@@ -455,7 +455,7 @@ func showSummary(corpus []string, corpusInfo map[string][]imageInfo) {
 	numFiles := len(corpusInfo)
 	numImages := sumVals(corpusInfo)
 	fmt.Println("=================================================")
-	fmt.Printf("Totals:%d of files contain images. %6d images\n", numFiles, len(corpus), numImages)
+	fmt.Printf("Totals: %d of %d files contain images. %6d images\n", numFiles, len(corpus), numImages)
 	boolSummary("inline", corpusInfo, func(info imageInfo) bool { return info.inline })
 	stringSummary("filter", corpusInfo, func(info imageInfo) string { return info.filter })
 	stringSummary("color", corpusInfo, func(info imageInfo) string { return info.colorspace })
