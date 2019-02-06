@@ -11,6 +11,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"math"
 	"os"
 	"os/user"
@@ -27,6 +28,11 @@ var colorspaces = map[string]int{}
 
 const usage = "Usage: go run pdf_list_images_position.go testdata/*.pdf\n"
 
+func isInteresting(imageMark extractor.ImageMark) bool {
+	img := imageMark.Image
+	return math.Abs(imageMark.Angle) >= 1.0 && img.Width >= 100.0 && img.Height >= 100.0
+}
+
 func main() {
 	// Make sure to enter a valid license key.
 	// Otherwise text is truncated and a watermark added to the text.
@@ -39,9 +45,11 @@ func main() {
 		`)
 	*/
 	var showHelp, debug, trace bool
+	var maxInteresting int
 	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
+	flag.IntVar(&maxInteresting, "i", 0, "Stop when this interesting files are found.")
 	makeUsage(usage)
 
 	flag.Parse()
@@ -80,6 +88,7 @@ func main() {
 		return fi < fj
 	})
 
+
 	type result struct {
 		numPages  int
 		numImages int
@@ -89,13 +98,15 @@ func main() {
 	var results []result
 
 	for i, inputPath := range corpus {
-		fmt.Printf("^^^ %d: %s\n", i, inputPath)
 		// defer func() {
 		// 	if r := recover(); r != nil {
 		// 		fmt.Fprintf(os.Stderr, "%d of %d: inputPath=%q Error: %v\n", i+1, len(corpus), inputPath, r)
 		// 		os.Exit(33)
 		// 	}
 		// }()
+		if !isWanted(inputPath) {
+			continue
+		}
 		numPages, numImages, report, interesting, err := listImages(inputPath)
 		if err != nil {
 			fmt.Printf("%d of %d: inputPath=%q Error: %v\n", i+1, len(corpus), inputPath, err)
@@ -109,6 +120,9 @@ func main() {
 			fmt.Printf("%s\n", headline)
 			fmt.Printf("%s\n", strings.Join(report, ""))
 			results = append(results, result{numPages, numImages, fileSizeMB(inputPath), headline})
+		}
+		if len(results) >= maxInteresting {
+			break
 		}
 	}
 
@@ -183,9 +197,8 @@ func listImages(inputPath string) (int, int, []string, bool, error) {
 
 	numImages := 0
 	report := []string{fmt.Sprintf("PDF Num Pages: %d\n", numPages)}
-	interesting := true
+	interesting := false
 	for pageNum := 1; pageNum <= numPages; pageNum++ {
-		fmt.Printf("^^$ page %d\n", pageNum)
 		page, err := pdfReader.GetPage(pageNum)
 		if err != nil {
 			return numPages, numImages, report, interesting, err
@@ -228,19 +241,19 @@ func listImagesOnPage(page *pdf.PdfPage) (int, []string, bool, error) {
 // listPageImages returns a report on the images in `images`.
 func listPageImages(images *extractor.PageImages) ([]string, bool) {
 	var report []string
-	interesting := true
+	interesting := false
 
-	for i, imgData := range images.Images {
-		img := imgData.Image
+	for i, imageMark := range images.Images {
+		img := imageMark.Image
 
 		report = append(report, fmt.Sprintf(" image %d\n", i))
 		report = append(report, fmt.Sprintf("  Width: %d\n", img.Width))
 		report = append(report, fmt.Sprintf("  Height: %d\n", img.Height))
 		report = append(report, fmt.Sprintf("  Color components: %d\n", img.ColorComponents))
 		report = append(report, fmt.Sprintf("  BPC: %d\n", img.BitsPerComponent))
-		report = append(report, fmt.Sprintf("  Size %.1fx%.1f\n", imgData.Width, imgData.Height))
-		report = append(report, fmt.Sprintf("  CTM (%.1f,%.1f) ϴ=%.1f\n", imgData.X, imgData.Y, imgData.Angle))
-		if math.Abs(imgData.Angle) >= 1.0 && img.Width >= 100.0 && img.Height >= 100.0 {
+		report = append(report, fmt.Sprintf("  Size %.1fx%.1f\n", imageMark.Width, imageMark.Height))
+		report = append(report, fmt.Sprintf("  CTM (%.1f,%.1f) ϴ=%.1f\n", imageMark.X, imageMark.Y, imageMark.Angle))
+		if isInteresting(imageMark) {
 			interesting = true
 		}
 		// Log colorspace use globally.
@@ -342,4 +355,15 @@ func makeUsage(msg string) {
 		fmt.Fprintln(os.Stderr, msg)
 		usage()
 	}
+}
+
+// isWanted is for customising test runs to include desired files.
+// It should return true for the files you want to process.
+// e.g.The commented core returns true for files containing Type0 font dicts in clear text.
+func isWanted(filename string) bool {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	return !strings.Contains(string(data), "Linearized")
 }
