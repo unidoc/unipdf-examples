@@ -28,9 +28,45 @@ var colorspaces = map[string]int{}
 
 const usage = "Usage: go run pdf_list_images_position.go testdata/*.pdf\n"
 
-func isInteresting(imageMark extractor.ImageMark) bool {
-	img := imageMark.Image
-	return math.Abs(imageMark.Angle) >= 1.0 && img.Width >= 100.0 && img.Height >= 100.0
+// isInteresting returns true for the images we are interested in.
+// This is a user-supplied function
+// It currently returns true for images that are scaled anisotropically.
+func isInteresting(imgMark extractor.ImageMark) bool {
+	img := imgMark.Image
+	big := img.Width >= 100 && img.Height >= 100
+	if !big {
+		return false
+	}
+	w := math.Abs(imgMark.CTM.ScalingFactorX())
+	h := math.Abs(imgMark.CTM.ScalingFactorY())
+	W := math.Abs(float64(img.Width))
+	H := math.Abs(float64(img.Height))
+
+	method := 2
+	switch method {
+	case 1:
+		if w < 0.001 {
+			return false
+		}
+		r := h / w
+		return r <= 0.5 || r >= 2.0
+	case 2: // Very anistropic
+		if w < 0.001 || H == 0 {
+			return false
+		}
+		rr := (h / w) * (W / H)
+		return rr <= 0.5 || rr >= 2.0
+	case 3: // Anistropic
+		if w < 0.001 || H == 0 {
+			return false
+		}
+		rr := (h / w) * (W / H)
+		return rr <= 0.9 || rr >= 1.1
+
+	case 0:
+		return math.Abs(imgMark.CTM.Angle()) >= 1.0
+	}
+	return false
 }
 
 func main() {
@@ -46,10 +82,12 @@ func main() {
 	*/
 	var showHelp, debug, trace bool
 	var maxInteresting int
+	var maxSizeMB float64
 	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
 	flag.IntVar(&maxInteresting, "i", 0, "Stop when this interesting files are found.")
+	flag.Float64Var(&maxSizeMB, "s", 0, "Search files up this size in MBytes.")
 	makeUsage(usage)
 
 	flag.Parse()
@@ -77,6 +115,7 @@ func main() {
 		os.Exit(2)
 	}
 	corpus = removeDuplicates(corpus)
+	corpus = filterCorpus(corpus, maxSizeMB)
 	corpus = cleanCorpus(corpus)
 	// Process files from smallest to largest.
 	sort.Slice(corpus, func(i, j int) bool {
@@ -88,12 +127,12 @@ func main() {
 		return fi < fj
 	})
 
-
 	type result struct {
-		numPages  int
-		numImages int
-		size      float64
-		summary   string
+		numPages    int
+		numImages   int
+		size        float64
+		headline    string
+		interesting map[int]map[int]bool
 	}
 	var results []result
 
@@ -112,14 +151,23 @@ func main() {
 			fmt.Printf("%d of %d: inputPath=%q Error: %v\n", i+1, len(corpus), inputPath, err)
 			continue
 		}
-		headline := fmt.Sprintf("%d of %d: %.1f MB %d pages %d images %q",
-			i+1, len(corpus), fileSizeMB(inputPath), numPages, numImages, inputPath)
-		if interesting {
-			fmt.Fprintf(os.Stderr, "%s\n", headline)
+		headline := fmt.Sprintf("%d of %d: %.1f MB %d pages %d images %d interesting %q",
+			i+1, len(corpus), fileSizeMB(inputPath), numPages, numImages, sum(interesting), inputPath)
+		if interesting != nil {
+			fmt.Fprintf(os.Stderr, "%d:: %s %s\n", len(results)+1, headline, showInteresting(interesting))
 			fmt.Println("===========================================")
 			fmt.Printf("%s\n", headline)
+			fmt.Printf("Interesting: %s\n", headline)
 			fmt.Printf("%s\n", strings.Join(report, ""))
-			results = append(results, result{numPages, numImages, fileSizeMB(inputPath), headline})
+			results = append(results, result{numPages, numImages, fileSizeMB(inputPath), headline, interesting})
+			if len(interesting) == 0 {
+				common.Log.Error("interesting=%#v", interesting)
+				panic("A")
+			}
+			if sum(interesting) == 0 {
+				common.Log.Error("interesting=%#v", interesting)
+				panic("B")
+			}
 		}
 		if len(results) >= maxInteresting {
 			break
@@ -132,6 +180,7 @@ func main() {
 		pi, pj := fi.numPages, fj.numPages
 		gi, gj := fi.numImages, fj.numImages
 		si, sj := fi.size, fj.size
+		ii, ij := sum(fi.interesting), sum(fj.interesting)
 		ti := pi*pi + gi*gi
 		tj := pj*pj + gj*gj
 		if ti != tj {
@@ -143,14 +192,17 @@ func main() {
 		if si != sj {
 			return si < sj
 		}
-		return fi.summary < fi.summary
+		if ii != ij {
+			return ii > ij
+		}
+		return fi.headline < fj.headline
 	})
 
 	for _, f := range []*os.File{os.Stdout, os.Stderr} {
 		fmt.Fprintln(f, "========================= |||| ========================= ")
 		fmt.Fprintf(f, "%d interesting results\n", len(results))
 		for i, r := range results {
-			fmt.Fprintf(f, "%3d:: %s\n", i, r.summary)
+			fmt.Fprintf(f, "%3d:: %s\n\t%s\n", i, showInteresting(r.interesting), r.headline)
 		}
 	}
 
@@ -160,44 +212,79 @@ func main() {
 	}
 }
 
+func showInteresting(interesting map[int]map[int]bool) string {
+	var parts []string
+	for _, pageNum := range keysIIB(interesting) {
+		parts = append(parts, fmt.Sprintf("Page %d: %+v", pageNum, keysIB(interesting[pageNum])))
+	}
+	return fmt.Sprintf("Interesting: %d pages %d images: %s",
+		len(interesting), sum(interesting), strings.Join(parts, ", "))
+}
+
+func keysIIB(m map[int]map[int]bool) []int {
+	var keys []int
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	return keys
+}
+
+func keysIB(m map[int]bool) []int {
+	var keys []int
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	return keys
+}
+
+func sum(interesting map[int]map[int]bool) int {
+	n := 0
+	for _, p := range interesting {
+		n += len(p)
+	}
+	return n
+}
+
 // listImages returns a report on and other information about the images in PDF file `inputPath`.
-func listImages(inputPath string) (int, int, []string, bool, error) {
+func listImages(inputPath string) (int, int, []string, map[int]map[int]bool, error) {
 	f, err := os.Open(inputPath)
 	if err != nil {
-		return 0, 0, nil, false, err
+		return 0, 0, nil, nil, err
 	}
 	defer f.Close()
 
 	pdfReader, err := pdf.NewPdfReader(f)
 	if err != nil {
-		return 0, 0, nil, false, err
+		return 0, 0, nil, nil, err
 	}
 
 	isEncrypted, err := pdfReader.IsEncrypted()
 	if err != nil {
-		return 0, 0, nil, false, err
+		return 0, 0, nil, nil, err
 	}
 
 	if isEncrypted {
 		// Try decrypting with an empty one.
 		auth, err := pdfReader.Decrypt([]byte(""))
 		if err != nil {
-			return 0, 0, nil, false, err
+			return 0, 0, nil, nil, err
 		}
 		if !auth {
 			fmt.Println("Need to decrypt with a specified user/owner password")
-			return 0, 0, nil, false, nil
+			return 0, 0, nil, nil, nil
 		}
 	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
-		return numPages, 0, nil, false, err
+		return numPages, 0, nil, nil, err
 	}
 
 	numImages := 0
 	report := []string{fmt.Sprintf("PDF Num Pages: %d\n", numPages)}
-	interesting := false
+	interesting := map[int]map[int]bool{}
 	for pageNum := 1; pageNum <= numPages; pageNum++ {
 		page, err := pdfReader.GetPage(pageNum)
 		if err != nil {
@@ -209,52 +296,63 @@ func listImages(inputPath string) (int, int, []string, bool, error) {
 		if err != nil {
 			return numPages, numImages, report, interesting, err
 		}
-		if !interestingPage {
+		if interestingPage == nil {
 			continue
 		}
+		if len(interestingPage) == 0 {
+			common.Log.Error("interestingPage=%#v", interestingPage)
+			panic("1")
+		}
+
 		numImages += nImages
 		report = append(report, fmt.Sprintln("--------------------"))
 		report = append(report, fmt.Sprintf("Page %d of %d:\n", pageNum, numPages))
 		report = append(report, pageReport...)
-		interesting = interesting || interestingPage
+		interesting[pageNum] = interestingPage
+	}
+
+	if len(interesting) == 0 {
+		interesting = nil
 	}
 
 	return numPages, numImages, report, interesting, nil
 }
 
 // listPageImages returns a report on the images in PDF page `page`.
-func listImagesOnPage(page *pdf.PdfPage) (int, []string, bool, error) {
+func listImagesOnPage(page *pdf.PdfPage) (int, []string, map[int]bool, error) {
 	pageExtractor, err := extractor.New(page)
 	if err != nil {
-		return 0, nil, false, err
+		return 0, nil, nil, err
 	}
 	images, err := pageExtractor.ExtractPageImages()
 	if err != nil {
-		return 0, nil, false, err
+		return 0, nil, nil, err
 	}
-	fmt.Printf("&&& %d images\n", len(images.Images))
+	// fmt.Printf("&&& %d images\n", len(images.Images))
 	report, interesting := listPageImages(images)
-	fmt.Printf("&&& %d images\n", len(images.Images))
+	// fmt.Printf("&&& %d images\n", len(images.Images))
 	return len(images.Images), report, interesting, nil
 }
 
 // listPageImages returns a report on the images in `images`.
-func listPageImages(images *extractor.PageImages) ([]string, bool) {
+func listPageImages(images *extractor.PageImages) ([]string, map[int]bool) {
 	var report []string
-	interesting := false
+	interesting := map[int]bool{}
 
-	for i, imageMark := range images.Images {
-		img := imageMark.Image
+	for i, imgMark := range images.Images {
+		img := imgMark.Image
 
 		report = append(report, fmt.Sprintf(" image %d\n", i))
 		report = append(report, fmt.Sprintf("  Width: %d\n", img.Width))
 		report = append(report, fmt.Sprintf("  Height: %d\n", img.Height))
 		report = append(report, fmt.Sprintf("  Color components: %d\n", img.ColorComponents))
 		report = append(report, fmt.Sprintf("  BPC: %d\n", img.BitsPerComponent))
-		report = append(report, fmt.Sprintf("  Size %.1fx%.1f\n", imageMark.Width, imageMark.Height))
-		report = append(report, fmt.Sprintf("  CTM (%.1f,%.1f) ϴ=%.1f\n", imageMark.X, imageMark.Y, imageMark.Angle))
-		if isInteresting(imageMark) {
-			interesting = true
+		report = append(report, fmt.Sprintf("  Size %.1fx%.1f\n",
+			imgMark.CTM.ScalingFactorX(), imgMark.CTM.ScalingFactorY()))
+		tx, ty := imgMark.CTM.Translation()
+		report = append(report, fmt.Sprintf("  CTM (%.1f,%.1f) ϴ=%.1f\n", tx, ty, imgMark.CTM.Angle()))
+		if isInteresting(imgMark) {
+			interesting[i+1] = true
 		}
 		// Log colorspace use globally.
 		csName := fmt.Sprintf("%d", img.ColorComponents)
@@ -264,6 +362,10 @@ func listPageImages(images *extractor.PageImages) ([]string, bool) {
 		} else {
 			colorspaces[csName] = 1
 		}
+	}
+
+	if len(interesting) == 0 {
+		interesting = nil
 	}
 
 	return report, interesting
@@ -320,6 +422,19 @@ func removeDuplicates(corpus []string) []string {
 		if _, ok := seen[path]; !ok {
 			cleaned = append(cleaned, path)
 			seen[path] = true
+		}
+	}
+	return cleaned
+}
+
+func filterCorpus(corpus []string, maxSizeMB float64) []string {
+	if maxSizeMB <= 0.0 {
+		return corpus
+	}
+	var cleaned []string
+	for _, path := range corpus {
+		if fileSizeMB(path) <= maxSizeMB {
+			cleaned = append(cleaned, path)
 		}
 	}
 	return cleaned
