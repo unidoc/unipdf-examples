@@ -14,7 +14,6 @@ import (
 
 	"github.com/unidoc/unidoc/pdf/annotator"
 	"github.com/unidoc/unidoc/pdf/model"
-	"github.com/unidoc/unidoc/pdf/model/fonts"
 )
 
 func main() {
@@ -122,7 +121,7 @@ func createForm(page *model.PdfPage) *model.PdfAcroForm {
 	form := model.NewPdfAcroForm()
 
 	// Add ZapfDingbats font.
-	zapfdb := fonts.NewFontZapfDingbats()
+	zapfdb := model.NewStandard14FontMustCompile(model.ZapfDingbatsName)
 	form.DR = model.NewPdfPageResources()
 	form.DR.SetFontByName(`ZaDb`, zapfdb.ToPdfObject())
 
