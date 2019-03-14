@@ -150,7 +150,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	ch.GetHeading().SetFontSize(18)
 	ch.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
-	sc := c.NewSubchapter(ch, "Issuer details")
+	sc := ch.NewSubchapter("Issuer details")
 	sc.GetHeading().SetFont(fontRegular)
 	sc.GetHeading().SetFontSize(18)
 	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
@@ -249,7 +249,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.Add(issuerTable)
 
 	// 1.2 - Document history
-	sc = c.NewSubchapter(ch, "Document History")
+	sc = ch.NewSubchapter("Document History")
 	sc.SetMargins(0, 0, 5, 0)
 	sc.GetHeading().SetFont(fontRegular)
 	sc.GetHeading().SetFontSize(18)
@@ -325,7 +325,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	ch.Add(p)
 
 	// Paragraphs.
-	sc := c.NewSubchapter(ch, "Paragraphs")
+	sc := ch.NewSubchapter("Paragraphs")
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
@@ -359,7 +359,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 		sc.Add(p)
 	}
 
-	sc = c.NewSubchapter(ch, "Tables")
+	sc = ch.NewSubchapter("Tables")
 	// Mock table: Priority table.
 	priTable := c.NewTable(2)
 	priTable.SetMargins(40, 40, 10, 0)
@@ -394,7 +394,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	}
 	sc.Add(priTable)
 
-	sc = c.NewSubchapter(ch, "Images")
+	sc = ch.NewSubchapter("Images")
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
@@ -415,7 +415,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	img.ScaleToHeight(50)
 	sc.Add(img)
 
-	sc = c.NewSubchapter(ch, "QR Codes / Barcodes")
+	sc = ch.NewSubchapter("QR Codes / Barcodes")
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
@@ -437,7 +437,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	img.SetHeight(40)
 	sc.Add(img)
 
-	sc = c.NewSubchapter(ch, "Graphing / Charts")
+	sc = ch.NewSubchapter("Graphing / Charts")
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
@@ -472,7 +472,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	img.SetMargins(0, 0, 10, 0)
 	sc.Add(img)
 
-	sc = c.NewSubchapter(ch, "Headers and footers")
+	sc = ch.NewSubchapter("Headers and footers")
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
@@ -490,7 +490,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	p.SetMargins(0, 0, 5, 0)
 	sc.Add(p)
 
-	sc = c.NewSubchapter(ch, "Table of contents generation")
+	sc = ch.NewSubchapter("Table of contents generation")
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
