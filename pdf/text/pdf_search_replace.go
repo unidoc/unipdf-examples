@@ -12,12 +12,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/unidoc/unidoc/pdf/model/optimize"
-
 	"github.com/unidoc/unidoc/common"
 	"github.com/unidoc/unidoc/pdf/contentstream"
 	"github.com/unidoc/unidoc/pdf/core"
 	"github.com/unidoc/unidoc/pdf/model"
+	"github.com/unidoc/unidoc/pdf/model/optimize"
 )
 
 func main() {
