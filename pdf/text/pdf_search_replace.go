@@ -4,6 +4,7 @@
  *
  * Syntax: go run pdf_search_replace.go <input.pdf> <output.pdf> <text> <replace text>
  */
+
 package main
 
 import (
