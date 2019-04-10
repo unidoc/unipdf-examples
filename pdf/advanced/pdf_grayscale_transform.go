@@ -167,7 +167,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					csname := op.Params[0].(*pdfcore.PdfObjectName)
 					if *csname != "Pattern" {
 						// Update if referring to an external colorspace in resources.
-						cs, ok := resources.ColorSpace.Colorspaces[string(*csname)]
+						cs, ok := resources.GetColorspaceByName(*csname)
 						if !ok {
 							unicommon.Log.Debug("Undefined colorspace for pattern (%s)", csname)
 							return errors.New("Colorspace not defined")
@@ -183,7 +183,10 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 							patternCS.UnderlyingCS = pdf.NewPdfColorspaceDeviceGray()
 						}
 
-						resources.ColorSpace.Colorspaces[string(*csname)] = patternCS
+						err = resources.SetColorspaceByName(*csname, patternCS)
+						if err != nil {
+							return err
+						}
 					}
 					*processedOperations = append(*processedOperations, op)
 					return nil
@@ -203,7 +206,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					csname := op.Params[0].(*pdfcore.PdfObjectName)
 					if *csname != "Pattern" {
 						// Update if referring to an external colorspace in resources.
-						cs, ok := resources.ColorSpace.Colorspaces[string(*csname)]
+						cs, ok := resources.GetColorspaceByName(*csname)
 						if !ok {
 							unicommon.Log.Debug("Undefined colorspace for pattern (%s)", csname)
 							return errors.New("Colorspace not defined")
@@ -219,7 +222,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 							patternCS.UnderlyingCS = pdf.NewPdfColorspaceDeviceGray()
 						}
 
-						resources.ColorSpace.Colorspaces[string(*csname)] = patternCS
+						resources.SetColorspaceByName(*csname, patternCS)
 					}
 					*processedOperations = append(*processedOperations, op)
 					return nil
