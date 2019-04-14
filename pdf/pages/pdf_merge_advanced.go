@@ -89,22 +89,22 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 	}
 
 	// Merge Colorspace resources.
-	colorspace, err := r.GetColorSpace()
+	colorspaces, err := r.GetColorspaces()
 	if err != nil {
 		return nil, err
 	}
-	colorspace2, err := r2.GetColorSpace()
+	colorspaces2, err := r2.GetColorspaces()
 	if err != nil {
 		return nil, err
 	}
-	if colorspace == nil {
-		r.SetColorSpace(colorspace2)
+	if colorspaces == nil {
+		r.SetColorSpace(colorspaces2)
 	} else {
-		if colorspace2 != nil {
-			for key, val := range colorspace2.Colorspaces {
+		if colorspaces2 != nil {
+			for key, val := range colorspaces2.Colorspaces {
 				// Add the r2 colorspaces to r. Overwrite if duplicate.  Ensure only present once in Names.
-				if _, has := colorspace.Colorspaces[key]; !has {
-					colorspace.Names = append(colorspace.Names, key)
+				if _, has := colorspaces.Colorspaces[key]; !has {
+					colorspaces.Names = append(colorspaces.Names, key)
 				}
 				r.SetColorspaceByName(core.PdfObjectName(key), val)
 			}
