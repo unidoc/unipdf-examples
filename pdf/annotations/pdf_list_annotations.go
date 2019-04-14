@@ -74,7 +74,11 @@ func listAnnotations(inputPath string) error {
 		}
 
 		fmt.Printf("-- Page %d\n", i+1)
-		printAnnotations(page.Annotations)
+		annotations, err := page.GetAnnotations()
+		if err != nil {
+			return err
+		}
+		printAnnotations(annotations)
 	}
 
 	return nil

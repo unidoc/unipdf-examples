@@ -119,7 +119,7 @@ func annotatePdfAddLineAnnotation(inputPath string, pageNum int64, outputPath st
 			}
 
 			// Add to the page annotations.
-			page.Annotations = append(page.Annotations, lineAnnotation)
+			page.AddAnnotation(lineAnnotation)
 		}
 
 		err = pdfWriter.AddPage(page)
