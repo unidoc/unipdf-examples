@@ -123,7 +123,7 @@ func annotatePdfAddEllipseAnnotation(inputPath string, pageNum int64, outputPath
 			}
 
 			// Add to the page annotations.
-			page.Annotations = append(page.Annotations, circAnnotation)
+			page.AddAnnotation(circAnnotation)
 		}
 
 		err = pdfWriter.AddPage(page)
