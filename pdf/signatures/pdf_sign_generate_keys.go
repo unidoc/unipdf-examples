@@ -2,7 +2,7 @@
  * This example showcases how to digitally sign a PDF file using a generated
  * private/public key pair.
  *
- * $ ./pdf_sign_external <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
+ * $ ./pdf_sign_generate_keys <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
 package main
 
