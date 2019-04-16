@@ -2,7 +2,7 @@
  * This example showcases how to digitally sign a PDF file using HSM via PKCS11.
  * with UniDoc.
  *
- * To create a kay pair:
+ * To create a key pair:
  * $ ./pdf_sign_hsm_pkcs11 add test <PIN> <keypair_label>
  *
  * To sign a PDF:
@@ -231,7 +231,7 @@ func sign(priv *crypto11.PKCS11PrivateKeyRSA, certificate *x509.Certificate, inp
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
 			annotator.NewSignatureLine("Date", "2019.15.03"),
-			annotator.NewSignatureLine("Reason", "External signature test"),
+			annotator.NewSignatureLine("Reason", "SoftHSM2 Signature Test"),
 		},
 		opts,
 	)
