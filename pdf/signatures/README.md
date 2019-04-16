@@ -1,10 +1,8 @@
 # Digital signatures.
 
 Examples for digital signing of PDF files with UniDoc:
-- pdf_sign_pkcs12.go  
-  Example of PKCS7 signing with an external service with an interim step,
-  creating a PDF with a blank signature and then replacing the blank signature
-  with the actual signature from the signing service.
+- pdf_sign_generate_keys.go  
+  Example of PKCS7 signing with generated private/public key pair.
 - pdf_sign_external.go  
   Example of PKCS7 signing with an external service with an interim step,
   creating a PDF with a blank signature and then replacing the blank signature
