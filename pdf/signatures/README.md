@@ -2,7 +2,9 @@
 
 Examples for digital signing of PDF files with UniDoc:
 - pdf_sign_generate_keys.go  
-  Example of PKCS7 signing with generated private/public key pair.
+  Example of signing using generated private/public key pair.
+- pdf_sign_pkcs12.go  
+  Example of signing using PKCS12 (.p12/.pfx) file.
 - pdf_sign_external.go  
   Example of PKCS7 signing with an external service with an interim step,
   creating a PDF with a blank signature and then replacing the blank signature
@@ -13,7 +15,7 @@ Examples for digital signing of PDF files with UniDoc:
 ## pkcs_sign_hsm_pkcs11.go
 
 The code example shows how to sign with a HSM via PKCS11 as supported by the
-crypto11 library.   
+crypto11 library.  
 The example uses SoftHSM which is great for testing digital signatures via
 PKCS11 without any hardware requirements.
 
