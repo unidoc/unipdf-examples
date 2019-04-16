@@ -11,6 +11,8 @@ Examples for digital signing of PDF files with UniDoc:
   with the actual signature from the signing service.
 - pdf_sign_pkcs11.go  
   Example of signing with a PKCS11 service using SoftHSM and the crypto11 package.
+- pdf_sign_appearance.go  
+  Example of creating signature appearance fields.
 - pdf_sign_validate.go  
   Example of signature validation.
 

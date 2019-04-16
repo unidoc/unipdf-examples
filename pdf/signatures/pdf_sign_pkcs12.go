@@ -7,14 +7,10 @@
 package main
 
 import (
-	"crypto/rand"
 	"crypto/rsa"
-	"crypto/x509"
-	"crypto/x509/pkix"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math/big"
 	"os"
 	"time"
 
@@ -24,8 +20,6 @@ import (
 	"github.com/unidoc/unidoc/pdf/model/sighandler"
 	"golang.org/x/crypto/pkcs12"
 )
-
-var now = time.Now()
 
 const usage = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH\n"
 
@@ -79,7 +73,7 @@ func main() {
 	signature := model.NewPdfSignature(handler)
 	signature.SetName("Test Self Signed PDF")
 	signature.SetReason("TestSelfSignedPDF")
-	signature.SetDate(now, "")
+	signature.SetDate(time.Now(), "")
 
 	if err := signature.Initialize(); err != nil {
 		log.Fatal("Fail: %v\n", err)
@@ -112,39 +106,4 @@ func main() {
 	}
 
 	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)
-}
-
-func generateKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
-	// Generate private key.
-	priv, err := rsa.GenerateKey(rand.Reader, 2048)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// Initialize X509 certificate template.
-	template := x509.Certificate{
-		SerialNumber: big.NewInt(1),
-		Subject: pkix.Name{
-			Organization: []string{"Test Company"},
-		},
-		NotBefore: now.Add(-time.Hour),
-		NotAfter:  now.Add(time.Hour * 24 * 365),
-
-		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
-	}
-
-	// Generate X509 certificate.
-	certData, err := x509.CreateCertificate(rand.Reader, &template, &template, priv.Public(), priv)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	cert, err := x509.ParseCertificate(certData)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return priv, cert, nil
 }

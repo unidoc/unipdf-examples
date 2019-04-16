@@ -9,13 +9,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/unidoc/unidoc/pdf/model"
 	"github.com/unidoc/unidoc/pdf/model/sighandler"
 )
-
-var now = time.Now()
 
 const usage = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH\n"
 
