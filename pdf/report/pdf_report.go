@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/wcharczuk/go-chart"
+
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
 
