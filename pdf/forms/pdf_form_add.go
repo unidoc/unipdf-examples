@@ -133,7 +133,7 @@ func createForm(page *model.PdfPage) *model.PdfAcroForm {
 		}
 
 		*form.Fields = append(*form.Fields, textf.PdfField)
-		page.Annotations = append(page.Annotations, textf.Annotations[0].PdfAnnotation)
+		page.AddAnnotation(textf.Annotations[0].PdfAnnotation)
 	}
 
 	for _, cbdef := range checkboxFieldDefs {
@@ -144,7 +144,7 @@ func createForm(page *model.PdfPage) *model.PdfAcroForm {
 		}
 
 		*form.Fields = append(*form.Fields, checkboxf.PdfField)
-		page.Annotations = append(page.Annotations, checkboxf.Annotations[0].PdfAnnotation)
+		page.AddAnnotation(checkboxf.Annotations[0].PdfAnnotation)
 	}
 
 	for _, chdef := range choiceFieldDefs {
@@ -155,7 +155,7 @@ func createForm(page *model.PdfPage) *model.PdfAcroForm {
 		}
 
 		*form.Fields = append(*form.Fields, comboboxf.PdfField)
-		page.Annotations = append(page.Annotations, comboboxf.Annotations[0].PdfAnnotation)
+		page.AddAnnotation(comboboxf.Annotations[0].PdfAnnotation)
 	}
 
 	return form

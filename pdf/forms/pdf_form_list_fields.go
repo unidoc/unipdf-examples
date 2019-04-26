@@ -139,7 +139,11 @@ func listFormFields(inputPath string) error {
 				// If P not set, go through pages and look for match.
 				// TODO: Make a map of widget annotations to page numbers a priori.
 				for pageidx, page := range pdfReader.PageList {
-					for _, annot := range page.Annotations {
+					annotations, err := page.GetAnnotations()
+					if err != nil {
+						return err
+					}
+					for _, annot := range annotations {
 						switch t := annot.GetContext().(type) {
 						case *model.PdfAnnotationWidget:
 							if wa == t {
