@@ -10,9 +10,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path/filepath"
 	"sort"
 
+	"github.com/bmatcuk/doublestar"
 	"github.com/unidoc/unidoc/common"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
@@ -21,8 +21,7 @@ import (
 const usage = "Usage: go run pdf_fonts.go testdata/*.pdf\n"
 
 func main() {
-	var showHelp, debug, trace bool
-	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
+	var debug, trace bool
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
 	makeUsage(usage)
@@ -30,10 +29,6 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if showHelp {
-		flag.Usage()
-		os.Exit(0)
-	}
 	if len(args) < 1 {
 		flag.Usage()
 		os.Exit(1)
@@ -44,11 +39,8 @@ func main() {
 	} else if debug {
 		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 	} else {
-		common.SetLogger(common.NewConsoleLogger(common.LogLevelError))
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelInfo))
 	}
-
-	// showOneFile(os.Args[1])
-	// os.Exit(0)
 
 	pathList, err := patternsToPaths(args)
 	if err != nil {
@@ -72,14 +64,6 @@ func main() {
 	for _, version := range versions {
 		versionOccurrences[version].showSubtypeCounts(fmt.Sprintf("PDF version %s", version))
 	}
-	// occurrences.showEncodingCounts("All versions")
-	// for _, version := range versions {
-	// 	versionOccurrences[version].showEncodingCounts(fmt.Sprintf("PDF version %s", version))
-	// }
-	// occurrences.showTounicodeCounts("All versions")
-	// for _, version := range versions {
-	// 	versionOccurrences[version].showTounicodeCounts(fmt.Sprintf("PDF version %s", version))
-	// }
 
 	subtypeOccurrences := occurrences.bySubtype()
 	subtypes := mapKeysNumFiles(subtypeOccurrences)
@@ -398,7 +382,7 @@ func showOneFile(filename string) {
 func patternsToPaths(patternList []string) ([]string, error) {
 	pathList := []string{}
 	for _, pattern := range patternList {
-		files, err := filepath.Glob(pattern)
+		files, err := doublestar.Glob(pattern)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "patternsToPaths: Glob failed. pattern=%#q err=%v\n", pattern, err)
 			return pathList, err

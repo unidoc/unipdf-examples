@@ -31,8 +31,7 @@ func main() {
 		-----END UNIDOC LICENSE KEY-----
 		`)
 	*/
-	var showHelp, debug, trace bool
-	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
+	var debug, trace bool
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
 	makeUsage(usage)
@@ -40,10 +39,6 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if showHelp {
-		flag.Usage()
-		os.Exit(0)
-	}
 	if len(args) < 2 {
 		flag.Usage()
 		os.Exit(1)
@@ -53,7 +48,7 @@ func main() {
 	} else if debug {
 		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 	} else {
-		common.SetLogger(common.NewConsoleLogger(common.LogLevelError))
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelInfo))
 	}
 
 	inputPath := args[0]

@@ -35,9 +35,20 @@
   Size 500.0x500.0
 
    Scales incorrectly. Unscaled image is correct.
-   go run pdf_extract_images_position.go -p 5 -i 2 -s  ~/testdata/programming/images/deskew/50682881b388d2a5c534caab6031db39e61d.pdf
+   go run pdf_extract_images_position.go -p 5 -i 2 -s ~/testdata/programming/images/deskew/50682881b388d2a5c534caab6031db39e61d.pdf
 
+   Looks correct
+   go run pdf_extract_images_position.go -p 25 -i 3 ~/testdata/programming/digital_signatures/guide.pdf
 
+   Color is reversed.
+   go run pdf_extract_images_position.go -p 7 -i 1 ~/testdata/misc/slides_12.pdf
+
+   Inline image
+   ~/testdata/other/pdf/itextpdf/itext/src/test/resources/com/itextpdf/text/pdf/parser/PdfContentStreamProcessorTest/inlineImages01.pdf
+   go run pdf_extract_images_position.go -p 443 -i 1 ~/testdata/other/unidoc-examples/pdf/testing/out.1/psrefman.pdf
+
+   Rotated image?
+   ~/testdata/science/climate/environment/20190117-105663-2.pdf
 
 */
 
@@ -51,7 +62,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/disintegration/imaging"
 	"github.com/unidoc/unidoc/common"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	"github.com/unidoc/unidoc/pdf/extractor"
@@ -71,11 +81,10 @@ func main() {
 		-----END UNIDOC LICENSE KEY-----
 		`)
 	*/
-	var showHelp, debug, trace bool
+	var debug, trace bool
 	var outputDir string
 	var pageNum, imageNum int
 	var unscaled bool
-	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
 	flag.StringVar(&outputDir, "o", "extracted.images", "Directory where extracted images are saved.")
@@ -87,10 +96,6 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if showHelp {
-		flag.Usage()
-		os.Exit(0)
-	}
 	if len(args) < 1 || len(outputDir) == 0 {
 		flag.Usage()
 		os.Exit(1)
@@ -100,7 +105,7 @@ func main() {
 	} else if debug {
 		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 	} else {
-		common.SetLogger(common.NewConsoleLogger(common.LogLevelError))
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelInfo))
 	}
 
 	inputPath := args[0]
@@ -191,49 +196,20 @@ func extractImagesToFolder(inputPath, outputDir string, pageN, imageN int, unsca
 			if imageN > 0 && idx+1 != imageN {
 				continue
 			}
-			// img := imgMark.Image
 			fname := fmt.Sprintf("%s_page%d_img%d", name, pageNum, idx+1)
 
-			var lossless bool // Is image compressed losslessly?
-
-			// switch imgMark.filter.(type) {
-			// case *pdfcore.FlateEncoder:
-			// 	lossless = true
-			// case *pdfcore.CCITTFaxEncoder:
-			// 	lossless = true
-			// 	// XXX(peterwilliams97) Hack to work around got6.DecodeBytes() returning an 8 bits
-			// 	// per component raster and sampling.ResampleBytes() not working for 1 bits per
-			// 	// pixel
-			// 	imgMark.img.BitsPerComponent = 8
-			// }
-
-			// gimg, err := img.ToGoImage()
-			gimg, err := imgMark.PageView(*mbox, !unscaled)
+			gimg, err := imgMark.PageView(*mbox, !unscaled, !unscaled, false)
 			if err != nil {
 				return err
 			}
-			theta := imgMark.CTM.Angle()
-			if theta != 0 {
-				fmt.Printf("*** %.1f\n", theta)
-				fmt.Printf("<<< %+v\n", gimg.Bounds())
-				// gimg = transform.Rotate(gimg, 360-imgMark.Angle, nil)
-				gimg = imaging.Rotate(gimg, 360-theta, nil)
-				fmt.Printf(">>> %+v\n", gimg.Bounds())
-			}
 
-			if unscaled {
-				fname += ".unscaled"
-			}
-
-			if lossless {
-				fname += ".png"
-			} else {
-				fname += ".jpg"
-			}
+			fname = addSuffix(fname, imgMark.Inline, ".i", ".x")
+			fname = addSuffix(fname, unscaled, ".unscaled", "")
+			fname = addSuffix(fname, imgMark.Lossy, ".jpg", ".png")
 			outputPath := filepath.Join(outputDir, fname)
 
-			fmt.Printf("  Converting to go image: page %d img %d ⇾ %q  %s %+v\n",
-				pageNum, idx+1, outputPath, imgMark.String(), mbox)
+			fmt.Printf("  Converting to go image: page %d img %d ⇾ %q mbox=%+v\n  imgMark=%s\n",
+				pageNum, idx+1, outputPath, *mbox, imgMark.String())
 
 			imgf, err := os.OpenFile(outputPath, os.O_RDWR|os.O_CREATE, 0755)
 			if err != nil {
@@ -241,7 +217,7 @@ func extractImagesToFolder(inputPath, outputDir string, pageN, imageN int, unsca
 			}
 			defer imgf.Close()
 
-			if lossless {
+			if !imgMark.Lossy {
 				err = png.Encode(imgf, gimg)
 			} else {
 				opt := jpeg.Options{Quality: 100}
@@ -262,6 +238,13 @@ type imageData struct {
 	inline bool
 }
 
+func addSuffix(prefix string, condition bool, is, isnt string) string {
+	if condition {
+		return prefix + is
+	}
+	return prefix + isnt
+}
+
 func count(data []imageData, inline bool) int {
 	n := 0
 	for _, d := range data {
@@ -278,7 +261,7 @@ func extractImagesOnPage(page *pdf.PdfPage) (*extractor.PageImages, error) {
 	if err != nil {
 		return nil, err
 	}
-	return pageExtractor.ExtractPageImages()
+	return pageExtractor.ExtractPageImages(nil)
 }
 
 // func describeImage(img *pdf.Image) string {

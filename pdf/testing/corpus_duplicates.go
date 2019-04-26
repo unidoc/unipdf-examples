@@ -11,8 +11,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"sort"
+
+	"github.com/bmatcuk/doublestar"
 )
 
 const usage = "Usage: corpus_duplicates  <file1> <file2> ..."
@@ -63,7 +64,7 @@ func main() {
 func patternsToPaths(patternList []string) ([]string, error) {
 	pathList := []string{}
 	for _, pattern := range patternList {
-		files, err := filepath.Glob(pattern)
+		files, err := doublestar.Glob(pattern)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "patternsToPaths: Glob failed. pattern=%#q err=%v\n", pattern, err)
 			return pathList, err

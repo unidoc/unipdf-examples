@@ -60,10 +60,9 @@ type details struct {
 
 func main() {
 
-	var showHelp, debug, trace, verbose bool
+	var debug, trace, verbose bool
 	var outputDir string
 	var minDim int
-	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
 	flag.BoolVar(&verbose, "v", false, "Print extra page information.")
@@ -74,10 +73,6 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if showHelp {
-		flag.Usage()
-		os.Exit(0)
-	}
 	if len(args) < 1 || outputDir == "" {
 		flag.Usage()
 		os.Exit(1)
@@ -96,7 +91,7 @@ func main() {
 	} else if debug {
 		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 	} else {
-		common.SetLogger(common.NewConsoleLogger(common.LogLevelError))
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelInfo))
 	}
 
 	files := args[:]

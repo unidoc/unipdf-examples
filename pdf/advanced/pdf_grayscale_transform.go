@@ -11,28 +11,51 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unidoc/common"
+	common "github.com/unidoc/unidoc/common"
 	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
 	pdf "github.com/unidoc/unidoc/pdf/model"
 	"github.com/unidoc/unidoc/pdf/ps"
 )
 
-func init() {
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-}
+const usage = "Usage: go run pdf_grayscale_transform.go input.pdf output.pdf\n"
 
 func main() {
-	if len(os.Args) < 3 {
-		fmt.Printf("Syntax: go run pdf_grayscale_transform.go input.pdf output.pdf\n")
+	// Make sure to enter a valid license key.
+	// Otherwise text is truncated and a watermark added to the text.
+	// License keys are available via: https://unidoc.io
+	/*
+			license.SetLicenseKey(`
+		-----BEGIN UNIDOC LICENSE KEY-----
+		...key contents...
+		-----END UNIDOC LICENSE KEY-----
+		`)
+	*/
+	var debug, trace bool
+	flag.BoolVar(&debug, "d", false, "Print debugging information.")
+	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
+	makeUsage(usage)
+	flag.Parse()
+	args := flag.Args()
+
+	if len(args) < 2 {
+		flag.Usage()
 		os.Exit(1)
 	}
+	if trace {
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelTrace))
+	} else if debug {
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	} else {
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelInfo))
+	}
 
-	inputPath := os.Args[1]
-	outputPath := os.Args[2]
+	inputPath := args[0]
+	outputPath := args[1]
 
 	err := convertPdfToGrayscale(inputPath, outputPath)
 	if err != nil {
@@ -169,7 +192,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						// Update if referring to an external colorspace in resources.
 						cs, ok := resources.ColorSpace.Colorspaces[string(*csname)]
 						if !ok {
-							unicommon.Log.Debug("Undefined colorspace for pattern (%s)", csname)
+							common.Log.Debug("Undefined colorspace for pattern (%s)", csname)
 							return errors.New("Colorspace not defined")
 						}
 
@@ -205,7 +228,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						// Update if referring to an external colorspace in resources.
 						cs, ok := resources.ColorSpace.Colorspaces[string(*csname)]
 						if !ok {
-							unicommon.Log.Debug("Undefined colorspace for pattern (%s)", csname)
+							common.Log.Debug("Undefined colorspace for pattern (%s)", csname)
 							return errors.New("Colorspace not defined")
 						}
 
@@ -270,7 +293,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 					grayPattern, err := convertPatternToGray(pattern)
 					if err != nil {
-						unicommon.Log.Debug("Unable to convert pattern to grayscale: %v", err)
+						common.Log.Debug("Unable to convert pattern to grayscale: %v", err)
 						return err
 					}
 					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
@@ -332,7 +355,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 					grayPattern, err := convertPatternToGray(pattern)
 					if err != nil {
-						unicommon.Log.Debug("Unable to convert pattern to grayscale: %v", err)
+						common.Log.Debug("Unable to convert pattern to grayscale: %v", err)
 						return err
 					}
 					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
@@ -454,7 +477,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				return err
 			}
 
-			// Update the XObject image.
+			// Update the inline image.
 			// Use same encoder as input data.  Make sure for DCT filter it is updated to 1 color component.
 			encoder, err := iimg.GetEncoder()
 			if err != nil {
@@ -464,6 +487,18 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
 				dctEncoder.ColorComponents = 1
 			}
+			// else if flateEncoder, is := encoder.(*pdfcore.FlateEncoder); is {
+			// if flateEncoder.Predictor != 1 && flateEncoder.Predictor != 11 {
+			// 	flateEncoder.Predictor = 11
+			// }
+			// }
+
+			{
+				g := grayImage
+				g.Data = nil
+				fmt.Printf("*** grayImage=%#v\n", g)
+			}
+			fmt.Printf("*** encoder=%#v\n", encoder)
 
 			grayInlineImg, err := pdfcontent.NewInlineImageFromImage(grayImage, encoder)
 			if err != nil {
@@ -543,6 +578,11 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
 					dctEncoder.ColorComponents = 1
 				}
+				// else if flateEncoder, is := encoder.(*pdfcore.FlateEncoder); is {
+				// 	if flateEncoder.Predictor != 1 && flateEncoder.Predictor != 11 {
+				// 		flateEncoder.Predictor = 11
+				// 	}
+				// }
 
 				ximgGray, err := pdf.NewXObjectImageFromImage(&grayImage, nil, encoder)
 				if err != nil {
@@ -749,7 +789,16 @@ func convertShadingToGray(shading *pdf.PdfShading) (*pdf.PdfShading, error) {
 
 		return shading, nil
 	} else {
-		unicommon.Log.Debug("Cannot convert to shading pattern grayscale, color space N = %d", cs.GetNumComponents())
+		common.Log.Debug("Cannot convert to shading pattern grayscale, color space N = %d", cs.GetNumComponents())
 		return nil, errors.New("Unsupported pattern colorspace for grayscale conversion")
+	}
+}
+
+// makeUsage updates flag.Usage to include usage message `msg`.
+func makeUsage(msg string) {
+	usage := flag.Usage
+	flag.Usage = func() {
+		fmt.Fprintln(os.Stderr, msg)
+		usage()
 	}
 }

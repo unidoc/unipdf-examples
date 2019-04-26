@@ -36,6 +36,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/bmatcuk/doublestar"
 	common "github.com/unidoc/unidoc/common"
 	pdfcontent "github.com/unidoc/unidoc/pdf/contentstream"
 	pdfcore "github.com/unidoc/unidoc/pdf/core"
@@ -1011,7 +1012,7 @@ func removeDir(dir string) error {
 func patternsToPaths(patternList []string) ([]string, error) {
 	pathList := []string{}
 	for _, pattern := range patternList {
-		files, err := filepath.Glob(pattern)
+		files, err := doublestar.Glob(pattern)
 		if err != nil {
 			common.Log.Debug("ERROR: patternsToPaths: Glob failed. pattern=%#q err=%v", pattern, err)
 			return pathList, err

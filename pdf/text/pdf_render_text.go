@@ -44,19 +44,16 @@ func main() {
 		-----END UNIDOC LICENSE KEY-----
 		`)
 	*/
-	var showHelp, debug, trace, verbose bool
+	var debug, trace, verbose bool
 	var filesPath string
 	var threshold float64
-	var width int
-	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
+	var pageNum int
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
 	flag.BoolVar(&verbose, "v", false, "Print extra page information.")
-	flag.Float64Var(&threshold, "t", 1.0,
-		"Missclassification threshold. percentage of missclassified characters above this "+
-			"threshold are treated as errors.")
-	flag.IntVar(&width, "w", 0,
-		"Normalize text (remove runs of space) with this target output width.")
+	flag.Float64Var(&threshold, "t", 100.0,
+		"A percentage of missclassified characters exceeding this threshold is reported as an error.")
+	flag.IntVar(&pageNum, "p", 0, "Render only this (1-offset) page number ")
 	flag.StringVar(&filesPath, "@", "",
 		"File containing list of files to process. Usually a 'bad.files' from a previous test run.")
 	makeUsage(usage)
@@ -64,10 +61,6 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if showHelp {
-		flag.Usage()
-		os.Exit(0)
-	}
 	if len(args) < 1 && filesPath == "" {
 		flag.Usage()
 		os.Exit(1)
@@ -77,7 +70,7 @@ func main() {
 	} else if debug {
 		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 	} else {
-		common.SetLogger(common.NewConsoleLogger(common.LogLevelError))
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelInfo))
 	}
 
 	files := args[:]
@@ -147,7 +140,7 @@ func main() {
 		}
 
 		// numPages = 1
-		numChars, numMisses, err := outputPdfText(inputPath, pdfReader, numPages, width, verbose)
+		numChars, numMisses, err := outputPdfText(inputPath, pdfReader, numPages, pageNum, verbose)
 		dt := time.Since(t0)
 		if err == nil {
 			err = missclassificationError(threshold, numChars, numMisses)
@@ -169,7 +162,6 @@ func main() {
 		}
 		if err != nil {
 			errorCounts[err.Error()]++
-
 		}
 		numFiles++
 	}
@@ -193,7 +185,7 @@ func missclassificationError(threshold float64, numChars, numMisses int) error {
 	if numChars == 0 || numMisses == 0 {
 		return nil
 	}
-	if threshold*float64(numChars) >= 1.0 && percentage(numChars, numMisses) < threshold {
+	if (threshold/100.0)*float64(numChars) >= 1.0 && percentage(numChars, numMisses) < threshold {
 		return nil
 	}
 	return ErrBadText
@@ -407,9 +399,12 @@ func getReader(inputPath string) (pdfReader *pdf.PdfReader, numPages int, err er
 
 // outputPdfText prints out text of PDF file `inputPath` to stdout.
 // `pdfReader` is a previously opened PdfReader of `inputPath`
-func outputPdfText(inputPath string, pdfReader *pdf.PdfReader, numPages, width int, verbose bool) (int, int, error) {
+func outputPdfText(inputPath string, pdfReader *pdf.PdfReader, numPages, pageN int, verbose bool) (int, int, error) {
 	numChars, numMisses := 0, 0
 	for pageNum := 1; pageNum <= numPages; pageNum++ {
+		if pageN > 0 && pageNum != pageN {
+			continue
+		}
 		// common.Log.Debug("===========================~~~page %d", pageNum)
 
 		page, err := pdfReader.GetPage(pageNum)
@@ -425,9 +420,6 @@ func outputPdfText(inputPath string, pdfReader *pdf.PdfReader, numPages, width i
 		numMisses += nMisses
 		if err != nil {
 			return numChars, numMisses, err
-		}
-		if width != 0 {
-			text = normalizeText(text, width)
 		}
 
 		if verbose {

@@ -22,17 +22,11 @@ const (
 )
 
 func main() {
-	var showHelp bool
-	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
 	makeUsage(usage)
 
 	flag.Parse()
 	args := flag.Args()
 
-	if showHelp {
-		flag.Usage()
-		os.Exit(0)
-	}
 	if len(args) < 1 {
 		flag.Usage()
 		os.Exit(1)

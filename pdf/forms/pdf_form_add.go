@@ -30,7 +30,7 @@ func main() {
 }
 
 // addFormToPdf adds the form to the PDF specified by `inputPath` and outputs to `outputPath`.
-func addFormToPdf(inputPath string, outputPath string) error {
+func addFormToPdf(inputPath, outputPath string) error {
 	// Read the input pdf file.
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -79,8 +79,8 @@ func addFormToPdf(inputPath string, outputPath string) error {
 	return pdfWriter.Write(of)
 }
 
-// textFieldsDef is a list of text fields to add to the form. The Rect field specifies the coordinates of the
-// field.
+// textFieldsDef is a list of text fields to add to the form. The Rect field specifies the
+// coordinates of the field.
 var textFieldsDef = []struct {
 	Name string
 	Rect []float64

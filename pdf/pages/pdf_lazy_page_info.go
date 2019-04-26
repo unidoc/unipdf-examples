@@ -120,7 +120,7 @@ func describPage(page *pdf.PdfPage, mBox *pdf.PdfRectangle) {
 	} else {
 		fmt.Printf(" Page rotation: 0\n")
 	}
-	fmt.Printf(" Page mediabox: %+v\n", page.MediaBox)
+	fmt.Printf(" Page mediabox: %+v\n", *page.MediaBox)
 	fmt.Printf(" Page height: %f\n", pageHeight)
 	fmt.Printf(" Page width: %f\n", pageWidth)
 }

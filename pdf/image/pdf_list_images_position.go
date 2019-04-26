@@ -29,21 +29,24 @@ var colorspaces = map[string]int{}
 const usage = "Usage: go run pdf_list_images_position.go testdata/*.pdf\n"
 
 // isInteresting returns true for the images we are interested in.
-// This is a user-supplied function
+// This is a user-supplied function.
 // It currently returns true for images that are scaled anisotropically.
-func isInteresting(imgMark extractor.ImageMark) bool {
+func isInteresting(page *pdf.PdfPage, imgMark extractor.ImageMark) bool {
 	img := imgMark.Image
-	big := img.Width >= 100 && img.Height >= 100
+	big := img.Width >= 20 && img.Height >= 20
 	if !big {
 		return false
 	}
-	w := math.Abs(imgMark.CTM.ScalingFactorX())
-	h := math.Abs(imgMark.CTM.ScalingFactorY())
-	W := math.Abs(float64(img.Width))
-	H := math.Abs(float64(img.Height))
+	return true
 
-	method := 2
+	sx, sy := imgMark.CTM.ScalingFactorX(), imgMark.CTM.ScalingFactorY()
+	w, h := math.Abs(sx), math.Abs(sy)
+	W, H := math.Abs(float64(img.Width)), math.Abs(float64(img.Height))
+
+	method := 5
 	switch method {
+	case 0: // Rotated
+		return math.Abs(imgMark.CTM.Angle()) >= 1.0
 	case 1:
 		if w < 0.001 {
 			return false
@@ -62,9 +65,21 @@ func isInteresting(imgMark extractor.ImageMark) bool {
 		}
 		rr := (h / w) * (W / H)
 		return rr <= 0.9 || rr >= 1.1
-
-	case 0:
-		return math.Abs(imgMark.CTM.Angle()) >= 1.0
+	case 4: // Inline
+		return imgMark.Inline
+	case 5: // Clipped
+		d := 100.0
+		mbox, err := page.GetMediaBox()
+		if err != nil {
+			panic(err)
+		}
+		llx, lly := imgMark.CTM.Translation()
+		urx, ury := llx+sx, lly+sy
+		ok := llx < mbox.Llx-d || lly < mbox.Lly-d || urx > mbox.Urx+d || ury > mbox.Ury+d
+		if ok {
+			fmt.Fprintf(os.Stderr, "*** mbox=%+v ctm=%s\n", *mbox, imgMark.CTM.String())
+		}
+		return ok
 	}
 	return false
 }
@@ -80,10 +95,9 @@ func main() {
 		-----END UNIDOC LICENSE KEY-----
 		`)
 	*/
-	var showHelp, debug, trace bool
+	var debug, trace bool
 	var maxInteresting int
 	var maxSizeMB float64
-	flag.BoolVar(&showHelp, "h", false, "Show this help message.")
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
 	flag.IntVar(&maxInteresting, "i", 0, "Stop when this interesting files are found.")
@@ -93,10 +107,6 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
-	if showHelp {
-		flag.Usage()
-		os.Exit(0)
-	}
 	if len(args) < 1 {
 		flag.Usage()
 		os.Exit(1)
@@ -106,7 +116,7 @@ func main() {
 	} else if debug {
 		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 	} else {
-		common.SetLogger(common.NewConsoleLogger(common.LogLevelError))
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelInfo))
 	}
 
 	corpus, err := patternsToPaths(args)
@@ -137,6 +147,10 @@ func main() {
 	var results []result
 
 	for i, inputPath := range corpus {
+		if (maxCorpus >= 0 && maxCorpus < len(corpus)) && i+1 < maxCorpus {
+			continue
+		}
+		fmt.Fprintf(os.Stderr, "%d of %d: inputPath=%q\n", i+1, len(corpus), inputPath)
 		// defer func() {
 		// 	if r := recover(); r != nil {
 		// 		fmt.Fprintf(os.Stderr, "%d of %d: inputPath=%q Error: %v\n", i+1, len(corpus), inputPath, r)
@@ -151,8 +165,8 @@ func main() {
 			fmt.Printf("%d of %d: inputPath=%q Error: %v\n", i+1, len(corpus), inputPath, err)
 			continue
 		}
-		headline := fmt.Sprintf("%d of %d: %.1f MB %d pages %d images %d interesting %q",
-			i+1, len(corpus), fileSizeMB(inputPath), numPages, numImages, sum(interesting), inputPath)
+		headline := fmt.Sprintf("%d of %d: %.1f MB %d pages %d images %q",
+			i+1, len(corpus), fileSizeMB(inputPath), numPages, numImages, inputPath)
 		if interesting != nil {
 			fmt.Fprintf(os.Stderr, "%d:: %s %s\n", len(results)+1, headline, showInteresting(interesting))
 			fmt.Println("===========================================")
@@ -169,7 +183,7 @@ func main() {
 				panic("B")
 			}
 		}
-		if len(results) >= maxInteresting {
+		if maxInteresting > 0 && len(results) >= maxInteresting {
 			break
 		}
 	}
@@ -202,7 +216,7 @@ func main() {
 		fmt.Fprintln(f, "========================= |||| ========================= ")
 		fmt.Fprintf(f, "%d interesting results\n", len(results))
 		for i, r := range results {
-			fmt.Fprintf(f, "%3d:: %s\n\t%s\n", i, showInteresting(r.interesting), r.headline)
+			fmt.Fprintf(f, "%3d:: %s %s\n", i, r.headline, showInteresting(r.interesting))
 		}
 	}
 
@@ -324,18 +338,18 @@ func listImagesOnPage(page *pdf.PdfPage) (int, []string, map[int]bool, error) {
 	if err != nil {
 		return 0, nil, nil, err
 	}
-	images, err := pageExtractor.ExtractPageImages()
+	images, err := pageExtractor.ExtractPageImages(nil)
 	if err != nil {
 		return 0, nil, nil, err
 	}
 	// fmt.Printf("&&& %d images\n", len(images.Images))
-	report, interesting := listPageImages(images)
+	report, interesting := listPageImages(page, images)
 	// fmt.Printf("&&& %d images\n", len(images.Images))
 	return len(images.Images), report, interesting, nil
 }
 
 // listPageImages returns a report on the images in `images`.
-func listPageImages(images *extractor.PageImages) ([]string, map[int]bool) {
+func listPageImages(page *pdf.PdfPage, images *extractor.PageImages) ([]string, map[int]bool) {
 	var report []string
 	interesting := map[int]bool{}
 
@@ -351,7 +365,7 @@ func listPageImages(images *extractor.PageImages) ([]string, map[int]bool) {
 			imgMark.CTM.ScalingFactorX(), imgMark.CTM.ScalingFactorY()))
 		tx, ty := imgMark.CTM.Translation()
 		report = append(report, fmt.Sprintf("  CTM (%.1f,%.1f) ϴ=%.1f\n", tx, ty, imgMark.CTM.Angle()))
-		if isInteresting(imgMark) {
+		if isInteresting(page, imgMark) {
 			interesting[i+1] = true
 		}
 		// Log colorspace use globally.
@@ -461,7 +475,23 @@ var badFiles = []string{
 	"bookmarks_circular.pdf",            // Stack overflow in reader
 	"4865ab395ed664c3ee17.pdf",          // Stack overflow in image forms
 	"circularReferencesInResources.pdf", // Stack overflow in image forms
+	"mrm-icdar.pdf",                     // !@#$
+	"ghmt.pdf",                          // !@#$
+	"SA_implementations.pdf",            // !@#$
+	"naacl06-shinyama.pdf",              // !@#$
+	"a_im_",                             // !@#$
+	"CaiHof-CIKM2004.pdf",
+	"blurhmt.pdf",
+	"ESCP-R reference_151008.pdf",
+	"a_imagemask.pdf",
+	"sample_chapter_verilab_aop_cookbook.pdf",
+	"TWISCKeyDist.pdf",
+	"ergodicity/1607.04968.pdf",
+	"1812.09449.pdf", // hangs
+	"INF586.pdf",     // hangs
 }
+
+const maxCorpus = 10920
 
 // makeUsage updates flag.Usage to include usage message `msg`.
 func makeUsage(msg string) {

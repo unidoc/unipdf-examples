@@ -73,7 +73,7 @@ func main() {
 }
 
 // Prepare the QR code. The oversampling ratio specifies how many pixels/point to use.  The default resolution of
-// PDFs is 72PPI (points per inch). A higher PPI allows higher resolution QR code generation which is particularly
+// PDFs is 72PPI (pixels per inch). A higher PPI allows higher resolution QR code generation which is particularly
 // important if the document is scaled (zoom in).
 func makeQrCode(contentStr string, width float64, oversampling int) (goimage.Image, error) {
 	qrCode, err := qr.Encode(contentStr, qr.M, qr.Auto)
