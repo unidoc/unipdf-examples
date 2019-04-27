@@ -490,11 +490,6 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
 				dctEncoder.ColorComponents = 1
 			}
-			// else if flateEncoder, is := encoder.(*pdfcore.FlateEncoder); is {
-			// if flateEncoder.Predictor != 1 && flateEncoder.Predictor != 11 {
-			// 	flateEncoder.Predictor = 11
-			// }
-			// }
 
 			{
 				g := grayImage
@@ -581,11 +576,6 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
 					dctEncoder.ColorComponents = 1
 				}
-				// else if flateEncoder, is := encoder.(*pdfcore.FlateEncoder); is {
-				// 	if flateEncoder.Predictor != 1 && flateEncoder.Predictor != 11 {
-				// 		flateEncoder.Predictor = 11
-				// 	}
-				// }
 
 				ximgGray, err := pdf.NewXObjectImageFromImage(&grayImage, nil, encoder)
 				if err != nil {
