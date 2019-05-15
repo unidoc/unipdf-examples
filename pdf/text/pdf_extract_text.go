@@ -25,15 +25,17 @@ func main() {
 	// Otherwise text is truncated and a watermark added to the text.
 	// License keys are available via: https://unidoc.io
 	/*
-			license.SetLicenseKey(`
+					license.SetLicenseKey(`
 		-----BEGIN UNIDOC LICENSE KEY-----
-		...key contents...
+		eyJsaWNlbnNlX2lkIjoiMjA0YWIxMjgtZGY5Yy00ZWE3LTdlM2UtNzJiYTk4OWFhNGZmIiwiY3VzdG9tZXJfaWQiOiJlMDRiODNjZC0zOTYzLTQxNDktNjljOC03MDU0MTM0OWUyMWMiLCJjdXN0b21lcl9uYW1lIjoiUGFwZXJjdXQiLCJ0eXBlIjoiY29tbWVyY2lhbCIsInRpZXIiOiJidXNpbmVzc191bmxpbWl0ZWQiLCJmZWF0dXJlcyI6WyJ1bmlkb2MiLCJ1bmlkb2MtY2xpIl0sImNyZWF0ZWRfYXQiOjE0ODU0NzUxOTksImV4cGlyZXNfYXQiOjE1MTcwMTExOTksImNyZWF0b3JfbmFtZSI6IlVuaURvYyBTdXBwb3J0IiwiY3JlYXRvcl9lbWFpbCI6InN1cHBvcnRAdW5pZG9jLmlvIn0=
+		+
+		JYUUjfjjpek96Rh2LoPy4LbWEHT5X46PxLyNkMyF74L/eNeLR55vcvvi2MIUtZBamCbay+YjmqZu5n6IJQWVDrImdC3b7OthoSdGMvfNSjOSuQcoV/mFpkMYin34Uwe7KM6EebzCuX2LF/LTPpdL6iYHtiWxTnF3yZwFqSgJLa8NSSSElfVLidbfQHYJSu52FTcqqWaqIjT51YiZB0Pq54YDP/jS10sRDYDe3sOpI1bfFplYkcdxPX1tK0AQKbvYCDcNbbnoKhk0EZAVSmI+kh5TdKzUn3BpQc7MP+koGrAePc3ddZF6pNzaiW1CJiO7/TmRzQioEq3Rp/h1XYkKXw==
 		-----END UNIDOC LICENSE KEY-----
 		`)
 	*/
 
 	// For debugging.
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelInfo))
 
 	inputPath := os.Args[1]
 

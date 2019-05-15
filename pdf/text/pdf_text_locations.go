@@ -1,7 +1,7 @@
 /*
- * PDF to text: Extract all text for each page of a pdf file.
+ * PDF text locations: Extract all text and its location for each page of a pdf file.
  *
- * Run as: go run pdf_extract_text.go input.pdf
+ * Run as: go run pdf_text_locations.go input.pdf
  */
 
 package main
@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	usage                 = "Usage: go run pdf_render_text.go testdata/*.pdf\n"
+	usage                 = "Usage: go run pdf_text_locations.go testdata/*.pdf\n"
 	badFilesPath          = "bad.files"
 	defaultNormalizeWidth = 60
 )
@@ -44,7 +44,7 @@ func main() {
 	var debug, trace bool
 	maxPages := 5
 	maxText := 500
-	maxLocations := 10
+	maxLocations := 100
 
 	flag.BoolVar(&debug, "d", false, "Print debugging information.")
 	flag.BoolVar(&trace, "e", false, "Print detailed debugging information.")
@@ -154,6 +154,7 @@ func makeUsage(msg string) {
 	}
 }
 
+// truncate returns `text` truncated to `n` characters.
 func truncate(text string, n int) string {
 	if len(text) < n {
 		return text
