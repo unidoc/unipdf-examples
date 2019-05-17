@@ -9,4 +9,5 @@ require (
 	github.com/wcharczuk/go-chart v2.0.1+incompatible // indirect
 	github.com/youtube/vitess v2.1.1+incompatible // indirect
 	golang.org/x/net v0.0.0-20190514140710-3ec191127204 // indirect
+	golang.org/x/text v0.3.2 // indirect
 )
