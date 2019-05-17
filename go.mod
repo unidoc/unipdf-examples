@@ -1,4 +1,4 @@
-module github.com/adrg/unidoc-examples
+module github.com/unidoc/unidoc-examples
 
 require (
 	github.com/ThalesIgnite/crypto11 v0.1.0 // indirect
