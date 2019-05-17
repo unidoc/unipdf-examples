@@ -6,4 +6,8 @@ a pull request.
 
 The examples are also available on UniDoc's website: [https://unidoc.io/examples/](https://unidoc.io/examples/). 
 
+### Build all examples
 
+```bash
+find . -name "*.go" -print0 | CGO_ENABLED=1 xargs -0 -n1 go build
+```
