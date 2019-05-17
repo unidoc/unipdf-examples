@@ -47,7 +47,6 @@ pkg/buildinfo/buildinfo.go
 temp/
 buildinfo.json
 
-*.sh
 pdf/bak
 
 pdf/report/pdf_report
