@@ -84,6 +84,12 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 		_ = c.Draw(watermarkImg)
 	}
 
+	// Add reader outline tree to the creator.
+	c.SetOutlineTree(pdfReader.GetOutlineTree())
+
+	// Add reader AcroForm to the creator.
+	c.SetForms(pdfReader.AcroForm)
+
 	err = c.WriteToFile(outputPath)
 	return err
 }
