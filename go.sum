@@ -16,6 +16,8 @@ github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
 github.com/unidoc/unipdf/v3 v3.0.0-20190516204451-c64812093d7b h1:yp+Mw55jFK8C2LQMrnaeJGL0wpb/cAT99YMQ+rFePAg=
 github.com/unidoc/unipdf/v3 v3.0.0-20190516204451-c64812093d7b/go.mod h1:xq0X+xxSAgPpoQNyPtXmKOdGV3iZBPQQxuV2roDhECw=
+github.com/unidoc/unipdf/v3 v3.0.3 h1:NuZstrWdULqrRVXXfvyyXaR82frFnwJ29ZaPN6mz0AU=
+github.com/unidoc/unipdf/v3 v3.0.3/go.mod h1:xq0X+xxSAgPpoQNyPtXmKOdGV3iZBPQQxuV2roDhECw=
 github.com/wcharczuk/go-chart v2.0.1+incompatible h1:0pz39ZAycJFF7ju/1mepnk26RLVLBCWz1STcD3doU0A=
 github.com/wcharczuk/go-chart v2.0.1+incompatible/go.mod h1:PF5tmL4EIx/7Wf+hEkpCqYi5He4u90sw+0+6FhrryuE=
 github.com/youtube/vitess v2.1.1+incompatible h1:SE+P7DNX/jw5RHFs5CHRhZQjq402EJFCD33JhzQMdDw=
