@@ -15,6 +15,7 @@ import (
 	"path"
 	"path/filepath"
 	"sort"
+	"strings"
 
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/creator"
@@ -109,11 +110,13 @@ func markTextLocations(inPath, term string) error {
 		text := pageText.Text()
 		textMarks := pageText.Marks()
 		common.Log.Debug("pageNum=%d text=%d textMarks=%d", pageNum, len(text), textMarks.Len())
-		bboxes, err := getBBoxes(text, textMarks, term)
+		matches, err := getMatches(text, textMarks, term)
 		if err != nil {
-			return fmt.Errorf("getBBoxes failed. %q pageNum=%d err=%v", inPath, pageNum, err)
+			return fmt.Errorf("getMatches failed. %q pageNum=%d err=%v", inPath, pageNum, err)
 		}
-		l.addMatches(term, pageNum, bboxes)
+		if matches != nil {
+			l.pageMatches[pageNum] = matches
+		}
 	}
 	err = l.saveOutputPdf()
 	if err != nil {
@@ -122,18 +125,17 @@ func markTextLocations(inPath, term string) error {
 	return nil
 }
 
-// getBBoxes returns the bounding boxes on the PDF page described `textMarks` that correspond to
-// all the instances of `term` in `text`, where `text` and `textMarks` are the extracted text
-// returned by text := pageText.Text and textMarks := pageText.Marks().
-// NOTE: This is how you would use TextByComponents in an application.
-func getBBoxes(text string, textMarks *extractor.TextMarkArray, term string) ([]pdf.PdfRectangle, error) {
-	indexes := indexRunesAll(text, term)
+// getMatches returns the matches (bounding box + offset) on the PDF page described by `textMarks`
+// that correspond to/ all the instances of `term` in `text`, where `text` and `textMarks` are the
+// extracted text returned by text := pageText.Text and textMarks := pageText.Marks().
+func getMatches(text string, textMarks *extractor.TextMarkArray, term string) ([]match, error) {
+	indexes := indexAll(text, term)
 	if len(indexes) == 0 {
 		return nil, nil
 	}
-	bboxes := make([]pdf.PdfRectangle, len(indexes))
+	matches := make([]match, len(indexes))
 	for i, start := range indexes {
-		end := start + len([]rune(term))
+		end := start + len(term)
 		spanMarks, err := textMarks.RangeOffset(start, end)
 		if err != nil {
 			return nil, err
@@ -142,48 +144,30 @@ func getBBoxes(text string, textMarks *extractor.TextMarkArray, term string) ([]
 		if !ok {
 			return nil, fmt.Errorf("spanMarks.BBox has no bounding box. spanMarks=%s", spanMarks)
 		}
-		bboxes[i] = bbox
+		matches[i] = match{
+			Term:        term,
+			OffsetRange: [2]int{start, end},
+			BBox:        bbox,
+		}
 	}
-	return bboxes, nil
+	return matches, nil
 }
 
-// indexRunes returns the indexes of all instances of `term` in `text`
-// This index is over runes, unlike strings.Index.
-func indexRunesAll(text, term string) []int {
-	runes := []rune(text)
-	substr := []rune(term)
-	if len(substr) == 0 {
+// indexAll returns the indices of all instances of `term` in `text`
+func indexAll(text, term string) []int {
+	if len(term) == 0 {
 		return nil
 	}
 	var indexes []int
-	for start := 0; start < len(runes); {
-		i := indexRunesFirst(runes[start:], substr)
+	for start := 0; start < len(text); {
+		i := strings.Index(text[start:], term)
 		if i < 0 {
 			return indexes
 		}
 		indexes = append(indexes, start+i)
-		start += i + len(substr)
+		start += i + len(term)
 	}
 	return indexes
-}
-
-// indexRunes returns the index in `text` of the first instance of `term` if `term` is a substring
-// of `text`, or -1 if it is not a substring.
-// This index is over runes, unlike strings.Index.
-func indexRunesFirst(runes, substr []rune) int {
-	for i := 0; i < len(runes)-len(substr); i++ {
-		matched := true
-		for j, r := range substr {
-			if runes[i+j] != r {
-				matched = false
-				break
-			}
-		}
-		if matched {
-			return i
-		}
-	}
-	return -1
 }
 
 // markupList saves the results of text searches so they can be used to mark-up a PDF with search
@@ -200,8 +184,9 @@ type markupList struct {
 // match is a match of search term `Term` on a page. `BBox` is the bounding box around the matched
 // term on the PDF page
 type match struct {
-	Term string
-	BBox pdf.PdfRectangle
+	Term        string
+	BBox        pdf.PdfRectangle
+	OffsetRange [2]int
 }
 
 // String returns a description of `l`.
@@ -217,15 +202,6 @@ func createMarkupList(inPath string, pdfReader *pdf.PdfReader) *markupList {
 		inPath:      inPath,
 		pdfReader:   pdfReader,
 		pageMatches: map[int][]match{},
-	}
-}
-
-// addMatch added a match on search term `term` that was found to have bounding box `bbox` to
-// for `l`.pageNum. l.pageNum is set with markupList.setPageNum()
-func (l *markupList) addMatches(term string, pageNum int, bboxes []pdf.PdfRectangle) {
-	l.pageMatches[pageNum] = make([]match, len(bboxes))
-	for i, bbox := range bboxes {
-		l.pageMatches[pageNum][i] = match{Term: term, BBox: bbox}
 	}
 }
 
