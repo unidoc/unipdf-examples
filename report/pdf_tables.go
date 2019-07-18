@@ -76,7 +76,7 @@ func drawFrontPage(c *creator.Creator, font, fontBold *model.PdfFont) {
 
 		chunk = p.Append("\n")
 
-		chunk = p.Append("Table feature showcase")
+		chunk = p.Append("Table features")
 		chunk.Style.Font = fontBold
 		chunk.Style.FontSize = 40
 		chunk.Style.Color = creator.ColorRGBFrom8bit(45, 148, 215)
@@ -142,12 +142,21 @@ func basicUsage(c *creator.Creator, font, fontBold *model.PdfFont) error {
 }
 
 func contentAlignH(c *creator.Creator, ch *creator.Chapter, font, fontBold *model.PdfFont) {
+	// Create subchapter.
 	sc := ch.NewSubchapter("Content horizontal alignment")
 	sc.SetMargins(0, 0, 30, 0)
 	sc.GetHeading().SetFont(font)
 	sc.GetHeading().SetFontSize(13)
 	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
+	// Create subchapter description.
+	desc := c.NewStyledParagraph()
+	desc.SetMargins(0, 0, 10, 0)
+	desc.Append("Cell content can be aligned horizontally left, right or it can be centered.")
+
+	sc.Add(desc)
+
+	// Create table.
 	table := c.NewTable(3)
 	table.SetMargins(0, 0, 10, 0)
 
@@ -179,12 +188,21 @@ func contentAlignH(c *creator.Creator, ch *creator.Chapter, font, fontBold *mode
 }
 
 func contentAlignV(c *creator.Creator, ch *creator.Chapter, font, fontBold *model.PdfFont) {
+	// Create subchapter.
 	sc := ch.NewSubchapter("Content vertical alignment")
 	sc.SetMargins(0, 0, 30, 0)
 	sc.GetHeading().SetFont(font)
 	sc.GetHeading().SetFontSize(13)
 	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
+	// Create subchapter description.
+	desc := c.NewStyledParagraph()
+	desc.SetMargins(0, 0, 10, 0)
+	desc.Append("Cell content can be positioned vertically at the top, bottom or in the middle of the cell.")
+
+	sc.Add(desc)
+
+	// Create table.
 	table := c.NewTable(3)
 	table.SetMargins(0, 0, 10, 0)
 
@@ -220,12 +238,21 @@ func contentAlignV(c *creator.Creator, ch *creator.Chapter, font, fontBold *mode
 }
 
 func contentWrapping(c *creator.Creator, ch *creator.Chapter, font, fontBold *model.PdfFont) {
+	// Create subchapter.
 	sc := ch.NewSubchapter("Content wrapping")
 	sc.SetMargins(0, 0, 30, 0)
 	sc.GetHeading().SetFont(font)
 	sc.GetHeading().SetFontSize(13)
 	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
+	// Create subchapter description.
+	desc := c.NewStyledParagraph()
+	desc.SetMargins(0, 0, 10, 0)
+	desc.Append("Cell text content is automatically broken into lines, depeding on the cell size.")
+
+	sc.Add(desc)
+
+	// Create table.
 	table := c.NewTable(4)
 	table.SetColumnWidths(0.25, 0.2, 0.25, 0.3)
 	table.SetMargins(0, 0, 10, 0)
@@ -249,7 +276,7 @@ func contentWrapping(c *creator.Creator, ch *creator.Chapter, font, fontBold *mo
 	drawCell("Align justify", fontBold, creator.TextAlignmentCenter)
 
 	// Draw table content.
-	content := "Maecenas tempor nibh gravida nunc laoreet, ut rhoncus justo ultricies. Mauris nec purus sit amet purus tincidunt efficitur tincidunt non dolor. Aenean nisl eros, volutpat vitae dictum id, facilisis ac felis. Integer lacinia, turpis at fringilla posuere, erat tortor ultrices orci, non tempor neque mauris ac neque. Morbi blandit ante et lacus ornare, ut vulputate massa dictum. Etiam tristique a est in mattis. Nulla est elit, viverra non dui vel, ullamcorper tristique massa."
+	content := "Maecenas tempor nibh gravida nunc laoreet, ut rhoncus justo ultricies. Mauris nec purus sit amet purus tincidunt efficitur tincidunt non dolor. Aenean nisl eros, volutpat vitae dictum id, facilisis ac felis. Integer lacinia, turpis at fringilla posuere, erat tortor ultrices orci, non tempor neque mauris ac neque. Morbi blandit ante et lacus ornare, ut vulputate massa dictum."
 
 	drawCell(content, font, creator.TextAlignmentLeft)
 	drawCell(content, font, creator.TextAlignmentCenter)
@@ -282,12 +309,26 @@ func stylingContent(c *creator.Creator, font, fontBold *model.PdfFont) error {
 }
 
 func contentBorders(c *creator.Creator, ch *creator.Chapter, font, fontBold *model.PdfFont) {
+	// Create subchapter.
 	sc := ch.NewSubchapter("Cell borders")
 	sc.SetMargins(0, 0, 30, 0)
 	sc.GetHeading().SetFont(font)
 	sc.GetHeading().SetFontSize(13)
 	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
+	// Create subchapter description.
+	desc := c.NewStyledParagraph()
+	desc.SetMargins(0, 0, 10, 0)
+	desc.Append("Customizable cell border properties:\n\n")
+	desc.Append("\u2022 Border side: left, right, top, bottom, all\n")
+	desc.Append("\u2022 Border style: single or double\n")
+	desc.Append("\u2022 Border line style: solid or dashed\n")
+	desc.Append("\u2022 Border color\n")
+	desc.Append("\u2022 Border width\n")
+
+	sc.Add(desc)
+
+	// Create table.
 	table := c.NewTable(2)
 	table.SetMargins(0, 0, 10, 0)
 
@@ -334,12 +375,21 @@ func contentBorders(c *creator.Creator, ch *creator.Chapter, font, fontBold *mod
 }
 
 func contentBackground(c *creator.Creator, ch *creator.Chapter, font, fontBold *model.PdfFont) {
+	// Create subchapter.
 	sc := ch.NewSubchapter("Cell background")
 	sc.SetMargins(0, 0, 30, 0)
 	sc.GetHeading().SetFont(font)
 	sc.GetHeading().SetFontSize(13)
 	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
+	// Create subchapter description.
+	desc := c.NewStyledParagraph()
+	desc.SetMargins(0, 0, 10, 0)
+	desc.Append("The background color of the cells is also customizable.")
+
+	sc.Add(desc)
+
+	// Create table.
 	table := c.NewTable(4)
 	table.SetMargins(0, 0, 10, 0)
 
@@ -393,12 +443,21 @@ func advancedUsage(c *creator.Creator, font, fontBold *model.PdfFont) error {
 }
 
 func columnSpan(c *creator.Creator, ch *creator.Chapter, font, fontBold *model.PdfFont) {
+	// Create subchapter.
 	sc := ch.NewSubchapter("Column span")
 	sc.SetMargins(0, 0, 30, 0)
 	sc.GetHeading().SetFont(font)
 	sc.GetHeading().SetFontSize(13)
 	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
+	// Create subchapter description.
+	desc := c.NewStyledParagraph()
+	desc.SetMargins(0, 0, 10, 0)
+	desc.Append("Table content can be configured to span a specified number of cells.")
+
+	sc.Add(desc)
+
+	// Create table.
 	table := c.NewTable(5)
 	table.SetMargins(0, 0, 10, 0)
 
@@ -471,11 +530,19 @@ func columnSpan(c *creator.Creator, ch *creator.Chapter, font, fontBold *model.P
 }
 
 func tableHeaders(c *creator.Creator, ch *creator.Chapter, font, fontBold *model.PdfFont) error {
+	// Create subchapter.
 	sc := ch.NewSubchapter("Headers")
 	sc.SetMargins(0, 0, 30, 0)
 	sc.GetHeading().SetFont(font)
 	sc.GetHeading().SetFontSize(13)
 	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
+
+	// Create subchapter description.
+	desc := c.NewStyledParagraph()
+	desc.SetMargins(0, 0, 10, 0)
+	desc.Append("Table rows can be configured to become headers which are automatically repeated on every new page the table spans. This example also showcases the usage of images inside table cells.")
+
+	sc.Add(desc)
 
 	// Load table image.
 	img, err := c.NewImageFromFile("./unidoc-logo.png")
@@ -485,6 +552,7 @@ func tableHeaders(c *creator.Creator, ch *creator.Chapter, font, fontBold *model
 	img.SetMargins(2, 2, 2, 2)
 	img.ScaleToWidth(30)
 
+	// Create table.
 	table := c.NewTable(4)
 	table.SetColumnWidths(0.1, 0.3, 0.4, 0.2)
 	table.SetMargins(0, 0, 10, 0)
@@ -507,7 +575,7 @@ func tableHeaders(c *creator.Creator, ch *creator.Chapter, font, fontBold *model
 	table.SetHeaderRows(1, 2)
 
 	// Draw table content.
-	for i := 0; i < 65; i++ {
+	for i := 0; i < 62; i++ {
 		num := i + 1
 
 		color := creator.ColorBlack
@@ -533,12 +601,21 @@ func tableHeaders(c *creator.Creator, ch *creator.Chapter, font, fontBold *model
 }
 
 func subtables(c *creator.Creator, ch *creator.Chapter, font, fontBold *model.PdfFont) {
+	// Create subchapter.
 	sc := ch.NewSubchapter("Subtables")
 	sc.SetMargins(0, 0, 30, 0)
 	sc.GetHeading().SetFont(font)
 	sc.GetHeading().SetFontSize(13)
 	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
+	// Create subchapter description.
+	desc := c.NewStyledParagraph()
+	desc.SetMargins(0, 0, 10, 0)
+	desc.Append("Large tables can be tedious to construct. In order to make the process more manageable, the table component allows building tables from subtables. If subtables do not fit in the current configuration of the table, the table is automatically expanded.")
+
+	sc.Add(desc)
+
+	// Create table.
 	table := c.NewTable(6)
 	table.SetMargins(0, 0, 10, 0)
 
