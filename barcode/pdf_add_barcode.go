@@ -1,6 +1,6 @@
 /*
- * Create a barcode code and insert on a specific location in a PDf file.
- * If unsure about position, try getting the dimensions of a PDF with unidoc-examples/pdf/pages/pdf_page_info.go first,
+ * Create a barcode and insert on a specific location in a PDf file.
+ * If unsure about position, try getting the dimensions of a PDF with unipdf-examples/pages/pdf_page_info.go first,
  * or just start with 0,0 and increase to move right, down.
  *
  * This example demonstrates an EAN barcode.  It is worth noting that the barcode package supports multiple other
@@ -31,7 +31,7 @@ import (
 
 	unicommon "github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/creator"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
 func main() {
@@ -120,7 +120,7 @@ func addBarcodeToPdf(inputPath string, outputPath string, codeStr string, pageNu
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}

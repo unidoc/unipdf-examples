@@ -1,7 +1,7 @@
 /*
  * Convert a PDF to grayscale in a vectorized fashion, including images and all content.
  *
- * This advanced example demonstrates some of the more complex capabilities of UniDoc, showing the capability to process
+ * This advanced example demonstrates some of the more complex capabilities of UniPDF, showing the capability to process
  * and transform objects and contents.
  *
  * Run as: go run pdf_grayscale_transform.go color.pdf output.pdf

@@ -1,6 +1,6 @@
 /*
  * Create a barcode or a QR code and insert on a specific location in a PDf file.
- * If unsure about position, try getting the dimensions of a PDF with unidoc-examples/pdf/pages/pdf_page_info.go first,
+ * If unsure about position, try getting the dimensions of a PDF with unipdf-examples/pages/pdf_page_info.go first,
  * or just start with 0,0 and increase to move right, down.
  *
  * Run as: go run pdf_add_qr_code.go input.pdf <page> <qrtext> <xpos> <ypos> <width> output.pdf
@@ -24,7 +24,7 @@ import (
 
 	unicommon "github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/creator"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
 func main() {
@@ -106,7 +106,7 @@ func addQrCodeToPdf(inputPath string, outputPath string, qrContentStr string, pa
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
