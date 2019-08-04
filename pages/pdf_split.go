@@ -64,7 +64,7 @@ func splitPdf(inputPath string, outputPath string, pageFrom int, pageTo int) err
 
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := pdf.NewPdfReaderLazy(f)
 	if err != nil {
 		return err
 	}

@@ -1,5 +1,5 @@
 /*
- * Show contents of all objects in a PDF file. Handy for debugging UniDoc programs
+ * Show contents of all objects in a PDF file. Handy for debugging UniPDF programs
  *
  * Run as: go run pdf_all_objects.go input.pdf
  */
