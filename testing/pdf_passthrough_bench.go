@@ -1,5 +1,5 @@
 /*
- * Passthrough benchmark for UniDoc, loads input PDF files and writes them back out. Has ghostscript validation.
+ * Passthrough benchmark for UniPDF: loads input PDF files and writes them back out.
  *
  * Run as: go run pdf_passthrough_bench.go ...
  *
@@ -14,12 +14,14 @@
  *     -hang: Hang when completed (no exit) - for memory profiling
  *     -rmlist: Print out a list of files to rm to make fully compliant
  *     -optimize: Use Use Pdf compression and optimization
+ *     -pprof: Run with profiling enabled.
+ *     -lazy: Use lazy loading.
  *
  * The passthrough benchmark
- * - Loads the input PDF with unidoc
+ * - Loads the input PDF with unipdf
  * - Writes the output PDF
  * - Runs ghostscript (gs) on both input and output and checks for errors
- * - Invalid if unidoc returns an error or if gs on output has more errors than gs on input PDF.
+ * - Invalid if unipdf returns an error or if gs on output has more errors than gs on input PDF.
  */
 
 package main
@@ -28,16 +30,18 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"github.com/unidoc/unipdf/v3/model/optimize"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"runtime/pprof"
 	"strings"
 	"time"
 
-	common "github.com/unidoc/unipdf/v3/common"
-	unipdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model/optimize"
 )
 
 // Results for single pdf.
@@ -54,17 +58,6 @@ type benchmarkResult struct {
 // Total results.
 type benchmarkResults []benchmarkResult
 
-func initUniDoc(debug bool) error {
-	if debug {
-		common.SetLogger(common.NewConsoleLogger(common.LogLevelTrace))
-		//common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
-	} else {
-		common.SetLogger(common.DummyLogger{})
-	}
-
-	return nil
-}
-
 const usage = `Usage:
 pdf_passthrough_bench [options] <file1> <file2> ... > results
 Options:
@@ -75,12 +68,12 @@ Options:
 -hang: Hang when completed (no exit) - for memory profiling
 -rmlist: Print out a list of files to rm to make fully compliant
 -optimize: Use Pdf compression and optimization
+-lazy: Use lazy loading.
 
 Example: pdf_passthrough_bench -gsv ~/pdfdb/* >results_YYYY_MM_DD
 `
 
 type benchParams struct {
-	debug        bool
 	runAllTests  bool
 	processPath  string
 	outputDir    string
@@ -88,12 +81,17 @@ type benchParams struct {
 	hangOnExit   bool
 	printRmList  bool
 	optimize     bool
+	lazyLoading  bool
+	profilePath  string
+	loglevel     string
 }
 
 func main() {
 	params := benchParams{}
 
-	params.debug = false       // Write debug level info to stdout?
+	fmt.Printf("UniPDF version %s\n", common.Version)
+
+	//params.debug = false       // Write debug level info to stdout?
 	params.runAllTests = false // Don't stop when a PDF file fails to process?
 	params.processPath = ""    // Transformed PDFs are written here
 	params.outputDir = ""      // Alternatively, can store output files in an output directory.
@@ -101,15 +99,18 @@ func main() {
 	params.hangOnExit = false
 	params.printRmList = false
 	params.optimize = false
+	params.loglevel = "info"
 
-	flag.BoolVar(&params.debug, "d", false, "Enable debug logging")
+	flag.StringVar(&params.loglevel, "loglevel", "info", "Set loglevel: info (default), debug, trace, none")
 	flag.BoolVar(&params.gsValidation, "gsv", false, "Enable ghostscript validation")
 	flag.BoolVar(&params.runAllTests, "a", false, "Run all tests. Don't stop at first failure")
 	flag.BoolVar(&params.hangOnExit, "hang", false, "Hang when completed without exiting (memory profiling)")
 	flag.BoolVar(&params.printRmList, "rmlist", false, "Print rm list at end")
 	flag.StringVar(&params.processPath, "o", "/tmp/test.pdf", "Temporary output file path")
-	flag.StringVar(&params.outputDir, "odir", "/tmp/", "Output directory (optional)")
+	flag.StringVar(&params.outputDir, "odir", "", "Output directory (optional)")
 	flag.BoolVar(&params.optimize, "optimize", false, "Use Pdf compression and optimization")
+	flag.BoolVar(&params.lazyLoading, "lazy", false, "Use lazy loading")
+	flag.StringVar(&params.profilePath, "pprof", "", "Pprof output for profiling (optional)")
 
 	flag.Parse()
 	args := flag.Args()
@@ -118,12 +119,36 @@ func main() {
 		os.Exit(1)
 	}
 
+	if len(params.profilePath) > 0 {
+		fmt.Printf("Profiling to %s\n", params.profilePath)
+		f, err := os.Create(params.profilePath)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+			os.Exit(1)
+		}
+		defer f.Close()
+		err = pprof.StartCPUProfile(f)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+			os.Exit(1)
+		}
+		defer pprof.StopCPUProfile()
+	}
+
 	fmt.Printf("With GS validation: %t\n", params.gsValidation)
 	fmt.Printf("With compression and optimization: %t\n", params.optimize)
 
-	err := initUniDoc(params.debug)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
+	switch params.loglevel {
+	case "none":
+		common.SetLogger(common.DummyLogger{})
+	case "info":
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelInfo))
+	case "debug":
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	case "trace":
+		common.SetLogger(common.NewConsoleLogger(common.LogLevelTrace))
+	default:
+		fmt.Printf("Unknown loglevel: %v\n", params.loglevel)
 		os.Exit(1)
 	}
 
@@ -138,6 +163,8 @@ func main() {
 		common.Log.Error("benchmarkPDFs failed err=%v", err)
 		os.Exit(1)
 	}
+
+	fmt.Printf("Complete\n")
 
 	if params.hangOnExit {
 		// Endless loop.
@@ -157,10 +184,29 @@ func patternsToPaths(patternList []string) ([]string, error) {
 			return pathList, err
 		}
 		for _, path := range files {
-			if !regularFile(path) {
+			fi, err := os.Stat(path)
+			if err != nil {
+				panic(err)
+			}
+
+			// One level of directories supported.
+			if fi.Mode().IsDir() {
+				innerFiles, err := ioutil.ReadDir(path)
+				if err != nil {
+					panic(err)
+				}
+				for _, f := range innerFiles {
+					if f.Mode().IsRegular() {
+						pathList = append(pathList, filepath.Join(path, f.Name()))
+					}
+				}
+				continue
+			}
+			if !fi.Mode().IsRegular() {
 				fmt.Printf("Not a regular file. %#q\n", path)
 				continue
 			}
+
 			pathList = append(pathList, path)
 		}
 	}
@@ -185,9 +231,9 @@ func validatePdf(path string, password string) (error, int) {
 	var cmd *exec.Cmd
 	if len(password) > 0 {
 		option := fmt.Sprintf("-sPDFPassword=%s", password)
-		cmd = exec.Command(ghostscriptName(), "-dBATCH", "-dNODISPLAY", "-dNOPAUSE", option, path)
+		cmd = exec.Command(ghostscriptName(), "-dBATCH", "-dNODISPLAY", "-dNOPAUSE", "-dPDFSTOPONERROR", option, path)
 	} else {
-		cmd = exec.Command(ghostscriptName(), "-dBATCH", "-dNODISPLAY", "-dNOPAUSE", path)
+		cmd = exec.Command(ghostscriptName(), "-dBATCH", "-dNODISPLAY", "-dNOPAUSE", "-dPDFSTOPONERROR", path)
 	}
 
 	var out bytes.Buffer
@@ -235,7 +281,13 @@ func testPassthroughSinglePdf(inputPath string, params benchParams) error {
 	}
 	defer file.Close()
 
-	reader, err := unipdf.NewPdfReader(file)
+	var reader *model.PdfReader
+	if params.lazyLoading {
+		fmt.Printf("Lazy loading used\n")
+		reader, err = model.NewPdfReaderLazy(file)
+	} else {
+		reader, err = model.NewPdfReader(file)
+	}
 	if err != nil {
 		common.Log.Debug("Reader create error %s\n", err)
 		return err
@@ -264,20 +316,16 @@ func testPassthroughSinglePdf(inputPath string, params benchParams) error {
 		return err
 	}
 
-	if numPages < 1 {
-		common.Log.Debug("Empty pdf - nothing to be done!")
-		return nil
-	}
-
-	writer := unipdf.NewPdfWriter()
+	writer := model.NewPdfWriter()
 	if params.optimize {
 		optimizer := optimize.New(optimize.Options{
-			CombineDuplicateDirectObjects:   true,
-			CombineIdenticalIndirectObjects: true,
-			ImageUpperPPI:                   100.0,
-			UseObjectStreams:                true,
-			ImageQuality:                    80,
 			CombineDuplicateStreams:         true,
+			CombineDuplicateDirectObjects:   true,
+			ImageUpperPPI:                   100.0,
+			ImageQuality:                    90,
+			CombineIdenticalIndirectObjects: true,
+			UseObjectStreams:                true,
+			CompressStreams:                 true,
 		})
 		writer.SetOptimizer(optimizer)
 	}
@@ -333,6 +381,7 @@ func testPassthroughSinglePdf(inputPath string, params benchParams) error {
 	err = writer.Write(of)
 	if err != nil {
 		common.Log.Debug("WriteFile error")
+
 		return err
 	}
 
@@ -345,7 +394,7 @@ func testPassthroughSinglePdf(inputPath string, params benchParams) error {
 		err, warnings := validatePdf(outputPath, "")
 		if err != nil && warnings > inputWarnings {
 			common.Log.Error("Input warnings %d vs output %d", inputWarnings, warnings)
-			return fmt.Errorf("Invalid PDF input %d/ output %d warnings", inputWarnings, warnings)
+			return fmt.Errorf("GS: Invalid PDF input %d/ output %d warnings", inputWarnings, warnings)
 		}
 		common.Log.Debug("Valid PDF!")
 	}
@@ -356,6 +405,21 @@ func testPassthroughSinglePdf(inputPath string, params benchParams) error {
 // TestSinglePdf tests a single pdf file.
 func TestSinglePdf(target string, params benchParams) error {
 	err := testPassthroughSinglePdf(target, params)
+
+	if err != nil {
+		// If unidoc fails the file, check the input file.  Do not count as error
+		// if ghostscript has issues with the file.  Ensure not processed by ghostscript already (GS: error prefix).
+		if params.gsValidation && !strings.HasPrefix(err.Error(), "GS: ") {
+			fmt.Printf("Error, lets doa ghostscript check of input\n")
+			err, _ := validatePdf(target, "")
+			fmt.Println(err)
+			if err != nil {
+				common.Log.Debug("GS fails processing input file %s - not counting as problematic", target)
+				return nil
+			}
+		}
+	}
+
 	return err
 }
 
@@ -376,10 +440,17 @@ func (this benchmarkResults) printResults(params benchParams) {
 		totalInputSize += result.sizeMB
 		totalOutputSize += result.outputSizeMB
 
+		baseName := filepath.Base(result.path)
+		if len(baseName) > 30 {
+			baseName = baseName[0:30]
+		}
 		if !result.passed {
 			// Only print ones that failed.
-			fmt.Printf("%s\t%.1f\t%v\t%.1f\t%s\n", result.path, result.sizeMB,
+			fmt.Printf("%30s\t%.1f\t%v\t%.1f\tError: %s\n", baseName, result.sizeMB,
 				result.passed, result.processTime, result.errorMessage)
+		} else if params.optimize && result.outputSizeMB > result.sizeMB {
+			fmt.Printf("%30s\t%.1fM\t%v\t%.1fs\t%.4f -> %.4f\t%.4f\n", baseName, result.sizeMB,
+				result.passed, result.processTime, result.sizeMB, result.outputSizeMB, result.sizeMB/result.outputSizeMB)
 		}
 	}
 
@@ -456,13 +527,16 @@ func benchmarkPDFs(paths []string, params benchParams) error {
 			benchmark.errorMessage = fmt.Sprintf("%s", err)
 			fmt.Printf("%s - fail %s\n", path, err)
 		}
-		if params.optimize {
+		if benchmark.passed && params.optimize {
 			outputPath := params.processPath
+			fmt.Printf("Output path: %s\n", outputPath)
 			if len(params.outputDir) > 0 {
 				outputPath = filepath.Join(params.outputDir, filepath.Base(path))
 			}
+			fmt.Printf("Output path 2: %s\n", outputPath)
 			outputFileSizeMB, err := getFileSize(outputPath)
 			if err != nil {
+				fmt.Printf("Error in getFileSize: %v\n", err)
 				return err
 			}
 			benchmark.outputSizeMB = outputFileSizeMB
