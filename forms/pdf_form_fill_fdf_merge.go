@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/annotator"
+	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/fdf"
 	"github.com/unidoc/unipdf/v3/model"
 )
@@ -31,7 +31,8 @@ func main() {
 	fdfPath := os.Args[2]
 	outputPath := os.Args[3]
 
-	err := fdfMerge(templatePath, fdfPath, outputPath)
+	flatten := false
+	err := fdfMerge(templatePath, fdfPath, outputPath, flatten)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
@@ -41,8 +42,8 @@ func main() {
 }
 
 // fdfMerge loads template PDF in `templatePath` and FDF form data from `fdfPath` and fills into the fields,
-// flattens and outputs as a PDF to `outputPath`.
-func fdfMerge(templatePath, fdfPath, outputPath string) error {
+// flattens (if flatten specified) and outputs as a PDF to `outputPath`.
+func fdfMerge(templatePath, fdfPath, outputPath string, flatten bool) error {
 	fdfData, err := fdf.LoadFromPath(fdfPath)
 	if err != nil {
 		return err
@@ -66,32 +67,54 @@ func fdfMerge(templatePath, fdfPath, outputPath string) error {
 	}
 
 	// Flatten form.
-	fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: true, RegenerateTextFields: true}
+	if flatten {
+		fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: true, RegenerateTextFields: true}
 
-	// NOTE: To customize certain styles try:
-	// style := fieldAppearance.Style()
-	// style.CheckmarkGlyph = "a22"
-	// style.AutoFontSizeFraction = 0.70
-	// fieldAppearance.SetStyle(style)
-	//
-	// or for specifying a full set of appearance styles:
-	// fieldAppearance.SetStyle(annotator.AppearanceStyle{
-	//     CheckmarkGlyph:       "a22",
-	//     AutoFontSizeFraction: 0.70,
-	//     FillColor:            model.NewPdfColorDeviceGray(0.8),
-	//     BorderColor:          model.NewPdfColorDeviceRGB(1, 0, 0),
-	//     BorderSize:           2.0,
-	//     AllowMK:              false,
-	// })
+		// NOTE: To customize certain styles try:
+		// style := fieldAppearance.Style()
+		// style.CheckmarkGlyph = "a22"
+		// style.AutoFontSizeFraction = 0.70
+		// fieldAppearance.SetStyle(style)
+		//
+		// or for specifying a full set of appearance styles:
+		// fieldAppearance.SetStyle(annotator.AppearanceStyle{
+		//     CheckmarkGlyph:       "a22",
+		//     AutoFontSizeFraction: 0.70,
+		//     FillColor:            model.NewPdfColorDeviceGray(0.8),
+		//     BorderColor:          model.NewPdfColorDeviceRGB(1, 0, 0),
+		//     BorderSize:           2.0,
+		//     AllowMK:              false,
+		// })
 
-	err = pdfReader.FlattenFields(true, fieldAppearance)
-	if err != nil {
-		return err
+		err = pdfReader.FlattenFields(true, fieldAppearance)
+		if err != nil {
+			return err
+		}
+	} else {
+		fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: true, RegenerateTextFields: true}
+		for _, field := range pdfReader.AcroForm.AllFields() {
+			for _, wa := range field.Annotations {
+				// appgen generates the appearance based on the form/field/annotation and other settings
+				// based on the implementation (for example may only generate appearance if none set).
+				apDict, err := fieldAppearance.GenerateAppearanceDict(pdfReader.AcroForm, field, wa)
+				if err != nil {
+					return err
+				}
+				wa.AP = apDict
+				// Force update of the widget appearance.
+				_ = wa.ToPdfObject()
+			}
+		}
 	}
 
 	// Write out.
 	pdfWriter := model.NewPdfWriter()
-	pdfWriter.SetForms(nil)
+	if flatten {
+		pdfWriter.SetForms(nil)
+	} else {
+		pdfReader.AcroForm.ToPdfObject()
+		pdfWriter.SetForms(pdfReader.AcroForm)
+	}
 
 	for _, p := range pdfReader.PageList {
 		err := pdfWriter.AddPage(p)
