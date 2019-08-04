@@ -6,8 +6,8 @@
  * words, lines and columns.
  *
  * Run as: go run pdf_to_csv.go -m all -mf markup.pdf table.pdf table.csv
- *
- * NOTE: The debug marks are limited to 1000 per group.
+ * - Outputs debug markup including: marks, words, lines, columns to markup.pdf
+ * - The table data is outputed to table.csv with UTF-8 encoding.
  */
 
 package main
@@ -31,10 +31,6 @@ import (
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-const usage = `
-	Usage: go run pdf_to_csv.go file.pdf
-`
-
 var saveParams saveMarkedupParams
 
 func main() {
@@ -46,8 +42,11 @@ func main() {
 		-----BEGIN UNIDOC LICENSE KEY-----
 		...key contents...
 		-----END UNIDOC LICENSE KEY-----
-		`)
+		`, "Customer Name")
 	*/
+	// Alternatively license can be loaded via UNIPDF_LICENSE_PATH and UNIPDF_CUSTOMER_NAME environment variables,
+	// where UNIPDF_LICENSE_PATH points to the file containing the license key and the UNIPDF_CUSTOMER_NAME
+	// the explicitly specified customer name to which the key is licensed.
 	var (
 		loglevel   string
 		saveMarkup string
@@ -59,7 +58,7 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 	if len(args) < 2 {
-		fmt.Printf("Syntax: go run pdf_to_csv.go <file.pdf> <output.csv>\n")
+		fmt.Printf("Syntax: go run pdf_to_csv.go [options] <file.pdf> <output.csv>\n")
 		os.Exit(1)
 	}
 
@@ -177,7 +176,7 @@ func extractTableData(inPath string, outPath string) error {
 		}
 		saveParams.markups[pageNum] = append(saveParams.markups[pageNum], group)
 
-		pageCSV, err := processLineData(textMarks, mbox)
+		pageCSV, err := pageMarksToCSV(textMarks)
 		if err != nil {
 			common.Log.Debug("Error grouping text: %v", err)
 			return err
@@ -208,6 +207,8 @@ func bboxArea(bbox model.PdfRectangle) float64 {
 	return math.Abs(bbox.Urx-bbox.Llx) * math.Abs(bbox.Ury-bbox.Lly)
 }
 
+// Measure of the difference between areas of `bbox1` and `bbox2` individually
+// and that of the union of the two.
 func overlaps(bbox1, bbox2 model.PdfRectangle) float64 {
 	union := rectUnion(bbox1, bbox2)
 	a := bboxArea(union)
@@ -216,6 +217,8 @@ func overlaps(bbox1, bbox2 model.PdfRectangle) float64 {
 	return diff
 }
 
+// Measure of the vertical overlap of `bbox1` and `bbox2`, when the difference is 0
+// then they are exactly on top of each other, and there is overlap when < 0.
 func lineOverlap(bbox1, bbox2 model.PdfRectangle) float64 {
 	union := rectUnion(bbox1, bbox2)
 	a := math.Abs(union.Ury - union.Lly)
@@ -224,6 +227,8 @@ func lineOverlap(bbox1, bbox2 model.PdfRectangle) float64 {
 	return diff
 }
 
+// Measure of the horizontal overlap of `bbox1` and `bbox2`, when the difference is 0
+// then they are exactly on next to each other, and there is overlap when < 0.
 func columnOverlap(bbox1, bbox2 model.PdfRectangle) float64 {
 	union := rectUnion(bbox1, bbox2)
 	a := math.Abs(union.Urx - union.Llx)
@@ -232,7 +237,7 @@ func columnOverlap(bbox1, bbox2 model.PdfRectangle) float64 {
 	return diff
 }
 
-// Identify lines. - segment lines
+// Identify lines. - segment words into lines
 func identifyLines(words []segmentationWord) [][]segmentationWord {
 	lines := [][]segmentationWord{}
 
@@ -275,6 +280,7 @@ func identifyLines(words []segmentationWord) [][]segmentationWord {
 		})
 	}
 
+	// Save the line bounding boxes for markup output.
 	lineGroups := []model.PdfRectangle{}
 	for li, line := range lines {
 		var lineRect model.PdfRectangle
@@ -319,7 +325,7 @@ func identifyColumns(words []segmentationWord) []model.PdfRectangle {
 
 			overlap := columnOverlap(wbbox, firstBBox)
 			common.Log.Debug("column: '%s'/'%s' overlap: %v [%+v/%+v]", word.String(), firstWord.String(), overlap, wbbox, firstBBox)
-			if overlap < 0.05 {
+			if overlap < 0.0 {
 				if overlap < bestOverlap {
 					bestOverlap = overlap
 					bestColumn = i
@@ -363,12 +369,33 @@ func identifyColumns(words []segmentationWord) []model.PdfRectangle {
 				colRect = rectUnion(colRect, wbbox)
 			}
 		}
+		common.Log.Debug("Column %d: Bbox: %+v", li+1, colRect)
 		colGroups = append(colGroups, colRect)
 	}
-	saveParams.markups[saveParams.curPage] = append(saveParams.markups[saveParams.curPage], colGroups)
-	return colGroups
+
+	// Filter by combining overlapping columns.
+	filtered := []model.PdfRectangle{}
+	for i := 0; i < len(colGroups); {
+		colgroup := colGroups[i]
+		j := i + 1
+		for ; j < len(colGroups); j++ {
+			overlap := columnOverlap(colgroup, colGroups[j])
+			common.Log.Debug("COLUMN overlap %d/%d: %v (%+v/%+v)", i+1, j+1, overlap, colgroup, colGroups[j])
+			if overlap > 0.0 {
+				break
+			}
+			colgroup = rectUnion(colgroup, colGroups[j])
+		}
+		i = j
+		filtered = append(filtered, colgroup)
+	}
+
+	saveParams.markups[saveParams.curPage] = append(saveParams.markups[saveParams.curPage], filtered)
+	return filtered
 }
 
+// getLineTableTextData converts the lines of words into table strings cells by accounting for
+// distribution of lines into columns as specified by `columnBBoxes`.
 func getLineTableTextData(lines [][]segmentationWord, columnBBoxes []model.PdfRectangle) [][]string {
 	tabledata := [][]string{}
 	for _, line := range lines {
@@ -400,12 +427,6 @@ type segmentationWord struct {
 	ma *extractor.TextMarkArray
 }
 
-func newWord(group *extractor.TextMarkArray) segmentationWord {
-	return segmentationWord{
-		ma: group,
-	}
-}
-
 func (w segmentationWord) Elements() []extractor.TextMark {
 	return w.ma.Elements()
 }
@@ -423,10 +444,12 @@ func (w segmentationWord) String() string {
 	for _, m := range w.Elements() {
 		buf.WriteString(m.Text)
 	}
-	return strings.TrimSpace(buf.String())
+	return buf.String()
 }
 
-func processLineData(textMarks *extractor.TextMarkArray, mbox *model.PdfRectangle) (string, error) {
+// pageMarksToCSV converts textMarks from a single page into CSV by grouping the marks into
+// words, lines and columns and then writing the table cells data as CSV output.
+func pageMarksToCSV(textMarks *extractor.TextMarkArray) (string, error) {
 	// STEP - Form words.
 	// Group the closest text marks that are overlapping.
 	words := []segmentationWord{}
@@ -437,6 +460,7 @@ func processLineData(textMarks *extractor.TextMarkArray, mbox *model.PdfRectangl
 		if mark.Text == "" {
 			continue
 		}
+
 		common.Log.Debug("Mark %d - '%s' (% X)", i, mark.Text, mark.Text)
 		if isFirst {
 			word = segmentationWord{ma: &extractor.TextMarkArray{}}
@@ -448,7 +472,7 @@ func processLineData(textMarks *extractor.TextMarkArray, mbox *model.PdfRectangl
 		common.Log.Debug(" - overlaps: %f", overlaps(mark.BBox, lastMark.BBox))
 		overlap := overlaps(mark.BBox, lastMark.BBox)
 		if overlap > 0.1 {
-			if len(word.String()) > 0 {
+			if len(strings.TrimSpace(word.String())) > 0 {
 				common.Log.Debug("Appending word: '%s' (%d chars) (%d elements)", word.String(), len(word.String()), len(word.Elements()))
 				words = append(words, word)
 			}
@@ -457,11 +481,12 @@ func processLineData(textMarks *extractor.TextMarkArray, mbox *model.PdfRectangl
 		word.ma.Append(mark)
 		lastMark = mark
 	}
-	if len(word.String()) > 0 {
+	if len(strings.TrimSpace(word.String())) > 0 {
 		common.Log.Debug("Appending word: '%s' (%d chars) (%d elements)", word.String(), len(word.String()), len(word.Elements()))
 		words = append(words, word)
 	}
 
+	// Include the words in the markup.
 	{
 		wbboxes := []model.PdfRectangle{}
 		for _, word := range words {
@@ -475,7 +500,24 @@ func processLineData(textMarks *extractor.TextMarkArray, mbox *model.PdfRectangl
 	}
 
 	lines := identifyLines(words)
-	columnBBoxes := identifyColumns(words)
+
+	// Filter out words in lines with only 1 column.
+	tableLines := [][]segmentationWord{}
+	for _, line := range lines {
+		if len(line) <= 1 {
+			continue
+		}
+		tableLines = append(tableLines, line)
+	}
+
+	tableWords := []segmentationWord{}
+	for _, line := range tableLines {
+		for _, word := range line {
+			tableWords = append(tableWords, word)
+		}
+	}
+
+	columnBBoxes := identifyColumns(tableWords)
 
 	tabledata := getLineTableTextData(lines, columnBBoxes)
 
@@ -497,6 +539,7 @@ type saveMarkedupParams struct {
 	markupOutputPath string
 }
 
+// Saves a marked up PDF with the original with certain groups highlighted: marks, words, lines, columns.
 func saveMarkedupPDF(params saveMarkedupParams) error {
 	var pageNums []int
 	for pageNum, _ := range params.markups {
@@ -559,10 +602,6 @@ func saveMarkedupPDF(params saveMarkedupParams) error {
 			}
 			borderColor := creator.ColorRGBFromHex(colors[gi])
 			for i, r := range group {
-				if i > 1000 {
-					// Gets exponentially slow with a huge number of marks.
-					break
-				}
 				common.Log.Trace("Mark %d", i+1)
 				rect := c.NewRectangle(r.Llx, h-r.Lly, r.Urx-r.Llx, -(r.Ury - r.Lly))
 				rect.SetBorderColor(borderColor)
