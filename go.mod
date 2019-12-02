@@ -3,6 +3,7 @@ module github.com/unidoc/unidoc-examples
 require (
 	github.com/ThalesIgnite/crypto11 v0.1.0
 	github.com/blend/go-sdk v2.0.0+incompatible // indirect
+	github.com/bmatcuk/doublestar v1.1.5
 	github.com/boombuler/barcode v1.0.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
