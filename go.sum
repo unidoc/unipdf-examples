@@ -1,5 +1,11 @@
 github.com/ThalesIgnite/crypto11 v0.1.0 h1:wh3jljzD2GLFcWZQlT5RC2yHxt10gdxhZg/TnFiFhaQ=
 github.com/ThalesIgnite/crypto11 v0.1.0/go.mod h1:DdvQlzHSrdXwhcXCWY6o1HquZycJyAwsXXpKlk1+rww=
+github.com/adrg/strutil v0.1.0 h1:IOQnSOAjbE17+7l1lw4rXgX6JuSeJGdZa7BucTMV3Qg=
+github.com/adrg/strutil v0.1.0/go.mod h1:pXRr2+IyX5AEPAF5icj/EeTaiflPSD2hvGjnguilZgE=
+github.com/adrg/sysfont v0.1.0 h1:vOk13USVkciGOJj9sPT9Gl9zfHUT2HZgsBnwS1Je4Q8=
+github.com/adrg/sysfont v0.1.0/go.mod h1:DzISco90USPZJ+lmtpuz1SOTn1fih6YyB0KG2TEP/0U=
+github.com/adrg/xdg v0.2.1 h1:VSVdnH7cQ7V+B33qSJHTCRlNgra1607Q8PzEmnvb2Ic=
+github.com/adrg/xdg v0.2.1/go.mod h1:ZuOshBmzV4Ta+s23hdfFZnBsdzmoR3US0d7ErpqSbTQ=
 github.com/blend/go-sdk v2.0.0+incompatible h1:FL9X/of4ZYO5D2JJNI4vHrbXPfuSDbUa7h8JP9+E92w=
 github.com/blend/go-sdk v2.0.0+incompatible/go.mod h1:3GUb0YsHFNTJ6hsJTpzdmCUl05o8HisKjx5OAlzYKdw=
 github.com/boombuler/barcode v1.0.0 h1:s1TvRnXwL2xJRaccrdcBQMZxq6X7DvsMogtmJeHDdrc=
@@ -19,10 +25,13 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0Q=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
+github.com/unidoc/unipdf/v3 v3.0.1-0.20191212174100-1d29f5c376a7 h1:Hn2P37WHQECkLwxz4tB2Dg4MW/AQwrFRnAAxcFU0VVc=
+github.com/unidoc/unipdf/v3 v3.0.1-0.20191212174100-1d29f5c376a7/go.mod h1:57uIP/JiZeNZAjvFajbzopRxIW/xQ3ZTht8LOMMWWJE=
 github.com/unidoc/unipdf/v3 v3.1.0 h1:gr3nlEB2SFf1w0AaXBAj7nHd/cdnXWQZvYYdnoSbjCQ=
 github.com/unidoc/unipdf/v3 v3.1.0/go.mod h1:deHLROTLv9UDHIcWQFbjcrEZ4aTwyhPXX0fvpyoZyAM=
 github.com/unidoc/unipdf/v3 v3.1.1 h1:/emmQWTj23+oWIkIAM95R6BbhM4+wh9R5+txZBwFV50=
 github.com/unidoc/unipdf/v3 v3.1.1/go.mod h1:deHLROTLv9UDHIcWQFbjcrEZ4aTwyhPXX0fvpyoZyAM=
+github.com/unidoc/unipdf/v3 v3.3.0 h1:VbKYl0YFseQfq7IF7weCcnmYZjmUSFrE1Xgt9mKposs=
 github.com/wcharczuk/go-chart v2.0.1+incompatible h1:0pz39ZAycJFF7ju/1mepnk26RLVLBCWz1STcD3doU0A=
 github.com/wcharczuk/go-chart v2.0.1+incompatible/go.mod h1:PF5tmL4EIx/7Wf+hEkpCqYi5He4u90sw+0+6FhrryuE=
 github.com/youtube/vitess v2.1.1+incompatible h1:SE+P7DNX/jw5RHFs5CHRhZQjq402EJFCD33JhzQMdDw=
