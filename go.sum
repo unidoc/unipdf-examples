@@ -19,6 +19,8 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0Q=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
+github.com/unidoc/unipdf/v3 v3.0.1-0.20200121204407-843a48ed7bc8 h1:evf6xNA0L5xsk8hYUqEesy8nICJyBpOmfhaUhXXQWGw=
+github.com/unidoc/unipdf/v3 v3.0.1-0.20200121204407-843a48ed7bc8/go.mod h1:deHLROTLv9UDHIcWQFbjcrEZ4aTwyhPXX0fvpyoZyAM=
 github.com/unidoc/unipdf/v3 v3.1.0 h1:gr3nlEB2SFf1w0AaXBAj7nHd/cdnXWQZvYYdnoSbjCQ=
 github.com/unidoc/unipdf/v3 v3.1.0/go.mod h1:deHLROTLv9UDHIcWQFbjcrEZ4aTwyhPXX0fvpyoZyAM=
 github.com/unidoc/unipdf/v3 v3.1.1 h1:/emmQWTj23+oWIkIAM95R6BbhM4+wh9R5+txZBwFV50=
