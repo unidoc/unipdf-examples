@@ -1,8 +1,9 @@
 /*
- * Prints PDF page info: Mediabox size and other parameters.
- * If [page num] is not specified prints out info for all pages.
+ * Retrieves outlines (bookmarks) from a PDF file and prints out in JSON format.
+ * Note: The JSON output can be used with the related pdf_set_outlines.go example to
+ * apply outlines to a PDF file.
  *
- * Run as: go run pdf_info.go input.pdf [page num]
+ * Run as: go run pdf_get_outlines.go input.pdf > outlines.json
  */
 
 package main
@@ -25,7 +26,7 @@ func main() {
 	inputPath := os.Args[1]
 
 	// Enable debug-level logging.
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	fmt.Printf("Input file: %s\n", inputPath)
 
