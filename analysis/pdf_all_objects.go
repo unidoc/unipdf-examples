@@ -8,6 +8,7 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 
@@ -15,31 +16,38 @@ import (
 	pdf "github.com/unidoc/unipdf/v3/model"
 )
 
+type cmdOptions struct {
+	pdfPassword string
+}
+
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Fprintln(os.Stderr, "Syntax: go run pdf_all_objects.go input.pdf")
+	var opt cmdOptions
+	flag.StringVar(&opt.pdfPassword, "password", "", "PDF Password (empty default)")
+	flag.Parse()
+	args := flag.Args()
+	if len(args) < 1 {
+		fmt.Fprintln(os.Stderr, "Syntax: go run pdf_all_objects.go [options] input.pdf")
 		os.Exit(1)
 	}
 
 	// Enable debug-level logging.
 	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
-	inputPath := os.Args[1]
+	inputPath := args[0]
 
 	fmt.Printf("Input file: %s\n", inputPath)
-	err := inspectPdf(inputPath)
+	err := inspectPdf(inputPath, opt)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
 }
 
-func inspectPdf(inputPath string) error {
+func inspectPdf(inputPath string, opt cmdOptions) error {
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
 
 	pdfReader, err := pdf.NewPdfReader(f)
@@ -54,7 +62,7 @@ func inspectPdf(inputPath string) error {
 
 	// Try decrypting with an empty one.
 	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
+		auth, err := pdfReader.Decrypt([]byte(opt.pdfPassword))
 		if err != nil {
 			return err
 		}
