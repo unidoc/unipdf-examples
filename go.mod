@@ -10,7 +10,7 @@ require (
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/miekg/pkcs11 v1.0.2
 	github.com/stretchr/testify v1.4.0 // indirect
-	github.com/unidoc/unipdf/v3 v3.4.1
+	github.com/unidoc/unipdf/v3 v3.0.0-20200218005420-9de5fe644e
 	github.com/wcharczuk/go-chart v2.0.1+incompatible
 	github.com/youtube/vitess v2.1.1+incompatible // indirect
 	golang.org/x/crypto v0.0.0-20200214034016-1d94cc7ab1c6
