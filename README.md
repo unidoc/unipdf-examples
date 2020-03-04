@@ -4,8 +4,6 @@ This example repository demonstrates many use cases for UniDoc's UniPDF library.
 it easy for users to get started with UniPDF. Feel free to add to this by submitting
 a pull request.
 
-The examples are also available on UniDoc's website: [https://unidoc.io/examples/](https://unidoc.io/examples/). 
-
 ### Build all examples
 
 #### Building with go modules:
