@@ -3,11 +3,6 @@
  * The output is saved as styled_paragraph.pdf which illustrates some of the features
  * of the creator.
  */
-/*
- * NOTE: This example depends on github.com/unidoc/unipdf/v3/creator, MIT licensed,
- *       and github.com/unidoc/unipdf/v3/model,
- *       Apache-2 licensed.
- */
 
 package main
 
@@ -19,51 +14,64 @@ import (
 )
 
 func main() {
-
 	c := creator.New()
 	c.NewPage()
 
-	fontRegular, _ := model.NewStandard14Font(model.HelveticaName)
-	fontBold, _ := model.NewStandard14Font(model.HelveticaBoldName)
+	fontRegular, err := model.NewStandard14Font(model.HelveticaName)
+	if err != nil {
+		log.Fatalf("Error %s", err)
+	}
 
-	//Styled paragraphs ***********************************************
-	//Setting heading style
+	fontBold, err := model.NewStandard14Font(model.HelveticaBoldName)
+	if err != nil {
+		log.Fatalf("Error %s", err)
+	}
+
+	// `stChap` represents a styled paragraphs chapter
 	stChap := c.NewChapter("Styled Paragraphs")
 	stChap.GetHeading().SetMargins(0, 0, 20, 0)
 	stChap.GetHeading().SetFont(fontBold)
 	stChap.GetHeading().SetFontSize(18)
 	stChap.GetHeading().SetColor(creator.ColorRed)
 
-	//Creatign new styled paragraph
+	// `stylPar` creates a new styled paragraph
 	stylPar := c.NewStyledParagraph()
-	stylPar.SetLineHeight(3) //setting line height
+	stylPar.SetLineHeight(3)
 
-	boldStyle := c.NewTextStyle() //creating new style
+	// `boldStyle` creates a new style
+	boldStyle := c.NewTextStyle()
+	boldStyle.Font = fontBold
+	boldStyle.Color = creator.ColorGreen
 
-	boldStyle.Font = fontBold                                                                                       //setting chunk's font style
-	boldStyle.Color = creator.ColorGreen                                                                            //setting chunk's color
-	chunk := stylPar.Append("This text is bolded and is in green color. We're showing how styled paragraphs work.") //setting chunk's text
-	chunk.Style = boldStyle                                                                                         //setting chunk's style
+	// Applying `boldStyle` to `chunk`
+	chunk := stylPar.Append("This text is bolded and is in green color. We're showing how styled paragraphs work.")
+	chunk.Style = boldStyle
 
-	normStyle := c.NewTextStyle()                                                                                                                                               //creating new style
-	normStyle.Font = fontRegular                                                                                                                                                //setting chunk's font style
-	normStyle.Color = creator.ColorBlue                                                                                                                                         //setting chunk's color
-	chunktwo := stylPar.Append("You can change the size, color and almost anything of the font using the StyledParagraph command. This font is in blue color and is not bold.") //setting chunk's text
-	chunktwo.Style = normStyle                                                                                                                                                  //setting chunk's style
+	// Creating new style `normStyle`
+	normStyle := c.NewTextStyle()
+	normStyle.Font = fontRegular
+	normStyle.Color = creator.ColorBlue
 
+	// Applying `normStyle` to `chunkTwo`
+	chunkTwo := stylPar.Append("You can change the size, color and almost anything of the font using the StyledParagraph command. This font is in blue color and is not bold.")
+	chunkTwo.Style = normStyle
+
+	// Creating new style `hugeStyle`
 	hugeStyle := c.NewTextStyle()
 	hugeStyle.Font = fontRegular
 	hugeStyle.FontSize = 25
-	chunkthree := stylPar.Append("This is HUGE and black.")
-	chunkthree.Style = hugeStyle
 
-	stChap.Add(stylPar) //Adding styled paragraph into the chapter
+	// Applying `normStyle` to `chunkThree`
+	chunkThree := stylPar.Append("This is HUGE and black.")
+	chunkThree.Style = hugeStyle
 
-	c.Draw(stChap) //Drawing the chapter using the creator in the new page we creator
+	// Adding styled paragraph into the chapter `stChap` and drawing it using the creator
+	stChap.Add(stylPar)
+	c.Draw(stChap)
 
 	// Write output file.
-	err := c.WriteToFile("styled_paragraph.pdf")
+	err = c.WriteToFile("styled_paragraph.pdf")
 	if err != nil {
-		log.Fatalf("Error %s", err) //Writing error if any
+		log.Fatalf("Error %s", err)
 	}
 }
