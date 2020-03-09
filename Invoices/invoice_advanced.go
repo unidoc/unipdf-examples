@@ -2,6 +2,7 @@
  * This example showcases the creation of an advanced invoice with custom fields
  * The output is saved as invoice_advanced.pdf
  * The invoice contains improved formatting and styling as compared to simple invoice
+ * You can easily create a personalized invoice following the code given below
  */
 
 package main
