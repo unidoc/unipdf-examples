@@ -1,5 +1,5 @@
 /*
- * This example showcases the creation of styled paragraph
+ * This example showcases the creation of styled paragraph.
  * The output is saved as styled_paragraph.pdf which illustrates some of the features
  * of the creator.
  */
