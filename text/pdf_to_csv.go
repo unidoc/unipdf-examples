@@ -2,8 +2,8 @@
  * PDF to CSV: Example illustrating capability to extract TextMarks from PDF, and grouping together into
  * words, rows and columns for CSV data extraction.
  *
- * Includes debugging capabilities such as outputing a marked up PDF showing bounding boxes of marks,
-	 * words, lines and columns.
+ * Includes debugging capabilities such as outputing a marked up PDF showing bounding boxes of marks
+ * words, lines and columns.
  *
  * Run as: go run pdf_to_csv.go -m all -mf markup.pdf table.pdf table.csv
  * - Outputs debug markup including: marks, words, lines, columns to markup.pdf
