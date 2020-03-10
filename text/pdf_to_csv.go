@@ -8,7 +8,7 @@
  * Run as: go run pdf_to_csv.go -m all -mf markup.pdf table.pdf table.csv
  * - Outputs debug markup including: marks, words, lines, columns to markup.pdf
  * - The table data is outputed to table.csv with UTF-8 encoding.
-*/
+ */
 
 package main
 
