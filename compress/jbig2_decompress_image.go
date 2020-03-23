@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/unidoc/unipdf/core"
+	"github.com/unidoc/unipdf/v3/core"
 )
 
 func main() {
