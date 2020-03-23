@@ -46,20 +46,20 @@ func main() {
 
 	// create a jbig2 encoder context.
 	enc := &core.JBIG2Encoder{
-		// JBIG2 files could be stored as a separate files (mostly with .jb2 extension) or
-		// as a part of PDF stream. In this case we want to store it as a file - thus set FileMode to true.
-		FileMode: true,
-	}
-	settings := core.JBIG2EncoderSettings{
-		// In order to have better compression, JBIG2 encoder allows to store
-		// duplicated lines (image row bits) once, and then relates to it's value on the
-		// subsequent rows.
-		// In order to use it set DuplicatedLinesRemoval to true.
-		DuplicatedLinesRemoval: true,
+		DefaultPageSettings: core.JBIG2EncoderSettings{
+			// JBIG2 files could be stored as a separate files (mostly with .jb2 extension) or
+			// as a part of PDF stream. In this case we want to store it as a file - thus set FileMode to true.
+			FileMode: true,
+			// In order to have better compression, JBIG2 encoder allows to store
+			// duplicated lines (image row bits) once, and then relates to it's value on the
+			// subsequent rows.
+			// In order to use it set DuplicatedLinesRemoval to true.
+			DuplicatedLinesRemoval: true,
+		},
 	}
 
-	// Add JBIG2Image as a new page to the encoder context with the given settings.
-	if err = enc.AddPageImage(jb2Img, settings); err != nil {
+	// Add JBIG2Image as a new page to the encoder context with the default page settings.
+	if err = enc.AddPageImage(jb2Img, nil); err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
