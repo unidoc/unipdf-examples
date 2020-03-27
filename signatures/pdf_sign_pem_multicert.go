@@ -34,7 +34,7 @@ import (
 )
 
 const (
-	usage = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH CERT PRIVATE_KEY\n"
+	usage = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH CERTS_PATH PRIVATE_KEY_PATH\n"
 )
 
 func main() {
