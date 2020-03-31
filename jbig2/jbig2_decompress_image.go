@@ -9,9 +9,9 @@
 package main
 
 import (
-	"fmt"
 	"image/jpeg"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/unidoc/unipdf/v3/core"
@@ -21,16 +21,14 @@ func main() {
 	// read jbig2 encoded file with the checkerboard-squares-black-white image.
 	f, err := os.Open("checkerboard-squares-black-white.jb2")
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error: %v\n", err)
 	}
 	defer f.Close()
 
 	// read all bytes from the file
 	data, err := ioutil.ReadAll(f)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error: %v\n", err)
 	}
 
 	// Create new JBIG2Encoder/Decoder
@@ -39,25 +37,21 @@ func main() {
 	// Decode all images from the 'data'.
 	images, err := enc.DecodeImages(data)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error: %v\n", err)
 	}
 	// there should be exactly one image.
 	if len(images) != 1 {
-		fmt.Printf("Error: Only a single image should be decoded\n")
-		os.Exit(1)
+		log.Fatalf("Error: Only a single image should be decoded\n")
 	}
 	// Create a new decoded file.
 	dec, err := os.Create("checkerboard-squares-black-white-decoded.jpg")
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error: %v\n", err)
 	}
 	defer dec.Close()
 
 	// encode using commonly used jpeg.
 	if err = jpeg.Encode(dec, images[0], &jpeg.Options{Quality: 100}); err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error: %v\n", err)
 	}
 }

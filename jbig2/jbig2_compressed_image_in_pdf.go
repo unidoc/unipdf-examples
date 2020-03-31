@@ -14,6 +14,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/unidoc/unipdf/core"
@@ -23,8 +24,7 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Printf("Usage: go run pdf_add_images.go output.pdf img1.jpg img2.jpg ...\n")
-		os.Exit(1)
+		log.Fatalf("Usage: go run pdf_add_images.go output.pdf img1.jpg img2.jpg ...\n")
 	}
 
 	outputPath := os.Args[1]
@@ -32,8 +32,7 @@ func main() {
 
 	err := imagesToJBIG2ToPdf(inputPaths, outputPath)
 	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Error: %v\n", err)
 	}
 
 	fmt.Printf("Complete, see output file: %s\n", outputPath)
