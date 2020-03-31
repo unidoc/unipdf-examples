@@ -1,3 +1,13 @@
+/*
+ * This example showcases the decompression of the jbig2 encoded document
+ * with additional 'globals' jbig2 file.
+ *
+ * JBIG2 standard allows to store common segment definitions called 'Globals' which may be stored
+ * on separate byte stream or file. In order to decode this kind of documents, we need to
+ * firstly decode the globals file (jbig2_example_globals.jb2), and then apply it to the JBIG2Encoder context that would be used
+ * to decode the main file (jbig2_example_globals.jb2).
+ */
+
 package main
 
 import (
@@ -15,7 +25,6 @@ func main() {
 	// and the main jb2 file.
 	// In the PDF stream this is done automatically by the UniPDF library.
 	// In order to decode it manually a user is responsible for decoding JBIG2 Globals.
-
 	// At first we need to read and decode Globals file.
 	globalsFile, err := os.Open("jbig2_example_globals.jb2")
 	if err != nil {

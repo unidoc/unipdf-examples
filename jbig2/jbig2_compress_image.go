@@ -1,3 +1,14 @@
+/*
+ * This example showcases the conversion of the jpg encoded image
+ * into jbig2 encoding format.
+ *
+ * The result jbig2 file is compressed with a lossless method stored with
+ * the standard  jbig2 - .jb2 extension. The file compressed in this example
+ * is stored in just 377 bytes - compared to the 142 794 bytes for original image.
+ * This gives compression ratio (uncompressed size/compressed size) of 378.76, which leads to 99.735%
+ * space savings for given example.
+ */
+
 package main
 
 import (

@@ -1,3 +1,11 @@
+/*
+ * This example showcases the decompression of the jbig2 encoded image and storing into
+ * commonly used jpg format.
+ *
+ * As the input for this test the result of the compression example would be used (lossless image).
+ * The result of this example is an image that has unchanged quality (in compare to the input of the compression example).
+ */
+
 package main
 
 import (
