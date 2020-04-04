@@ -1,6 +1,11 @@
 /*
  * This example showcases the conversion of the jpg encoded image
  * into jbig2 encoding format.
+ *
+ * The input file would be firstly converted into bi-level image
+ * and then stored using jbig2 encoding format.
+ *
+ * Syntax: go run jbig2_compress_image.go img.jpg
  */
 
 package main
@@ -8,13 +13,12 @@ package main
 import (
 	"fmt"
 	"image"
+	// load jpeg image decoder
+	_ "image/jpeg"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
-
-	// load jpeg decoder
-	_ "image/jpeg"
-	"os"
 
 	"github.com/unidoc/unipdf/v3/core"
 )
@@ -79,15 +83,8 @@ func main() {
 		log.Fatalf("Error: %v\n", err)
 	}
 
-	fileNameWithoutExtension := func(filename string) string {
-		if i := strings.LastIndex(filename, "."); i != -1 {
-			return filename[:i]
-		}
-		return filename
-	}
-
 	// Write encoded data into a file with the extension '.jb2' - this is standard extension for the jbig2 files.
-	encodedFile, err := os.Create(fileNameWithoutExtension(fileName) + ".jb2")
+	encodedFile, err := os.Create(strings.TrimSuffix(fileName, filepath.Ext(fileName)) + ".jb2")
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}

@@ -1,8 +1,8 @@
 /*
- * Insert an image to a PDF file compressed using JBIG2 encoder.
+ * Add images to a PDF file stored in a JBIG2 encoding, one image per page.
  *
- * Example go run jbig2_compressed_image_in_pdf.go /tmp/output.pdf 1 /tmp/image.jpg /tmp/image2.jpg
- * adds the image to the upper left corner of the page (0,0).  The width is 100 (typical page width 612 with defaults).
+ * All input images would be converted into bi-level (binary) form and then
+ * stored in JBIG2 encoding format.
  *
  * Syntax: go run jbig2_compressed_image.go output.pdf img1.jpg, img2.jpg
  */
