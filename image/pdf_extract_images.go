@@ -18,10 +18,9 @@ import (
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-
 func main() {
-	// Enable debug-level console logging, when debuggingn:
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// Enable debug-level console logging, when debugging:
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	if len(os.Args) < 3 {
 		fmt.Printf("Syntax: go run pdf_extract_images.go input.pdf output.zip\n")
@@ -96,7 +95,6 @@ func extractImagesToArchive(inputPath, outputPath string) error {
 			return err
 		}
 
-
 		pextract, err := extractor.New(page)
 		if err != nil {
 			return err
@@ -140,4 +138,3 @@ func extractImagesToArchive(inputPath, outputPath string) error {
 
 	return nil
 }
-

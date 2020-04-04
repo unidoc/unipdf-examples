@@ -17,9 +17,9 @@ import (
 	"os"
 	"strconv"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/creator"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 	}
 
 	// Use debug logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	inputPath := os.Args[1]
 	pageNumStr := os.Args[2]
@@ -71,7 +71,6 @@ func main() {
 // Add image to a specific page of a PDF.  xPos and yPos define the upper left corner of the image location, and iwidth
 // is the width of the image in PDF document dimensions (height/width ratio is maintained).
 func addImageToPdf(inputPath string, outputPath string, imagePath string, pageNum int, xPos float64, yPos float64, iwidth float64) error {
-
 	c := creator.New()
 
 	// Prepare the image.
@@ -89,7 +88,7 @@ func addImageToPdf(inputPath string, outputPath string, imagePath string, pageNu
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}

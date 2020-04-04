@@ -10,14 +10,14 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/creator"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
 func main() {
 	// Enable console-level debug-mode logging when debugging:
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	if len(os.Args) < 4 {
 		fmt.Printf("go run pdf_watermark_image.go input.pdf watermark.jpg output.pdf\n")
@@ -39,8 +39,8 @@ func main() {
 
 // Watermark pdf file based on an image.
 func addWatermarkImage(inputPath string, outputPath string, watermarkPath string) error {
-	unicommon.Log.Debug("Input PDF: %v", inputPath)
-	unicommon.Log.Debug("Watermark image: %s", watermarkPath)
+	common.Log.Debug("Input PDF: %v", inputPath)
+	common.Log.Debug("Watermark image: %s", watermarkPath)
 
 	c := creator.New()
 
@@ -56,7 +56,7 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
