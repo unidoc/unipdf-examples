@@ -1,36 +1,29 @@
 /*
  * This example showcases the decompression of the jbig2 encoded image and storing into
  * commonly used jpg format.
+ *
+ * As the input for this test the result of the compression example would be used (lossless image).
+ * The result of this example is an image that has unchanged quality (in compare to the input of the compression example).
  */
 
 package main
 
 import (
-	"fmt"
 	"image/jpeg"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
-	"strings"
 
 	"github.com/unidoc/unipdf/v3/core"
 )
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Printf("Usage: go run jbig2_decompress_image.go img.jb2 ...\n")
-		os.Exit(1)
-	}
-	inputImage := os.Args[1]
-	_, fileName := filepath.Split(inputImage)
-
-	f, err := os.Open(inputImage)
+	f, err := os.Open(filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "unidoc", "unipdf-examples", "jbig2", "checkerboard-squares-black-white.jb2"))
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
 	defer f.Close()
-
 	data, err := ioutil.ReadAll(f)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
@@ -48,14 +41,8 @@ func main() {
 	if len(images) != 1 {
 		log.Fatalf("Error: Only a single image should be decoded\n")
 	}
-	fileNameWithoutExtension := func(filename string) string {
-		if i := strings.LastIndex(filename, "."); i != -1 {
-			return filename[:i]
-		}
-		return filename
-	}
 	// Create a new file for the decoded image.
-	dec, err := os.Create(fileNameWithoutExtension(fileName) + ".jpg")
+	dec, err := os.Create("checkerboard-squares-black-white-decoded.jpg")
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}

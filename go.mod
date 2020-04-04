@@ -9,7 +9,7 @@ require (
 	github.com/miekg/pkcs11 v1.0.2
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/stretchr/testify v1.5.1 // indirect
-	github.com/unidoc/unipdf/v3 v3.5.0
+	github.com/unidoc/unipdf/v3 v3.5.1-0.20200403205459-29efa30439b3
 	github.com/wcharczuk/go-chart v2.0.1+incompatible
 	github.com/youtube/vitess v2.1.1+incompatible // indirect
 	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
@@ -19,4 +19,4 @@ require (
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
 
-go 1.13
+go 1.11

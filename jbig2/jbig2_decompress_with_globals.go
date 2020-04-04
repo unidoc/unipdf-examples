@@ -17,6 +17,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 
 	"github.com/unidoc/unipdf/v3/core"
 )
@@ -28,7 +29,7 @@ func main() {
 	// In the PDF stream this is done automatically by the UniPDF library.
 	// In order to decode it manually a user is responsible for decoding JBIG2 Globals.
 	// At first we need to read and decode Globals file.
-	globalsFile, err := os.Open("jbig2_example_globals.jb2")
+	globalsFile, err := os.Open(filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "unidoc", "unipdf-examples", "jbig2", "jbig2_example_globals.jb2"))
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
@@ -49,7 +50,7 @@ func main() {
 	}
 
 	// Now read the main JBIG2 file and decode it with the the use of provided 'globals'.
-	jbig2File, err := os.Open("jbig2_example.jb2")
+	jbig2File, err := os.Open(filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "unidoc", "unipdf-examples", "jbig2", "jbig2_example.jb2"))
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
@@ -77,7 +78,7 @@ func main() {
 }
 
 func saveImage(i int, img image.Image) {
-	imgFile, err := os.Create(fmt.Sprintf("jbig2_example_decoded_%d", i+1))
+	imgFile, err := os.Create(fmt.Sprintf("jbig2_example_decoded_%d.jpg", i+1))
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}

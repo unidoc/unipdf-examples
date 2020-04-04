@@ -41,7 +41,7 @@ func imagesToJBIG2ToPdf(inputPaths []string, outputPath string) error {
 	c := creator.New()
 
 	for _, imgPath := range inputPaths {
-		common.Log.Debugf("Encoding image: %s", imgPath)
+		common.Log.Debug("Encoding image: %s", imgPath)
 		img, err := c.NewImageFromFile(imgPath)
 		if err != nil {
 			common.Log.Debug("Error loading image: %v", err)
@@ -49,7 +49,7 @@ func imagesToJBIG2ToPdf(inputPaths []string, outputPath string) error {
 		}
 		// Convert the image into binary format. The RGB and GrayScale images would be converted into bi-level image.
 		// This step is required for the JBIG2 Encoder.
-		if err = img.ToBinaryImage(); err != nil {
+		if err = img.ConvertToBinary(); err != nil {
 			return err
 		}
 		// Set the JBIG2 Encoder as the image encoder.
