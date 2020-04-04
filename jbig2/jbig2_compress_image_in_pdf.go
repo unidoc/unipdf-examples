@@ -4,7 +4,7 @@
  * All input images would be converted into bi-level (binary) form and then
  * stored in JBIG2 encoding format.
  *
- * Syntax: go run jbig2_compressed_image.go output.pdf img1.jpg, img2.jpg
+ * Syntax: go run jbig2_compress_image.go output.pdf img1.jpg, img2.jpg
  */
 
 package main
@@ -21,7 +21,7 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Printf("Usage: go run jbig2_compressed_image_in_pdf.go output.pdf img1.jpg img2.jpg ...\n")
+		fmt.Printf("Usage: go run jbig2_compress_image_in_pdf.go output.pdf img1.jpg img2.jpg ...\n")
 		os.Exit(1)
 	}
 
