@@ -17,8 +17,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/unidoc/unipdf/core"
 	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/creator"
 )
 

@@ -12,6 +12,7 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"image/jpeg"
 	"io/ioutil"
 	"log"
@@ -70,15 +71,20 @@ func main() {
 	}
 
 	for i, img := range images {
-		imgFile, err := os.Create(fmt.Sprintf("jbig2_example_decoded_%d", i+1))
-		if err != nil {
-			log.Fatalf("Error: %v\n", err)
-		}
-		defer imgFile.Close()
-		err = jpeg.Encode(imgFile, img, &jpeg.Options{Quality: 100})
-		if err != nil {
-			log.Fatalf("Error: %v\n", err)
-		}
+		saveImage(i, img)
 	}
 	fmt.Printf("Decoded %d images.", len(images))
+}
+
+func saveImage(i int, img image.Image) {
+	imgFile, err := os.Create(fmt.Sprintf("jbig2_example_decoded_%d", i+1))
+	if err != nil {
+		log.Fatalf("Error: %v\n", err)
+	}
+	defer imgFile.Close()
+
+	err = jpeg.Encode(imgFile, img, &jpeg.Options{Quality: 100})
+	if err != nil {
+		log.Fatalf("Error: %v\n", err)
+	}
 }
