@@ -1,13 +1,10 @@
 /*
  * Insert an image to a PDF file compressed using JBIG2 encoder.
  *
- * Adds image to a specific page of a PDF.  xPos and yPos define the upper left corner of the image location, and width
- * is the width of the image in PDF coordinates (height/width ratio is maintained).
- *
- * Example go run jbig2_compressed_image_in_pdf.go /tmp/input.pdf 1 /tmp/image.jpg 0 0 100 /tmp/output.pdf
+ * Example go run jbig2_compressed_image_in_pdf.go /tmp/output.pdf 1 /tmp/image.jpg /tmp/image2.jpg
  * adds the image to the upper left corner of the page (0,0).  The width is 100 (typical page width 612 with defaults).
  *
- * Syntax: go run pdf_add_image_to_page.go input.pdf <page> image.jpg <xpos> <ypos> <width> output.pdf
+ * Syntax: go run jbig2_compressed_image.go output.pdf img1.jpg, img2.jpg
  */
 
 package main
