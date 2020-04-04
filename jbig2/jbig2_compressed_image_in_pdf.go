@@ -21,7 +21,7 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Printf("Usage: go run jbig2_compressed_image.go output.pdf img1.jpg img2.jpg ...\n")
+		fmt.Printf("Usage: go run jbig2_compressed_image_in_pdf.go output.pdf img1.jpg img2.jpg ...\n")
 		os.Exit(1)
 	}
 
