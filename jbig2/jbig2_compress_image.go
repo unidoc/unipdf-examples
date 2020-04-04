@@ -2,11 +2,10 @@
  * This example showcases the conversion of the jpg encoded image
  * into jbig2 encoding format.
  *
- * The result jbig2 file is compressed with a lossless method stored with
- * the standard  jbig2 - .jb2 extension. The file compressed in this example
- * is stored in just 377 bytes - compared to the 142 794 bytes for original image.
- * This gives compression ratio (uncompressed size/compressed size) of 378.76, which leads to 99.735%
- * space savings for given example.
+ * The input file would be firstly converted into bi-level image
+ * and then stored using jbig2 encoding format.
+ *
+ * Syntax: go run jbig2_compress_image.go img.jpg
  */
 
 package main
@@ -14,11 +13,12 @@ package main
 import (
 	"fmt"
 	"image"
-	"log"
-
-	// load jpeg decoder
+	// load jpeg image decoder
 	_ "image/jpeg"
+	"log"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/unidoc/unipdf/v3/core"
 )
@@ -26,7 +26,15 @@ import (
 func main() {
 	// Let's read an jpeg rgba image from the file, convert it into JBIG2Image
 	// using auto threshold and compress the black and white result into another file.
-	f, err := os.Open("checkerboard-squares-black-white.jpg")
+	if len(os.Args) < 2 {
+		fmt.Printf("Usage: go run jbig2_compress_image.go img.jpg ...\n")
+		os.Exit(1)
+	}
+
+	inputImage := os.Args[1]
+	_, fileName := filepath.Split(inputImage)
+
+	f, err := os.Open(inputImage)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
@@ -76,7 +84,7 @@ func main() {
 	}
 
 	// Write encoded data into a file with the extension '.jb2' - this is standard extension for the jbig2 files.
-	encodedFile, err := os.Create("checkerboard-squares-black-white.jb2")
+	encodedFile, err := os.Create(strings.TrimSuffix(fileName, filepath.Ext(fileName)) + ".jb2")
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
@@ -86,5 +94,5 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
-	fmt.Printf("Created JBIG2 Encoded file successfully")
+	fmt.Println("Created JBIG2 Encoded file successfully")
 }

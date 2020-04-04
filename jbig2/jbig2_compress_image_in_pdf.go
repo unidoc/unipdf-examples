@@ -1,10 +1,10 @@
 /*
- * Insert an image to a PDF file compressed using JBIG2 encoder.
+ * Add images to a PDF file stored in a JBIG2 encoding, one image per page.
  *
- * Example go run jbig2_compressed_image_in_pdf.go /tmp/output.pdf 1 /tmp/image.jpg /tmp/image2.jpg
- * adds the image to the upper left corner of the page (0,0).  The width is 100 (typical page width 612 with defaults).
+ * All input images would be converted into bi-level (binary) form and then
+ * stored in JBIG2 encoding format.
  *
- * Syntax: go run jbig2_compressed_image.go output.pdf img1.jpg, img2.jpg
+ * Syntax: go run jbig2_compress_image.go output.pdf img1.jpg, img2.jpg
  */
 
 package main
@@ -21,7 +21,7 @@ import (
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Printf("Usage: go run jbig2_compressed_image_in_pdf.go output.pdf img1.jpg img2.jpg ...\n")
+		fmt.Printf("Usage: go run jbig2_compress_image_in_pdf.go output.pdf img1.jpg img2.jpg ...\n")
 		os.Exit(1)
 	}
 
@@ -41,7 +41,7 @@ func imagesToJBIG2ToPdf(inputPaths []string, outputPath string) error {
 	c := creator.New()
 
 	for _, imgPath := range inputPaths {
-		common.Log.Debugf("Encoding image: %s", imgPath)
+		common.Log.Debug("Encoding image: %s", imgPath)
 		img, err := c.NewImageFromFile(imgPath)
 		if err != nil {
 			common.Log.Debug("Error loading image: %v", err)
@@ -49,7 +49,7 @@ func imagesToJBIG2ToPdf(inputPaths []string, outputPath string) error {
 		}
 		// Convert the image into binary format. The RGB and GrayScale images would be converted into bi-level image.
 		// This step is required for the JBIG2 Encoder.
-		if err = img.ToBinaryImage(); err != nil {
+		if err = img.ConvertToBinary(); err != nil {
 			return err
 		}
 		// Set the JBIG2 Encoder as the image encoder.
