@@ -12,6 +12,7 @@
 package main
 
 import (
+	"fmt"
 	"image"
 	"log"
 
@@ -31,7 +32,6 @@ func main() {
 	}
 	defer f.Close()
 
-	// decode the jpeg image.
 	img, _, err := image.Decode(f)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
@@ -44,14 +44,14 @@ func main() {
 	// at which level the values should be black and at which it should be white.
 	// It is recommended to use core.JB2ImageAutoThreshold value which computes image histogram.
 	// and on it's base gets proper value for the threshold.
-
-	// convert the image into JBIG2Image using auto threshold.
+	// Convert the image into JBIG2Image using auto threshold.
 	jb2Img, err := core.GoImageToJBIG2(img, core.JB2ImageAutoThreshold)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
 
-	// create a jbig2 encoder context.
+	// Create a JBIG2 Encoder/Decoder context. In this example we're setting page settings
+	// used for the encoding process.
 	enc := &core.JBIG2Encoder{
 		DefaultPageSettings: core.JBIG2EncoderSettings{
 			// JBIG2 files could be stored as a separate files (mostly with .jb2 extension) or
@@ -64,28 +64,27 @@ func main() {
 			DuplicatedLinesRemoval: true,
 		},
 	}
-
 	// Add JBIG2Image as a new page to the encoder context with the default page settings.
 	if err = enc.AddPageImage(jb2Img, nil); err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
 
-	// Encode the data into jbig2 format.
+	// Encode the data into jbig2 format and return as the slice of bytes.
 	data, err := enc.Encode()
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
 
-	// write encoded data into a file with the extension '.jb2' - this is standard extension for the jbig2 files.
-	encoded, err := os.Create("checkerboard-squares-black-white.jb2")
+	// Write encoded data into a file with the extension '.jb2' - this is standard extension for the jbig2 files.
+	encodedFile, err := os.Create("checkerboard-squares-black-white.jb2")
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
-	defer encoded.Close()
+	defer encodedFile.Close()
 
-	// Write encoded data into the file.
-	_, err = encoded.Write(data)
+	_, err = encodedFile.Write(data)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
+	fmt.Printf("Created JBIG2 Encoded file successfully")
 }

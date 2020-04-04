@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/creator"
 )
 
@@ -37,11 +37,11 @@ func imagesToPdf(inputPaths []string, outputPath string) error {
 	c := creator.New()
 
 	for _, imgPath := range inputPaths {
-		unicommon.Log.Debug("Image: %s", imgPath)
+		common.Log.Debug("Image: %s", imgPath)
 
 		img, err := c.NewImageFromFile(imgPath)
 		if err != nil {
-			unicommon.Log.Debug("Error loading image: %v", err)
+			common.Log.Debug("Error loading image: %v", err)
 			return err
 		}
 		img.ScaleToWidth(612.0)

@@ -33,40 +33,37 @@ func main() {
 	}
 	defer globalsFile.Close()
 
-	// read all data from the globals file.
+	// Read all data from the globals file.
 	globalsData, err := ioutil.ReadAll(globalsFile)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
-	// create JBIG2Encoder/Decoder context for the globals.
+	// Create JBIG2 Encoder/Decoder context for the globals file.
 	globalsDecoder := &core.JBIG2Encoder{}
 
-	// decode the globals using 'DecodeGlobals' method.
+	// Decode the globals using 'DecodeGlobals' method.
 	globals, err := globalsDecoder.DecodeGlobals(globalsData)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
 
-	// Read main JBIG2 file.
+	// Now read the main JBIG2 file and decode it with the the use of provided 'globals'.
 	jbig2File, err := os.Open("jbig2_example.jb2")
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
 	defer jbig2File.Close()
 
-	// read all files
 	exampleFileData, err := ioutil.ReadAll(jbig2File)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
 
-	// create new JBIG2 Decoder context.
+	// Create new JBIG2 Decoder context with previously decoded 'globals' and decode the images.
 	enc := &core.JBIG2Encoder{
 		Globals: globals,
 	}
 
-	// Decode the example file data.
-	// The globals would already be included into the context of this Decoder.
 	images, err := enc.DecodeImages(exampleFileData)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
@@ -83,5 +80,5 @@ func main() {
 			log.Fatalf("Error: %v\n", err)
 		}
 	}
-	fmt.Printf("Created %d images.", len(images))
+	fmt.Printf("Decoded %d images.", len(images))
 }
