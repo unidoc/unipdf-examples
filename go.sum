@@ -38,6 +38,8 @@ github.com/unidoc/unipdf/v3 v3.5.0 h1:VXz2QwqZyBMrvzQ956nzIAydP2DDd2YFG7o9htCxz/
 github.com/unidoc/unipdf/v3 v3.5.0/go.mod h1:57uIP/JiZeNZAjvFajbzopRxIW/xQ3ZTht8LOMMWWJE=
 github.com/unidoc/unipdf/v3 v3.5.1-0.20200403205459-29efa30439b3 h1:lKn3HUIW8sGhjKFFRt+vi1lcG9r4ZqXR16Sn8286Ms0=
 github.com/unidoc/unipdf/v3 v3.5.1-0.20200403205459-29efa30439b3/go.mod h1:oB/vP2a5OJfA5Op0X26CFX1JC8yECO2w+f6pMO/zpoo=
+github.com/unidoc/unipdf/v3 v3.6.0 h1:ajyu0gW0M6RY+XTAyx6mx/fdvwUxbVl654EDNOn3+84=
+github.com/unidoc/unipdf/v3 v3.6.0/go.mod h1:oB/vP2a5OJfA5Op0X26CFX1JC8yECO2w+f6pMO/zpoo=
 github.com/wcharczuk/go-chart v2.0.1+incompatible h1:0pz39ZAycJFF7ju/1mepnk26RLVLBCWz1STcD3doU0A=
 github.com/wcharczuk/go-chart v2.0.1+incompatible/go.mod h1:PF5tmL4EIx/7Wf+hEkpCqYi5He4u90sw+0+6FhrryuE=
 github.com/youtube/vitess v2.1.1+incompatible h1:SE+P7DNX/jw5RHFs5CHRhZQjq402EJFCD33JhzQMdDw=

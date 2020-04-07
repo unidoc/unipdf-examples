@@ -47,7 +47,8 @@ func main() {
 
 	// Store all images in the jpg format.
 	saveImage := func(i int, img image.Image) {
-		imgFile, err := os.Create(fmt.Sprintf("jbig2_decoded_%d.jpg", i+1))
+		output := fmt.Sprintf("jbig2_decoded_%d.jpg", i+1)
+		imgFile, err := os.Create(output)
 		if err != nil {
 			log.Fatalf("Error: %v\n", err)
 		}
@@ -57,6 +58,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error: %v\n", err)
 		}
+		fmt.Printf("Decompressed and stored the output to: '%s' with success.\n", output)
 	}
 
 	for i, img := range images {
