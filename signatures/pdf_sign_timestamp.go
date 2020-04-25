@@ -1,8 +1,8 @@
 /*
- * This example showcases how to digitally sign a PDF file using a
+ * This example showcases how to digitally sign and timestamp a PDF file using a
  * PKCS12 (.p12/.pfx) file.
  *
- * $ ./pdf_sign_pkcs12 <FILE.p12> <PASSWORD> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
+ * $ ./pdf_sign_timestamp <FILE.p12> <PASSWORD> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
 package main
 
