@@ -1,7 +1,7 @@
 /*
- * This example showcases how to validate a digital signature with UniDoc.
+ * This example showcases how to validate a digital signature containing timestamp with UniDoc.
  *
- * $ ./pdf_sign_validate <INPUT_PDF_PATH>
+ * $ ./pdf_sign_validate_timestamp <INPUT_PDF_PATH>
  */
 package main
 
