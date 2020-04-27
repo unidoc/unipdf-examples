@@ -10,6 +10,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
 
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
@@ -127,10 +129,38 @@ func main() {
 	contentCell.BackgroundColor = lightBlue
 	contentCell.BorderColor = lightBlue
 
-	invoice.SetSubtotal("$100.00")
-	invoice.AddTotalLine("Tax (10%)", "$10.00")
-	invoice.AddTotalLine("Shipping", "$5.00")
-	invoice.SetTotal("$85.00")
+	// Getting last column to calculate Total
+	allLines := invoice.Lines()
+	subTotal := 0
+	for _, cell := range allLines {
+		total := cell[4].Value
+		total = strings.Replace(total, "$", "", 1)
+		newTotal, err := strconv.Atoi(total)
+		if err == nil {
+			subTotal += newTotal
+		}
+	}
+
+	strSubTotal := "$" + strconv.Itoa(subTotal)
+
+	// Setting Tax %
+	fTax := float32(10)
+	fPerTax := float32(subTotal) * (fTax / 100)
+
+	strTax := strconv.Itoa(int(fTax)) + "%"
+
+	// Shipping cost $
+	intShipping := 5
+	strShipping := "$" + strconv.Itoa(intShipping)
+
+	//Calculating Abs Total
+	fAbsTotal := float32(intShipping) + fPerTax + float32(subTotal)
+	strAbsTotal := "$" + strconv.Itoa(int(fAbsTotal))
+
+	invoice.SetSubtotal(strSubTotal)
+	invoice.AddTotalLine("Tax %", strTax)
+	invoice.AddTotalLine("Shipping", strShipping)
+	invoice.SetTotal(strAbsTotal)
 
 	// Set invoice content sections.
 	invoice.SetNotes("Notes", "Thank you for your business.")
