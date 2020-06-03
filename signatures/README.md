@@ -27,10 +27,7 @@ PKCS11 without any hardware requirements.
 
 Ubuntu/Debian
 ```bash
-$ sudo apt-get install libssl-dev
-$ sudo apt-get install autotools-dev
-$ sudo apt-get install autoconf
-$ sudo apt-get install libtool
+$ sudo apt-get install libssl-dev autotools-dev autoconf libtool
 ```
 
 CentOS/RHEL
