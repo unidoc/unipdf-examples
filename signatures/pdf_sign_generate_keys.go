@@ -114,16 +114,17 @@ func generateKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 
 	// Initialize X509 certificate template.
 	template := x509.Certificate{
-		SerialNumber: big.NewInt(1),
+		SerialNumber: new(big.Int),
 		Subject: pkix.Name{
+			CommonName:   "any",
 			Organization: []string{"Test Company"},
 		},
-		NotBefore: now.Add(-time.Hour),
-		NotAfter:  now.Add(time.Hour * 24 * 365),
-
-		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
+		NotBefore:          now.Add(-time.Hour).UTC(),
+		NotAfter:           now.Add(time.Hour * 24 * 365).UTC(),
+		PublicKeyAlgorithm: x509.RSA,
+		KeyUsage: x509.KeyUsageKeyEncipherment |
+			x509.KeyUsageDigitalSignature |
+			x509.KeyUsageDataEncipherment,
 	}
 
 	// Generate X509 certificate.
