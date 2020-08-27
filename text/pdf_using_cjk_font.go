@@ -32,6 +32,13 @@ func genPdfFile(outputFile string) error {
 
 	c := creator.New()
 	c.SetPageMargins(50, 50, 100, 70)
+
+	// Subset the font.
+	// Composite fonts usually quite big and in turn would enlarge the document size if we embed all the runes/glyphs
+	// This setting will embed the runes/glyphs that are used in the document
+	// and in turn would reduce the document size by a lot.
+	//
+	// For example, in this case, the PDF file output size is reduced from 1.4 MB to 74 KB
 	c.EnableFontSubsetting(compositeFontRegular)
 
 	c.CreateFrontPage(func(args creator.FrontpageFunctionArgs) {
