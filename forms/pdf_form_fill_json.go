@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/annotator"
 	"github.com/unidoc/unipdf/v3/fjson"
 	"github.com/unidoc/unipdf/v3/model"
@@ -29,7 +28,7 @@ func main() {
 	}
 
 	// Enable debug-level logging.
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	var (
 		inputPath    string

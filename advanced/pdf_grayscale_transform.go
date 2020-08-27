@@ -22,7 +22,7 @@ import (
 )
 
 func init() {
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 }
 
 func main() {

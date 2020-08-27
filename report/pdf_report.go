@@ -30,7 +30,7 @@ import (
 
 func main() {
 	// For development:
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	err := RunPdfReport("unidoc-report.pdf")
 	if err != nil {

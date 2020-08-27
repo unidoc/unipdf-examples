@@ -18,7 +18,6 @@ import (
 	"os"
 	"sort"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
 )
@@ -31,7 +30,7 @@ func main() {
 	}
 
 	// Enable debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	fmt.Printf("XML metadata for root catalog\n")
 	for _, inputPath := range os.Args[1:len(os.Args)] {

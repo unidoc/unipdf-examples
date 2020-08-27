@@ -25,7 +25,7 @@ func main() {
 	}
 
 	// When debugging, log to console:
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	inputPath := os.Args[1]
 	pageNumStr := os.Args[2]

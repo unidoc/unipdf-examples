@@ -17,7 +17,7 @@ import (
 
 func main() {
 	// If debugging:
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	if len(os.Args) < 6 {
 		fmt.Printf("go run pdf_draw_line.go <x1> <y1> <x2> <y2> output.pdf\n")

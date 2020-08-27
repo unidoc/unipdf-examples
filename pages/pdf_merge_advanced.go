@@ -18,8 +18,8 @@ import (
 
 func init() {
 	// Debug log level.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
 }
 
 func main() {

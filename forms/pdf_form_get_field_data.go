@@ -12,13 +12,12 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
 func main() {
 	// When debugging, enable debug-level logging via console:
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	if len(os.Args) < 2 {
 		fmt.Printf("Usage: go run pdf_forms_list_fields.go <input.pdf> [full field name]\n")

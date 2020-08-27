@@ -14,14 +14,14 @@ import (
 
 	"strconv"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/annotator"
+	unicommon "github.com/unidoc/unipdf/v3/common"
 	pdf "github.com/unidoc/unipdf/v3/model"
 )
 
 func main() {
 	// Debug log mode.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	if len(os.Args) < 8 {
 		fmt.Printf("go run pdf_annotate_add_rectangle.go input.pdf <page> <x> <y> <width> <height> output.pdf\n")

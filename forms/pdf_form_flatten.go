@@ -13,14 +13,13 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/annotator"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
 func main() {
 	// When debugging, enable debug-level logging via console:
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	if len(os.Args) < 3 {
 		fmt.Printf("Usage: go run pdf_form_flatten.go <outputdir> <input1.pdf> [input2.pdf] ...\n")

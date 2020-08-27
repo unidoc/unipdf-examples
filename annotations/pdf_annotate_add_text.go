@@ -18,7 +18,7 @@ import (
 
 func main() {
 	// Debug log mode.
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	if len(os.Args) < 4 {
 		fmt.Printf("go run pdf_annotate_add_text.go input.pdf output.pdf text\n")

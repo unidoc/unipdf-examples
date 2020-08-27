@@ -18,7 +18,7 @@ import (
 
 func init() {
 	// When debugging: use debug-level console logger.
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 }
 
 func main() {

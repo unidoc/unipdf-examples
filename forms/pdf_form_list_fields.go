@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
 )
@@ -23,7 +22,7 @@ func main() {
 	}
 
 	// When debugging, enable debug-level logging via console:
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	for _, inputPath := range os.Args[1:len(os.Args)] {
 		err := listFormFields(inputPath)

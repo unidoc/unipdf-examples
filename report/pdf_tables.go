@@ -17,7 +17,7 @@ import (
 
 func main() {
 	// For development:
-	//common.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// common.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	// Create report fonts.
 	font, err := model.NewStandard14Font("Helvetica")
