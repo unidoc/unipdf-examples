@@ -11,7 +11,6 @@ import (
 	"os"
 	"sort"
 
-	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/fdf"
 )
@@ -24,7 +23,7 @@ func main() {
 	}
 
 	// Enable debug-level logging.
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	for _, inputPath := range os.Args[1:len(os.Args)] {
 		fmt.Printf("Input file: %s\n", inputPath)

@@ -16,13 +16,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/model"
 	"github.com/unidoc/unipdf/v3/render"
 )
 
 func main() {
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	if len(os.Args) < 3 {
 		fmt.Printf("Usage: %s OUTPUT_DIR INPUT.pdf...\n", os.Args[0])

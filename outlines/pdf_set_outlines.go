@@ -29,7 +29,7 @@ func main() {
 	outPath := os.Args[3]
 
 	// Enable debug-level logging.
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	fmt.Printf("Input file: %s\n", inputPath)
 	fmt.Printf("Outlines file (JSON): %s\n", outlinesPath)

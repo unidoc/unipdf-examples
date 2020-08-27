@@ -20,8 +20,8 @@ func main() {
 	}
 
 	// Enable debug-level logging.
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelTrace))
 
 	for _, inputPath := range os.Args[1:len(os.Args)] {
 		err := listAnnotations(inputPath)

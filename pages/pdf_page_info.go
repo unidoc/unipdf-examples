@@ -36,7 +36,7 @@ func main() {
 	}
 
 	// Enable debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	fmt.Printf("Input file: %s\n", inputPath)
 

@@ -10,14 +10,13 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/core/security"
 	pdf "github.com/unidoc/unipdf/v3/model"
 )
 
 func init() {
 	// Set debug-level logging via console.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 }
 

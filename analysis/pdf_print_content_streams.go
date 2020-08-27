@@ -35,8 +35,8 @@ func main() {
 		pageNum = int(val)
 	}
 
-	//When debugging:
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// When debugging:
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	fmt.Println(inputPath)
 	err := listContentStreams(inputPath, pageNum)
