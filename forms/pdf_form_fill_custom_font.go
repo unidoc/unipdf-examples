@@ -63,6 +63,10 @@ func fillFields(inputPath, jsonPath, outputPath string) error {
 	// set font using ttf font file
 	fontReplacement, err := model.NewPdfFontFromTTFFile("./DoHyeon-Regular.ttf")
 
+	// use composite ttf font file
+	// refer to `text/pdf_using_cjk_font.go` example file for more information
+	cjkFont, err := model.NewCompositePdfFontFromTTFFile("./rounded-mplus-1p-regular.ttf")
+
 	if err != nil {
 		log.Fatalf("Error %s", err)
 	}
@@ -80,6 +84,31 @@ func fillFields(inputPath, jsonPath, outputPath string) error {
 			"email4": {
 				Font: fontReplacement,
 				Name: fontReplacement.FontDescriptor().FontName.String(),
+				Size: 0,
+			},
+			"address5[addr_line1]": {
+				Font: cjkFont,
+				Name: cjkFont.FontDescriptor().FontName.String(),
+				Size: 0,
+			},
+			"address5[addr_line2]": {
+				Font: cjkFont,
+				Name: cjkFont.FontDescriptor().FontName.String(),
+				Size: 0,
+			},
+			"address5[city]": {
+				Font: cjkFont,
+				Name: cjkFont.FontDescriptor().FontName.String(),
+				Size: 0,
+			},
+			"address5[state]": {
+				Font: cjkFont,
+				Name: cjkFont.FontDescriptor().FontName.String(),
+				Size: 0,
+			},
+			"address5[postal]": {
+				Font: cjkFont,
+				Name: cjkFont.FontDescriptor().FontName.String(),
 				Size: 0,
 			},
 		},
@@ -116,6 +145,10 @@ func fillFields(inputPath, jsonPath, outputPath string) error {
 		return err
 	}
 	defer fout.Close()
+
+	// Subset the composite font file to reduce pdf file size.
+	// Refer to `text/pdf_using_cjk_font.go` example file for more information
+	cjkFont.SubsetRegistered()
 
 	err = pdfWriter.Write(fout)
 	return err
