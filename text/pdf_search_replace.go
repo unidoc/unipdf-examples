@@ -139,9 +139,9 @@ func searchReplacePageText(page *model.PdfPage, searchText, replaceText string) 
 					return nil
 				}
 				replaceFunc(&op.Params[0])
-			case `''`:
+			case `"`:
 				if len(op.Params) != 3 {
-					common.Log.Debug("Invalid: '' with invalid set of parameters - skip")
+					common.Log.Debug("Invalid: \" with invalid set of parameters - skip")
 					return nil
 				}
 				replaceFunc(&op.Params[3])
