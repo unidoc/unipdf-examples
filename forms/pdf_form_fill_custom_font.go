@@ -12,7 +12,6 @@ import (
 	"os"
 
 	"github.com/unidoc/unipdf/v3/annotator"
-	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/fjson"
 	"github.com/unidoc/unipdf/v3/model"
 )
@@ -20,7 +19,7 @@ import (
 // Example of filling PDF formdata with a form using custom font.
 func main() {
 	// Enable debug-level logging.
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	inputPdf := "sample_form.pdf"
 	fillJSONFile := "formdata.json"
