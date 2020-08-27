@@ -10,3 +10,4 @@ The example explains how you can use UniPDF to perform a number of text manipula
 - [pdf_search_replace.go](pdf_search_replace.go) The example highlights a basic example of find and replace with UniPDF.
 - [pdf_text_locations.go](pdf_text_locations.go) The example highlights how to find mark up locations of substrings of extracted text in a PDF file.
 - [pdf_to_csv.go](pdf_to_csv.go) The example is illustrating capability to extract TextMarks from PDF, and grouping together into words, rows and columns for CSV data extraction. The example includes debugging capabilities such as outputting a marked-up PDF showing bounding boxes of marks, words, lines and columns.
+- [pdf_using_cjk_font.go](pdf_using_cjk_font.go) The example illustrates how to use composite font (CJK font) file to render a text and subset the font to create a small output file.
