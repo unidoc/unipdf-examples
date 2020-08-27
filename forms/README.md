@@ -6,6 +6,7 @@ forms.
 ## Examples
 
 - [pdf_form_add.go](pdf_form_add.go) illustates adding a basic form to a document.
+- [pdf_form_fill_custom_font.go](pdf_form_fill_custom_font.go) illustrates how to specify custom fonts when filling and flattening forms.
 - [pdf_form_fill_fdf_merge.go](pdf_form_fill_fdf_merge.go) illustates FDF merging - merging FDF form data (values) with a template PDF, producing a flattened output PDF (with appearances streams generated).
 - [pdf_form_fill_json.go](pdf_form_fill_json.go) supports exporting form data as JSON as well filling form and outputting a flattened PDF (see below).
 - [pdf_form_flatten.go](pdf_form_flatten.go) flattens a form, making the fields part of the document and no longer editable.
