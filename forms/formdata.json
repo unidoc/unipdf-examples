@@ -29,23 +29,23 @@
     },
     {
         "name": "address5[addr_line1]",
-        "value": "2399 Hillcrest Drive"
+        "value": "高橋町鈴木5-4-1"
     },
     {
         "name": "address5[addr_line2]",
-        "value": ""
+        "value": "-"
     },
     {
         "name": "address5[city]",
-        "value": "Tacoma"
+        "value": "小泉市"
     },
     {
         "name": "address5[state]",
-        "value": "Washington"
+        "value": "-"
     },
     {
         "name": "address5[postal]",
-        "value": "98402"
+        "value": "3538148"
     },
     {
         "name": "fakeSubmitButton",
