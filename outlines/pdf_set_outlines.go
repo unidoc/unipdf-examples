@@ -15,8 +15,25 @@ import (
 	"os"
 
 	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/model"
 )
+
+const licenseKey = `
+-----BEGIN UNIDOC LICENSE KEY-----
+Free trial license keys are available at: https://unidoc.io/
+-----END UNIDOC LICENSE KEY-----
+`
+
+func init() {
+	// Enable debug-level logging.
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
+	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 4 {
@@ -27,9 +44,6 @@ func main() {
 	inputPath := os.Args[1]
 	outlinesPath := os.Args[2]
 	outPath := os.Args[3]
-
-	// Enable debug-level logging.
-	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	fmt.Printf("Input file: %s\n", inputPath)
 	fmt.Printf("Outlines file (JSON): %s\n", outlinesPath)

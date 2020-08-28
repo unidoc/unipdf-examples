@@ -14,18 +14,32 @@ import (
 	"strconv"
 
 	//unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	pdf "github.com/unidoc/unipdf/v3/model"
 )
+
+const licenseKey = `
+-----BEGIN UNIDOC LICENSE KEY-----
+Free trial license keys are available at: https://unidoc.io/
+-----END UNIDOC LICENSE KEY-----
+`
+
+func init() {
+	// Enable debug-level logging.
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
+	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 7 {
 		fmt.Printf("Usage: go run pdf_insert_text.go input.pdf <page> <xpos> <ypos> \"text\" output.pdf\n")
 		os.Exit(1)
 	}
-
-	// When debugging, log to console:
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	inputPath := os.Args[1]
 	pageNumStr := os.Args[2]

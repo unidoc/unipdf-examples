@@ -20,12 +20,26 @@ import (
 	"time"
 
 	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	pdfcontent "github.com/unidoc/unipdf/v3/contentstream"
 	pdfcore "github.com/unidoc/unipdf/v3/core"
 	pdf "github.com/unidoc/unipdf/v3/model"
 )
 
+const licenseKey = `
+-----BEGIN UNIDOC LICENSE KEY-----
+Free trial license keys are available at: https://unidoc.io/
+-----END UNIDOC LICENSE KEY-----
+`
+
 const usage = "Usage: go run pdf_summarize_images.go testdata/*.pdf\n"
+
+func init() {
+	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	var debug, trace bool

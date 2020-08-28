@@ -12,15 +12,29 @@ import (
 	"os"
 
 	"github.com/unidoc/unipdf/v3/annotator"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/fjson"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
+const licenseKey = `
+-----BEGIN UNIDOC LICENSE KEY-----
+Free trial license keys are available at: https://unidoc.io/
+-----END UNIDOC LICENSE KEY-----
+`
+
+func init() {
+	// Enable debug-level logging.
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
+	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	if err != nil {
+		panic(err)
+	}
+}
+
 // Example of filling PDF formdata with a form using custom font.
 func main() {
-	// Enable debug-level logging.
-	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
-
 	inputPdf := "sample_form.pdf"
 	fillJSONFile := "formdata.json"
 	outputFile := "output.pdf"

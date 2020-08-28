@@ -18,10 +18,17 @@ import (
 	"strings"
 
 	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/extractor"
 	pdf "github.com/unidoc/unipdf/v3/model"
 )
+
+const licenseKey = `
+-----BEGIN UNIDOC LICENSE KEY-----
+Free trial license keys are available at: https://unidoc.io/
+-----END UNIDOC LICENSE KEY-----
+`
 
 const (
 	// markupDir is the directory where the marked-up PDFs are saved.
@@ -37,17 +44,17 @@ const (
 `
 )
 
+func init() {
+	// Enable debug-level logging.
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
+	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func main() {
-	// Make sure to enter a valid license key.
-	// Otherwise text is truncated and a watermark added to the text.
-	// License keys are available via: https://unidoc.io
-	/*
-			license.SetLicenseKey(`
-		-----BEGIN UNIDOC LICENSE KEY-----
-		...key contents...
-		-----END UNIDOC LICENSE KEY-----
-		`)
-	*/
 	var debug bool
 	flag.BoolVar(&debug, "d", false, "Enable debug logging")
 	makeUsage(usage)
