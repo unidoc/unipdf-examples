@@ -13,12 +13,24 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/unidoc/unipdf/v3/common/license"
 	pdf "github.com/unidoc/unipdf/v3/model"
 )
 
+const licenseKey = `
+-----BEGIN UNIDOC LICENSE KEY-----
+Free trial license keys are available at: https://unidoc.io/
+-----END UNIDOC LICENSE KEY-----
+`
+
 func init() {
-	// Debug log level.
+	// Enable debug-level logging.
 	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
+	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {

@@ -37,10 +37,24 @@ import (
 	"time"
 
 	common "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	pdfcontent "github.com/unidoc/unipdf/v3/contentstream"
 	pdfcore "github.com/unidoc/unipdf/v3/core"
 	pdf "github.com/unidoc/unipdf/v3/model"
 )
+
+const licenseKey = `
+-----BEGIN UNIDOC LICENSE KEY-----
+Free trial license keys are available at: https://unidoc.io/
+-----END UNIDOC LICENSE KEY-----
+`
+
+func init() {
+	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func initUniDoc(debug bool) error {
 	logLevel := common.LogLevelInfo

@@ -3,6 +3,7 @@
  *
  * Run as: go run pdf_optimize.go <input.pdf> <output.pdf>
  */
+
 package main
 
 import (
@@ -11,11 +12,28 @@ import (
 	"os"
 	"time"
 
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/model"
 	"github.com/unidoc/unipdf/v3/model/optimize"
 )
 
+const licenseKey = `
+-----BEGIN UNIDOC LICENSE KEY-----
+Free trial license keys are available at: https://unidoc.io/
+-----END UNIDOC LICENSE KEY-----
+`
+
 const usage = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH\n"
+
+func init() {
+	// Enable debug-level logging.
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
+	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	args := os.Args
@@ -32,25 +50,25 @@ func main() {
 	// Get input file stat.
 	inputFileInfo, err := os.Stat(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create reader.
 	inputFile, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer inputFile.Close()
 
 	reader, err := model.NewPdfReader(inputFile)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Get number of pages in the input file.
 	pages, err := reader.GetNumPages()
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Add input file pages to the writer.
@@ -58,11 +76,11 @@ func main() {
 	for i := 1; i <= pages; i++ {
 		page, err := reader.GetPage(i)
 		if err != nil {
-			log.Fatal("Fail: %v\n", err)
+			log.Fatalf("Fail: %v\n", err)
 		}
 
 		if err = writer.AddPage(page); err != nil {
-			log.Fatal("Fail: %v\n", err)
+			log.Fatalf("Fail: %v\n", err)
 		}
 	}
 
@@ -85,20 +103,20 @@ func main() {
 	// Create output file.
 	outputFile, err := os.Create(outputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer outputFile.Close()
 
 	// Write output file.
 	err = writer.Write(outputFile)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Get output file stat.
 	outputFileInfo, err := os.Stat(outputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Print basic optimization statistics.

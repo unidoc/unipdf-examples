@@ -10,15 +10,29 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/contentstream/draw"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-func main() {
-	// For development:
-	// common.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+const licenseKey = `
+-----BEGIN UNIDOC LICENSE KEY-----
+Free trial license keys are available at: https://unidoc.io/
+-----END UNIDOC LICENSE KEY-----
+`
 
+func init() {
+	// Enable debug-level logging.
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
+	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func main() {
 	// Create report fonts.
 	font, err := model.NewStandard14Font("Helvetica")
 	if err != nil {

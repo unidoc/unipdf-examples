@@ -49,11 +49,18 @@ import (
 	"time"
 
 	common "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	pdfcontent "github.com/unidoc/unipdf/v3/contentstream"
 	pdfcore "github.com/unidoc/unipdf/v3/core"
 	pdf "github.com/unidoc/unipdf/v3/model"
 	"github.com/unidoc/unipdf/v3/ps"
 )
+
+const licenseKey = `
+-----BEGIN UNIDOC LICENSE KEY-----
+Free trial license keys are available at: https://unidoc.io/
+-----END UNIDOC LICENSE KEY-----
+`
 
 const usage = `Usage:
 pdf_grayscale_convert_bench -g <output directory> [-r <results>][-d][-k][-a][-min <val>][-max <val>] <file1> <file2> ...
@@ -70,6 +77,16 @@ pdf_grayscale_convert_bench -g <output directory> [-r <results>][-d][-k][-a][-mi
 // Ignore CCITTFaxDecode, JBIG2 - that are always grayscale.
 // Change with -ignoregrayfilters=false
 var ignoreGrayFilters = true
+
+func init() {
+	// Enable debug-level logging.
+	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+
+	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func initUniDoc(debug bool) {
 	pdf.SetPdfCreator("pdf_grayscale_convert_bench test suite")
