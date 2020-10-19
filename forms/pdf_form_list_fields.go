@@ -117,12 +117,9 @@ func listFormFields(inputPath string) error {
 		case *model.PdfFieldText:
 			fmt.Printf(" Text\n")
 			fmt.Printf(" - DA: %v\n", getDictEntry(field, "DA"))
-
-			if getDictEntry(field, "V") != nil {
-				fmt.Printf(" - '%v'\n", t.V)
-				if str, ok := core.GetString(t.V); ok {
-					fmt.Printf(" - Decoded: '%s'\n", str.Decoded())
-				}
+			fmt.Printf(" - '%v'\n", t.V)
+			if str, ok := core.GetString(t.V); ok {
+				fmt.Printf(" - Decoded: '%s'\n", str.Decoded())
 			}
 
 		case *model.PdfFieldChoice:
