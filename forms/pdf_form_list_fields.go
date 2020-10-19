@@ -99,8 +99,8 @@ func listFormFields(inputPath string) error {
 		fmt.Printf("Name: %v\n", fullname)
 		fmt.Printf(" Flags: %s (%d)\n", fflags, fflags)
 
-		fieldType := getFieldType(field)
-		switch t := fieldType.(type) {
+		ctx := field.GetContext()
+		switch t := ctx.(type) {
 		case *model.PdfFieldButton:
 			fmt.Printf(" Button\n")
 			if t.IsCheckbox() {
@@ -219,27 +219,6 @@ func listFormFields(inputPath string) error {
 	}
 
 	return nil
-}
-
-func getFieldType(f *model.PdfField) interface{} {
-	ctx := f.GetContext()
-
-	if ctx == nil && f.Parent != nil {
-		ctx = f.Parent.GetContext()
-	}
-
-	switch ctx.(type) {
-	case *model.PdfFieldButton:
-		return &model.PdfFieldButton{}
-	case *model.PdfFieldText:
-		return &model.PdfFieldText{}
-	case *model.PdfFieldChoice:
-		return &model.PdfFieldChoice{}
-	case *model.PdfFieldSignature:
-		return &model.PdfFieldSignature{}
-	default:
-		return nil
-	}
 }
 
 // Returns the object corresponding with the specified
