@@ -75,7 +75,7 @@ func listFormFields(inputPath string) error {
 	fmt.Printf(" Q: %v\n", acroForm.Q)
 	fmt.Printf(" XFA: %v\n", acroForm.XFA)
 	if acroForm.Fields != nil {
-		fmt.Printf(" #Fields: %d\n", len(*acroForm.Fields))
+		fmt.Printf(" #Fields: %d\n", len(acroForm.AllFields()))
 	} else {
 		fmt.Printf("No fields set\n")
 	}
@@ -113,8 +113,10 @@ func listFormFields(inputPath string) error {
 				fmt.Printf(" - Radio\n")
 			}
 			fmt.Printf(" - '%v'\n", t.V)
+
 		case *model.PdfFieldText:
 			fmt.Printf(" Text\n")
+			fmt.Printf(" - DA: %v\n", getDictEntry(field, "DA"))
 			fmt.Printf(" - '%v'\n", t.V)
 			if str, ok := core.GetString(t.V); ok {
 				fmt.Printf(" - Decoded: '%s'\n", str.Decoded())
@@ -123,9 +125,11 @@ func listFormFields(inputPath string) error {
 		case *model.PdfFieldChoice:
 			fmt.Printf(" Choice\n")
 			fmt.Printf(" - '%v'\n", t.V)
+
 		case *model.PdfFieldSignature:
 			fmt.Printf(" Signature\n")
 			fmt.Printf(" - '%v'\n", t.V)
+
 		default:
 			fmt.Printf(" Unknown\n")
 			continue
@@ -207,6 +211,24 @@ func listFormFields(inputPath string) error {
 
 			} else {
 				fmt.Printf("   - Appearance dict not present: %s\n", apDict)
+			}
+		}
+	}
+
+	return nil
+}
+
+// Returns the object corresponding with the specified
+// key in the field or from the field's parent.
+// Return nil if not found.
+func getDictEntry(f *model.PdfField, key core.PdfObjectName) core.PdfObject {
+	for _, fc := range []*model.PdfField{f, f.Parent} {
+		if fc == nil {
+			continue
+		}
+		if d, ok := core.GetDict(fc.GetContainingPdfObject()); ok {
+			if val := d.Get(key); val != nil {
+				return val
 			}
 		}
 	}
