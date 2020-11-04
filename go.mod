@@ -11,7 +11,7 @@ require (
 	github.com/unidoc/unipdf/v3 v3.13.0
 	github.com/wcharczuk/go-chart v2.0.1+incompatible
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897
-	golang.org/x/text v0.3.3
+	golang.org/x/text v0.3.4
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
 )
 
