@@ -12,7 +12,6 @@ import (
 	"path"
 
 	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
@@ -62,42 +61,15 @@ func printPdfDocInfo(inputPath string) error {
 	if err != nil {
 		return err
 	}
+
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
 		return err
 	}
 
-	trailerDict, err := pdfReader.GetTrailer()
+	pdfInfo, err := pdfReader.GetPdfInfo()
 	if err != nil {
 		return err
-	}
-	if trailerDict == nil {
-		fmt.Printf("No trailer dictionary -> No DID dictionary\n")
-		// Note: not returning an error - it is not guaranteed for every PDF to have the DID dictionary.
-		return nil
-	}
-
-	// XXX/FIXME: Much of the clunky type casting and tracing is being improved in v3.
-
-	var infoDict *core.PdfObjectDictionary
-
-	infoObj := trailerDict.Get("Info")
-	switch t := infoObj.(type) {
-	case *core.PdfObjectReference:
-		infoRef := t
-		infoObj, err = pdfReader.GetIndirectObjectByNumber(int(infoRef.ObjectNumber))
-		infoObj = core.TraceToDirectObject(infoObj)
-		if err != nil {
-			return err
-		}
-		infoDict, _ = infoObj.(*core.PdfObjectDictionary)
-	case *core.PdfObjectDictionary:
-		infoDict = t
-	}
-
-	if infoDict == nil {
-		fmt.Printf("DID dictionary not present\n")
-		return nil
 	}
 
 	di := pdfDocInfo{
@@ -105,36 +77,40 @@ func printPdfDocInfo(inputPath string) error {
 		NumPages: numPages,
 	}
 
-	if str, has := infoDict.Get("Title").(*core.PdfObjectString); has {
-		di.Title = str.String()
+	if pdfInfo.Title != nil {
+		di.Title = pdfInfo.Title.Str()
 	}
 
-	if str, has := infoDict.Get("Author").(*core.PdfObjectString); has {
-		di.Author = str.String()
+	if pdfInfo.Author != nil {
+		di.Author = pdfInfo.Author.Str()
 	}
 
-	if str, has := infoDict.Get("Keywords").(*core.PdfObjectString); has {
-		di.Keywords = str.String()
+	if pdfInfo.Subject != nil {
+		di.Subject = pdfInfo.Subject.Str()
 	}
 
-	if str, has := infoDict.Get("Creator").(*core.PdfObjectString); has {
-		di.Creator = str.String()
+	if pdfInfo.Keywords != nil {
+		di.Keywords = pdfInfo.Keywords.Str()
 	}
 
-	if str, has := infoDict.Get("Producer").(*core.PdfObjectString); has {
-		di.Producer = str.String()
+	if pdfInfo.Creator != nil {
+		di.Creator = pdfInfo.Creator.Str()
 	}
 
-	if str, has := infoDict.Get("CreationDate").(*core.PdfObjectString); has {
-		di.CreationDate = str.String()
+	if pdfInfo.Producer != nil {
+		di.Producer = pdfInfo.Producer.Str()
 	}
 
-	if str, has := infoDict.Get("ModDate").(*core.PdfObjectString); has {
-		di.ModDate = str.String()
+	if pdfInfo.CreationDate != nil {
+		di.CreationDate = pdfInfo.CreationDate.ToGoTime().String()
 	}
 
-	if name, has := infoDict.Get("Trapped").(*core.PdfObjectName); has {
-		di.Trapped = name.String()
+	if pdfInfo.ModifiedDate != nil {
+		di.ModDate = pdfInfo.ModifiedDate.ToGoTime().String()
+	}
+
+	if pdfInfo.Trapped != nil {
+		di.Trapped = pdfInfo.Trapped.String()
 	}
 
 	di.print()
