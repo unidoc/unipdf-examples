@@ -9,6 +9,8 @@ Examples for digital signing of PDF files with UniDoc:
 - [pdf_sign_validate.go](pdf_sign_validate.go) Example of signature validation.
 - [pdf_sign_pem_multicert.go](pdf_sign_pem_multicert.go) Example of signing using a certificate chain and a private key, extracted from PEM files.
 
+For LTV enabling digital signatures, see the [LTV](ltv) guide and samples.
+
 ## pkcs_sign_hsm_pkcs11.go
 
 The code example shows how to sign with a HSM via PKCS11 as supported by the
@@ -81,4 +83,4 @@ Sign PDF file:
 $ go run pdf_sign_hsm_pkcs11.go sign test <PIN> <KEYPAIR_LABEL> input.pdf input_signed.pdf
 ```
 
-Signed output is in `input_signed.pdf`
+Signed output is in `input_signed.pdf`.
