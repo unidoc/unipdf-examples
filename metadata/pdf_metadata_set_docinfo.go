@@ -103,6 +103,7 @@ func main() {
 	pdfInfo := &model.PdfInfo{}
 	pdfInfo.Author = core.MakeString("UniPDF Tester 2")
 	pdfInfo.Subject = core.MakeString("PDF Example with custom information dictionary")
+	pdfInfo.AddCustomInfo("custom_info", "This is an optional custom info")
 
 	customFWrite, err := os.Create("gen_pdf_custom_info.pdf")
 	if err != nil {

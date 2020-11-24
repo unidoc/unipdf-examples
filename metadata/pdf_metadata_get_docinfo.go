@@ -78,27 +78,27 @@ func printPdfDocInfo(inputPath string) error {
 	}
 
 	if pdfInfo.Title != nil {
-		di.Title = pdfInfo.Title.Str()
+		di.Title = pdfInfo.Title.Decoded()
 	}
 
 	if pdfInfo.Author != nil {
-		di.Author = pdfInfo.Author.Str()
+		di.Author = pdfInfo.Author.Decoded()
 	}
 
 	if pdfInfo.Subject != nil {
-		di.Subject = pdfInfo.Subject.Str()
+		di.Subject = pdfInfo.Subject.Decoded()
 	}
 
 	if pdfInfo.Keywords != nil {
-		di.Keywords = pdfInfo.Keywords.Str()
+		di.Keywords = pdfInfo.Keywords.Decoded()
 	}
 
 	if pdfInfo.Creator != nil {
-		di.Creator = pdfInfo.Creator.Str()
+		di.Creator = pdfInfo.Creator.Decoded()
 	}
 
 	if pdfInfo.Producer != nil {
-		di.Producer = pdfInfo.Producer.Str()
+		di.Producer = pdfInfo.Producer.Decoded()
 	}
 
 	if pdfInfo.CreationDate != nil {
@@ -111,6 +111,13 @@ func printPdfDocInfo(inputPath string) error {
 
 	if pdfInfo.Trapped != nil {
 		di.Trapped = pdfInfo.Trapped.String()
+	}
+
+	customInfoKeys := pdfInfo.CustomKeys()
+	di.CustomInfo = make(map[string]string, len(customInfoKeys))
+
+	for _, key := range customInfoKeys {
+		di.CustomInfo[key] = pdfInfo.GetCustomInfo(key).Decoded()
 	}
 
 	di.print()
@@ -132,6 +139,7 @@ type pdfDocInfo struct {
 	CreationDate string
 	ModDate      string
 	Trapped      string
+	CustomInfo   map[string]string
 }
 
 // print prints a summary of the PDF document information.
@@ -147,4 +155,10 @@ func (di pdfDocInfo) print() {
 	fmt.Printf("  CreationDate: %s\n", di.CreationDate)
 	fmt.Printf("  ModDate: %s\n", di.ModDate)
 	fmt.Printf("  Trapped: %s\n", di.Trapped)
+
+	if di.CustomInfo != nil {
+		for k, v := range di.CustomInfo {
+			fmt.Printf("  %s: %s\n", k, v)
+		}
+	}
 }
