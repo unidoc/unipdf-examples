@@ -1,12 +1,11 @@
 module github.com/unidoc/unidoc-examples
 
 require (
-	github.com/ThalesIgnite/crypto11 v0.1.0
+	github.com/ThalesIgnite/crypto11 v1.2.3
 	github.com/blend/go-sdk v2.0.0+incompatible // indirect
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/boombuler/barcode v1.0.0
-	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
-	github.com/miekg/pkcs11 v1.0.3
+	github.com/miekg/pkcs11 v1.0.3 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/sirupsen/logrus v1.7.0 // indirect
 	github.com/unidoc/unipdf/v3 v3.15.0
