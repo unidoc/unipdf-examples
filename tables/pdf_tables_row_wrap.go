@@ -1,5 +1,5 @@
 /*
- * This example showcases row wrapping in creator tables.
+ * This example showcases row wrapping across pages in creator tables.
  * The output is saved as unipdf-tables-row-wrap.pdf.
  */
 
@@ -145,8 +145,6 @@ func rowWrapEnabled(c *creator.Creator, headingFont *model.PdfFont) error {
 
 		return nil
 	})
-
-	return nil
 }
 
 func drawCell(table *creator.Table, content creator.VectorDrawable) error {

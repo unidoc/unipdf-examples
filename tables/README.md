@@ -9,4 +9,4 @@ The example explains how to create tables in your PDF reports. The examples vary
 - [pdf_tables_colSpan.go](pdf_tables_colSpan.go) The example showcases how to generate columns in tables that are longer than one column. 
 - [pdf_tables_header_images.go](pdf_tables_header_images.go) The example highlights how you can include headers in your tables. The header persists along pages for tables that are longer than one page. The example also discusses how to add images in tables. 
 - [pdf_tables_subtables.go](pdf_tables_subtables.go) The example showcases how you can create a table that has sub-tables inside of it. This feature will allow you produce complex tables that suit your needs. 
-- [pdf_tables_row_wrap.go](pdf_tables_row_wrap.go) The example showcases row wrapping in tables.
+- [pdf_tables_row_wrap.go](pdf_tables_row_wrap.go) The example example showcases row wrapping across pages in creator tables.
