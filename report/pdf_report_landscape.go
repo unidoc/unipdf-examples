@@ -18,7 +18,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/wcharczuk/go-chart"
+	"github.com/wcharczuk/go-chart/v2"
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
