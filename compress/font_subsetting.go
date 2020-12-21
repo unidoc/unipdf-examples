@@ -1,6 +1,9 @@
 /*
- * Font subsetting example by using creator `EnableFontSubsetting` setting
- * and using optimizer option of `SubsetFonts`.
+ * Font subsetting example by using optimizer option of `SubsetFonts`.
+ *
+ * Note: This option would subset all fonts used in the documents.
+ * To subset only some font file, consider using `EnableFontSubsetting`
+ * in creator package.
  *
  * Run as: go run font_subsetting.go <font.ttf>
  */
@@ -25,7 +28,6 @@ Free trial license keys are available at: https://unidoc.io/
 `
 
 const usage = "Usage: %s FONT_TTF_FILE\n"
-const outputCreatorFile = "font_subsetting_creator.pdf"
 const outputOptimizesFile = "font_subsetting_optimizer.pdf"
 
 func init() {
@@ -51,29 +53,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	subsetUsingCreator(font)
 	subsetUsingOptimizer(font)
-}
-
-func subsetUsingCreator(font *model.PdfFont) {
-	c := creator.New()
-	c.SetPageMargins(50, 50, 50, 50)
-	c.NewPage()
-
-	// Subset the font by calling `EnableFontsubsetting`
-	c.EnableFontSubsetting(font)
-
-	p := c.NewStyledParagraph()
-	p.SetPos(100, 100)
-	text := p.SetText("This is an example of using EnableFontSubsetting")
-	text.Style.Font = font
-
-	c.Draw(p)
-
-	err := c.WriteToFile(outputCreatorFile)
-	if err != nil {
-		log.Fatalln(err)
-	}
 }
 
 func subsetUsingOptimizer(font *model.PdfFont) {
