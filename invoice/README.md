@@ -4,5 +4,5 @@ Using UniPDF, you can create beautifully formatted automated invoices using code
 
 ## Examples
 
-- [invoice_simple.go](invoice_simple.go) explains how to create a simple invoice
-- [invoice_advanced.go](invoice_advanced.go) explains how to create a better invoice that has customized formatting and coloring and a lot of other customized content.  
+- [pdf_invoice_simple.go](pdf_invoice_simple.go) explains how to create a simple invoice
+- [pdf_invoice_advanced.go](pdf_invoice_advanced.go) explains how to create a better invoice that has customized formatting and coloring and a lot of other customized content.  
