@@ -22,7 +22,7 @@ Free trial license keys are available at: https://unidoc.io/
 
 func init() {
 	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	err := license.SetLicenseKey(licenseKey, `Company Name`)
 	if err != nil {
@@ -32,63 +32,135 @@ func init() {
 
 func main() {
 	c := creator.New()
-	c.NewPage()
 
 	fontRegular, err := model.NewStandard14Font(model.HelveticaName)
 	if err != nil {
-		log.Fatalf("Error %s", err)
+		log.Fatalf("Error: %v", err)
 	}
 
 	fontBold, err := model.NewStandard14Font(model.HelveticaBoldName)
 	if err != nil {
-		log.Fatalf("Error %s", err)
+		log.Fatalf("Error: %v", err)
 	}
 
-	// `stChap` represents a styled paragraphs chapter
-	stChap := c.NewChapter("Styled Paragraphs")
-	stChap.GetHeading().SetMargins(0, 0, 20, 0)
-	stChap.GetHeading().SetFont(fontBold)
-	stChap.GetHeading().SetFontSize(18)
-	stChap.GetHeading().SetColor(creator.ColorRed)
+	// Create styled paragraph chapter.
+	chap := c.NewChapter("Styled Paragraphs")
+	chap.GetHeading().SetMargins(0, 0, 0, 20)
+	chap.GetHeading().SetFont(fontBold)
+	chap.GetHeading().SetFontSize(18)
+	chap.GetHeading().SetColor(creator.ColorRed)
 
-	// `stylPar` creates a new styled paragraph
-	stylPar := c.NewStyledParagraph()
-	stylPar.SetLineHeight(3)
+	// Generate styled paragraph text style subchapter.
+	err = styledParagraphTextStyle(c, chap, fontRegular, fontBold)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
 
-	// `boldStyle` creates a new style
-	boldStyle := c.NewTextStyle()
-	boldStyle.Font = fontBold
-	boldStyle.Color = creator.ColorGreen
+	// Generate styled paragraph text underline subchapter.
+	err = styledParagraphUnderline(c, chap, fontRegular, fontBold)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
 
-	// Applying `boldStyle` to `chunk`
-	chunk := stylPar.Append("This text is bolded and is in green color. We're showing how styled paragraphs work.")
-	chunk.Style = boldStyle
-
-	// Creating new style `normStyle`
-	normStyle := c.NewTextStyle()
-	normStyle.Font = fontRegular
-	normStyle.Color = creator.ColorBlue
-
-	// Applying `normStyle` to `chunkTwo`
-	chunkTwo := stylPar.Append("You can change the size, color and almost anything of the font using the StyledParagraph command. This font is in blue color and is not bold.")
-	chunkTwo.Style = normStyle
-
-	// Creating new style `hugeStyle`
-	hugeStyle := c.NewTextStyle()
-	hugeStyle.Font = fontRegular
-	hugeStyle.FontSize = 25
-
-	// Applying `normStyle` to `chunkThree`
-	chunkThree := stylPar.Append("This is HUGE and black.")
-	chunkThree.Style = hugeStyle
-
-	// Adding styled paragraph into the chapter `stChap` and drawing it using the creator
-	stChap.Add(stylPar)
-	c.Draw(stChap)
+	// Draw styled paragraph chapter.
+	if err = c.Draw(chap); err != nil {
+		log.Fatal(err)
+	}
 
 	// Write output file.
 	err = c.WriteToFile("styled_paragraph.pdf")
 	if err != nil {
-		log.Fatalf("Error %s", err)
+		log.Fatalf("Error: %s", err)
 	}
+}
+
+func styledParagraphTextStyle(c *creator.Creator, ch *creator.Chapter,
+	fontRegular, fontBold *model.PdfFont) error {
+	// Create new subchapter.
+	subchap := ch.NewSubchapter("Text styles")
+
+	// Create a new styled paragraph.
+	p := c.NewStyledParagraph()
+	p.SetMargins(0, 0, 20, 20)
+	p.SetLineHeight(1.1)
+
+	// Change individual text style properties.
+	chunk := p.Append("Styled paragraphs are fully customizable.")
+	chunk.Style.Font = fontRegular
+
+	p.Append("You can change the ")
+	chunk = p.Append("color")
+	chunk.Style.Color = creator.ColorRed
+
+	p.Append(", the ")
+	chunk = p.Append("font ")
+	chunk.Style.Font = fontBold
+
+	p.Append("and the ")
+	chunk = p.Append("font size ")
+	chunk.Style.FontSize = 14
+	p.Append("of text chunks. ")
+
+	// Change text font size.
+	chunk = p.Append("Let's draw some text with a larger font size. ")
+	chunk.Style.FontSize = 16
+
+	// Assign custom style to a text chunk.
+	boldStyle := c.NewTextStyle()
+	boldStyle.Font = fontBold
+	boldStyle.Color = creator.ColorBlue
+
+	chunk = p.Append("Now some blue bold text in order to showcase what styled paragraphs can do.")
+	chunk.Style = boldStyle
+
+	// Add the styled paragraph to the created subchapter.
+	return subchap.Add(p)
+}
+
+func styledParagraphUnderline(c *creator.Creator, ch *creator.Chapter,
+	fontRegular, fontBold *model.PdfFont) error {
+	// Create new subchapter.
+	subchap := ch.NewSubchapter("Text underline")
+
+	// Create a new styled paragraph.
+	p := c.NewStyledParagraph()
+	p.SetMargins(0, 0, 20, 20)
+	p.SetLineHeight(1.2)
+	p.Append("Text chunks can be ")
+
+	// Default underline style.
+	chunk := p.Append("underlined")
+	chunk.Style.Underline = true
+
+	p.Append(" using the default style.\n")
+	p.Append("By default, the ")
+
+	// Default underline style based on the color of the text.
+	chunk = p.Append("underline color")
+	chunk.Style.Underline = true
+	chunk.Style.Color = creator.ColorBlue
+
+	p.Append(" is the color of the text chunk. We can also add ")
+
+	// Custom underline style color.
+	chunk = p.Append("some long underlined text chunk which wraps")
+	chunk.Style.FontSize = 15
+	chunk.Style.Underline = true
+	chunk.Style.UnderlineStyle.Color = creator.ColorRed
+	chunk.Style.UnderlineStyle.Offset = 1
+
+	p.Append(" and then some more regular text.\n")
+
+	// Custom underline thickness and offset.
+	p.Append("Finally, we can customize the offset and the thickness of the ")
+
+	chunk = p.Append("underlined text")
+	chunk.Style.Underline = true
+	chunk.Style.UnderlineStyle.Thickness = 2
+	chunk.Style.UnderlineStyle.Offset = 2
+
+	p.Append(".")
+
+	// Add the styled paragraph to the created subchapter.
+	return subchap.Add(p)
 }
