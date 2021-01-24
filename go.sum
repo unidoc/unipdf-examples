@@ -49,10 +49,6 @@ github.com/unidoc/pkcs7 v0.0.0-20200411230602-d883fd70d1df h1:1RV3lxQ6L6xGFNhngp
 github.com/unidoc/pkcs7 v0.0.0-20200411230602-d883fd70d1df/go.mod h1:UEzOZUEpJfDpywVJMUT8QiugqEZC29pDq7kdIZhWCr8=
 github.com/unidoc/timestamp v0.0.0-20200412005513-91597fd3793a h1:RLtvUhe4DsUDl66m7MJ8OqBjq8jpWBXPK6/RKtqeTkc=
 github.com/unidoc/timestamp v0.0.0-20200412005513-91597fd3793a/go.mod h1:j+qMWZVpZFTvDey3zxUkSgPJZEX33tDgU/QIA0IzCUw=
-github.com/unidoc/unipdf/v3 v3.15.0 h1:AkSXsq5hb5V9l1QCBxBMepK1CBGug4TrpukP56+LcPY=
-github.com/unidoc/unipdf/v3 v3.15.0/go.mod h1:WdRz3hVhi/M0jFGXhsT5/9FDyRfga6KgI2ZQqjiOXaM=
-github.com/unidoc/unipdf/v3 v3.16.0 h1:Mm0r1J6uR767zffZ0Cjwl3fJ24/gIm3Ddr9zXHquhxg=
-github.com/unidoc/unipdf/v3 v3.16.0/go.mod h1:WdRz3hVhi/M0jFGXhsT5/9FDyRfga6KgI2ZQqjiOXaM=
 github.com/unidoc/unipdf/v3 v3.18.0 h1:sO5apnUc3dYeuCbZYt8AXBybvUB0SjUjFmGsE+dV/3o=
 github.com/unidoc/unipdf/v3 v3.18.0/go.mod h1:WdRz3hVhi/M0jFGXhsT5/9FDyRfga6KgI2ZQqjiOXaM=
 github.com/unidoc/unitype v0.2.1 h1:x0jMn7pB/tNrjEVjy3Ukpxo++HOBQaTCXcTYFA6BH3w=
@@ -89,6 +85,8 @@ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=
+gopkg.in/gographics/imagick.v3 v3.3.0 h1:MI9qkquiNDmrSGnTG2241GZqOUgEfR7KQpVsVLxiylk=
+gopkg.in/gographics/imagick.v3 v3.3.0/go.mod h1:+Q9nyA2xRZXrDyTtJ/eko+8V/5E7bWYs08ndkZp8UmA=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c h1:dUUwHk2QECo/6vqA44rthZ8ie2QXMNeKRTHCNY2nXvo=
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
