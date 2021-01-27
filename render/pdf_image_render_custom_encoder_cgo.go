@@ -4,7 +4,7 @@
  * Renders all pages of all input files to PNG images using custom JPEG2000 encoder,
  * and saves them in the specified output directory.
  *
- * Run as: go run pdf_image_render_custom_encoder.go OUTPUT_DIR INPUT.pdf...
+ * Run as: go run pdf_image_render_custom_encoder_cgo.go OUTPUT_DIR INPUT.pdf...
  */
 
 package main

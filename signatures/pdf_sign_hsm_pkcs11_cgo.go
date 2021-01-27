@@ -3,10 +3,10 @@
  * with UniDoc.
  *
  * To create a key pair:
- * $ ./pdf_sign_hsm_pkcs11 add test <PIN> <keypair_label>
+ * $ ./pdf_sign_hsm_pkcs11_cgo add test <PIN> <keypair_label>
  *
  * To sign a PDF:
- * $ ./pdf_sign_hsm_pkcs11 sign test <PIN> <keypair_label> input.pdf input_signed.pdf
+ * $ ./pdf_sign_hsm_pkcs11_cgo sign test <PIN> <keypair_label> input.pdf input_signed.pdf
  *
  * See instructions for testing via SoftHSM in README.md.
  */
