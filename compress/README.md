@@ -21,4 +21,4 @@ type Options struct {
 ## Examples
 
 - [pdf_optimize.go](pdf_optimize.go) compresses a PDF file with some typical options.
-- [font_subsetting.go](font_subsetting.go) illustrates how to reduce a PDF file size by subsetting all fonts used in the document using `SubsetFonts` Optimizer option.
+- [pdf_font_subsetting.go](pdf_font_subsetting.go) illustrates how to reduce a PDF file size by subsetting all fonts used in the document using `SubsetFonts` Optimizer option.
