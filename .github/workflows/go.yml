@@ -22,6 +22,10 @@ jobs:
       with:
         go-version: ${{ matrix.go }}
 
+    - name: Setup ImageMagick's MagickWand
+      run: 
+        sudo apt-get install libmagickwand-dev
+
     - name: Build all
       run: |
         ./build_examples.sh
