@@ -58,14 +58,10 @@ func (enc *CustomJPXEncoder) DecodeBytes(encoded []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	// fmt.Println(mw.IdentifyImage())
-
 	imgWidth := mw.GetImageWidth()
 	imgHeight := mw.GetImageHeight()
 	imgDepth := mw.GetImageDepth()
 	cs := mw.GetImageColorspace()
-
-	fmt.Printf("Color space %v - %d bit\n", cs, imgDepth)
 
 	imw := mw.NewPixelIterator()
 	defer imw.Destroy()
@@ -87,7 +83,7 @@ func (enc *CustomJPXEncoder) DecodeBytes(encoded []byte) ([]byte, error) {
 
 		for x := 0; x < int(imgWidth); x++ {
 			if cs == imagick.COLORSPACE_GRAY {
-				r := int(pmw[x].GetRed() * 255)
+				r := int(pmw[x].GetBlack() * 255)
 				if imgDepth == 16 {
 					decoded[index] = byte((r >> 8) & 0xff)
 					index++
