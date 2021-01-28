@@ -1,6 +1,5 @@
 /*
- * Flatten form data in PDF file, moving to content stream from annotations, so cannot be edited.
- * Note: Works for forms that have been filled in an editor and have the appearance streams generated.
+ * Partially flatten form data in PDF file by using a callback function to filter Fields.
  *
  * Run as: go run pdf_form_partial_flatten.go
  */
