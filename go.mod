@@ -12,7 +12,7 @@ require (
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
 	golang.org/x/text v0.3.5
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/gographics/imagick.v3 v3.3.0
+	gopkg.in/gographics/imagick.v2 v2.6.0
 )
 
 go 1.12

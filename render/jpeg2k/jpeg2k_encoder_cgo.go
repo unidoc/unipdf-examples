@@ -11,7 +11,7 @@ import (
 	"fmt"
 
 	"github.com/unidoc/unipdf/v3/core"
-	"gopkg.in/gographics/imagick.v3/imagick"
+	"gopkg.in/gographics/imagick.v2/imagick"
 )
 
 // Custom encoder declaration that implements StreamEncoder interface.
