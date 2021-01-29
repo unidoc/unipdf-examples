@@ -99,7 +99,7 @@ func (enc *CustomJPXEncoder) DecodeBytes(encoded []byte) ([]byte, error) {
 		for x := 0; x < int(imgWidth); x++ {
 			switch cs {
 			case imagick.COLORSPACE_GRAY:
-				g := uint16(pmw[x].GetBlack() * depthMultiplier)
+				g := uint16(pmw[x].GetRed() * depthMultiplier)
 				if imgDepth == 16 {
 					decoded[index] = byte((g >> 8) & 0xff)
 					index++
@@ -111,7 +111,7 @@ func (enc *CustomJPXEncoder) DecodeBytes(encoded []byte) ([]byte, error) {
 				}
 
 			case imagick.COLORSPACE_RGB, imagick.COLORSPACE_SRGB:
-				// Get the RGB quanta from the source image
+				// Get the RGB from the source image
 				r := uint16(pmw[x].GetRed() * depthMultiplier)
 				g := uint16(pmw[x].GetGreen() * depthMultiplier)
 				b := uint16(pmw[x].GetBlue() * depthMultiplier)
