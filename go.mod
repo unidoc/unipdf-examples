@@ -15,4 +15,4 @@ require (
 	gopkg.in/gographics/imagick.v2 v2.6.0
 )
 
-go 1.12
+go 1.13
