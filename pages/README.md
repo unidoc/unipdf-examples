@@ -6,6 +6,7 @@ The example explains how to work with and manipulate PDF pages using UniPDF libr
 
 - [pdf_4up.go](pdf_4up.go) The example outputs multiple pages (4) per page to an output PDF from an input PDF. Showcases page templating by loading pages as Blocks and manipulating with the creator package.
 - [pdf_crop.go](pdf_crop.go) The example Crop pages in a PDF file. Crops the view to a certain percentage of the original. The percentage specifies the trim-off percentage, both widthwise and heightwise.
+- [pdf_duplicate_doc.go](pdf_duplicate_doc.go) The example highlights a simple method to generate a `PdfWriter` from the existing `PdfReader`.
 - [pdf_merge.go](pdf_merge.go) The example highlights basic merging of PDF files. Simply loads all pages for each file and writes to the output file.
 - [pdf_merge_advanced.go](pdf_merge_advanced.go) The example merges PDF files, including form field data (AcroForms). For a more basic merging of PDF page contents, see pdf_merge.go.
 - [pdf_page_info.go](pdf_page_info.go) The example prints PDF page info: Mediabox size and other parameters. If [page num] is not specified prints out info for all pages.
