@@ -79,11 +79,13 @@ func unlockPdf(inputPath string, outputPath string, password string) error {
 		}
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(nil)
 	if err != nil {
 		return err
 	}
 
+	// Write to file.
 	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }

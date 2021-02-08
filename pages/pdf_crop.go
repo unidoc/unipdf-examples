@@ -92,6 +92,8 @@ func cropPdf(inputPath string, outputPath string, percentage int64) error {
 		}
 	}
 
+	// Process each page using the following callback
+	// when generating PdfWriter from PdfReader.
 	opts := &pdf.ReaderToWriterOpts{
 		PageCallback: func(pageNum int, page *pdf.PdfPage) {
 			bbox, err := page.GetMediaBox()
@@ -113,11 +115,13 @@ func cropPdf(inputPath string, outputPath string, percentage int64) error {
 		},
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(opts)
 	if err != nil {
 		return err
 	}
 
+	// Write to file.
 	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err

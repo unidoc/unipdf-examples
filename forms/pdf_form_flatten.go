@@ -86,15 +86,18 @@ func flattenPdf(inputPath, outputPath string) error {
 		return err
 	}
 
+	// AcroForm field is no longer needed.
 	opt := &model.ReaderToWriterOpts{
 		SkipAcroForm: true,
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
 
+	// Write to file.
 	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }

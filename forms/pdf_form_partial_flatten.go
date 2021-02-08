@@ -78,11 +78,13 @@ func partialFlattenPdf(inputPath, outputPath string, fieldToFlatten []string) er
 		return err
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(nil)
 	if err != nil {
 		return err
 	}
 
+	// Write to file.
 	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }

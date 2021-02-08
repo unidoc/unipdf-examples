@@ -96,16 +96,19 @@ func protectPdf(inputPath string, outputPath string, userPassword, ownerPassword
 		return fmt.Errorf("The PDF is already locked (need to unlock first)")
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(nil)
 	if err != nil {
 		return err
 	}
 
+	// Encrypt document before writing to file.
 	err = pdfWriter.Encrypt([]byte(userPassword), []byte(ownerPassword), encryptOptions)
 	if err != nil {
 		return err
 	}
 
+	// Write to file.
 	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }

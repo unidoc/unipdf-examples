@@ -112,6 +112,8 @@ func annotatePdfAddLineAnnotation(inputPath string, targetPageNum int64, outputP
 		return err
 	}
 
+	// Process each page using the following callback
+	// when generating PdfWriter.
 	opt := &pdf.ReaderToWriterOpts{
 		PageCallback: func(pageNum int, page *pdf.PdfPage) {
 			if int(targetPageNum) == pageNum {
@@ -127,11 +129,13 @@ func annotatePdfAddLineAnnotation(inputPath string, targetPageNum int64, outputP
 		},
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
 
+	// Write to file.
 	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err

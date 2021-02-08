@@ -59,6 +59,7 @@ func main() {
 		SkipInfo: true,
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	defaultPdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
@@ -67,14 +68,14 @@ func main() {
 
 	customPdfWriter := defaultPdfWriter
 
-	// Write new PDF with default author name
+	// Write new PDF with default author name.
 	err = defaultPdfWriter.WriteToFile("gen_pdf_default_author.pdf")
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
-	// Write new PDF with custom information dictionary
+	// Write new PDF with custom information dictionary.
 	pdfInfo := &model.PdfInfo{}
 	pdfInfo.Author = core.MakeString("UniPDF Tester 2")
 	pdfInfo.Subject = core.MakeString("PDF Example with custom information dictionary")

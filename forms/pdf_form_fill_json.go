@@ -133,15 +133,18 @@ func fillFields(inputPath, jsonPath, outputPath string) error {
 		return err
 	}
 
+	// AcroForm field no longer needed on the new PDF.
 	opt := &model.ReaderToWriterOpts{
 		SkipAcroForm: true,
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
 
+	// Write to file.
 	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }

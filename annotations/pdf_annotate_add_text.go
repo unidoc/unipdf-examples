@@ -68,6 +68,8 @@ func annotatePdfAddText(inputPath string, outputPath string, annotationText stri
 		return err
 	}
 
+	// Process each page using the following callback
+	// when generating PdfWriter.
 	opt := &pdf.ReaderToWriterOpts{
 		PageCallback: func(pageNum int, page *pdf.PdfPage) {
 			// New text annotation.
@@ -81,11 +83,13 @@ func annotatePdfAddText(inputPath string, outputPath string, annotationText stri
 		},
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
 
+	// Write to file.
 	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err

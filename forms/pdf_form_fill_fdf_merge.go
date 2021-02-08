@@ -120,15 +120,18 @@ func fdfMerge(templatePath, fdfPath, outputPath string, flatten bool) error {
 		}
 	}
 
+	// Don't copy AcroForm when flattening.
 	opt := &model.ReaderToWriterOpts{
 		SkipAcroForm: flatten,
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
 
+	// Write to file.
 	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }

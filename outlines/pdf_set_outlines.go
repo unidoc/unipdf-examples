@@ -101,11 +101,13 @@ func applyOutlines(inputPath, outlinesPath, outPath string) error {
 		SkipOutlines: true,
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
 
+	// Add the new document outline.
 	pdfWriter.AddOutlineTree(newOutlines.ToOutlineTree())
 
 	return pdfWriter.WriteToFile(outPath)

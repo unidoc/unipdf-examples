@@ -143,10 +143,12 @@ func fillFields(inputPath, jsonPath, outputPath string) error {
 		return err
 	}
 
+	// The document AcroForm field is no longer needed.
 	opt := &model.ReaderToWriterOpts{
 		SkipAcroForm: true,
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
@@ -156,6 +158,7 @@ func fillFields(inputPath, jsonPath, outputPath string) error {
 	// Refer to `text/pdf_using_cjk_font.go` example file for more information
 	cjkFont.SubsetRegistered()
 
+	// Write to file.
 	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }
