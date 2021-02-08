@@ -65,32 +65,22 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Get number of pages in the input file.
-	pages, err := reader.GetNumPages()
+	opt := &model.ReaderToWriterOpts{
+		SkipAcroForm:     false,
+		SkipInfo:         true,
+		SkipNamedDests:   true,
+		SkipOCProperties: true,
+		SkipOutlines:     true,
+		SkipPageLabels:   true,
+	}
+
+	pdfWriter, err := reader.ToWriter(opt)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Add input file pages to the writer.
-	writer := model.NewPdfWriter()
-	for i := 1; i <= pages; i++ {
-		page, err := reader.GetPage(i)
-		if err != nil {
-			log.Fatalf("Fail: %v\n", err)
-		}
-
-		if err = writer.AddPage(page); err != nil {
-			log.Fatalf("Fail: %v\n", err)
-		}
-	}
-
-	// Add reader AcroForm to the writer.
-	if reader.AcroForm != nil {
-		writer.SetForms(reader.AcroForm)
-	}
-
 	// Set optimizer.
-	writer.SetOptimizer(optimize.New(optimize.Options{
+	pdfWriter.SetOptimizer(optimize.New(optimize.Options{
 		CombineDuplicateDirectObjects:   true,
 		CombineIdenticalIndirectObjects: true,
 		CombineDuplicateStreams:         true,
@@ -101,14 +91,7 @@ func main() {
 	}))
 
 	// Create output file.
-	outputFile, err := os.Create(outputPath)
-	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
-	}
-	defer outputFile.Close()
-
-	// Write output file.
-	err = writer.Write(outputFile)
+	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}

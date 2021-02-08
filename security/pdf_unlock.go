@@ -51,8 +51,6 @@ func main() {
 }
 
 func unlockPdf(inputPath string, outputPath string, password string) error {
-	pdfWriter := pdf.NewPdfWriter()
-
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return err
@@ -81,36 +79,11 @@ func unlockPdf(inputPath string, outputPath string, password string) error {
 		}
 	}
 
-	numPages, err := pdfReader.GetNumPages()
+	pdfWriter, err := pdfReader.ToWriter(nil)
 	if err != nil {
 		return err
 	}
 
-	for i := 0; i < numPages; i++ {
-		pageNum := i + 1
-
-		page, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			return err
-		}
-	}
-
-	fWrite, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	err = pdfWriter.WriteToFile(outputPath)
+	return err
 }

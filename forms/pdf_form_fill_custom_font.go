@@ -143,27 +143,19 @@ func fillFields(inputPath, jsonPath, outputPath string) error {
 		return err
 	}
 
-	// Write out.
-	pdfWriter := model.NewPdfWriter()
-	pdfWriter.SetForms(nil)
-
-	for _, p := range pdfReader.PageList {
-		err := pdfWriter.AddPage(p)
-		if err != nil {
-			return err
-		}
+	opt := &model.ReaderToWriterOpts{
+		SkipAcroForm: true,
 	}
 
-	fout, err := os.Create(outputPath)
+	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
-	defer fout.Close()
 
 	// Subset the composite font file to reduce pdf file size.
 	// Refer to `text/pdf_using_cjk_font.go` example file for more information
 	cjkFont.SubsetRegistered()
 
-	err = pdfWriter.Write(fout)
+	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }
