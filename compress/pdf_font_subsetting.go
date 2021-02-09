@@ -69,17 +69,8 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Only copy AcroForm to the new PDF file.
-	opt := &model.ReaderToWriterOpts{
-		SkipAcroForm:     false,
-		SkipInfo:         true,
-		SkipNamedDests:   true,
-		SkipOCProperties: true,
-		SkipOutlines:     true,
-		SkipPageLabels:   true,
-	}
-
-	pdfWriter, err := reader.ToWriter(opt)
+	// Generate a PDFWriter from PDFReader.
+	pdfWriter, err := reader.ToWriter(nil)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
