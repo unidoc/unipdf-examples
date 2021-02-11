@@ -86,10 +86,8 @@ func main() {
 }
 
 // Annotate pdf file.
-func annotatePdfAddRectAnnotation(inputPath string, pageNum int64, outputPath string, x, y, width, height float64) error {
+func annotatePdfAddRectAnnotation(inputPath string, targetPageNum int64, outputPath string, x, y, width, height float64) error {
 	unicommon.Log.Debug("Input PDF: %v", inputPath)
-
-	pdfWriter := pdf.NewPdfWriter()
 
 	// Read the input pdf file.
 	f, err := os.Open(inputPath)
@@ -103,57 +101,45 @@ func annotatePdfAddRectAnnotation(inputPath string, pageNum int64, outputPath st
 		return err
 	}
 
-	numPages, err := pdfReader.GetNumPages()
-	if err != nil {
-		return err
-	}
+	// Process each page using the following callback
+	// when generating PdfWriter.
+	opt := &pdf.ReaderToWriterOpts{
+		PageCallback: func(pageNum int, page *pdf.PdfPage) {
+			// Add only to the specific page.
+			if int(targetPageNum) == pageNum {
+				// Define a semi-transparent yellow rectangle with black borders at the specified location.
+				rectDef := annotator.RectangleAnnotationDef{}
+				rectDef.X = x
+				rectDef.Y = y
+				rectDef.Width = width
+				rectDef.Height = height
+				rectDef.Opacity = 0.5 // Semi transparent.
+				rectDef.FillEnabled = false
+				rectDef.FillColor = pdf.NewPdfColorDeviceRGB(1, 1, 0) // Yellow fill.
+				rectDef.BorderEnabled = true
+				rectDef.BorderWidth = 30
+				rectDef.BorderColor = pdf.NewPdfColorDeviceRGB(0, 0, 0) // Black border.
 
-	for i := 0; i < numPages; i++ {
-		// Read the page.
-		page, err := pdfReader.GetPage(i + 1)
-		if err != nil {
-			return err
-		}
+				rectAnnotation, err := annotator.CreateRectangleAnnotation(rectDef)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 
-		// Add only to the specific page.
-		if int64(i+1) == pageNum {
-			// Define a semi-transparent yellow rectangle with black borders at the specified location.
-			rectDef := annotator.RectangleAnnotationDef{}
-			rectDef.X = x
-			rectDef.Y = y
-			rectDef.Width = width
-			rectDef.Height = height
-			rectDef.Opacity = 0.5 // Semi transparent.
-			rectDef.FillEnabled = false
-			rectDef.FillColor = pdf.NewPdfColorDeviceRGB(1, 1, 0) // Yellow fill.
-			rectDef.BorderEnabled = true
-			rectDef.BorderWidth = 30
-			rectDef.BorderColor = pdf.NewPdfColorDeviceRGB(0, 0, 0) // Black border.
-
-			rectAnnotation, err := annotator.CreateRectangleAnnotation(rectDef)
-			if err != nil {
-				return err
+				// Add to the page annotations.
+				page.AddAnnotation(rectAnnotation)
 			}
-
-			// Add to the page annotations.
-			page.AddAnnotation(rectAnnotation)
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			unicommon.Log.Error("Failed to add page: %s", err)
-			return err
-		}
+		},
 	}
 
-	fWrite, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
 
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err
 	}

@@ -86,10 +86,8 @@ func main() {
 }
 
 // Annotate pdf file.
-func annotatePdfAddEllipseAnnotation(inputPath string, pageNum int64, outputPath string, x, y, width, height float64) error {
+func annotatePdfAddEllipseAnnotation(inputPath string, targetPageNum int64, outputPath string, x, y, width, height float64) error {
 	unicommon.Log.Debug("Input PDF: %v", inputPath)
-
-	pdfWriter := pdf.NewPdfWriter()
 
 	// Read the input pdf file.
 	f, err := os.Open(inputPath)
@@ -103,58 +101,45 @@ func annotatePdfAddEllipseAnnotation(inputPath string, pageNum int64, outputPath
 		return err
 	}
 
-	numPages, err := pdfReader.GetNumPages()
-	if err != nil {
-		return err
-	}
+	// Process each page using the following callback
+	// when generating PdfWriter.
+	opt := &pdf.ReaderToWriterOpts{
+		PageCallback: func(pageNum int, page *pdf.PdfPage) {
+			// Add only to the specific page.
+			if int(targetPageNum) == pageNum {
+				// Define a semi-transparent yellow ellipse with black borders at the specified location.
+				circDef := annotator.CircleAnnotationDef{}
+				circDef.X = x
+				circDef.Y = y
+				circDef.Width = width
+				circDef.Height = height
+				circDef.Opacity = 0.5 // Semi transparent.
+				circDef.FillEnabled = true
+				circDef.FillColor = pdf.NewPdfColorDeviceRGB(1, 1, 0) // Yellow fill.
+				circDef.BorderEnabled = true
+				circDef.BorderWidth = 15
+				circDef.BorderColor = pdf.NewPdfColorDeviceRGB(0, 0, 0) // Black border.
 
-	for i := 0; i < numPages; i++ {
-		// Read the page.
-		page, err := pdfReader.GetPage(i + 1)
-		if err != nil {
-			return err
-		}
+				circAnnotation, err := annotator.CreateCircleAnnotation(circDef)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 
-		// Add only to the specific page.
-		if int64(i+1) == pageNum {
-			// Define a semi-transparent yellow rectangle with black borders at the specified location.
-
-			circDef := annotator.CircleAnnotationDef{}
-			circDef.X = x
-			circDef.Y = y
-			circDef.Width = width
-			circDef.Height = height
-			circDef.Opacity = 0.5 // Semi transparent.
-			circDef.FillEnabled = true
-			circDef.FillColor = pdf.NewPdfColorDeviceRGB(1, 1, 0) // Yellow fill.
-			circDef.BorderEnabled = true
-			circDef.BorderWidth = 15
-			circDef.BorderColor = pdf.NewPdfColorDeviceRGB(0, 0, 0) // Black border.
-
-			circAnnotation, err := annotator.CreateCircleAnnotation(circDef)
-			if err != nil {
-				return err
+				// Add to the page annotations.
+				page.AddAnnotation(circAnnotation)
 			}
-
-			// Add to the page annotations.
-			page.AddAnnotation(circAnnotation)
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			unicommon.Log.Error("Failed to add page: %s", err)
-			return err
-		}
+		},
 	}
 
-	fWrite, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
 
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err
 	}

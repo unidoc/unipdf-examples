@@ -86,22 +86,18 @@ func flattenPdf(inputPath, outputPath string) error {
 		return err
 	}
 
-	pdfWriter := model.NewPdfWriter()
-	pdfWriter.SetForms(nil)
-
-	for _, p := range pdfReader.PageList {
-		err := pdfWriter.AddPage(p)
-		if err != nil {
-			return err
-		}
+	// AcroForm field is no longer needed.
+	opt := &model.ReaderToWriterOpts{
+		SkipAcroForm: true,
 	}
 
-	fout, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
-	defer fout.Close()
 
-	err = pdfWriter.Write(fout)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }

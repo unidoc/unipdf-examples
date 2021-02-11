@@ -60,40 +60,31 @@ func addFormToPdf(inputPath string, outputPath string) error {
 		return err
 	}
 
-	numPages, err := pdfReader.GetNumPages()
-	if err != nil {
-		return err
-	}
+	var form *model.PdfAcroForm
 
-	pdfWriter := model.NewPdfWriter()
-
-	// Load the pages.
-	for i := 0; i < numPages; i++ {
-		page, err := pdfReader.GetPage(i + 1)
-		if err != nil {
-			return err
-		}
-
-		if i == 0 {
-			err = pdfWriter.SetForms(createForm(page))
-			if err != nil {
-				return err
+	// Generate a new AcroForm instead of copying from the source PDF.
+	opt := &model.ReaderToWriterOpts{
+		SkipAcroForm: true,
+		PageCallback: func(pageNum int, page *model.PdfPage) {
+			if pageNum == 1 {
+				form = createForm(page)
 			}
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			return err
-		}
+		},
 	}
 
-	of, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
-	defer of.Close()
 
-	return pdfWriter.Write(of)
+	// Set new AcroForm.
+	err = pdfWriter.SetForms(form)
+	if err != nil {
+		return err
+	}
+
+	return pdfWriter.WriteToFile(outputPath)
 }
 
 // textFieldsDef is a list of text fields to add to the form. The Rect field specifies the coordinates of the

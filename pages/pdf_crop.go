@@ -64,8 +64,6 @@ func main() {
 
 // Crop all pages by a given percentage.
 func cropPdf(inputPath string, outputPath string, percentage int64) error {
-	pdfWriter := pdf.NewPdfWriter()
-
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return err
@@ -94,50 +92,37 @@ func cropPdf(inputPath string, outputPath string, percentage int64) error {
 		}
 	}
 
-	numPages, err := pdfReader.GetNumPages()
+	// Process each page using the following callback
+	// when generating PdfWriter from PdfReader.
+	opts := &pdf.ReaderToWriterOpts{
+		PageCallback: func(pageNum int, page *pdf.PdfPage) {
+			bbox, err := page.GetMediaBox()
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			// Zoom in on the page middle, with a scaled width and height.
+			width := (*bbox).Urx - (*bbox).Llx
+			height := (*bbox).Ury - (*bbox).Lly
+			newWidth := width * float64(percentage) / 100.0
+			newHeight := height * float64(percentage) / 100.0
+			(*bbox).Llx += newWidth / 2
+			(*bbox).Lly += newHeight / 2
+			(*bbox).Urx -= newWidth / 2
+			(*bbox).Ury -= newHeight / 2
+
+			page.MediaBox = bbox
+		},
+	}
+
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opts)
 	if err != nil {
 		return err
 	}
 
-	for i := 0; i < numPages; i++ {
-		pageNum := i + 1
-
-		page, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		bbox, err := page.GetMediaBox()
-		if err != nil {
-			return err
-		}
-
-		// Zoom in on the page middle, with a scaled width and height.
-		width := (*bbox).Urx - (*bbox).Llx
-		height := (*bbox).Ury - (*bbox).Lly
-		newWidth := width * float64(percentage) / 100.0
-		newHeight := height * float64(percentage) / 100.0
-		(*bbox).Llx += newWidth / 2
-		(*bbox).Lly += newHeight / 2
-		(*bbox).Urx -= newWidth / 2
-		(*bbox).Ury -= newHeight / 2
-
-		page.MediaBox = bbox
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			return err
-		}
-	}
-
-	fWrite, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err
 	}

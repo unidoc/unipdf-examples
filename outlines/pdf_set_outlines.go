@@ -96,20 +96,19 @@ func applyOutlines(inputPath, outlinesPath, outPath string) error {
 		}
 	}
 
-	fw, err := os.Create(outPath)
+	// Don't copy document outlines.
+	opt := &model.ReaderToWriterOpts{
+		SkipOutlines: true,
+	}
+
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
-	defer fw.Close()
 
-	w := model.NewPdfWriter()
-	for _, p := range pdfReader.PageList {
-		err = w.AddPage(p)
-		if err != nil {
-			return err
-		}
-	}
-	w.AddOutlineTree(newOutlines.ToOutlineTree())
+	// Add the new document outline.
+	pdfWriter.AddOutlineTree(newOutlines.ToOutlineTree())
 
-	return w.Write(fw)
+	return pdfWriter.WriteToFile(outPath)
 }

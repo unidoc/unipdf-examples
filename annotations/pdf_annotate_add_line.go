@@ -97,10 +97,8 @@ func main() {
 }
 
 // Annotate pdf file.
-func annotatePdfAddLineAnnotation(inputPath string, pageNum int64, outputPath string, lineDef annotator.LineAnnotationDef) error {
+func annotatePdfAddLineAnnotation(inputPath string, targetPageNum int64, outputPath string, lineDef annotator.LineAnnotationDef) error {
 	unicommon.Log.Debug("Input PDF: %v", inputPath)
-
-	pdfWriter := pdf.NewPdfWriter()
 
 	// Read the input pdf file.
 	f, err := os.Open(inputPath)
@@ -114,43 +112,31 @@ func annotatePdfAddLineAnnotation(inputPath string, pageNum int64, outputPath st
 		return err
 	}
 
-	numPages, err := pdfReader.GetNumPages()
-	if err != nil {
-		return err
-	}
+	// Process each page using the following callback
+	// when generating PdfWriter.
+	opt := &pdf.ReaderToWriterOpts{
+		PageCallback: func(pageNum int, page *pdf.PdfPage) {
+			if int(targetPageNum) == pageNum {
+				lineAnnotation, err := annotator.CreateLineAnnotation(lineDef)
+				if err != nil {
+					fmt.Println(err)
+					return
+				}
 
-	for i := 0; i < numPages; i++ {
-		// Read the page.
-		page, err := pdfReader.GetPage(int(i + 1))
-		if err != nil {
-			return err
-		}
-
-		if int(pageNum) == (i + 1) {
-			lineAnnotation, err := annotator.CreateLineAnnotation(lineDef)
-			if err != nil {
-				return err
+				// Add to the page annotations.
+				page.AddAnnotation(lineAnnotation)
 			}
-
-			// Add to the page annotations.
-			page.AddAnnotation(lineAnnotation)
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			unicommon.Log.Error("Failed to add page: %s", err)
-			return err
-		}
+		},
 	}
 
-	fWrite, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
 
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err
 	}

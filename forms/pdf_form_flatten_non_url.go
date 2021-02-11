@@ -77,11 +77,13 @@ func nonUrlFlattenPdf(inputPath, outputPath string) error {
 		return err
 	}
 
+	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(nil)
 	if err != nil {
 		return err
 	}
 
+	// Write to file.
 	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err

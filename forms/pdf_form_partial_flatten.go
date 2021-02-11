@@ -78,22 +78,13 @@ func partialFlattenPdf(inputPath, outputPath string, fieldToFlatten []string) er
 		return err
 	}
 
-	pdfWriter := model.NewPdfWriter()
-	pdfWriter.SetForms(pdfReader.AcroForm)
-
-	for _, p := range pdfReader.PageList {
-		err := pdfWriter.AddPage(p)
-		if err != nil {
-			return err
-		}
-	}
-
-	fout, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(nil)
 	if err != nil {
 		return err
 	}
-	defer fout.Close()
 
-	err = pdfWriter.Write(fout)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }

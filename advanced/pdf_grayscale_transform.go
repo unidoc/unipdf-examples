@@ -57,8 +57,6 @@ func main() {
 }
 
 func convertPdfToGrayscale(inputPath, outputPath string) error {
-	pdfWriter := pdf.NewPdfWriter()
-
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return err
@@ -94,31 +92,27 @@ func convertPdfToGrayscale(inputPath, outputPath string) error {
 	}
 	fmt.Printf("PDF Num Pages: %d\n", numPages)
 
-	for i := 0; i < numPages; i++ {
-		fmt.Printf("Processing page %d/%d\n", i+1, numPages)
-		page, err := pdfReader.GetPage(i + 1)
-		if err != nil {
-			return err
-		}
+	// Process each page using the following callback
+	// when generating PdfWriter.
+	opts := &pdf.ReaderToWriterOpts{
+		PageCallback: func(pageNum int, page *pdf.PdfPage) {
+			fmt.Printf("Processing page %d/%d\n", pageNum, numPages)
 
-		err = convertPageToGrayscale(page)
-		if err != nil {
-			return err
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			return err
-		}
+			err = convertPageToGrayscale(page)
+			if err != nil {
+				fmt.Println(err)
+			}
+		},
 	}
 
-	fWrite, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opts)
 	if err != nil {
 		return err
 	}
-	defer fWrite.Close()
 
-	err = pdfWriter.Write(fWrite)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err
 	}

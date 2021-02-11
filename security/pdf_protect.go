@@ -63,8 +63,6 @@ func main() {
 }
 
 func protectPdf(inputPath string, outputPath string, userPassword, ownerPassword string) error {
-	pdfWriter := pdf.NewPdfWriter()
-
 	permissions := security.PermPrinting | // Allow printing with low quality
 		security.PermFullPrintQuality |
 		security.PermModify | // Allow modifications.
@@ -76,11 +74,6 @@ func protectPdf(inputPath string, outputPath string, userPassword, ownerPassword
 
 	encryptOptions := &pdf.EncryptOptions{
 		Permissions: permissions,
-	}
-
-	err := pdfWriter.Encrypt([]byte(userPassword), []byte(ownerPassword), encryptOptions)
-	if err != nil {
-		return err
 	}
 
 	f, err := os.Open(inputPath)
@@ -103,36 +96,19 @@ func protectPdf(inputPath string, outputPath string, userPassword, ownerPassword
 		return fmt.Errorf("The PDF is already locked (need to unlock first)")
 	}
 
-	numPages, err := pdfReader.GetNumPages()
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(nil)
 	if err != nil {
 		return err
 	}
 
-	for i := 0; i < numPages; i++ {
-		pageNum := i + 1
-
-		page, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			return err
-		}
-	}
-
-	fWrite, err := os.Create(outputPath)
+	// Encrypt document before writing to file.
+	err = pdfWriter.Encrypt([]byte(userPassword), []byte(ownerPassword), encryptOptions)
 	if err != nil {
 		return err
 	}
 
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
+	return err
 }

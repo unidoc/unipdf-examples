@@ -120,28 +120,18 @@ func fdfMerge(templatePath, fdfPath, outputPath string, flatten bool) error {
 		}
 	}
 
-	// Write out.
-	pdfWriter := model.NewPdfWriter()
-	if flatten {
-		pdfWriter.SetForms(nil)
-	} else {
-		pdfReader.AcroForm.ToPdfObject()
-		pdfWriter.SetForms(pdfReader.AcroForm)
+	// Don't copy AcroForm when flattening.
+	opt := &model.ReaderToWriterOpts{
+		SkipAcroForm: flatten,
 	}
 
-	for _, p := range pdfReader.PageList {
-		err := pdfWriter.AddPage(p)
-		if err != nil {
-			return err
-		}
-	}
-
-	fout, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
-	defer fout.Close()
 
-	err = pdfWriter.Write(fout)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }
