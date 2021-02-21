@@ -18,7 +18,7 @@ import (
 
 // Custom encoder declaration that implements StreamEncoder interface.
 type CustomJPXEncoder struct {
-	magickWand *imagick.MagickWand
+	pdfColorSpace model.PdfColorspace
 }
 
 // NewCustomJPXEncoder returns a new instance of CustomJPXEncoder.
@@ -52,17 +52,42 @@ func (enc *CustomJPXEncoder) UpdateParams(params *core.PdfObjectDictionary) {
 
 // DecodeBytes decodes a slice of JPX encoded bytes and returns the result.
 func (enc *CustomJPXEncoder) DecodeBytes(encoded []byte) ([]byte, error) {
-	return nil, nil
-}
+	imagick.Initialize()
+	defer imagick.Terminate()
 
-// DecodeMagickWandData decodes image data stored in imagick and returns the result.
-func (enc *CustomJPXEncoder) DecodeMagickWandData() ([]byte, error) {
-	imgWidth := enc.magickWand.GetImageWidth()
-	imgHeight := enc.magickWand.GetImageHeight()
-	imgDepth := enc.magickWand.GetImageDepth()
-	cs := enc.magickWand.GetImageColorspace()
+	mw := imagick.NewMagickWand()
+	defer mw.Destroy()
 
-	imw := enc.magickWand.NewPixelIterator()
+	if err := mw.ReadImageBlob(encoded); err != nil {
+		return nil, err
+	}
+
+	// Modify image data according to document ColorSpace information.
+	switch enc.pdfColorSpace.(type) {
+	case *model.PdfColorspaceSpecialIndexed:
+		err := mw.SetImageColorspace(imagick.COLORSPACE_GRAY)
+		if err != nil {
+			return nil, err
+		}
+
+		err = mw.NegateImage(false)
+		if err != nil {
+			return nil, err
+		}
+
+	case *model.PdfColorspaceDeviceCMYK:
+		err := mw.SetImageColorspace(imagick.COLORSPACE_CMYK)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	imgWidth := mw.GetImageWidth()
+	imgHeight := mw.GetImageHeight()
+	imgDepth := mw.GetImageDepth()
+	cs := mw.GetImageColorspace()
+
+	imw := mw.NewPixelIterator()
 	defer imw.Destroy()
 
 	var colorComponent uint
@@ -179,16 +204,6 @@ func (enc *CustomJPXEncoder) DecodeMagickWandData() ([]byte, error) {
 // DecodeStream decodes a JPX encoded stream and returns the result as a
 // slice of bytes.
 func (enc *CustomJPXEncoder) DecodeStream(streamObj *core.PdfObjectStream) ([]byte, error) {
-	imagick.Initialize()
-	defer imagick.Terminate()
-
-	enc.magickWand = imagick.NewMagickWand()
-	defer enc.magickWand.Destroy()
-
-	if err := enc.magickWand.ReadImageBlob(streamObj.Stream); err != nil {
-		return nil, err
-	}
-
 	// ColorSpace shall be optional since JPEG2000 data contain colour space specifications.
 	// If present, it shall determine how the image samples are interpreted,
 	// and the colour space specifications in the JPEG2000 data shall be ignored.
@@ -200,17 +215,10 @@ func (enc *CustomJPXEncoder) DecodeStream(streamObj *core.PdfObjectStream) ([]by
 			return nil, err
 		}
 
-		switch pdfColorSpace.(type) {
-		case *model.PdfColorspaceSpecialIndexed:
-			enc.magickWand.SetImageColorspace(imagick.COLORSPACE_GRAY)
-			enc.magickWand.NegateImage(false)
-
-		case *model.PdfColorspaceDeviceCMYK:
-			enc.magickWand.SetImageColorspace(imagick.COLORSPACE_CMYK)
-		}
+		enc.pdfColorSpace = pdfColorSpace
 	}
 
-	return enc.DecodeMagickWandData()
+	return enc.DecodeBytes(streamObj.Stream)
 }
 
 // EncodeBytes JPX encodes the passed in slice of bytes.
