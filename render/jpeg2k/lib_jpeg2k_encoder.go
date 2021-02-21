@@ -12,11 +12,14 @@ import (
 	"math"
 
 	"github.com/unidoc/unipdf/v3/core"
+	"github.com/unidoc/unipdf/v3/model"
 	"gopkg.in/gographics/imagick.v2/imagick"
 )
 
 // Custom encoder declaration that implements StreamEncoder interface.
-type CustomJPXEncoder struct{}
+type CustomJPXEncoder struct {
+	magickWand *imagick.MagickWand
+}
 
 // NewCustomJPXEncoder returns a new instance of CustomJPXEncoder.
 func NewCustomJPXEncoder() *CustomJPXEncoder {
@@ -49,22 +52,17 @@ func (enc *CustomJPXEncoder) UpdateParams(params *core.PdfObjectDictionary) {
 
 // DecodeBytes decodes a slice of JPX encoded bytes and returns the result.
 func (enc *CustomJPXEncoder) DecodeBytes(encoded []byte) ([]byte, error) {
-	imagick.Initialize()
-	defer imagick.Terminate()
+	return nil, nil
+}
 
-	mw := imagick.NewMagickWand()
-	defer mw.Destroy()
+// DecodeMagickWandData decodes image data stored in imagick and returns the result.
+func (enc *CustomJPXEncoder) DecodeMagickWandData() ([]byte, error) {
+	imgWidth := enc.magickWand.GetImageWidth()
+	imgHeight := enc.magickWand.GetImageHeight()
+	imgDepth := enc.magickWand.GetImageDepth()
+	cs := enc.magickWand.GetImageColorspace()
 
-	if err := mw.ReadImageBlob(encoded); err != nil {
-		return nil, err
-	}
-
-	imgWidth := mw.GetImageWidth()
-	imgHeight := mw.GetImageHeight()
-	imgDepth := mw.GetImageDepth()
-	cs := mw.GetImageColorspace()
-
-	imw := mw.NewPixelIterator()
+	imw := enc.magickWand.NewPixelIterator()
 	defer imw.Destroy()
 
 	var colorComponent uint
@@ -181,7 +179,38 @@ func (enc *CustomJPXEncoder) DecodeBytes(encoded []byte) ([]byte, error) {
 // DecodeStream decodes a JPX encoded stream and returns the result as a
 // slice of bytes.
 func (enc *CustomJPXEncoder) DecodeStream(streamObj *core.PdfObjectStream) ([]byte, error) {
-	return enc.DecodeBytes(streamObj.Stream)
+	imagick.Initialize()
+	defer imagick.Terminate()
+
+	enc.magickWand = imagick.NewMagickWand()
+	defer enc.magickWand.Destroy()
+
+	if err := enc.magickWand.ReadImageBlob(streamObj.Stream); err != nil {
+		return nil, err
+	}
+
+	// ColorSpace shall be optional since JPEG2000 data contain colour space specifications.
+	// If present, it shall determine how the image samples are interpreted,
+	// and the colour space specifications in the JPEG2000 data shall be ignored.
+	// Source: PDF 32000-1:2008 page 37.
+	csObj := streamObj.Get("ColorSpace")
+	if csObj != nil {
+		pdfColorSpace, err := model.NewPdfColorspaceFromPdfObject(csObj)
+		if err != nil {
+			return nil, err
+		}
+
+		switch pdfColorSpace.(type) {
+		case *model.PdfColorspaceSpecialIndexed:
+			enc.magickWand.SetImageColorspace(imagick.COLORSPACE_GRAY)
+			enc.magickWand.NegateImage(false)
+
+		case *model.PdfColorspaceDeviceCMYK:
+			enc.magickWand.SetImageColorspace(imagick.COLORSPACE_CMYK)
+		}
+	}
+
+	return enc.DecodeMagickWandData()
 }
 
 // EncodeBytes JPX encodes the passed in slice of bytes.
