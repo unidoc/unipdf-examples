@@ -12,11 +12,14 @@ import (
 	"math"
 
 	"github.com/unidoc/unipdf/v3/core"
+	"github.com/unidoc/unipdf/v3/model"
 	"gopkg.in/gographics/imagick.v2/imagick"
 )
 
 // Custom encoder declaration that implements StreamEncoder interface.
-type CustomJPXEncoder struct{}
+type CustomJPXEncoder struct {
+	pdfColorSpace model.PdfColorspace
+}
 
 // NewCustomJPXEncoder returns a new instance of CustomJPXEncoder.
 func NewCustomJPXEncoder() *CustomJPXEncoder {
@@ -57,6 +60,26 @@ func (enc *CustomJPXEncoder) DecodeBytes(encoded []byte) ([]byte, error) {
 
 	if err := mw.ReadImageBlob(encoded); err != nil {
 		return nil, err
+	}
+
+	// Modify image data according to document ColorSpace information.
+	switch enc.pdfColorSpace.(type) {
+	case *model.PdfColorspaceSpecialIndexed:
+		err := mw.SetImageColorspace(imagick.COLORSPACE_GRAY)
+		if err != nil {
+			return nil, err
+		}
+
+		err = mw.NegateImage(false)
+		if err != nil {
+			return nil, err
+		}
+
+	case *model.PdfColorspaceDeviceCMYK:
+		err := mw.SetImageColorspace(imagick.COLORSPACE_CMYK)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	imgWidth := mw.GetImageWidth()
@@ -181,6 +204,20 @@ func (enc *CustomJPXEncoder) DecodeBytes(encoded []byte) ([]byte, error) {
 // DecodeStream decodes a JPX encoded stream and returns the result as a
 // slice of bytes.
 func (enc *CustomJPXEncoder) DecodeStream(streamObj *core.PdfObjectStream) ([]byte, error) {
+	// ColorSpace shall be optional since JPEG2000 data contain colour space specifications.
+	// If present, it shall determine how the image samples are interpreted,
+	// and the colour space specifications in the JPEG2000 data shall be ignored.
+	// Source: PDF 32000-1:2008 page 37.
+	csObj := streamObj.Get("ColorSpace")
+	if csObj != nil {
+		pdfColorSpace, err := model.NewPdfColorspaceFromPdfObject(csObj)
+		if err != nil {
+			return nil, err
+		}
+
+		enc.pdfColorSpace = pdfColorSpace
+	}
+
 	return enc.DecodeBytes(streamObj.Stream)
 }
 
