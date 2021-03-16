@@ -62,6 +62,12 @@ func main() {
 		log.Fatalf("Error: %v", err)
 	}
 
+	// Generate styled paragraph subscript and superscript subchapter.
+	err = styledParagraphScript(c, chap, fontRegular, fontBold)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
 	// Draw styled paragraph chapter.
 	if err = c.Draw(chap); err != nil {
 		log.Fatal(err)
@@ -160,6 +166,88 @@ func styledParagraphUnderline(c *creator.Creator, ch *creator.Chapter,
 	chunk.Style.UnderlineStyle.Offset = 2
 
 	p.Append(".")
+
+	// Add the styled paragraph to the created subchapter.
+	return subchap.Add(p)
+}
+
+func styledParagraphScript(c *creator.Creator, ch *creator.Chapter,
+	fontRegular, fontBold *model.PdfFont) error {
+	// Create new subchapter.
+	subchap := ch.NewSubchapter("Subscript & Superscript")
+	subchap.GetHeading().SetMargins(0, 0, 0, 10)
+
+	// Generate styled paragraph subscript and superscript subchapter.
+	err := styledParagraphScriptBasic(c, subchap, fontRegular, fontBold)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
+	// Generate styled paragraph subscript and superscript subchapter
+	// combined with underlined and annotated text.
+	err = styledParagraphScriptCombination(c, subchap, fontRegular, fontBold)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
+	return err
+}
+
+func styledParagraphScriptBasic(c *creator.Creator, ch *creator.Chapter,
+	fontRegular, fontBold *model.PdfFont) error {
+	// Create new subchapter.
+	subchap := ch.NewSubchapter("Basic Example")
+	subchap.GetHeading().SetMargins(10, 0, 0, 10)
+
+	// Basic example.
+	p := c.NewStyledParagraph()
+	p.SetMargins(10, 0, 0, 20)
+	p.SetLineHeight(1.2)
+	p.Append("Styled paragraphs allow drawing ")
+
+	style := &p.Append("subscript").Style
+	style.TextRise = -8
+	style.FontSize = 7
+	style.Color = creator.ColorRed
+
+	p.Append(" and ")
+
+	style = &p.Append("superscript").Style
+	style.TextRise = 9
+	style.FontSize = 7
+	style.Color = creator.ColorBlue
+
+	p.Append(" text chunks.")
+
+	// Add the styled paragraph to the created subchapter.
+	return subchap.Add(p)
+}
+
+func styledParagraphScriptCombination(c *creator.Creator, ch *creator.Chapter,
+	fontRegular, fontBold *model.PdfFont) error {
+	// Create new subchapter.
+	subchap := ch.NewSubchapter("Combined with Underlined and Annotated Text")
+	subchap.GetHeading().SetMargins(10, 0, 0, 10)
+
+	// Text rise combined with underlined and annotated text.
+	p := c.NewStyledParagraph()
+	p.SetMargins(10, 0, 0, 20)
+	p.SetLineHeight(1.2)
+	p.Append("Subscript and superscript text can be ")
+
+	style := &p.Append("underlined").Style
+	style.TextRise = 5
+	style.FontSize = 7
+	style.Color = creator.ColorGreen
+	style.Underline = true
+
+	p.Append(" or turned into ")
+
+	style = &p.AddExternalLink("link", "https://google.com").Style
+	style.TextRise = -5
+	style.FontSize = 7
+
+	p.Append(" annotations.")
 
 	// Add the styled paragraph to the created subchapter.
 	return subchap.Add(p)
