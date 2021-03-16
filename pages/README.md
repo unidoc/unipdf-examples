@@ -10,6 +10,7 @@ The example explains how to work with and manipulate PDF pages using UniPDF libr
 - [pdf_merge_advanced.go](pdf_merge_advanced.go) The example merges PDF files, including form field data (AcroForms). For a more basic merging of PDF page contents, see pdf_merge.go.
 - [pdf_page_info.go](pdf_page_info.go) The example prints PDF page info: Mediabox size and other parameters. If [page num] is not specified prints out info for all pages.
 - [pdf_rotate_flatten.go](pdf_rotate_flatten.go) The example rotates the contents of a PDF file in accordance with each page's Rotate entry and then sets Rotate to 0. That is, flattens the rotation. Will look the same in viewer, but when working with the PDF, the upper left corner will be the origin (in unidoc coordinate system).
-- [pdf_rotate.go](pdf_rotate.go) The example rotate pages in a PDF file. Degrees needs to be a multiple of 90. Example of how to manipulate pages with the pdf creator.
+- [pdf_page_rotate.go](pdf_page_rotate.go) The example rotate certain page in a PDF file. Degrees needs to be a multiple of 90.
+- [pdf_rotate.go](pdf_rotate.go) The example rotate pages in a PDF file using global flag instead of rotating each page one by one. Degrees needs to be a multiple of 90.
 - [pdf_split.go](pdf_split.go) The example highlights basic PDF split example: Splitting by page range.
 - [pdf_split_advanced.go](pdf_split_advanced.go) The example highlights advanced PDF split example: Takes into account optional content - OCProperties (rarely used).

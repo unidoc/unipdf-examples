@@ -1,9 +1,7 @@
 /*
- * Rotate pages in a PDF file using global flag instead of
- * rotating each page one by one.
- * Degrees needs to be a multiple of 90.
+ * Rotate certain page in a PDF file.  Degrees needs to be a multiple of 90.
  *
- * Run as: go run pdf_rotate.go input.pdf <angle> output.pdf
+ * Run as: go run pdf_page_rotate.go input.pdf page <angle> output.pdf
  * The angle is specified in degrees.
  */
 
@@ -36,15 +34,25 @@ func init() {
 }
 
 func main() {
-	if len(os.Args) < 4 {
-		fmt.Printf("Usage: go run pdf_rotate.go input.pdf <angle> output.pdf\n")
+	if len(os.Args) < 5 {
+		fmt.Printf("Usage: go run pdf_page_rotate.go input.pdf <page> <angle> output.pdf\n")
 		os.Exit(1)
 	}
 
 	inputPath := os.Args[1]
-	outputPath := os.Args[3]
+	outputPath := os.Args[4]
 
-	degrees, err := strconv.ParseInt(os.Args[2], 10, 64)
+	page, err := strconv.Atoi(os.Args[2])
+	if err != nil {
+		fmt.Printf("Invalid page: %v\n", err)
+		os.Exit(1)
+	}
+	if page < 1 {
+		fmt.Println("Invalid page number specified")
+		os.Exit(1)
+	}
+
+	degrees, err := strconv.ParseInt(os.Args[3], 10, 64)
 	if err != nil {
 		fmt.Printf("Invalid degrees: %v\n", err)
 		os.Exit(1)
@@ -54,7 +62,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = rotatePdf(inputPath, degrees, outputPath)
+	err = rotatePage(inputPath, page, degrees, outputPath)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
@@ -64,7 +72,7 @@ func main() {
 }
 
 // Rotate all pages by 90 degrees.
-func rotatePdf(inputPath string, degrees int64, outputPath string) error {
+func rotatePage(inputPath string, pageNum int, degrees int64, outputPath string) error {
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return err
@@ -92,15 +100,27 @@ func rotatePdf(inputPath string, degrees int64, outputPath string) error {
 		}
 	}
 
-	pdfWriter, err := pdfReader.ToWriter(&pdf.ReaderToWriterOpts{})
+	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
-		return nil
+		return err
 	}
 
-	// Rotate all page 90 degrees.
-	err = pdfWriter.SetRotation(90)
+	if pageNum > numPages {
+		return errors.New("Invalid page number specified")
+	}
+
+	pdfWriter, err := pdfReader.ToWriter(&pdf.ReaderToWriterOpts{
+		PageCallback: func(index int, page *pdf.PdfPage) {
+			if index != pageNum {
+				return
+			}
+
+			page.Rotate = &degrees
+		},
+	})
+
 	if err != nil {
-		return nil
+		return err
 	}
 
 	pdfWriter.WriteToFile(outputPath)
