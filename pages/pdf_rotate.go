@@ -1,8 +1,9 @@
 /*
- * Rotate pages in a PDF file.  Degrees needs to be a multiple of 90.
- * Example of how to manipulate pages with the pdf creator.
+ * Rotate pages in a PDF file using global flag instead of
+ * rotating each page one by one.
+ * Degrees needs to be a multiple of 90.
  *
- * Run as: go run pdf_rotate.go output.pdf <angle> input.pdf
+ * Run as: go run pdf_rotate.go input.pdf <angle> output.pdf
  * The angle is specified in degrees.
  */
 
@@ -15,7 +16,6 @@ import (
 	"strconv"
 
 	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/creator"
 	pdf "github.com/unidoc/unipdf/v3/model"
 )
 
@@ -65,8 +65,6 @@ func main() {
 
 // Rotate all pages by 90 degrees.
 func rotatePdf(inputPath string, degrees int64, outputPath string) error {
-	c := creator.New()
-
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return err
@@ -94,27 +92,18 @@ func rotatePdf(inputPath string, degrees int64, outputPath string) error {
 		}
 	}
 
-	numPages, err := pdfReader.GetNumPages()
+	pdfWriter, err := pdfReader.ToWriter(&pdf.ReaderToWriterOpts{})
 	if err != nil {
-		return err
+		return nil
 	}
 
-	for i := 0; i < numPages; i++ {
-		pageNum := i + 1
-
-		page, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		err = c.AddPage(page)
-		if err != nil {
-			return err
-		}
-
-		_ = c.RotateDeg(degrees)
+	// Rotate all page 90 degrees.
+	err = pdfWriter.SetRotation(90)
+	if err != nil {
+		return nil
 	}
 
-	err = c.WriteToFile(outputPath)
+	pdfWriter.WriteToFile(outputPath)
+
 	return err
 }
