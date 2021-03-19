@@ -95,10 +95,10 @@ func cropPdf(inputPath string, outputPath string, percentage int64) error {
 	// Process each page using the following callback
 	// when generating PdfWriter from PdfReader.
 	opts := &pdf.ReaderToWriterOpts{
-		PageCallback: func(pageNum int, page *pdf.PdfPage) {
+		PageProcessCallback: func(pageNum int, page *pdf.PdfPage) error {
 			bbox, err := page.GetMediaBox()
 			if err != nil {
-				fmt.Println(err)
+				return err
 			}
 
 			// Zoom in on the page middle, with a scaled width and height.
@@ -112,6 +112,8 @@ func cropPdf(inputPath string, outputPath string, percentage int64) error {
 			(*bbox).Ury -= newHeight / 2
 
 			page.MediaBox = bbox
+
+			return nil
 		},
 	}
 

@@ -115,17 +115,18 @@ func annotatePdfAddLineAnnotation(inputPath string, targetPageNum int64, outputP
 	// Process each page using the following callback
 	// when generating PdfWriter.
 	opt := &pdf.ReaderToWriterOpts{
-		PageCallback: func(pageNum int, page *pdf.PdfPage) {
+		PageProcessCallback: func(pageNum int, page *pdf.PdfPage) error {
 			if int(targetPageNum) == pageNum {
 				lineAnnotation, err := annotator.CreateLineAnnotation(lineDef)
 				if err != nil {
-					fmt.Println(err)
-					return
+					return err
 				}
 
 				// Add to the page annotations.
 				page.AddAnnotation(lineAnnotation)
 			}
+
+			return nil
 		},
 	}
 
