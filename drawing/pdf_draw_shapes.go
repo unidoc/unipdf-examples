@@ -84,9 +84,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	c.WriteToFile("output.pdf")
+	err = c.WriteToFile("unipdf-draw-shapes.pdf")
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
 
-	fmt.Println("Completed, output saved to output.pdf file")
+	fmt.Println("Completed, output saved to unipdf-draw-shapes.pdf file")
 }
 
 func drawHeader(c *creator.Creator, x, y float64, title string) error {
