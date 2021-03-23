@@ -5,4 +5,4 @@ objects can always be applied to the content stream directly.
 
 ## Examples
 
-- [pdf_draw_line.go](pdf_draw_line.go) draws a line in a new PDF file.
+- [pdf_draw_shapes.go](pdf_draw_shapes.go) draws multiple shapes in a new PDF file.
