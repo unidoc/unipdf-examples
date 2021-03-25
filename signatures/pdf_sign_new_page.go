@@ -130,6 +130,11 @@ func addSignature(reader *model.PdfReader, pageNum int, outputPath string) error
 	signature.SetReason("TestSignatureAppearance Reason")
 	signature.SetDate(time.Now(), "")
 
+	// Initialize signature.
+	if err := signature.Initialize(); err != nil {
+		return err
+	}
+
 	opts := annotator.NewSignatureFieldOpts()
 	opts.FontSize = 8
 	opts.Rect = []float64{250, 250, 325, 300}
@@ -157,8 +162,7 @@ func addSignature(reader *model.PdfReader, pageNum int, outputPath string) error
 	}
 
 	// Write output PDF file.
-	err = appender.WriteToFile(outputPath)
-	if err != nil {
+	if err = appender.WriteToFile(outputPath); err != nil {
 		return err
 	}
 
@@ -180,6 +184,7 @@ func generateSigKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 	template := x509.Certificate{
 		SerialNumber: big.NewInt(1),
 		Subject: pkix.Name{
+			CommonName:   "any",
 			Organization: []string{"Test Company"},
 		},
 		NotBefore: now.Add(-time.Hour),
