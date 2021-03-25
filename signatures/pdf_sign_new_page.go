@@ -7,6 +7,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -15,7 +16,6 @@ import (
 	"log"
 	"math/big"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/unidoc/unipdf/v3/annotator"
@@ -62,20 +62,13 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Add new page and write it into a temporary file.
-	tempPath, err := addPage(pdfReader)
+	// Add new page and write it into a buffer.
+	buf, err := addPage(pdfReader)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Reread the temporary file.
-	ftmp, err := os.Open(tempPath)
-	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
-	}
-	defer f.Close()
-
-	pdfReader, err = model.NewPdfReader(ftmp)
+	pdfReader, err = model.NewPdfReader(bytes.NewReader(buf.Bytes()))
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
@@ -94,25 +87,22 @@ func main() {
 	fmt.Println("Done")
 }
 
-func addPage(reader *model.PdfReader) (temporaryFilePath string, err error) {
-	tmpWriter, err := reader.ToWriter(&model.ReaderToWriterOpts{})
+func addPage(reader *model.PdfReader) (*bytes.Buffer, error) {
+	writer, err := reader.ToWriter(&model.ReaderToWriterOpts{})
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	err = tmpWriter.AddPage(model.NewPdfPage())
-	if err != nil {
-		return "", err
+	if err = writer.AddPage(model.NewPdfPage()); err != nil {
+		return nil, err
 	}
 
-	tempPath := filepath.Join(os.TempDir(), "output.pdf")
-
-	err = tmpWriter.WriteToFile(tempPath)
-	if err != nil {
-		return "", err
+	buf := bytes.NewBuffer(nil)
+	if err = writer.Write(buf); err != nil {
+		return nil, err
 	}
 
-	return tempPath, nil
+	return buf, nil
 }
 
 func addSignature(reader *model.PdfReader, pageNum int, outputPath string) error {
