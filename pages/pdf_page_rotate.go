@@ -110,12 +110,12 @@ func rotatePage(inputPath string, pageNum int, degrees int64, outputPath string)
 	}
 
 	pdfWriter, err := pdfReader.ToWriter(&pdf.ReaderToWriterOpts{
-		PageCallback: func(index int, page *pdf.PdfPage) {
-			if index != pageNum {
-				return
+		PageProcessCallback: func(index int, page *pdf.PdfPage) error {
+			if index == pageNum {
+				page.Rotate = &degrees
 			}
 
-			page.Rotate = &degrees
+			return nil
 		},
 	})
 

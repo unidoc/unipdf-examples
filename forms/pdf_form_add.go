@@ -65,10 +65,12 @@ func addFormToPdf(inputPath string, outputPath string) error {
 	// Generate a new AcroForm instead of copying from the source PDF.
 	opt := &model.ReaderToWriterOpts{
 		SkipAcroForm: true,
-		PageCallback: func(pageNum int, page *model.PdfPage) {
+		PageProcessCallback: func(pageNum int, page *model.PdfPage) error {
 			if pageNum == 1 {
 				form = createForm(page)
 			}
+
+			return nil
 		},
 	}
 
