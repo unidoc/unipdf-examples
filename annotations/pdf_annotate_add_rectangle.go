@@ -104,7 +104,7 @@ func annotatePdfAddRectAnnotation(inputPath string, targetPageNum int64, outputP
 	// Process each page using the following callback
 	// when generating PdfWriter.
 	opt := &pdf.ReaderToWriterOpts{
-		PageCallback: func(pageNum int, page *pdf.PdfPage) {
+		PageProcessCallback: func(pageNum int, page *pdf.PdfPage) error {
 			// Add only to the specific page.
 			if int(targetPageNum) == pageNum {
 				// Define a semi-transparent yellow rectangle with black borders at the specified location.
@@ -122,13 +122,14 @@ func annotatePdfAddRectAnnotation(inputPath string, targetPageNum int64, outputP
 
 				rectAnnotation, err := annotator.CreateRectangleAnnotation(rectDef)
 				if err != nil {
-					fmt.Println(err)
-					return
+					return err
 				}
 
 				// Add to the page annotations.
 				page.AddAnnotation(rectAnnotation)
 			}
+
+			return nil
 		},
 	}
 

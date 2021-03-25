@@ -71,7 +71,7 @@ func annotatePdfAddText(inputPath string, outputPath string, annotationText stri
 	// Process each page using the following callback
 	// when generating PdfWriter.
 	opt := &pdf.ReaderToWriterOpts{
-		PageCallback: func(pageNum int, page *pdf.PdfPage) {
+		PageProcessCallback: func(pageNum int, page *pdf.PdfPage) error {
 			// New text annotation.
 			textAnnotation := pdf.NewPdfAnnotationText()
 			textAnnotation.Contents = pdfcore.MakeString(annotationText)
@@ -80,6 +80,8 @@ func annotatePdfAddText(inputPath string, outputPath string, annotationText stri
 
 			// Add to the page annotations.
 			page.AddAnnotation(textAnnotation.PdfAnnotation)
+
+			return nil
 		},
 	}
 

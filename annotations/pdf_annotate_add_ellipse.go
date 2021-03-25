@@ -104,7 +104,7 @@ func annotatePdfAddEllipseAnnotation(inputPath string, targetPageNum int64, outp
 	// Process each page using the following callback
 	// when generating PdfWriter.
 	opt := &pdf.ReaderToWriterOpts{
-		PageCallback: func(pageNum int, page *pdf.PdfPage) {
+		PageProcessCallback: func(pageNum int, page *pdf.PdfPage) error {
 			// Add only to the specific page.
 			if int(targetPageNum) == pageNum {
 				// Define a semi-transparent yellow ellipse with black borders at the specified location.
@@ -122,13 +122,14 @@ func annotatePdfAddEllipseAnnotation(inputPath string, targetPageNum int64, outp
 
 				circAnnotation, err := annotator.CreateCircleAnnotation(circDef)
 				if err != nil {
-					fmt.Println(err)
-					return
+					return err
 				}
 
 				// Add to the page annotations.
 				page.AddAnnotation(circAnnotation)
 			}
+
+			return nil
 		},
 	}
 
