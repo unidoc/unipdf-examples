@@ -8,7 +8,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
@@ -42,20 +41,6 @@ func main() {
 	}
 }
 
-func drawTextRGB(c *creator.Creator, chapter *creator.Chapter,
-	colorName string, color creator.Color) {
-	r, g, b := color.ToRGB()
-
-	p := c.NewStyledParagraph()
-	tc := p.SetText(fmt.Sprintf("%s color => R: %.1f; G: %.1f; B: %.1f", colorName, r, g, b))
-	tc.Style.Color = color
-	tc.Style.FontSize = 20
-
-	p.SetMargins(20, 0, 10, 0)
-
-	chapter.Add(p)
-}
-
 func colorRGB(c *creator.Creator) {
 	// Color from one of predefined colors.
 	black := creator.ColorBlack
@@ -64,40 +49,48 @@ func colorRGB(c *creator.Creator) {
 	red := creator.ColorRGBFrom8bit(255, 0, 0)
 	green := creator.ColorRGBFromArithmetic(0.0, 1.0, 0.0)
 	blue := creator.ColorRGBFromHex("#0000ff")
+	outlineColor := creator.ColorRGBFromHex("#283A3F")
 
 	ch := c.NewChapter("Text Color RGB")
 	ch.GetHeading().SetColor(black)
 
-	drawTextRGB(c, ch, "Red", red)
-	drawTextRGB(c, ch, "Green", green)
-	drawTextRGB(c, ch, "Blue", blue)
-
-	c.Draw(ch)
-}
-
-func colorToCMYK(color creator.Color) (c, m, y, k float64) {
-	r, g, b := color.ToRGB()
-
-	k = 1 - math.Max(math.Max(r, g), b)
-	c = (1 - r - k) / (1 - k)
-	m = (1 - g - k) / (1 - k)
-	y = (1 - b - k) / (1 - k)
-
-	return
-}
-
-func drawTextCMYK(cr *creator.Creator, chapter *creator.Chapter,
-	colorName string, color creator.Color) {
-	c, m, y, k := colorToCMYK(color)
-
-	p := cr.NewStyledParagraph()
-	tc := p.SetText(fmt.Sprintf("%s color => C: %.1f; M: %.1f; Y: %.1f; K: %.1f", colorName, c, m, y, k))
-	tc.Style.Color = color
-	tc.Style.FontSize = 20
+	// Red colored text.
+	p := c.NewStyledParagraph()
+	tc := p.SetText("Red color")
+	tc.Style.Color = red
+	tc.Style.FontSize = 50
 
 	p.SetMargins(20, 0, 10, 0)
 
-	chapter.Add(p)
+	ch.Add(p)
+
+	// Green colored text.
+	p = c.NewStyledParagraph()
+	tc = p.SetText("Green color with underline")
+	tc.Style.Color = green
+	tc.Style.FontSize = 50
+	tc.Style.Underline = true
+	tc.Style.UnderlineStyle.Color = outlineColor
+	tc.Style.UnderlineStyle.Thickness = 2
+
+	p.SetMargins(20, 0, 10, 0)
+
+	ch.Add(p)
+
+	// Blue colored text.
+	p = c.NewStyledParagraph()
+	tc = p.SetText("Blue color with outline")
+	tc.Style.Color = blue
+	tc.Style.FontSize = 50
+	tc.Style.OutlineColor = outlineColor
+	tc.Style.OutlineSize = 2
+	tc.Style.RenderingMode = creator.TextRenderingModeFillStroke
+
+	p.SetMargins(20, 0, 10, 0)
+
+	ch.Add(p)
+
+	c.Draw(ch)
 }
 
 func colorCMYK(c *creator.Creator) {
@@ -105,17 +98,34 @@ func colorCMYK(c *creator.Creator) {
 	black := creator.ColorBlack
 
 	// Define CMYK color
-	red := creator.ColorCMYKFrom8bit(0, 100, 100, 0)
-	green := creator.ColorCMYKFromArithmetic(1.0, 0.0, 1.0, 0.0)
-	blue := creator.ColorCMYKFromArithmetic(1.0, 1.0, 0.0, 0.0)
+	cyan := creator.ColorCMYKFrom8bit(100, 0, 0, 0)
+	magenta := creator.ColorCMYKFromArithmetic(0.0, 1.0, 0.0, 0.0)
+	outlineColor := creator.ColorCMYKFrom8bit(37, 8, 0, 75)
 
 	ch := c.NewChapter("Text Color CMYK")
 	ch.GetHeading().SetColor(black)
 	ch.SetMargins(0, 0, 50, 0)
 
-	drawTextCMYK(c, ch, "Red", red)
-	drawTextCMYK(c, ch, "Green", green)
-	drawTextCMYK(c, ch, "Blue", blue)
+	p := c.NewStyledParagraph()
+	tc := p.SetText("Cyan color")
+	tc.Style.Color = cyan
+	tc.Style.FontSize = 50
+
+	p.SetMargins(20, 0, 10, 0)
+
+	ch.Add(p)
+
+	p = c.NewStyledParagraph()
+	tc = p.SetText("Magenta color with outline")
+	tc.Style.Color = magenta
+	tc.Style.FontSize = 50
+	tc.Style.OutlineColor = outlineColor
+	tc.Style.OutlineSize = 2
+	tc.Style.RenderingMode = creator.TextRenderingModeFillStroke
+
+	p.SetMargins(20, 0, 10, 0)
+
+	ch.Add(p)
 
 	c.Draw(ch)
 }
