@@ -4,6 +4,7 @@ The example explains how you can use UniPDF to perform a number of text manipula
 
 ## Examples
 
+- [pdf_cmyk_color.go](pdf_cmyk_color.go) The example showcase how to use CMYK color to colorize text.
 - [pdf_detect_signature.go](pdf_detect_signature.go) The example highlights the basic functionality for text searching: Retrieving position of a signature line in PDF where the signature line is given by "__________________" text. And positioned with a Tm operation above.
 - [pdf_extract_text.go](pdf_extract_text.go) The example showcases how to extract all text for each page of a PDF file.
 - [pdf_extract_location.go](pdf_extract_location.go) The example showcases how to extract text at certain location.
