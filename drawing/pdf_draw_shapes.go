@@ -187,8 +187,8 @@ func drawPolyBezierCurve(c *creator.Creator) error {
 		draw.NewCubicBezierCurve(450, 300, 446, 288, 442, 260, 450, 250), // leaf
 	})
 
-	curve.SetBorderColor(creator.ColorBlue)
-	curve.SetFillColor(creator.ColorGreen)
+	curve.SetBorderColor(creator.ColorCMYKFromArithmetic(1.0, 1.0, 0.0, 0.0))
+	curve.SetFillColor(creator.ColorCMYKFromArithmetic(1.0, 0.0, 1.0, 0.0))
 	curve.SetBorderWidth(2)
 
 	return c.Draw(curve)
@@ -196,7 +196,7 @@ func drawPolyBezierCurve(c *creator.Creator) error {
 
 // Draw using curve polygon.
 func drawCurvePolygon(c *creator.Creator) error {
-	drawHeader(c, 30, 500, "-- Curve Polygon --")
+	drawHeader(c, 30, 450, "-- Curve Polygon --")
 
 	curvePolygon := c.NewCurvePolygon([][]draw.CubicBezierCurve{
 		{
@@ -227,22 +227,26 @@ func drawCurvePolygon(c *creator.Creator) error {
 
 // Draw simple polygon.
 func drawPolygon(c *creator.Creator) error {
-	drawHeader(c, 100, 850, "-- Polygon -- ")
+	drawHeader(c, 350, 450, "-- Polygon -- ")
+
+	// Color using CMYK
+	yellow := creator.ColorCMYKFrom8bit(0, 0, 100, 0)
+	borderColor := creator.ColorCMYKFrom8bit(0, 74, 93, 1)
 
 	// Draw polygon.
 	polygon := c.NewPolygon([][]draw.Point{{
-		{X: 50, Y: 950},
-		{X: 100, Y: 900},
-		{X: 200.0, Y: 900.0},
-		{X: 250.0, Y: 950.0},
-		{X: 250.0, Y: 1100.0},
-		{X: 200.0, Y: 1150.0},
-		{X: 100.0, Y: 1150.0},
-		{X: 50.0, Y: 1100.0},
-		{X: 50.0, Y: 950.0},
+		{X: 300, Y: 550},
+		{X: 350, Y: 500},
+		{X: 450, Y: 500},
+		{X: 500, Y: 550},
+		{X: 500, Y: 700},
+		{X: 450, Y: 750},
+		{X: 350, Y: 750},
+		{X: 300, Y: 700},
+		{X: 300, Y: 550},
 	}})
-	polygon.SetFillColor(creator.ColorYellow)
-	polygon.SetBorderColor(creator.ColorRed)
+	polygon.SetFillColor(yellow)
+	polygon.SetBorderColor(borderColor)
 	polygon.SetBorderWidth(3)
 	polygon.SetFillOpacity(0.5)
 	polygon.SetBorderOpacity(0.9)
