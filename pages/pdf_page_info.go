@@ -124,12 +124,10 @@ func printPdfPageProperties(inputPath string, pageNum int) error {
 }
 
 func processPage(page *pdf.PdfPage) error {
-	mBox, err := page.GetMediaBox()
+	pageWidth, pageHeight, err := page.Size()
 	if err != nil {
 		return err
 	}
-	pageWidth := mBox.Urx - mBox.Llx
-	pageHeight := mBox.Ury - mBox.Lly
 
 	fmt.Printf(" Page: %+v\n", page)
 	if page.Rotate != nil {
