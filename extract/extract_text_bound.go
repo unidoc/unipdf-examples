@@ -1,0 +1,221 @@
+/*
+ * Example that illustrates the accuracy of the text extraction, by first extracting
+ * all TextMarks and then reconstructing the text by writing out the text page-by-page
+ * to a new PDF with the creator package.
+ * Only retains the text.
+ *
+ * Useful to check accuracy of text extraction properties.
+ *
+ * Run as: go run extract_text_bound.go input.pdf
+ */
+
+package main
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"unicode"
+
+	"github.com/unidoc/unipdf/v3/common/license"
+
+	"github.com/unidoc/unipdf/v3/extractor"
+	"github.com/unidoc/unipdf/v3/model"
+)
+
+const unidocLicenseKey = `
+-----BEGIN UNIDOC LICENSE KEY-----
+Free trial license keys are available at: https://unidoc.io/
+-----END UNIDOC LICENSE KEY-----
+`
+
+type PdfWordData struct {
+	Page     int
+	Text     string
+	Bounds   model.PdfRectangle
+	Font     string
+	FontSize float64
+}
+
+type PageData struct {
+	Number int
+	Words  []*PdfWordData
+}
+
+var pageDataList []*PageData
+
+func init() {
+	// Enable debug-level logging.
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+
+	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func main() {
+	if len(os.Args) < 2 {
+		fmt.Printf("Syntax: extract_text_bound <file.pdf>\n")
+		os.Exit(1)
+	}
+
+	pdfPath := os.Args[1]
+	err := reconstruct(pdfPath)
+	if err != nil {
+		fmt.Printf("ERROR: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+func reconstruct(pdfPath string) error {
+	f, err := os.Open(pdfPath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	pdfr, err := model.NewPdfReaderLazy(f)
+	if err != nil {
+		return err
+	}
+
+	for pageNum := 1; pageNum <= len(pdfr.PageList); pageNum++ {
+		err = extractWordsDataOnPage(pdfr, pageNum)
+		if err != nil {
+			return err
+		}
+	}
+
+	extractResult := ""
+
+	for _, data := range pageDataList {
+		extractResult += fmt.Sprintf("Page %d\n", data.Number)
+		extractResult += "==========\n"
+
+		for _, w := range data.Words {
+			extractResult += fmt.Sprintf("- %s (%f %f %f %f)\n", w.Text, w.Bounds.Llx, w.Bounds.Lly, w.Bounds.Urx, w.Bounds.Ury)
+		}
+
+		extractResult += "\n"
+	}
+
+	outFile, err := os.Create("extract_boundary.txt")
+
+	_, err = outFile.WriteString(extractResult)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func extractWordsDataOnPage(pdfReader *model.PdfReader, pageNumber int) error {
+	if pdfReader == nil {
+		return fmt.Errorf("It is impossible to extract words before a pdf is loaded\n")
+	}
+
+	page, err := pdfReader.GetPage(pageNumber)
+	if err != nil {
+		return fmt.Errorf("UniDoc pdfReader.GetNumPages failed. pageNum=%d err=%v\n", pageNumber, err)
+	}
+
+	ex, err := extractor.New(page)
+	if err != nil {
+		return fmt.Errorf("UniDoc pdfReader.extractor failed to create: pageNum=%d err=%v\n", pageNumber, err)
+	}
+	pageText, _, _, err := ex.ExtractPageText()
+	if err != nil {
+		return fmt.Errorf("UniDoc pdfReader failed to ExtractPageText: pageNum=%d err=%v\n", pageNumber, err)
+	}
+
+	trackingWord := false
+	textMarks := pageText.Marks()
+	var textMarkArrays []*extractor.TextMarkArray
+	curMarkArray := new(extractor.TextMarkArray)
+
+	for _, textMark := range textMarks.Elements() {
+		runes := []rune(textMark.Text)
+		if len(runes) != 1 {
+			fmt.Printf("Rune of length %v found -- %v -- Meta: %v\n", len(runes), runes, textMark.Meta)
+			continue
+		}
+		if unicode.IsSpace(runes[0]) || textMark.Meta == true {
+			if trackingWord {
+				trackingWord = false
+				textMarkArrays = append(textMarkArrays, curMarkArray)
+				curMarkArray = new(extractor.TextMarkArray)
+			}
+		} else if curMarkArray.Elements() != nil &&
+			curMarkArray.Elements()[curMarkArray.Len()-1].BBox.Lly > textMark.BBox.Lly {
+			// If current char is at a new line then the word is splitted into multiple line
+			// store each part data separately.
+			if trackingWord {
+				trackingWord = false
+				textMarkArrays = append(textMarkArrays, curMarkArray)
+				curMarkArray = new(extractor.TextMarkArray)
+				curMarkArray.Append(textMark)
+			}
+		} else {
+			if !trackingWord {
+				trackingWord = true
+			}
+			curMarkArray.Append(textMark)
+		}
+	}
+
+	pageData := &PageData{
+		Number: pageNumber,
+		Words:  make([]*PdfWordData, 0, len(textMarkArrays)),
+	}
+
+	for idx, textMarkArray := range textMarkArrays {
+		wordData, err := extractSingleWordData(textMarkArray, pageData.Number, 1000, 1000)
+		if err != nil {
+			fmt.Printf("extractWordsOnPage[%v] has a nil word at index %v\n", pageData.Number, idx)
+			continue
+		}
+
+		pageData.Words = append(pageData.Words, wordData)
+	}
+
+	pageDataList = append(pageDataList, pageData)
+
+	return nil
+}
+
+func extractSingleWordData(textMarkArray *extractor.TextMarkArray, pageNumber int, pageWidth, pageHeight float64) (*PdfWordData, error) {
+	wordData := new(PdfWordData)
+	wordData.Page = pageNumber
+	wordString := make([]rune, textMarkArray.Len(), textMarkArray.Len())
+
+	markArrayBBox, ok := textMarkArray.BBox()
+	if !ok {
+		return nil, errors.New("extractSingleWord failed: There was a problem generating the bbox for textMark")
+	}
+
+	wordData.Bounds = markArrayBBox
+
+	for idx, mark := range textMarkArray.Elements() {
+		if idx == 0 {
+			// Obtain the Pdf ObjectID of the first charracter in the word to assign to PdfWordData
+			//wordData.ObjectID = mark.
+			// TODO: [DP-6] Determine the other Font data that needs to be extracted with the words
+			wordData.Font = mark.Font.String()
+			wordData.FontSize = mark.FontSize
+		}
+		runes := []rune(mark.Text)
+		if len(runes) != 1 {
+			//log.Printf("ERROR: Rune of length %v found -- %v -- Meta: %v\n", len(runes), runes, mark.Meta)
+			continue
+		}
+		if unicode.IsSpace(runes[0]) {
+			continue
+		}
+		wordString[idx] = runes[0]
+	}
+
+	wordData.Text = string(wordString)
+
+	return wordData, nil
+}
