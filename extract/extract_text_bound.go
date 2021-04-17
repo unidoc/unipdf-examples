@@ -23,7 +23,7 @@ import (
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-const unidocLicenseKey = `
+const licenseKey = `
 -----BEGIN UNIDOC LICENSE KEY-----
 Free trial license keys are available at: https://unidoc.io/
 -----END UNIDOC LICENSE KEY-----
