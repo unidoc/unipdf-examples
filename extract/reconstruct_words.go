@@ -1,10 +1,14 @@
-// Example that illustrates the accuracy of the text extraction, by first extracting
-// all TextMarks and then reconstructing the text by writing out the text page-by-page
-// to a new PDF with the creator package.
-// Only retains the text.
-//
-// Useful to check accuracy of text extraction properties.
-// Expands upon reconstruct_text.go to show word placements.
+/*
+ * Example that illustrates the accuracy of the text extraction, by first extracting
+ * all TextMarks and then reconstructing the text by writing out the text page-by-page
+ * to a new PDF with the creator package.
+ * Only retains the text.
+ *
+ * Useful to check accuracy of text extraction properties.
+ * Expands upon reconstruct_text.go to show word placements.
+ *
+ * Run as: go run reconstruct_words.go input.pdf
+ */
 
 package main
 
@@ -38,7 +42,7 @@ func init() {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("Syntax: reconstruct_text <file.pdf>\n")
+		fmt.Printf("Syntax: reconstruct_words <file.pdf>\n")
 		os.Exit(1)
 	}
 

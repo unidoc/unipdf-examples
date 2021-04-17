@@ -1,9 +1,13 @@
-// Example that illustrates the accuracy of the text extraction, by first extracting
-// all TextMarks and then reconstructing the text by writing out the text page-by-page
-// to a new PDF with the creator package.
-// Only retains the text.
-//
-// Useful to check accuracy of text extraction properties.
+/*
+ * Example that illustrates the accuracy of the text extraction, by first extracting
+ * all TextMarks and then reconstructing the text by writing out the text page-by-page
+ * to a new PDF with the creator package.
+ * Only retains the text.
+ *
+ * Useful to check accuracy of text extraction properties.
+ *
+ * Run as: go run reconstruct_text.go input.pdf
+ */
 
 package main
 
