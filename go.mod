@@ -6,7 +6,7 @@ require (
 	github.com/boombuler/barcode v1.0.1
 	github.com/kr/text v0.2.0 // indirect
 	github.com/miekg/pkcs11 v1.0.3 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/unidoc/unipdf/v3 v3.23.0
 	github.com/wcharczuk/go-chart/v2 v2.1.0
