@@ -6,6 +6,7 @@ The example explains how you can use UniPDF to perform a number of text manipula
 
 ### Generation
 - [pdf_cmyk_color.go](pdf_cmyk_color.go) The example showcase how to use CMYK color to colorize text.
+- [pdf_formatted_text.go](pdf_formatted_text.go) The example showcases the usage of styled paragraphs. The output is saved as styled_paragraph.pdf which illustrates some of the features of the creator.
 - [pdf_insert_text.go](pdf_insert_text.go) The example showcases how to insert text to a specific page, location in a PDF file. If unsure about position, try getting the dimensions of a PDF with pdf/pages/pdf_page_info.go first or start with 0,0 (upper left corner) and increase to move right, down.
 - [pdf_text_color.go](pdf_text_color.go) The example showcase how to use RGB and CMYK color to colorize text.
 - [pdf_using_cjk_font.go](pdf_using_cjk_font.go) The example illustrates how to use composite font (CJK font) file to render a text and subset the font to create a small output file.
