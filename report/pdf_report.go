@@ -113,6 +113,32 @@ func RunPdfReport(outputPath string) error {
 		block.Draw(p)
 	})
 
+	// Draw side note on each content page
+	c.PageFinalize(func(args creator.PageFinalizeFunctionArgs) error {
+		if args.PageNum < 3 {
+			return nil
+		}
+
+		p := c.NewStyledParagraph()
+		chunk := p.Append(fmt.Sprintf("report side note for page %d", args.PageNum))
+		chunk.Style.FontSize = 10
+
+		if args.PageNum%2 != 0 {
+			// Draw left.
+			p.SetPos(p.Height()+10, (args.PageHeight-p.Width())/2)
+		} else {
+			// Draw right.
+			p.SetPos(args.PageWidth-p.Height()-10, (args.PageHeight-p.Width())/2)
+		}
+
+		p.SetAngle(90)
+		if err := c.Draw(p); err != nil {
+			return err
+		}
+
+		return nil
+	})
+
 	err = c.WriteToFile(outputPath)
 	if err != nil {
 		return err
