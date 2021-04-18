@@ -15,22 +15,15 @@ import (
 	"strconv"
 
 	"github.com/unidoc/unipdf/v3/annotator"
-	unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -87,7 +80,7 @@ func main() {
 
 // Annotate pdf file.
 func annotatePdfAddEllipseAnnotation(inputPath string, targetPageNum int64, outputPath string, x, y, width, height float64) error {
-	unicommon.Log.Debug("Input PDF: %v", inputPath)
+	common.Log.Debug("Input PDF: %v", inputPath)
 
 	// Read the input pdf file.
 	f, err := os.Open(inputPath)
@@ -96,15 +89,15 @@ func annotatePdfAddEllipseAnnotation(inputPath string, targetPageNum int64, outp
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
 
 	// Process each page using the following callback
 	// when generating PdfWriter.
-	opt := &pdf.ReaderToWriterOpts{
-		PageProcessCallback: func(pageNum int, page *pdf.PdfPage) error {
+	opt := &model.ReaderToWriterOpts{
+		PageProcessCallback: func(pageNum int, page *model.PdfPage) error {
 			// Add only to the specific page.
 			if int(targetPageNum) == pageNum {
 				// Define a semi-transparent yellow ellipse with black borders at the specified location.
@@ -115,10 +108,10 @@ func annotatePdfAddEllipseAnnotation(inputPath string, targetPageNum int64, outp
 				circDef.Height = height
 				circDef.Opacity = 0.5 // Semi transparent.
 				circDef.FillEnabled = true
-				circDef.FillColor = pdf.NewPdfColorDeviceRGB(1, 1, 0) // Yellow fill.
+				circDef.FillColor = model.NewPdfColorDeviceRGB(1, 1, 0) // Yellow fill.
 				circDef.BorderEnabled = true
 				circDef.BorderWidth = 15
-				circDef.BorderColor = pdf.NewPdfColorDeviceRGB(0, 0, 0) // Black border.
+				circDef.BorderColor = model.NewPdfColorDeviceRGB(0, 0, 0) // Black border.
 
 				circAnnotation, err := annotator.CreateCircleAnnotation(circDef)
 				if err != nil {

@@ -14,20 +14,13 @@ import (
 
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/extractor"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// common.SetLogger(common.NewConsoleLogger(common.LogLevelTrace))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -62,7 +55,7 @@ func extractTextAtLocation(inputPath string, pageNum int, x1, y1, x2, y2 float64
 
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -95,7 +88,7 @@ func extractTextAtLocation(inputPath string, pageNum int, x1, y1, x2, y2 float64
 		return err
 	}
 
-	pageText.ApplyArea(pdf.PdfRectangle{
+	pageText.ApplyArea(model.PdfRectangle{
 		Llx: x1, Lly: y1,
 		Urx: x2, Ury: y2,
 	})

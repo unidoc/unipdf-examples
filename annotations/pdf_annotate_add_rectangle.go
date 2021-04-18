@@ -11,26 +11,17 @@ package main
 import (
 	"fmt"
 	"os"
-
 	"strconv"
 
 	"github.com/unidoc/unipdf/v3/annotator"
-	unicommon "github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -87,8 +78,6 @@ func main() {
 
 // Annotate pdf file.
 func annotatePdfAddRectAnnotation(inputPath string, targetPageNum int64, outputPath string, x, y, width, height float64) error {
-	unicommon.Log.Debug("Input PDF: %v", inputPath)
-
 	// Read the input pdf file.
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -96,15 +85,15 @@ func annotatePdfAddRectAnnotation(inputPath string, targetPageNum int64, outputP
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
 
 	// Process each page using the following callback
 	// when generating PdfWriter.
-	opt := &pdf.ReaderToWriterOpts{
-		PageProcessCallback: func(pageNum int, page *pdf.PdfPage) error {
+	opt := &model.ReaderToWriterOpts{
+		PageProcessCallback: func(pageNum int, page *model.PdfPage) error {
 			// Add only to the specific page.
 			if int(targetPageNum) == pageNum {
 				// Define a semi-transparent yellow rectangle with black borders at the specified location.
@@ -115,10 +104,10 @@ func annotatePdfAddRectAnnotation(inputPath string, targetPageNum int64, outputP
 				rectDef.Height = height
 				rectDef.Opacity = 0.5 // Semi transparent.
 				rectDef.FillEnabled = false
-				rectDef.FillColor = pdf.NewPdfColorDeviceRGB(1, 1, 0) // Yellow fill.
+				rectDef.FillColor = model.NewPdfColorDeviceRGB(1, 1, 0) // Yellow fill.
 				rectDef.BorderEnabled = true
 				rectDef.BorderWidth = 30
-				rectDef.BorderColor = pdf.NewPdfColorDeviceRGB(0, 0, 0) // Black border.
+				rectDef.BorderColor = model.NewPdfColorDeviceRGB(0, 0, 0) // Black border.
 
 				rectAnnotation, err := annotator.CreateRectangleAnnotation(rectDef)
 				if err != nil {

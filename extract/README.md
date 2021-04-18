@@ -8,3 +8,4 @@ Various extraction example code.
 - [pdf_tables.go](pdf_tables.go) The example showcase how to extract all tables from the specified pages of one or more PDF files.
 - [reconstruct_text.go](reconstruct_text.go) Example that illustrates the accuracy of the text extraction, by first extracting all TextMarks and then reconstructing the text by writing out the text page-by-page to a new PDF with the creator package.
 - [reconstruct_words.go](reconstruct_words.go) The example expands upon [reconstruct_text.go](reconstruct_text.go) to show word placements.
+- [pdf_extract_images.go](pdf_extract_images.go) explains how to extract images from an existing PDF. The code passes through each page, goes through the content stream and finds XObject Images and inline images. Also handles images referred within XObject Form content streams. The output files are saved as a zip archive.

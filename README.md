@@ -7,6 +7,16 @@ a pull request.
 While the majority of examples are fully in pure Go, there are a few examples that demonstrate additional 
 functionality that requires CGO and external dependencies. Those examples are clarified by filename suffix "_cgo.go".
 
+## License codes
+UniPDF requires license codes to operate, there are two options:
+- Metered License API keys: Free ones can be obtained at https://cloud.unidoc.io
+- Offline Perpetual codes: Can be purchased at https://unidoc.io/pricing
+
+Most of the examples demonstrate loading the Metered License API keys through an environment
+variable `UNIDOC_LICENSE_API_KEY`.
+
+Examples for Offline Perpetual License Key loading can be found in the license subdirectory.
+
 ### Build all examples
 
 #### Building with go modules:

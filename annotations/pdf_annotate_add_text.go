@@ -11,23 +11,15 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
-	pdfcore "github.com/unidoc/unipdf/v3/core"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/core"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -54,8 +46,6 @@ func main() {
 
 // Annotate pdf file.
 func annotatePdfAddText(inputPath string, outputPath string, annotationText string) error {
-	unicommon.Log.Debug("Input PDF: %v", inputPath)
-
 	// Read the input pdf file.
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -63,20 +53,20 @@ func annotatePdfAddText(inputPath string, outputPath string, annotationText stri
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
 
 	// Process each page using the following callback
 	// when generating PdfWriter.
-	opt := &pdf.ReaderToWriterOpts{
-		PageProcessCallback: func(pageNum int, page *pdf.PdfPage) error {
+	opt := &model.ReaderToWriterOpts{
+		PageProcessCallback: func(pageNum int, page *model.PdfPage) error {
 			// New text annotation.
-			textAnnotation := pdf.NewPdfAnnotationText()
-			textAnnotation.Contents = pdfcore.MakeString(annotationText)
+			textAnnotation := model.NewPdfAnnotationText()
+			textAnnotation.Contents = core.MakeString(annotationText)
 			// The rect specifies the location of the markup.
-			textAnnotation.Rect = pdfcore.MakeArray(pdfcore.MakeInteger(20), pdfcore.MakeInteger(100), pdfcore.MakeInteger(10+50), pdfcore.MakeInteger(100+50))
+			textAnnotation.Rect = core.MakeArray(core.MakeInteger(20), core.MakeInteger(100), core.MakeInteger(10+50), pdfcore.MakeInteger(100+50))
 
 			// Add to the page annotations.
 			page.AddAnnotation(textAnnotation.PdfAnnotation)

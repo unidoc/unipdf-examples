@@ -34,11 +34,14 @@ import (
 	"github.com/unidoc/unipdf/v3/model/sighandler"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 // Library path might be different on different operating systems.
 const PathSoftHSM = "/usr/local/lib/softhsm/libsofthsm2.so"
@@ -48,16 +51,6 @@ const (
 	usageAdd  = "Usage: %s add TOKEN_LABEL TOKEN_PIN KEYPAIR_LABEL\n"
 	usageSign = "Usage: %s sign TOKEN_LABEL TOKEN_PIN KEYPAIR_LABEL INPUT_PDF_PATH OUTPUT_PDF_PATH\n"
 )
-
-func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
-	if err != nil {
-		panic(err)
-	}
-}
 
 func main() {
 	// Check specified action.
