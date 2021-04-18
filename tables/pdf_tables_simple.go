@@ -64,6 +64,7 @@ func basicUsage(c *creator.Creator, font, fontBold *model.PdfFont) error {
 	contentAlignH(c, ch, font, fontBold)
 	contentAlignV(c, ch, font, fontBold)
 	contentWrapping(c, ch, font, fontBold)
+	contentOverflow(c, ch, font, fontBold)
 
 	// Draw chapter.
 	if err := c.Draw(ch); err != nil {
@@ -214,6 +215,54 @@ func contentWrapping(c *creator.Creator, ch *creator.Chapter, font, fontBold *mo
 	drawCell(content, font, creator.TextAlignmentCenter)
 	drawCell(content, font, creator.TextAlignmentRight)
 	drawCell(content, font, creator.TextAlignmentJustify)
+
+	sc.Add(table)
+}
+
+func contentOverflow(c *creator.Creator, ch *creator.Chapter, font, fontBold *model.PdfFont) {
+	// Create subchapter.
+	sc := ch.NewSubchapter("Content overflow")
+	sc.SetMargins(0, 0, 30, 0)
+	sc.GetHeading().SetFont(font)
+	sc.GetHeading().SetFontSize(13)
+	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
+
+	// Create subchapter description.
+	desc := c.NewStyledParagraph()
+	desc.SetMargins(0, 0, 10, 0)
+	desc.Append("Cell text content which not fit in the available space could be truncated to fit.")
+
+	sc.Add(desc)
+
+	// Create table.
+	table := c.NewTable(2)
+	table.SetColumnWidths(0.3, 0.7)
+	table.SetMargins(0, 0, 10, 0)
+
+	drawCell := func(text string, font *model.PdfFont, enableWrap bool, overflow creator.TextOverflow) {
+		p := c.NewStyledParagraph()
+		p.SetEnableWrap(enableWrap)
+		p.SetTextOverflow(overflow)
+		p.SetMargins(2, 2, 0, 0)
+		p.Append(text).Style.Font = font
+
+		cell := table.NewCell()
+		cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
+		cell.SetContent(p)
+		cell.SetIndent(0)
+	}
+
+	content := "Maecenas tempor nibh gravida nunc laoreet, ut rhoncus justo ultricies. Mauris nec purus sit amet purus tincidunt efficitur tincidunt non dolor. Aenean nisl eros, volutpat vitae dictum id, facilisis ac felis. Integer lacinia, turpis at fringilla posuere, erat tortor ultrices orci, non tempor neque mauris ac neque. Morbi blandit ante et lacus ornare, ut vulputate massa dictum."
+
+	// Draw table header.
+	drawCell("Overflow Visible With Wrapping", fontBold, true, creator.TextOverflowVisible)
+	drawCell(content, font, true, creator.TextOverflowVisible)
+
+	drawCell("Overflow Visible Without Wrapping", fontBold, true, creator.TextOverflowVisible)
+	drawCell(content, font, false, creator.TextOverflowVisible)
+
+	drawCell("Overflow Hidden", fontBold, true, creator.TextOverflowHidden)
+	drawCell(content, font, false, creator.TextOverflowHidden)
 
 	sc.Add(table)
 }
