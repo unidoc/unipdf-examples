@@ -27,7 +27,7 @@ func init() {
 
 	// Good to load the license key in `init`. Needs to be done prior to using the library, otherwise operations
 	// will result in an error.
-	err := license.SetLicenseKey(licenseKey, customerName)
+	err := license.SetLicenseKey(offlineLicenseKey, customerName)
 	if err != nil {
 		panic(err)
 	}

@@ -17,5 +17,3 @@ require (
 )
 
 go 1.13
-
-replace github.com/unidoc/unipdf/v3 => ../unipdf-src

@@ -47,16 +47,6 @@ const (
 `
 )
 
-func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func main() {
 	var debug bool
 	flag.BoolVar(&debug, "d", false, "Enable debug logging")

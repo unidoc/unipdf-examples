@@ -30,7 +30,7 @@ const usagef = "Usage: %s INPUT_PDF_PATH\n"
 func main() {
 	args := os.Args
 	if len(args) < 1 {
-		fmt.Printf(usage, os.Args[0])
+		fmt.Printf(usagef, os.Args[0])
 		return
 	}
 	inputPath := args[1]

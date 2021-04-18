@@ -96,16 +96,6 @@ type benchParams struct {
 	loglevel     string
 }
 
-func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func main() {
 	params := benchParams{}
 
