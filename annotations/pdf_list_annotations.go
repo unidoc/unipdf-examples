@@ -11,20 +11,13 @@ import (
 	"os"
 
 	"github.com/unidoc/unipdf/v3/common/license"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -54,7 +47,7 @@ func listAnnotations(inputPath string) error {
 
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -97,7 +90,7 @@ func listAnnotations(inputPath string) error {
 	return nil
 }
 
-func printAnnotations(annotations []*pdf.PdfAnnotation) {
+func printAnnotations(annotations []*model.PdfAnnotation) {
 	for idx, annotation := range annotations {
 		fmt.Printf(" %d. %s\n", idx+1, annotation.String())
 	}

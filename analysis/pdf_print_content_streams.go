@@ -14,21 +14,14 @@ import (
 	"strconv"
 
 	"github.com/unidoc/unipdf/v3/common/license"
-	pdfcontent "github.com/unidoc/unipdf/v3/contentstream"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/contentstream"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -68,7 +61,7 @@ func listContentStreams(inputPath string, targetPageNum int) error {
 
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -126,7 +119,7 @@ func listContentStreams(inputPath string, targetPageNum int) error {
 		}
 		fmt.Printf("%s\n", pageContentStr)
 
-		cstreamParser := pdfcontent.NewContentStreamParser(pageContentStr)
+		cstreamParser := contentstream.NewContentStreamParser(pageContentStr)
 		operations, err := cstreamParser.Parse()
 		if err != nil {
 			return err

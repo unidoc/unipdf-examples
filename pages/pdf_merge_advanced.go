@@ -11,23 +11,16 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -64,32 +57,17 @@ func main() {
 	fmt.Printf("Complete, see output file: %s\n", outputPath)
 }
 
-func getDict(obj core.PdfObject) *core.PdfObjectDictionary {
-	if obj == nil {
-		return nil
-	}
-
-	obj = core.TraceToDirectObject(obj)
-	dict, ok := obj.(*core.PdfObjectDictionary)
-	if !ok {
-		unicommon.Log.Debug("Error type check error (got %T)", obj)
-		return nil
-	}
-
-	return dict
-}
-
 // Merge form resources.
 // TODO: Add handling for cases where same resource name is used with different values.  In that case, need to rename
 // the resource and change all references to that value with the new value.
-func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) {
+func mergeResources(r, r2 *model.PdfPageResources) (*model.PdfPageResources, error) {
 	// Merge XObject resources.
 	if r.XObject == nil {
 		r.XObject = r2.XObject
 	} else {
-		xobjs := getDict(r.XObject)
+		xobjs, _ := core.GetDict(r.XObject)
 		if r2.XObject != nil {
-			xobjs2 := getDict(r2.XObject)
+			xobjs2, _ := core.GetDict(r2.XObject)
 			for _, key := range xobjs2.Keys() {
 				val := xobjs2.Get(key)
 				// Add XObjects from r2.  Overwrite if existing...
@@ -126,10 +104,10 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 	if r.ExtGState == nil {
 		r.ExtGState = r2.ExtGState
 	} else {
-		extgstates := getDict(r.ExtGState)
+		extgstates, _ := core.GetDict(r.ExtGState)
 
 		if r2.ExtGState != nil {
-			extgstates2 := getDict(r2.ExtGState)
+			extgstates2, _ := core.GetDict(r2.ExtGState)
 			for _, key := range extgstates2.Keys() {
 				// TODO: Handle overwrites properly.
 				val := extgstates2.Get(key)
@@ -141,9 +119,9 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 	if r.Shading == nil {
 		r.Shading = r2.Shading
 	} else {
-		shadings := getDict(r.Shading)
+		shadings, _ := core.GetDict(r.Shading)
 		if r2.Shading != nil {
-			shadings2 := getDict(r2.Shading)
+			shadings2, _ := core.GetDict(r2.Shading)
 			for _, key := range shadings2.Keys() {
 				val := shadings2.Get(key)
 				shadings.Set(key, val)
@@ -154,9 +132,9 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 	if r.Pattern == nil {
 		r.Pattern = r2.Pattern
 	} else {
-		shadings := getDict(r.Pattern)
+		shadings, _ := core.GetDict(r.Pattern)
 		if r2.Pattern != nil {
-			patterns2 := getDict(r2.Pattern)
+			patterns2, _ := core.GetDict(r2.Pattern)
 			for _, key := range patterns2.Keys() {
 				val := patterns2.Get(key)
 				shadings.Set(key, val)
@@ -167,9 +145,9 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 	if r.Font == nil {
 		r.Font = r2.Font
 	} else {
-		fonts := getDict(r.Font)
+		fonts, _ := core.GetDict(r.Font)
 		if r2.Font != nil {
-			fonts2 := getDict(r2.Font)
+			fonts2, _ := core.GetDict(r2.Font)
 			for _, key := range fonts2.Keys() {
 				val := fonts2.Get(key)
 				fonts.Set(key, val)
@@ -180,9 +158,9 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 	if r.ProcSet == nil {
 		r.ProcSet = r2.ProcSet
 	} else {
-		procsets := getDict(r.ProcSet)
+		procsets, _ := core.GetDict(r.ProcSet)
 		if r2.ProcSet != nil {
-			procsets2 := getDict(r2.ProcSet)
+			procsets2, _ := core.GetDict(r2.ProcSet)
 			for _, key := range procsets2.Keys() {
 				val := procsets2.Get(key)
 				procsets.Set(key, val)
@@ -193,9 +171,9 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 	if r.Properties == nil {
 		r.Properties = r2.Properties
 	} else {
-		props := getDict(r.Properties)
+		props, _ := core.GetDict(r.Properties)
 		if r2.Properties != nil {
-			props2 := getDict(r2.Properties)
+			props2, _ := core.GetDict(r2.Properties)
 			for _, key := range props2.Keys() {
 				val := props2.Get(key)
 				props.Set(key, val)
@@ -207,7 +185,7 @@ func mergeResources(r, r2 *pdf.PdfPageResources) (*pdf.PdfPageResources, error) 
 }
 
 // Merge two interactive forms.
-func mergeForms(form, form2 *pdf.PdfAcroForm, docNum int) (*pdf.PdfAcroForm, error) {
+func mergeForms(form, form2 *model.PdfAcroForm, docNum int) (*model.PdfAcroForm, error) {
 	// Use whatever value comes first..
 	// TODO: Consider adding a more intelligent, preferential handling based on actual values.  If needed.
 
@@ -246,7 +224,7 @@ func mergeForms(form, form2 *pdf.PdfAcroForm, docNum int) (*pdf.PdfAcroForm, err
 	} else {
 		if form2.XFA != nil {
 			// TODO: Handle merging XFA.
-			unicommon.Log.Debug("TODO: Handle XFA merging - Currently just using first one that is encountered")
+			common.Log.Debug("TODO: Handle XFA merging - Currently just using first one that is encountered")
 		}
 	}
 
@@ -255,9 +233,9 @@ func mergeForms(form, form2 *pdf.PdfAcroForm, docNum int) (*pdf.PdfAcroForm, err
 		form.Fields = form2.Fields
 	} else {
 		// Make a top-level field for the doc (non-terminal field).
-		docfield := pdf.NewPdfField()
+		docfield := model.NewPdfField()
 		docfield.T = core.MakeString(fmt.Sprintf("doc%d", docNum))
-		docfield.Kids = []*pdf.PdfField{}
+		docfield.Kids = []*model.PdfField{}
 		if form2.Fields != nil {
 			for _, subfield := range *form2.Fields {
 				subfield.Parent = docfield // Update parent.
@@ -271,9 +249,9 @@ func mergeForms(form, form2 *pdf.PdfAcroForm, docNum int) (*pdf.PdfAcroForm, err
 }
 
 func mergePdf(inputPaths []string, outputPath string) error {
-	pdfWriter := pdf.NewPdfWriter()
+	pdfWriter := model.NewPdfWriter()
 
-	var forms *pdf.PdfAcroForm
+	var forms *model.PdfAcroForm
 
 	for docIdx, inputPath := range inputPaths {
 		f, err := os.Open(inputPath)
@@ -283,7 +261,7 @@ func mergePdf(inputPaths []string, outputPath string) error {
 
 		defer f.Close()
 
-		pdfReader, err := pdf.NewPdfReader(f)
+		pdfReader, err := model.NewPdfReader(f)
 		if err != nil {
 			return err
 		}

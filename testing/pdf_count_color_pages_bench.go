@@ -36,21 +36,17 @@ import (
 	"strconv"
 	"time"
 
-	common "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
-	pdfcontent "github.com/unidoc/unipdf/v3/contentstream"
-	pdfcore "github.com/unidoc/unipdf/v3/core"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/contentstream"
+	"github.com/unidoc/unipdf/v3/core"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -215,7 +211,7 @@ func describePdf(inputPath string, strictColorPages []int) (int, []int, error) {
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return 0, []int{}, err
 	}
@@ -270,7 +266,7 @@ func describePdf(inputPath string, strictColorPages []int) (int, []int, error) {
 
 // isPageColored returns true if `page` contains color. It also references
 // XObject Images and Forms to _possibly_ record if they contain color
-func isPageColored(page *pdf.PdfPage, desc string, debug bool) (bool, error) {
+func isPageColored(page *model.PdfPage, desc string, debug bool) (bool, error) {
 	// For each page, we go through the resources and look for the images.
 
 	contents, err := page.GetAllContentStreams()
@@ -299,31 +295,31 @@ func isPageColored(page *pdf.PdfPage, desc string, debug bool) (bool, error) {
 }
 
 // isPatternCS returns true if `colorspace` represents a Pattern colorspace.
-func isPatternCS(cs pdf.PdfColorspace) bool {
-	_, isPattern := cs.(*pdf.PdfColorspaceSpecialPattern)
+func isPatternCS(cs model.PdfColorspace) bool {
+	_, isPattern := cs.(*model.PdfColorspaceSpecialPattern)
 	return isPattern
 }
 
 // isContentStreamColored returns true if `contents` contains any color object
-func isContentStreamColored(contents string, resources *pdf.PdfPageResources, debug bool) (bool, error) {
-	cstreamParser := pdfcontent.NewContentStreamParser(contents)
+func isContentStreamColored(contents string, resources *model.PdfPageResources, debug bool) (bool, error) {
+	cstreamParser := contentstream.NewContentStreamParser(contents)
 	operations, err := cstreamParser.Parse()
 	if err != nil {
 		return false, err
 	}
 
-	colored := false                                    // Has a colored mark been detected in the stream?
-	coloredPatterns := map[pdfcore.PdfObjectName]bool{} // List of already detected patterns. Re-use for subsequent detections.
-	coloredShadings := map[string]bool{}                // List of already detected shadings. Re-use for subsequent detections.
+	colored := false                                 // Has a colored mark been detected in the stream?
+	coloredPatterns := map[core.PdfObjectName]bool{} // List of already detected patterns. Re-use for subsequent detections.
+	coloredShadings := map[string]bool{}             // List of already detected shadings. Re-use for subsequent detections.
 
 	// The content stream processor keeps track of the graphics state and we can make our own handlers to process
 	// certain commands using the AddHandler method. In this case, we hook up to color related operands, and for image
 	// and form handling.
-	processor := pdfcontent.NewContentStreamProcessor(*operations)
+	processor := contentstream.NewContentStreamProcessor(*operations)
 	// Add handlers for colorspace related functionality.
-	processor.AddHandler(pdfcontent.HandlerConditionEnumAllOperands, "",
-		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState,
-			resources *pdf.PdfPageResources) error {
+	processor.AddHandler(contentstream.HandlerConditionEnumAllOperands, "",
+		func(op *contentstream.ContentStreamOperation, gs contentstream.GraphicsState,
+			resources *model.PdfPageResources) error {
 			if colored {
 				return nil
 			}
@@ -331,11 +327,11 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			switch operand {
 			case "SC", "SCN": // Set stroking color.  Includes pattern colors.
 				if isPatternCS(gs.ColorspaceStroking) {
-					op := pdfcontent.ContentStreamOperation{}
+					op := contentstream.ContentStreamOperation{}
 					op.Operand = operand
-					op.Params = []pdfcore.PdfObject{}
+					op.Params = []core.PdfObject{}
 
-					patternColor, ok := gs.ColorStroking.(*pdf.PdfColorPattern)
+					patternColor, ok := gs.ColorStroking.(*model.PdfColorPattern)
 					if !ok {
 						return errors.New("Invalid stroking color type")
 					}
@@ -388,10 +384,10 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				return nil
 			case "sc", "scn": // Set non-stroking color.
 				if isPatternCS(gs.ColorspaceNonStroking) {
-					op := pdfcontent.ContentStreamOperation{}
+					op := contentstream.ContentStreamOperation{}
 					op.Operand = operand
-					op.Params = []pdfcore.PdfObject{}
-					patternColor, ok := gs.ColorNonStroking.(*pdf.PdfColorPattern)
+					op.Params = []core.PdfObject{}
+					patternColor, ok := gs.ColorNonStroking.(*model.PdfColorPattern)
 					if !ok {
 						return errors.New("Invalid stroking color type")
 					}
@@ -452,7 +448,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				if len(op.Params) != 1 {
 					return errors.New("Params to sh operator should be 1")
 				}
-				shname, ok := op.Params[0].(*pdfcore.PdfObjectName)
+				shname, ok := op.Params[0].(*core.PdfObjectName)
 				if !ok {
 					return errors.New("sh parameter should be a name")
 				}
@@ -481,8 +477,8 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 
 	// Add handler for image related handling.  Note that inline images are completely stored with a ContentStreamInlineImage
 	// object as the parameter for BI.
-	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "BI",
-		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
+	processor.AddHandler(contentstream.HandlerConditionEnumOperand, "BI",
+		func(op *contentstream.ContentStreamOperation, gs contentstream.GraphicsState, resources *model.PdfPageResources) error {
 			if colored {
 				return nil
 			}
@@ -492,7 +488,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 				return err
 			}
 			// Inline image.
-			iimg, ok := op.Params[0].(*pdfcontent.ContentStreamInlineImage)
+			iimg, ok := op.Params[0].(*contentstream.ContentStreamInlineImage)
 			if !ok {
 				common.Log.Error("Invalid handling for inline image")
 				return errors.New("Invalid inline image parameter")
@@ -536,8 +532,8 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 	// Handler for XObject Image and Forms.
 	processedXObjects := map[string]bool{} // Keep track of processed XObjects to avoid repetition.
 
-	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "Do",
-		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
+	processor.AddHandler(contentstream.HandlerConditionEnumOperand, "Do",
+		func(op *contentstream.ContentStreamOperation, gs contentstream.GraphicsState, resources *model.PdfPageResources) error {
 			if colored {
 				return nil
 			}
@@ -548,7 +544,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			}
 
 			// XObject.
-			name := op.Params[0].(*pdfcore.PdfObjectName)
+			name := op.Params[0].(*core.PdfObjectName)
 			common.Log.Debug("Name=%#v=%#q", name, string(*name))
 
 			// Only process each one once.
@@ -561,9 +557,9 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 			processedXObjects[string(*name)] = false
 
 			_, xtype := resources.GetXObjectByName(*name)
-			common.Log.Debug("xtype=%+v pdf.XObjectTypeImage=%v", xtype, pdf.XObjectTypeImage)
+			common.Log.Debug("xtype=%+v model.XObjectTypeImage=%v", xtype, model.XObjectTypeImage)
 
-			if xtype == pdf.XObjectTypeImage {
+			if xtype == model.XObjectTypeImage {
 				ximg, err := resources.GetXObjectImageByName(*name)
 				if err != nil {
 					common.Log.Error("Error w/GetXObjectImageByName : %v", err)
@@ -574,7 +570,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 						ximg.Filter.GetFilterName(), ximg.ColorSpace,
 						ximg.ImageMask, *ximg.Width, *ximg.Height)
 				}
-				if _, isIndexed := ximg.ColorSpace.(*pdf.PdfColorspaceSpecialIndexed); !isIndexed {
+				if _, isIndexed := ximg.ColorSpace.(*model.PdfColorspaceSpecialIndexed); !isIndexed {
 					if ximg.ColorSpace.GetNumComponents() == 1 {
 						return nil
 					}
@@ -615,7 +611,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 					common.Log.Info("hasCol=%t", hasCol)
 				}
 
-			} else if xtype == pdf.XObjectTypeForm {
+			} else if xtype == model.XObjectTypeForm {
 				common.Log.Debug(" XObject Form: %s", *name)
 
 				// Go through the XObject Form content stream.
@@ -666,7 +662,7 @@ func isContentStreamColored(contents string, resources *pdf.PdfPageResources, de
 }
 
 // isPatternColored returns true if `pattern` contains color (tiling or shading pattern).
-func isPatternColored(pattern *pdf.PdfPattern, debug bool) (bool, error) {
+func isPatternColored(pattern *model.PdfPattern, debug bool) (bool, error) {
 	// Case 1: Colored tiling patterns.  Need to process the content stream and replace.
 	if pattern.IsTiling() {
 		tilingPattern := pattern.GetAsTilingPattern()
@@ -690,7 +686,7 @@ func isPatternColored(pattern *pdf.PdfPattern, debug bool) (bool, error) {
 }
 
 // isShadingColored returns true if `shading` is a colored colorspace
-func isShadingColored(shading *pdf.PdfShading) (bool, error) {
+func isShadingColored(shading *model.PdfShading) (bool, error) {
 	cs := shading.ColorSpace
 	if cs.GetNumComponents() == 1 {
 		// Grayscale colorspace
@@ -709,26 +705,26 @@ func isShadingColored(shading *pdf.PdfShading) (bool, error) {
 }
 
 // isColorColored returns true if `color` is not gray
-func isColorColored(color pdf.PdfColor) bool {
+func isColorColored(color model.PdfColor) bool {
 	switch color.(type) {
-	case *pdf.PdfColorDeviceGray:
+	case *model.PdfColorDeviceGray:
 		return false
-	case *pdf.PdfColorDeviceRGB:
-		col := color.(*pdf.PdfColorDeviceRGB)
+	case *model.PdfColorDeviceRGB:
+		col := color.(*model.PdfColorDeviceRGB)
 		r, g, b := col.R(), col.G(), col.B()
 		return visible(r-g, r-b, g-b)
-	case *pdf.PdfColorDeviceCMYK:
-		col := color.(*pdf.PdfColorDeviceCMYK)
+	case *model.PdfColorDeviceCMYK:
+		col := color.(*model.PdfColorDeviceCMYK)
 		c, m, y := col.C(), col.M(), col.Y()
 		return visible(c-m, c-y, m-y)
-	case *pdf.PdfColorCalGray:
+	case *model.PdfColorCalGray:
 		return false
-	case *pdf.PdfColorCalRGB:
-		col := color.(*pdf.PdfColorCalRGB)
+	case *model.PdfColorCalRGB:
+		col := color.(*model.PdfColorCalRGB)
 		a, b, c := col.A(), col.B(), col.C()
 		return visible(a-b, a-c, b-c)
-	case *pdf.PdfColorLab:
-		col := color.(*pdf.PdfColorLab)
+	case *model.PdfColorLab:
+		col := color.(*model.PdfColorLab)
 		a, b := col.A(), col.B()
 		return visible(a, b)
 	}
@@ -737,7 +733,7 @@ func isColorColored(color pdf.PdfColor) bool {
 }
 
 // isRgbImageColored returns true if `img` contains any color pixels
-func isRgbImageColored(img pdf.Image, debug bool) bool {
+func isRgbImageColored(img model.Image, debug bool) bool {
 
 	samples := img.GetSamples()
 	maxVal := math.Pow(2, float64(img.BitsPerComponent)) - 1
