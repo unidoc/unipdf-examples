@@ -204,28 +204,14 @@ func main() {
 
 // describePdf reads PDF `inputPath` and returns number of pages, slice of color page numbers (1-offset)
 func describePdf(inputPath string, strictColorPages []int) (int, []int, error) {
+	readerOpts := model.NewReaderOpts()
+	readerOpts.LazyLoad = false
 
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 	if err != nil {
 		return 0, []int{}, err
 	}
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return 0, []int{}, err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return 0, []int{}, err
-	}
-	if isEncrypted {
-		_, err = pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return 0, []int{}, err
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {

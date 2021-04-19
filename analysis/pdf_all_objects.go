@@ -7,7 +7,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -51,33 +50,15 @@ func main() {
 }
 
 func inspectPdf(inputPath string, opt cmdOptions) error {
-	f, err := os.Open(inputPath)
+	readerOpts := model.NewReaderOpts()
+	readerOpts.LazyLoad = false
+	readerOpts.Password = opt.pdfPassword
+
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting with an empty one.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(opt.pdfPassword))
-		if err != nil {
-			return err
-		}
-
-		if !auth {
-			return errors.New("Unable to decrypt password protected file - need to specify pass to Decrypt")
-		}
-	}
 
 	objNums := pdfReader.GetObjectNums()
 

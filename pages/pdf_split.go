@@ -61,28 +61,14 @@ func main() {
 func splitPdf(inputPath string, outputPath string, pageFrom int, pageTo int) error {
 	pdfWriter := model.NewPdfWriter()
 
-	f, err := os.Open(inputPath)
+	readerOpts := model.NewReaderOpts()
+	readerOpts.LazyLoad = false
+
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReaderLazy(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	if isEncrypted {
-		_, err = pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {

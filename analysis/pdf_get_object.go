@@ -54,36 +54,14 @@ func main() {
 }
 
 func inspectPdfObject(inputPath string, objNum int) error {
-	f, err := os.Open(inputPath)
+	readerOpts := model.NewReaderOpts()
+	readerOpts.LazyLoad = false
+
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	if isEncrypted {
-		// If encrypted, try decrypting with an empty one.
-		// Can also specify a user/owner password here by modifying the line below.
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			fmt.Printf("Decryption error: %v\n", err)
-			return err
-		}
-		if !auth {
-			fmt.Println(" This file is encrypted with opening password. Modify the code to specify the password.")
-			return nil
-		}
-	}
 
 	// Print trailer
 	if objNum == -1 {

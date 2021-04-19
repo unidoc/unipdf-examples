@@ -44,29 +44,14 @@ func main() {
 }
 
 func detectSignatureInput(inputPath string) error {
-	f, err := os.Open(inputPath)
+	readerOpts := model.NewReaderOpts()
+	readerOpts.LazyLoad = false
+
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	if isEncrypted {
-		_, err = pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {

@@ -39,35 +39,14 @@ func main() {
 }
 
 func listAnnotations(inputPath string) error {
-	f, err := os.Open(inputPath)
+	readerOpts := model.NewReaderOpts()
+	readerOpts.LazyLoad = false
+
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Input file: %s\n", inputPath)
-
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting with an empty one.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !auth {
-			fmt.Printf(" Encrypted! Need to modify code to decrypt with your password.\n")
-			return nil
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {

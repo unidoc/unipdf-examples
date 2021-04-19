@@ -48,35 +48,14 @@ func main() {
 // Extracts images and properties of a PDF specified by inputPath.
 // The output images are stored into a zip archive whose path is given by outputPath.
 func extractImagesToArchive(inputPath, outputPath string) error {
-	f, err := os.Open(inputPath)
+	readerOpts := model.NewReaderOpts()
+	readerOpts.LazyLoad = false
+
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting with an empty one.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			// Encrypted and we cannot do anything about it.
-			return err
-		}
-		if !auth {
-			fmt.Println("Need to decrypt with password")
-			return nil
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {

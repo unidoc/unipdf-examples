@@ -8,7 +8,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -49,31 +48,16 @@ func main() {
 }
 
 func searchReplace(inputPath, outputPath, searchText, replaceText string) error {
-	f, err := os.Open(inputPath)
+	pdfWriter := model.NewPdfWriter()
+
+	readerOpts := model.NewReaderOpts()
+	readerOpts.LazyLoad = false
+
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	pdfWriter := model.NewPdfWriter()
-
-	encrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-	if encrypted {
-		ok, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !ok {
-			return errors.New("Encrypted")
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {

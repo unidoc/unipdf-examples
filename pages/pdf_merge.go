@@ -9,7 +9,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
@@ -61,32 +60,14 @@ func mergePdf(inputPaths []string, outputPath string) error {
 	pdfWriter := model.NewPdfWriter()
 
 	for _, inputPath := range inputPaths {
-		f, err := os.Open(inputPath)
+		readerOpts := model.NewReaderOpts()
+		readerOpts.LazyLoad = false
+
+		pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 		if err != nil {
 			return err
 		}
-
 		defer f.Close()
-
-		pdfReader, err := model.NewPdfReader(f)
-		if err != nil {
-			return err
-		}
-
-		isEncrypted, err := pdfReader.IsEncrypted()
-		if err != nil {
-			return err
-		}
-
-		if isEncrypted {
-			auth, err := pdfReader.Decrypt([]byte(""))
-			if err != nil {
-				return err
-			}
-			if !auth {
-				return errors.New("Cannot merge encrypted, password protected document")
-			}
-		}
 
 		numPages, err := pdfReader.GetNumPages()
 		if err != nil {

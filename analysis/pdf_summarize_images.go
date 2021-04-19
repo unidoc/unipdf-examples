@@ -98,33 +98,14 @@ func main() {
 
 // fileImages returns a list of imageInfo entries for the images in the PDF file `inputPath`.
 func fileImages(inputPath string) ([]imageInfo, error) {
-	f, err := os.Open(inputPath)
+	readerOpts := model.NewReaderOpts()
+	readerOpts.LazyLoad = false
+
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return nil, err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return nil, err
-	}
-
-	if isEncrypted {
-		// Try decrypting with an empty one.
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return nil, err
-		}
-		if !auth {
-			fmt.Println("Need to decrypt with a specified user/owner password")
-			return nil, nil
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {

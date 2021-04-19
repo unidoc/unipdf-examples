@@ -54,35 +54,14 @@ func main() {
 }
 
 func listContentStreams(inputPath string, targetPageNum int) error {
-	f, err := os.Open(inputPath)
+	readerOpts := model.NewReaderOpts()
+	readerOpts.LazyLoad = false
+
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	if isEncrypted {
-		fmt.Println("Is encrypted!")
-		// Try decrypting with empty pass.  Or can specify user/owner password by modifying the line below.
-		ok, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !ok {
-			fmt.Println("Unable to decrypt with empty string - skipping")
-			return nil
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
