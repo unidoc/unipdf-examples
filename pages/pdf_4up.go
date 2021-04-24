@@ -45,10 +45,7 @@ func main() {
 
 // Load an input PDF and output as n-pages per page in the output.
 func multiplePagesPerPage(inputPath, outputPath string) error {
-	readerOpts := model.NewReaderOpts()
-	readerOpts.LazyLoad = false
-
-	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}

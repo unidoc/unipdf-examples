@@ -204,10 +204,7 @@ func main() {
 
 // describePdf reads PDF `inputPath` and returns number of pages, slice of color page numbers (1-offset)
 func describePdf(inputPath string, strictColorPages []int) (int, []int, error) {
-	readerOpts := model.NewReaderOpts()
-	readerOpts.LazyLoad = false
-
-	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return 0, []int{}, err
 	}

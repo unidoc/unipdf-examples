@@ -57,10 +57,7 @@ func main() {
 
 // Rotate all pages by 90 degrees.
 func rotatePdf(inputPath string, degrees int64, outputPath string) error {
-	readerOpts := model.NewReaderOpts()
-	readerOpts.LazyLoad = false
-
-	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}

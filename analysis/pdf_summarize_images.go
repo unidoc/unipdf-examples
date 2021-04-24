@@ -98,10 +98,7 @@ func main() {
 
 // fileImages returns a list of imageInfo entries for the images in the PDF file `inputPath`.
 func fileImages(inputPath string) ([]imageInfo, error) {
-	readerOpts := model.NewReaderOpts()
-	readerOpts.LazyLoad = false
-
-	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return nil, err
 	}

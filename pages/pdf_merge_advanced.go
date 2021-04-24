@@ -254,10 +254,7 @@ func mergePdf(inputPaths []string, outputPath string) error {
 	var forms *model.PdfAcroForm
 
 	for docIdx, inputPath := range inputPaths {
-		readerOpts := model.NewReaderOpts()
-		readerOpts.LazyLoad = false
-
-		pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
+		pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 		if err != nil {
 			return err
 		}

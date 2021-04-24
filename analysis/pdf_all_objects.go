@@ -51,7 +51,6 @@ func main() {
 
 func inspectPdf(inputPath string, opt cmdOptions) error {
 	readerOpts := model.NewReaderOpts()
-	readerOpts.LazyLoad = false
 	readerOpts.Password = opt.pdfPassword
 
 	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)

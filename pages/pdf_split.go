@@ -60,11 +60,7 @@ func main() {
 
 func splitPdf(inputPath string, outputPath string, pageFrom int, pageTo int) error {
 	pdfWriter := model.NewPdfWriter()
-
-	readerOpts := model.NewReaderOpts()
-	readerOpts.LazyLoad = false
-
-	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}

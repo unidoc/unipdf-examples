@@ -39,10 +39,7 @@ func main() {
 
 	for _, filename := range os.Args[2:] {
 		// Create reader.
-		readerOpts := model.NewReaderOpts()
-		readerOpts.LazyLoad = false
-
-		reader, f, err := model.NewPdfReaderFromFile(filename, readerOpts)
+		reader, f, err := model.NewPdfReaderFromFile(filename, nil)
 		if err != nil {
 			log.Fatalf("Could not create reader: %v\n", err)
 		}

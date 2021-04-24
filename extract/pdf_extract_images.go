@@ -48,10 +48,7 @@ func main() {
 // Extracts images and properties of a PDF specified by inputPath.
 // The output images are stored into a zip archive whose path is given by outputPath.
 func extractImagesToArchive(inputPath, outputPath string) error {
-	readerOpts := model.NewReaderOpts()
-	readerOpts.LazyLoad = false
-
-	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}

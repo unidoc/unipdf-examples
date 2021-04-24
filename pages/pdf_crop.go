@@ -56,10 +56,7 @@ func main() {
 
 // Crop all pages by a given percentage.
 func cropPdf(inputPath string, outputPath string, percentage int64) error {
-	readerOpts := model.NewReaderOpts()
-	readerOpts.LazyLoad = false
-
-	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}

@@ -296,10 +296,7 @@ type ObjCounts struct {
 // transformPdfFile transforms PDF `inputPath` and writes the resulting PDF to `outputPath`
 // Returns: number of pages in `inputPath`
 func transformPdfFile(inputPath, outputPath string) (int, error) {
-	readerOpts := model.NewReaderOpts()
-	readerOpts.LazyLoad = false
-
-	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return 0, err
 	}
