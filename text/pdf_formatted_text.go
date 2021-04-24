@@ -39,7 +39,6 @@ func main() {
 
 	// Create styled paragraph chapter.
 	chap := c.NewChapter("Styled Paragraphs")
-	chap.GetHeading().SetMargins(0, 0, 0, 20)
 	chap.GetHeading().SetFont(fontBold)
 	chap.GetHeading().SetFontSize(18)
 	chap.GetHeading().SetColor(creator.ColorRed)
