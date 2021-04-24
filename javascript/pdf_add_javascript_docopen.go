@@ -47,33 +47,11 @@ func main() {
 }
 
 func addPDFDocOpenJSAction(inputPath, outputPath string, docOpenJS string) error {
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting with an empty one.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !auth {
-			fmt.Println("Encrypted - unable to access - update code to specify pass")
-			return nil
-		}
-	}
 
 	w, err := pdfReader.ToWriter(nil)
 	if err != nil {
