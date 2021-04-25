@@ -8,7 +8,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
@@ -46,32 +45,11 @@ func main() {
 
 // Load an input PDF and output as n-pages per page in the output.
 func multiplePagesPerPage(inputPath, outputPath string) error {
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting both with given password and an empty one if that fails.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !auth {
-			return errors.New("Unable to decrypt pdf with empty pass")
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {

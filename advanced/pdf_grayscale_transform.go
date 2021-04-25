@@ -51,34 +51,11 @@ func main() {
 }
 
 func convertPdfToGrayscale(inputPath, outputPath string) error {
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting with an empty one.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			// Encrypted and we cannot do anything about it.
-			return err
-		}
-		if !auth {
-			return errors.New("Need to decrypt with password")
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {

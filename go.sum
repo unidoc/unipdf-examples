@@ -49,8 +49,6 @@ github.com/unidoc/pkcs7 v0.0.0-20200411230602-d883fd70d1df h1:1RV3lxQ6L6xGFNhngp
 github.com/unidoc/pkcs7 v0.0.0-20200411230602-d883fd70d1df/go.mod h1:UEzOZUEpJfDpywVJMUT8QiugqEZC29pDq7kdIZhWCr8=
 github.com/unidoc/timestamp v0.0.0-20200412005513-91597fd3793a h1:RLtvUhe4DsUDl66m7MJ8OqBjq8jpWBXPK6/RKtqeTkc=
 github.com/unidoc/timestamp v0.0.0-20200412005513-91597fd3793a/go.mod h1:j+qMWZVpZFTvDey3zxUkSgPJZEX33tDgU/QIA0IzCUw=
-github.com/unidoc/unipdf/v3 v3.23.0 h1:CVUktNhZo1Fo1M137Jj73gp5h6FwR8b+dKrfc3teeb8=
-github.com/unidoc/unipdf/v3 v3.23.0/go.mod h1:WdRz3hVhi/M0jFGXhsT5/9FDyRfga6KgI2ZQqjiOXaM=
 github.com/unidoc/unipdf/v3 v3.24.0 h1:4/BgMtvfzwv8o6Z/nbKCQO672H+S/lA4wDDza1hPwS8=
 github.com/unidoc/unipdf/v3 v3.24.0/go.mod h1:WdRz3hVhi/M0jFGXhsT5/9FDyRfga6KgI2ZQqjiOXaM=
 github.com/unidoc/unitype v0.2.1 h1:x0jMn7pB/tNrjEVjy3Ukpxo++HOBQaTCXcTYFA6BH3w=
@@ -59,8 +57,8 @@ github.com/wcharczuk/go-chart/v2 v2.1.0 h1:tY2slqVQ6bN+yHSnDYwZebLQFkphK4WNrVwnt
 github.com/wcharczuk/go-chart/v2 v2.1.0/go.mod h1:yx7MvAVNcP/kN9lKXM/NTce4au4DFN99j6i1OwDclNA=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
-golang.org/x/crypto v0.0.0-20210415154028-4f45737414dc h1:+q90ECDSAQirdykUN6sPEiBXBsp8Csjcca8Oy7bgLTA=
-golang.org/x/crypto v0.0.0-20210415154028-4f45737414dc/go.mod h1:T9bdIzuCu7OtxOm1hfPfRQxPLYneinmdGuTeoZ9dtd4=
+golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b h1:7mWr3k41Qtv8XlltBkDkl8LoP3mpSgBW8BUoxtEdbXg=
+golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b/go.mod h1:T9bdIzuCu7OtxOm1hfPfRQxPLYneinmdGuTeoZ9dtd4=
 golang.org/x/image v0.0.0-20200927104501-e162460cd6b5 h1:QelT11PB4FXiDEXucrfNckHoFxwt8USGY1ajP1ZF5lM=
 golang.org/x/image v0.0.0-20200927104501-e162460cd6b5/go.mod h1:FeLwcggjj3mMvU+oOTbSwawSJRM1uh48EjtB4UJZlP0=
 golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=
