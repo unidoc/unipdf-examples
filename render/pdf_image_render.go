@@ -39,33 +39,11 @@ func main() {
 
 	for _, filename := range os.Args[2:] {
 		// Create reader.
-		file, err := os.Open(filename)
-		if err != nil {
-			log.Fatalf("Could not open input file: %v\n", err)
-		}
-		defer file.Close()
-
-		reader, err := model.NewPdfReader(file)
+		reader, f, err := model.NewPdfReaderFromFile(filename, nil)
 		if err != nil {
 			log.Fatalf("Could not create reader: %v\n", err)
 		}
-
-		// Check if file is encrypted.
-		isEncrypted, err := reader.IsEncrypted()
-		if err != nil {
-			log.Fatalf("Could not read file info: %v\n", err)
-		}
-
-		// Attempt to decrypt using an empty password.
-		if isEncrypted {
-			auth, err := reader.Decrypt([]byte(""))
-			if err != nil {
-				log.Fatalf("Could not decrypt input file: %v\n", err)
-			}
-			if !auth {
-				log.Fatalf("Could not decrypt input file")
-			}
-		}
+		defer f.Close()
 
 		// Get total number of pages.
 		numPages, err := reader.GetNumPages()
