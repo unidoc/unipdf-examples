@@ -3,6 +3,7 @@
  * The output is saved as unidoc-report-landscape.pdf which illustrates some of the features
  * of the creator.
  */
+
 /*
  * NOTE: This example depends on github.com/boombuler/barcode, MIT licensed,
  *       and github.com/wcharczuk/go-chart, MIT licensed,
