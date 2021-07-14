@@ -44,12 +44,6 @@ func main() {
 	// Initialize starting time.
 	start := time.Now()
 
-	// Get input file stat.
-	inputFileInfo, err := os.Stat(inputPath)
-	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
-	}
-
 	// Create reader.
 	inputFile, err := os.Open(inputPath)
 	if err != nil {
