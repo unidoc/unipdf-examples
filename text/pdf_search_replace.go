@@ -8,7 +8,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -21,17 +20,10 @@ import (
 	"github.com/unidoc/unipdf/v3/model/optimize"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -56,31 +48,12 @@ func main() {
 }
 
 func searchReplace(inputPath, outputPath, searchText, replaceText string) error {
-	f, err := os.Open(inputPath)
+	pdfWriter := model.NewPdfWriter()
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	pdfWriter := model.NewPdfWriter()
-
-	encrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-	if encrypted {
-		ok, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !ok {
-			return errors.New("Encrypted")
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {

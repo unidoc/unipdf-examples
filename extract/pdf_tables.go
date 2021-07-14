@@ -21,33 +21,27 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/text/unicode/norm"
+
 	"github.com/bmatcuk/doublestar"
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/extractor"
 	"github.com/unidoc/unipdf/v3/model"
 	"github.com/unidoc/unipdf/v3/pdfutil"
-	"golang.org/x/text/unicode/norm"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 const (
 	usage = "Usage: go run pdf_tables.go [options] <file1.pdf> <file2.pdf> ...\n"
-	// Make sure to enter a valid license key.
-	// Otherwise text is truncated and a watermark added to the text.
-	// License keys are available via: https://unidoc.io
-	/*
-			license.SetLicenseKey(`
-		-----BEGIN UNIDOC LICENSE KEY-----
-		...key contents...
-		-----END UNIDOC LICENSE KEY-----
-		`, "Customer Name")
-	*/
-	// Alternatively license can be loaded via UNIPDF_LICENSE_PATH and UNIPDF_CUSTOMER_NAME
-	// environment variables,  where UNIPDF_LICENSE_PATH points to the file containing the license
-	// key and the UNIPDF_CUSTOMER_NAME the explicitly specified customer name to which the key is
-	// licensed.
-	uniDocLicenseKey = ``
-	companyName      = ""
 )
 
 func main() {
@@ -87,12 +81,6 @@ func main() {
 		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 	} else {
 		common.SetLogger(common.NewConsoleLogger(common.LogLevelInfo))
-	}
-	if uniDocLicenseKey != "" {
-		if err := license.SetLicenseKey(uniDocLicenseKey, companyName); err != nil {
-			common.Log.Error("error loading UniDoc license: err=%v", err)
-		}
-		model.SetPdfCreator(companyName)
 	}
 
 	makeDir("CSV directory", csvDir)

@@ -14,8 +14,9 @@ package main
 import (
 	"bytes"
 	"fmt"
-	goimage "image"
+	"image"
 	"math"
+	"os"
 	"time"
 
 	"github.com/wcharczuk/go-chart/v2"
@@ -23,23 +24,16 @@ import (
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -287,9 +281,9 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 		cell.SetContent(p)
 	}
 
-	dateStr := unicommon.ReleasedAt.Format("1 Jan, 2006 15:04")
+	dateStr := common.ReleasedAt.Format("1 Jan, 2006 15:04")
 
-	histVals := []string{dateStr, unicommon.Version, "First issue"}
+	histVals := []string{dateStr, common.Version, "First issue"}
 	for _, histVal := range histVals {
 		p = c.NewParagraph(histVal)
 		p.SetFont(fontRegular)
@@ -525,7 +519,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 
 // Helper function to make the QR code image with a specified oversampling factor.
 // The oversampling specifies how many pixels/point. Standard PDF resolution is 72 points/inch.
-func makeQrCodeImage(text string, width float64, oversampling int) (goimage.Image, error) {
+func makeQrCodeImage(text string, width float64, oversampling int) (image.Image, error) {
 	qrCode, err := qr.Encode(text, qr.M, qr.Auto)
 	if err != nil {
 		return nil, err

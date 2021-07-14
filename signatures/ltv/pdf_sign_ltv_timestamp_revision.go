@@ -31,28 +31,21 @@ import (
 	"github.com/unidoc/unipdf/v3/model/sighandler"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
-const usage = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS]\n"
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
 }
 
+const usagef = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS]\n"
+
 func main() {
 	args := os.Args
 	if len(args) < 5 {
-		fmt.Printf(usage, os.Args[0])
+		fmt.Printf(usagef, os.Args[0])
 		return
 	}
 	p12Path := args[1]

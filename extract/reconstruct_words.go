@@ -1,10 +1,14 @@
-// Example that illustrates the accuracy of the text extraction, by first extracting
-// all TextMarks and then reconstructing the text by writing out the text page-by-page
-// to a new PDF with the creator package.
-// Only retains the text.
-//
-// Useful to check accuracy of text extraction properties.
-// Expands upon reconstruct_text.go to show word placements.
+/*
+ * Example that illustrates the accuracy of the text extraction, by first extracting
+ * all TextMarks and then reconstructing the text by writing out the text page-by-page
+ * to a new PDF with the creator package.
+ * Only retains the text.
+ *
+ * Useful to check accuracy of text extraction properties.
+ * Expands upon reconstruct_text.go to show word placements.
+ *
+ * Run as: go run reconstruct_words.go input.pdf
+ */
 
 package main
 
@@ -20,17 +24,10 @@ import (
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -38,7 +35,7 @@ func init() {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("Syntax: reconstruct_text <file.pdf>\n")
+		fmt.Printf("Syntax: reconstruct_words <file.pdf>\n")
 		os.Exit(1)
 	}
 

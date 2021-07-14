@@ -21,7 +21,7 @@ package main
 
 import (
 	"fmt"
-	goimage "image"
+	"image"
 	"math"
 	"os"
 	"strconv"
@@ -34,17 +34,10 @@ import (
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -102,7 +95,7 @@ func main() {
 // Prepare the barcode. The oversampling ratio specifies how many pixels/point to use.  The default resolution of
 // PDFs is 72PPI (points per inch). A higher PPI allows higher resolution QR code generation which is particularly
 // important if the document is scaled (zoom in).
-func makeBarcode(codeStr string, width float64, oversampling int) (goimage.Image, error) {
+func makeBarcode(codeStr string, width float64, oversampling int) (image.Image, error) {
 	bcode, err := ean.Encode(codeStr)
 	if err != nil {
 		return nil, err

@@ -19,17 +19,10 @@ import (
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -55,35 +48,11 @@ func main() {
 // Extracts images and properties of a PDF specified by inputPath.
 // The output images are stored into a zip archive whose path is given by outputPath.
 func extractImagesToArchive(inputPath, outputPath string) error {
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting with an empty one.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			// Encrypted and we cannot do anything about it.
-			return err
-		}
-		if !auth {
-			fmt.Println("Need to decrypt with password")
-			return nil
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {

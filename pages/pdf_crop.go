@@ -8,26 +8,18 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/unidoc/unipdf/v3/common/license"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -64,41 +56,19 @@ func main() {
 
 // Crop all pages by a given percentage.
 func cropPdf(inputPath string, outputPath string, percentage int64) error {
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
-
-	pdfReader, err := pdf.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting both with given password and an empty one if that fails.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !auth {
-			return errors.New("Unable to decrypt pdf with empty pass")
-		}
-	}
 
 	// Process each page using the following callback
 	// when generating PdfWriter from PdfReader.
-	opts := &pdf.ReaderToWriterOpts{
-		PageCallback: func(pageNum int, page *pdf.PdfPage) {
+	opts := &model.ReaderToWriterOpts{
+		PageProcessCallback: func(pageNum int, page *model.PdfPage) error {
 			bbox, err := page.GetMediaBox()
 			if err != nil {
-				fmt.Println(err)
+				return err
 			}
 
 			// Zoom in on the page middle, with a scaled width and height.
@@ -112,6 +82,8 @@ func cropPdf(inputPath string, outputPath string, percentage int64) error {
 			(*bbox).Ury -= newHeight / 2
 
 			page.MediaBox = bbox
+
+			return nil
 		},
 	}
 

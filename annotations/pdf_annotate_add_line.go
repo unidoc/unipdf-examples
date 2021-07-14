@@ -15,23 +15,15 @@ import (
 	"strconv"
 
 	"github.com/unidoc/unipdf/v3/annotator"
-	unicommon "github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/contentstream/draw"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -81,7 +73,7 @@ func main() {
 	lineDef := annotator.LineAnnotationDef{}
 	lineDef.X1, lineDef.Y1 = x1, y1
 	lineDef.X2, lineDef.Y2 = x2, y2
-	lineDef.LineColor = pdf.NewPdfColorDeviceRGB(1.0, 0.0, 0.0) // Red.
+	lineDef.LineColor = model.NewPdfColorDeviceRGB(1.0, 0.0, 0.0) // Red.
 	lineDef.Opacity = 0.50
 	lineDef.LineEndingStyle1 = draw.LineEndingStyleNone
 	lineDef.LineEndingStyle2 = draw.LineEndingStyleArrow
@@ -98,8 +90,6 @@ func main() {
 
 // Annotate pdf file.
 func annotatePdfAddLineAnnotation(inputPath string, targetPageNum int64, outputPath string, lineDef annotator.LineAnnotationDef) error {
-	unicommon.Log.Debug("Input PDF: %v", inputPath)
-
 	// Read the input pdf file.
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -107,25 +97,26 @@ func annotatePdfAddLineAnnotation(inputPath string, targetPageNum int64, outputP
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
 
 	// Process each page using the following callback
 	// when generating PdfWriter.
-	opt := &pdf.ReaderToWriterOpts{
-		PageCallback: func(pageNum int, page *pdf.PdfPage) {
+	opt := &model.ReaderToWriterOpts{
+		PageProcessCallback: func(pageNum int, page *model.PdfPage) error {
 			if int(targetPageNum) == pageNum {
 				lineAnnotation, err := annotator.CreateLineAnnotation(lineDef)
 				if err != nil {
-					fmt.Println(err)
-					return
+					return err
 				}
 
 				// Add to the page annotations.
 				page.AddAnnotation(lineAnnotation)
 			}
+
+			return nil
 		},
 	}
 

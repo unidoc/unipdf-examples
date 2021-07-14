@@ -21,25 +21,21 @@ import (
 
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
-	pdfcontent "github.com/unidoc/unipdf/v3/contentstream"
-	pdfcore "github.com/unidoc/unipdf/v3/core"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/contentstream"
+	"github.com/unidoc/unipdf/v3/core"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
-const usage = "Usage: go run pdf_summarize_images.go testdata/*.pdf\n"
-
 func init() {
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
 }
+
+const usage = "Usage: go run pdf_summarize_images.go testdata/*.pdf\n"
 
 func main() {
 	var debug, trace bool
@@ -102,33 +98,11 @@ func main() {
 
 // fileImages returns a list of imageInfo entries for the images in the PDF file `inputPath`.
 func fileImages(inputPath string) ([]imageInfo, error) {
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
-
-	pdfReader, err := pdf.NewPdfReader(f)
-	if err != nil {
-		return nil, err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return nil, err
-	}
-
-	if isEncrypted {
-		// Try decrypting with an empty one.
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return nil, err
-		}
-		if !auth {
-			fmt.Println("Need to decrypt with a specified user/owner password")
-			return nil, nil
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
@@ -164,7 +138,7 @@ func fileImages(inputPath string) ([]imageInfo, error) {
 }
 
 // pageImages returns a list of imageInfo entries for the images in the PDF page `page`.
-func pageImages(page *pdf.PdfPage) ([]imageInfo, error) {
+func pageImages(page *model.PdfPage) ([]imageInfo, error) {
 	contents, err := page.GetAllContentStreams()
 	if err != nil {
 		return nil, err
@@ -176,8 +150,8 @@ func pageImages(page *pdf.PdfPage) ([]imageInfo, error) {
 var errors = map[error]bool{nil: true}
 
 // contentStreamImages returns a list of imageInfo entries for the images in the content stream `contents`.
-func contentStreamImages(contents string, resources *pdf.PdfPageResources) ([]imageInfo, error) {
-	cstreamParser := pdfcontent.NewContentStreamParser(contents)
+func contentStreamImages(contents string, resources *model.PdfPageResources) ([]imageInfo, error) {
+	cstreamParser := contentstream.NewContentStreamParser(contents)
 	operations, err := cstreamParser.Parse()
 	showError(errors, err, "cstreamParser.Parse failed")
 	if err != nil {
@@ -191,7 +165,7 @@ func contentStreamImages(contents string, resources *pdf.PdfPageResources) ([]im
 	for _, op := range *operations {
 		if op.Operand == "BI" && len(op.Params) == 1 {
 			// Inline image.
-			iimg, ok := op.Params[0].(*pdfcontent.ContentStreamInlineImage)
+			iimg, ok := op.Params[0].(*contentstream.ContentStreamInlineImage)
 			if !ok {
 				continue
 			}
@@ -232,7 +206,7 @@ func contentStreamImages(contents string, resources *pdf.PdfPageResources) ([]im
 
 		} else if op.Operand == "Do" && len(op.Params) == 1 {
 			// XObject.
-			name := op.Params[0].(*pdfcore.PdfObjectName)
+			name := op.Params[0].(*core.PdfObjectName)
 
 			// Only process each one once.
 			if _, has := processedXObjects[string(*name)]; has {
@@ -241,7 +215,7 @@ func contentStreamImages(contents string, resources *pdf.PdfPageResources) ([]im
 			processedXObjects[string(*name)] = true
 
 			_, xtype := resources.GetXObjectByName(*name)
-			if xtype == pdf.XObjectTypeImage {
+			if xtype == model.XObjectTypeImage {
 
 				ximg, err := resources.GetXObjectImageByName(*name)
 				showError(errors, err, "GetXObjectImageByName failed: %q ", *name)
@@ -276,7 +250,7 @@ func contentStreamImages(contents string, resources *pdf.PdfPageResources) ([]im
 				}
 				infoList = append(infoList, info)
 
-			} else if xtype == pdf.XObjectTypeForm {
+			} else if xtype == model.XObjectTypeForm {
 				// Go through the XObject Form content stream.
 				xform, err := resources.GetXObjectFormByName(*name)
 				showError(errors, err, "GetXObjectFormByName failed: %q", *name)

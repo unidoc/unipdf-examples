@@ -11,26 +11,13 @@ import (
 	"os"
 
 	"github.com/unidoc/unipdf/v3/common/license"
-	unipdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
-type PdfProperties struct {
-	IsEncrypted bool
-	CanView     bool // Is the document viewable without password?
-	NumPages    int
-}
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -58,6 +45,12 @@ func main() {
 	}
 }
 
+type PdfProperties struct {
+	IsEncrypted bool
+	CanView     bool // Is the document viewable without password?
+	NumPages    int
+}
+
 func getPdfProperties(inputPath string) (*PdfProperties, error) {
 	ret := PdfProperties{}
 
@@ -68,7 +61,7 @@ func getPdfProperties(inputPath string) (*PdfProperties, error) {
 
 	defer f.Close()
 
-	pdfReader, err := unipdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return nil, err
 	}
