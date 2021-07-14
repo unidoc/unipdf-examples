@@ -34,12 +34,11 @@ func init() {
 
 func main() {
 	args := os.Args
-	if len(args) < 3 {
+	if len(args) < 2 {
 		fmt.Printf(usage, os.Args[0])
 		return
 	}
 	inputPath := args[1]
-	outputPath := args[2]
 
 	// Initialize starting time.
 	start := time.Now()
