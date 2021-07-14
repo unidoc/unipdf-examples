@@ -1,7 +1,7 @@
 /*
  * PDF optimization (compression) example.
  *
- * Run as: go run pdf_optimize.go <input.pdf> <output.pdf>
+ * Run as: go run pdfa_validate_standard.go <input.pdf>
  */
 
 package main
@@ -23,7 +23,7 @@ Free trial license keys are available at: https://unidoc.io/
 -----END UNIDOC LICENSE KEY-----
 `
 
-const usage = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH\n"
+const usage = "Usage: %s INPUT_PDF_PATH\n"
 
 func init() {
 	err := license.SetLicenseKey(licenseKey, `Company Name`)
@@ -57,25 +57,25 @@ func main() {
 	}
 	defer inputFile.Close()
 
-	reader, err := model.NewPdfReader(inputFile)
+	detailedReader, err := model.NewDetailedPdfReader(inputFile)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Generate a PDFWriter from PDFReader.
-	pdfWriter, err := reader.ToWriter(nil)
-	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
+
+	// Apply standard PDF/A-1B.
+	standards := []model.Standard{
+		pdfa.NewProfile1A(nil),
+		pdfa.NewProfile1B(nil),
 	}
 
-	// Set optimizer.
-	pdfWriter.SetDocumentOptimizer(pdfa.NewProfile1B(nil))
-
-	// Create output file.
-	err = pdfWriter.WriteToFile(outputPath)
-	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
+	// Iterate over input standards and check if the document passes its requirements.
+	for _, standard := range standards {
+		if err = standard.ValidateStandard(detailedReader); err != nil {
+			fmt.Printf("Input document didn't pass the standard: %s - %v\n", standard.StandardName(), err)
+		}
 	}
+
 
 	duration := float64(time.Since(start)) / float64(time.Millisecond)
 	fmt.Printf("Processing time: %.2f ms\n", duration)
