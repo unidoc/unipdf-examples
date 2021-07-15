@@ -17,20 +17,16 @@ import (
 	"github.com/unidoc/unipdf/v3/model/pdfa"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
-const usage = "Usage: %s INPUT_PDF_PATH\n"
-
 func init() {
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
 }
+
+const usage = "Usage: %s INPUT_PDF_PATH\n"
 
 func main() {
 	args := os.Args
@@ -55,7 +51,6 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-
 	// Apply standard PDF/A-1B.
 	standards := []model.Standard{
 		pdfa.NewProfile1A(nil),
@@ -69,8 +64,6 @@ func main() {
 		}
 	}
 
-
 	duration := float64(time.Since(start)) / float64(time.Millisecond)
 	fmt.Printf("Processing time: %.2f ms\n", duration)
 }
-
