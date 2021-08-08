@@ -60,17 +60,16 @@ func modifyPage(inputPath string, outputPath string) error {
 		return err
 	}
 
-	imgFile, err := os.Open(watermarkPath)
-	if err != nil {
-		return err
-	}
-	defer imgFile.Close()
+	c := creator.New()
 
-	// Load the image with default handler.
-	img, err := model.ImageHandling.Read(imgFile)
+	watermarkImg, err := c.NewImageFromFile(watermarkPath)
 	if err != nil {
 		return err
 	}
+
+	watermarkImg.ScaleToWidth(c.Context().PageWidth)
+	watermarkImg.SetPos(0, (c.Context().PageHeight-watermarkImg.Height())/2)
+	watermarkImg.SetOpacity(0.5)
 
 	opts := &creator.CreatorFromReaderOpts{
 		PageProcessCallback: func(c *creator.Creator, pageNum int, page *model.PdfPage) error {
@@ -82,15 +81,6 @@ func modifyPage(inputPath string, outputPath string) error {
 
 			page.AddAnnotation(textAnnotation.PdfAnnotation)
 
-			watermarkImg, err := c.NewImage(img)
-			if err != nil {
-				return errors.New(fmt.Sprintf("Error: %v\n", err))
-			}
-
-			watermarkImg.ScaleToWidth(c.Context().PageWidth)
-			watermarkImg.SetPos(0, (c.Context().PageHeight-watermarkImg.Height())/2)
-			watermarkImg.SetOpacity(0.5)
-
 			err = c.Draw(watermarkImg)
 			if err != nil {
 				return errors.New(fmt.Sprintf("Error: %v\n", err))
@@ -100,12 +90,12 @@ func modifyPage(inputPath string, outputPath string) error {
 		},
 	}
 
-	pdfCreator, err := creator.NewFromReader(pdfReader, opts)
+	err = c.AddFromReader(pdfReader, opts)
 	if err != nil {
 		return err
 	}
 
-	err = pdfCreator.WriteToFile(outputPath)
+	err = c.WriteToFile(outputPath)
 	if err != nil {
 		return err
 	}
