@@ -45,16 +45,11 @@ func main() {
 	start := time.Now()
 
 	// Create reader.
-	inputFile, err := os.Open(inputPath)
+	reader, file, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-	defer inputFile.Close()
-
-	reader, err := model.NewPdfReader(inputFile)
-	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
-	}
+	defer file.Close()
 
 	// Generate a PDFWriter from PDFReader.
 	pdfWriter, err := reader.ToWriter(nil)
