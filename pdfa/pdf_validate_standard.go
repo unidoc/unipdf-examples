@@ -57,7 +57,7 @@ func main() {
 
 
 	// Apply standard PDF/A-1B.
-	standards := []model.Standard{
+	standards := []model.StandardImplementer{
 		pdfa.NewProfile1A(nil),
 		pdfa.NewProfile1B(nil),
 	}
