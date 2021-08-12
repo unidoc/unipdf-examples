@@ -50,7 +50,7 @@ func main() {
 	}
 	defer inputFile.Close()
 
-	detailedReader, err := model.NewDetailedPdfReader(inputFile)
+	detailedReader, err := model.NewCompliancePdfReader(inputFile)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
