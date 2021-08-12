@@ -8,23 +8,17 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -45,13 +39,18 @@ func main() {
 
 	// Create styled paragraph chapter.
 	chap := c.NewChapter("Styled Paragraphs")
-	chap.GetHeading().SetMargins(0, 0, 0, 20)
 	chap.GetHeading().SetFont(fontBold)
 	chap.GetHeading().SetFontSize(18)
 	chap.GetHeading().SetColor(creator.ColorRed)
 
 	// Generate styled paragraph text style subchapter.
 	err = styledParagraphTextStyle(c, chap, fontRegular, fontBold)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
+	// Generate styled paragraph text wrapping and overflow subchapter.
+	err = styledParagraphTextOverflow(c, chap, fontRegular, fontBold)
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
@@ -121,6 +120,50 @@ func styledParagraphTextStyle(c *creator.Creator, ch *creator.Chapter,
 
 	// Add the styled paragraph to the created subchapter.
 	return subchap.Add(p)
+}
+
+func styledParagraphTextOverflow(c *creator.Creator, ch *creator.Chapter,
+	fontRegular, fontBold *model.PdfFont) error {
+	// Create new subchapter.
+	subchap := ch.NewSubchapter("Text wrapping and overflow")
+
+	// Text overflow disabled and wrapped (default setting).
+	p := c.NewStyledParagraph()
+	p.SetMargins(0, 0, 20, 20)
+	p.SetLineHeight(1.1)
+	chunk := p.Append("Long styled paragraph will be wrapped by default if it doesn't fit in the available space, like this one for example.")
+	chunk.Style.Font = fontRegular
+
+	if err := subchap.Add(p); err != nil {
+		return err
+	}
+
+	// Text wrapping disabled.
+	p = c.NewStyledParagraph()
+	p.SetMargins(0, 0, 0, 20)
+	p.SetLineHeight(1.1)
+	p.SetEnableWrap(false)
+	chunk = p.Append("This long styled paragraph has it's wrap setting disabled, so it will NOT be wrapped even if it doesn't fit in the available space and will overflows out of the page.")
+	chunk.Style.Font = fontRegular
+
+	if err := subchap.Add(p); err != nil {
+		return err
+	}
+
+	// Text wrapping disabled and text overflow set to hidden.
+	p = c.NewStyledParagraph()
+	p.SetMargins(0, 0, 0, 20)
+	p.SetLineHeight(1.1)
+	p.SetEnableWrap(false)
+	p.SetTextOverflow(creator.TextOverflowHidden)
+	chunk = p.Append("This long styled paragraph has it's wrap setting disabled and text overflow set to hidden, so it will be truncated if it doesn't fit in the available space.")
+	chunk.Style.Font = fontRegular
+
+	if err := subchap.Add(p); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func styledParagraphUnderline(c *creator.Creator, ch *creator.Chapter,

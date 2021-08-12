@@ -21,14 +21,17 @@ import (
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/extractor"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 const (
 	// markupDir is the directory where the marked-up PDFs are saved.
@@ -43,16 +46,6 @@ const (
 	Saves bounding box coordinates to marked.up/file.json
 `
 )
-
-func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
-	if err != nil {
-		panic(err)
-	}
-}
 
 func main() {
 	var debug bool
@@ -90,7 +83,7 @@ func markTextLocations(inPath, term string) error {
 	}
 	defer f.Close()
 	common.Log.Info("Searching %q for %q", inPath, term)
-	pdfReader, err := pdf.NewPdfReaderLazy(f)
+	pdfReader, err := model.NewPdfReaderLazy(f)
 	if err != nil {
 		return fmt.Errorf("NewPdfReaderLazy failed. %q err=%v", inPath, err)
 	}
@@ -182,17 +175,17 @@ func indexAll(text, term string) []int {
 // Marked up results are saved in markupDir if markupPDFs is true.
 // The PDFs in markupDir can be viewed in a PDF viewer to check that they correct.
 type markupList struct {
-	inPath      string          // Name of input PDF to be searced searched.
-	pageMatches map[int][]match // {pageNum: matches on page}
-	pdfReader   *pdf.PdfReader  // Reader for input PDF
-	pageNum     int             // (1-offset) Page number being worked on.
+	inPath      string           // Name of input PDF to be searced searched.
+	pageMatches map[int][]match  // {pageNum: matches on page}
+	pdfReader   *model.PdfReader // Reader for input PDF
+	pageNum     int              // (1-offset) Page number being worked on.
 }
 
 // match is a match of search term `Term` on a page. `BBox` is the bounding box around the matched
 // term on the PDF page
 type match struct {
 	Term        string
-	BBox        pdf.PdfRectangle
+	BBox        model.PdfRectangle
 	OffsetRange [2]int
 }
 
@@ -204,7 +197,7 @@ func (l markupList) String() string {
 
 // createMarkupList returns an initialized markupList for saving match results to so the bounding
 // boxes can be checked for accuracy in a PDF viewer.
-func createMarkupList(inPath string, pdfReader *pdf.PdfReader) *markupList {
+func createMarkupList(inPath string, pdfReader *model.PdfReader) *markupList {
 	return &markupList{
 		inPath:      inPath,
 		pdfReader:   pdfReader,

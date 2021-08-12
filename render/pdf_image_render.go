@@ -21,17 +21,10 @@ import (
 	"github.com/unidoc/unipdf/v3/render"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -46,33 +39,11 @@ func main() {
 
 	for _, filename := range os.Args[2:] {
 		// Create reader.
-		file, err := os.Open(filename)
-		if err != nil {
-			log.Fatalf("Could not open input file: %v\n", err)
-		}
-		defer file.Close()
-
-		reader, err := model.NewPdfReader(file)
+		reader, f, err := model.NewPdfReaderFromFile(filename, nil)
 		if err != nil {
 			log.Fatalf("Could not create reader: %v\n", err)
 		}
-
-		// Check if file is encrypted.
-		isEncrypted, err := reader.IsEncrypted()
-		if err != nil {
-			log.Fatalf("Could not read file info: %v\n", err)
-		}
-
-		// Attempt to decrypt using an empty password.
-		if isEncrypted {
-			auth, err := reader.Decrypt([]byte(""))
-			if err != nil {
-				log.Fatalf("Could not decrypt input file: %v\n", err)
-			}
-			if !auth {
-				log.Fatalf("Could not decrypt input file")
-			}
-		}
+		defer f.Close()
 
 		// Get total number of pages.
 		numPages, err := reader.GetNumPages()

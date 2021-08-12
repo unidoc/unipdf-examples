@@ -17,17 +17,10 @@ import (
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-const licenseKey = `
------BEGIN UNIDOC LICENSE KEY-----
-Free trial license keys are available at: https://unidoc.io/
------END UNIDOC LICENSE KEY-----
-`
-
 func init() {
-	// Enable debug-level logging.
-	// unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
-	err := license.SetLicenseKey(licenseKey, `Company Name`)
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
@@ -65,10 +58,12 @@ func addFormToPdf(inputPath string, outputPath string) error {
 	// Generate a new AcroForm instead of copying from the source PDF.
 	opt := &model.ReaderToWriterOpts{
 		SkipAcroForm: true,
-		PageCallback: func(pageNum int, page *model.PdfPage) {
+		PageProcessCallback: func(pageNum int, page *model.PdfPage) error {
 			if pageNum == 1 {
 				form = createForm(page)
 			}
+
+			return nil
 		},
 	}
 

@@ -5,6 +5,7 @@ Examples for digital signing of PDF files with UniDoc:
 - [pdf_sign_pkcs12.go](pdf_sign_pkcs12.go) Example of signing using PKCS12 (.p12/.pfx) file.
 - [pdf_sign_external.go](pdf_sign_external.go) Example of PKCS7 signing with an external service with an interim step, creating a PDF with a blank signature and then replacing the blank signature with the actual signature from the signing service.
 - [pdf_sign_hsm_pkcs11_cgo.go](pdf_sign_hsm_pkcs11_cgo.go) Example of signing with a PKCS11 service using SoftHSM and the crypto11 package.
+- [pdf_sign_new_page.go](pdf_sign_new_page.go) Example of appending a new page with signature to a PDF document.
 - [pdf_sign_appearance.go](pdf_sign_appearance.go) Example of creating signature appearance fields.
 - [pdf_sign_validate.go](pdf_sign_validate.go) Example of signature validation.
 - [pdf_sign_pem_multicert.go](pdf_sign_pem_multicert.go) Example of signing using a certificate chain and a private key, extracted from PEM files.
