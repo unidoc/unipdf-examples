@@ -11,7 +11,7 @@ require (
 	github.com/miekg/pkcs11 v1.0.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
-	github.com/unidoc/unipdf/v3 v3.27.0
+	github.com/unidoc/unipdf/v3 v3.28.0
 	github.com/wcharczuk/go-chart/v2 v2.1.0
 	golang.org/x/crypto v0.0.0-20210421170649-83a5a9bb288b
 	golang.org/x/image v0.0.0-20210220032944-ac19c3e999fb // indirect
