@@ -73,12 +73,6 @@ func rowSpan(c *creator.Creator, font, fontBold *model.PdfFont) error {
 	table.SetMargins(0, 0, 10, 0)
 
 	drawCell := func(font *model.PdfFont, rowspan int, color, bgColor creator.Color) {
-		p := c.NewStyledParagraph()
-		p.SetMargins(2, 2, 0, 0)
-		chunk := p.Append(text)
-		chunk.Style.Font = font
-		chunk.Style.Color = color
-
 		var cell *creator.TableCell
 
 		if rowspan == 1 {
@@ -102,15 +96,24 @@ func rowSpan(c *creator.Creator, font, fontBold *model.PdfFont) error {
 	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorBlue)
 	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorBlue)
 	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorBlue)
-	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorBlue)
 
-	// Colspan 2 + 3 + 1.
+	// Rowspan 1, 2, 3, 1, 1.
+	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorRed)
 	drawCell(fontBold, 2, creator.ColorWhite, creator.ColorRed)
 	drawCell(fontBold, 3, creator.ColorWhite, creator.ColorRed)
 	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorRed)
 	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorRed)
-	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorRed)
-	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorRed)
+
+	// Rowspan 1
+	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorGreen)
+	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorGreen)
+	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorGreen)
+
+	// Rowspan 1
+	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorYellow)
+	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorYellow)
+	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorYellow)
+	drawCell(fontBold, 1, creator.ColorWhite, creator.ColorYellow)
 
 	ch.Add(table)
 	// Draw chapter.
