@@ -15,7 +15,6 @@ import (
 	"fmt"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core/security"
-	"io/fs"
 	"io/ioutil"
 	"log"
 	"math/big"
@@ -102,7 +101,7 @@ func main() {
 	}
 
 	// Write the resulting file to output.pdf file.
-	err = ioutil.WriteFile(outputPath, buf, fs.ModePerm)
+	err = ioutil.WriteFile(outputPath, buf, 0666)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
