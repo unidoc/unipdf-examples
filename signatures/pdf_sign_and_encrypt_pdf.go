@@ -13,9 +13,8 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core/security"
-
-	//"github.com/unidoc/unipdf/v3/common/license"
 	"io/fs"
 	"io/ioutil"
 	"log"
@@ -29,14 +28,14 @@ import (
 	"github.com/unidoc/unipdf/v3/model/sighandler"
 )
 
-//func init() {
-//	//Make sure to load your metered License API key prior to using the library.
-//	//If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
-//	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
-//	if err != nil {
-//		panic(err)
-//	}
-//}
+func init() {
+	//Make sure to load your metered License API key prior to using the library.
+	//If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	args := os.Args
