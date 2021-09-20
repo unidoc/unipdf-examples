@@ -2,7 +2,7 @@
  * This example showcases how to append a new page with signature to a PDF document.
  * The file is signed using a private/public key pair.
  *
- * $ ./pdf_sign_new_page <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
+ * $ ./pdf_sign_twice_visible_annotation <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
 package main
 
@@ -39,7 +39,7 @@ func init() {
 func main() {
 	args := os.Args
 	if len(args) < 3 {
-		log.Fatalln("Usage: go run pdf_sign_new_page INPUT_PDF_PATH OUTPUT_PDF_PATH")
+		log.Fatalln("Usage: go run pdf_sign_twice_visible_annotation INPUT_PDF_PATH OUTPUT_PDF_PATH")
 	}
 
 	inputPath := args[1]
