@@ -13,13 +13,13 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
-	"github.com/unidoc/unipdf/v3/common/license"
-	"io/fs"
 	"io/ioutil"
 	"log"
 	"math/big"
 	"os"
 	"time"
+
+	"github.com/unidoc/unipdf/v3/common/license"
 
 	"github.com/unidoc/unipdf/v3/annotator"
 	"github.com/unidoc/unipdf/v3/core"
@@ -76,7 +76,7 @@ func main() {
 	}
 
 	// Write the resulting file to output.pdf file.
-	err = ioutil.WriteFile(outputPath, buf, fs.ModePerm)
+	err = ioutil.WriteFile(outputPath, buf, 0666)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
