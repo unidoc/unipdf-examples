@@ -84,7 +84,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-	defer imgFile.Close()
+	defer wImgFile.Close()
 
 	signatureWImage, _, err := image.Decode(wImgFile)
 	if err != nil {
