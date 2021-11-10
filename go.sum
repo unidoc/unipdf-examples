@@ -1,5 +1,7 @@
 github.com/ThalesIgnite/crypto11 v1.2.4 h1:3MebRK/U0mA2SmSthXAIZAdUA9w8+ZuKem2O6HuR1f8=
 github.com/ThalesIgnite/crypto11 v1.2.4/go.mod h1:ILDKtnCKiQ7zRoNxcp36Y1ZR8LBPmR2E23+wTQe/MlE=
+github.com/abdullahdiaa/garabic v0.0.0-20210618210345-00e1a0d4b691 h1:e8ZORu5eptsbphMOWc5QRADId08Lel6orGBfq5FnJ2s=
+github.com/abdullahdiaa/garabic v0.0.0-20210618210345-00e1a0d4b691/go.mod h1:JCJzUt3LLb+rVN+4v7lIBkXp+zmpt9Lz8HmeKjluEjY=
 github.com/adrg/strutil v0.1.0/go.mod h1:pXRr2+IyX5AEPAF5icj/EeTaiflPSD2hvGjnguilZgE=
 github.com/adrg/strutil v0.2.2/go.mod h1:EF2fjOFlGTepljfI+FzgTG13oXthR7ZAil9/aginnNQ=
 github.com/adrg/strutil v0.2.3 h1:WZVn3ItPBovFmP4wMHHVXUr8luRaHrbyIuLlHt32GZQ=
