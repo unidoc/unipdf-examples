@@ -43,8 +43,8 @@ func main() {
 	// we need to use external library for shaping arabic text
 	// in this example, we use: https://github.com/AbdullahDiaa/garabic.
 
-	textBismillah := `بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ`
-	par := c.NewParagraph(arabic.Shape(textBismillah))
+	textTitle := `كتابة مثال عربي`
+	par := c.NewParagraph(arabic.Shape(textTitle))
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentCenter)
@@ -61,8 +61,8 @@ func main() {
 		fmt.Println(err)
 	}
 
-	textSurahAlIkhlas := `قُلْ هُوَ اللّٰهُ اَحَدٌۚ - ١`
-	par = c.NewParagraph(arabic.Shape(textSurahAlIkhlas))
+	textArabic := `هذه فقرة بسيطة جدا`
+	par = c.NewParagraph(arabic.Shape(textArabic))
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -72,7 +72,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	par = c.NewParagraph("1. Say, ˹O Prophet,˺ “He is Allah—One ˹and Indivisible˺;")
+	par = c.NewParagraph("This is a pretty simple paragraph")
 	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
@@ -80,8 +80,8 @@ func main() {
 		fmt.Println(err)
 	}
 
-	textSurahAlIkhlas = `اَللّٰهُ الصَّمَدُۚ - ٢`
-	par = c.NewParagraph(arabic.Shape(textSurahAlIkhlas))
+	textArabic = `يبدو ، نضيف المزيد من الفقرة هنا`
+	par = c.NewParagraph(arabic.Shape(textArabic))
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -91,7 +91,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	par = c.NewParagraph("2. Allah—the Sustainer ˹needed by all˺.")
+	par = c.NewParagraph("Looks, we adding more paragraph here")
 	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
@@ -99,8 +99,8 @@ func main() {
 		fmt.Println(err)
 	}
 
-	textSurahAlIkhlas = `لَمْ يَلِدْ وَلَمْ يُوْلَدْۙ - ٣`
-	par = c.NewParagraph(arabic.Shape(textSurahAlIkhlas))
+	textArabic = `دعنا نحاول إضافة الرقم 300 و 500`
+	par = c.NewParagraph(arabic.Shape(textArabic))
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -110,7 +110,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	par = c.NewParagraph("3. He has never had offspring, nor was He born.")
+	par = c.NewParagraph("Let's try to adding number 300 and 500")
 	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
@@ -118,8 +118,8 @@ func main() {
 		fmt.Println(err)
 	}
 
-	textSurahAlIkhlas = `وَلَمْ يَكُنْ لَّهٗ كُفُوًا اَحَدٌ ࣖ - ٤`
-	par = c.NewParagraph(arabic.Shape(textSurahAlIkhlas))
+	textArabic = `ماذا لو أضفنا المزيد من الفقرات؟`
+	par = c.NewParagraph(arabic.Shape(textArabic))
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -129,7 +129,7 @@ func main() {
 		fmt.Println(err)
 	}
 
-	par = c.NewParagraph("4. And there is none comparable to Him.”")
+	par = c.NewParagraph("How about we add more paragraphs?")
 	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
@@ -138,7 +138,7 @@ func main() {
 	}
 
 	// Make sure to check error.
-	err = c.WriteToFile("arabic-surah-al-ikhlas.pdf")
+	err = c.WriteToFile("arabic-text.pdf")
 	if err != nil {
 		panic(err)
 	}
