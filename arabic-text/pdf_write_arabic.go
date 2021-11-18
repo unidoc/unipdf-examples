@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
@@ -25,6 +26,7 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelInfo))
 }
 
 func main() {
@@ -61,11 +63,11 @@ func main() {
 		fmt.Println(err)
 	}
 
-	textArabic := `هذه فقرة بسيطة جدا`
+	textArabic := `أم بينما الأعمال بلا, هذا غينيا يعادل اعتداء تم, هو شيء مقاطعة وبولندا. قد لان ووصف التبرعات, أي مكن هُزم الشّعبين, بها أعلنت يتسنّى ا و. من دنو إبّان الأوضاع ولاتّساع. حيث وأزيز وتتحمّل وباستثناء عن, حيث أي وانهاء التّحول. ولم أسيا الساحة أي, وتنصيب اتفاقية ألمانيا تحت أم.`
 	par = c.NewParagraph(arabic.Shape(textArabic))
+	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
-	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
 	if err != nil {
@@ -73,6 +75,22 @@ func main() {
 	}
 
 	par = c.NewParagraph("This is a pretty simple paragraph")
+	par.SetTextAlignment(creator.TextAlignmentRight)
+	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
+	err = c.Draw(par)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	par = c.NewParagraph("LTR: Looks, we adding more simple paragraph here lets try to write it, how it looks like. Is it good? How about we add more word here")
+	par.SetTextAlignment(creator.TextAlignmentRight)
+	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
+	err = c.Draw(par)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	par = c.NewParagraph("RTL: Looks, we adding more simple paragraph here lets try to write it, how it looks like. Is it good? How about we add more word here")
 	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
@@ -99,18 +117,10 @@ func main() {
 		fmt.Println(err)
 	}
 
-	textArabic = `دعنا نحاول إضافة الرقم 300 و 500`
+	textArabic = `عرض عن الشرق، وتتحمّل الموسوعة. بحق ترتيب الساحة اسبوعين تم, عل لإعادة يتعلّق بها, ومن إذ أفاق وباءت العظمى. زهاء فمرّ فهرست لم عدد, مع عرض حالية إبّان مشاركة. على عل وترك حالية جزيرتي, جعل وسوء الحكم للجزر هو. وبعد إحتار تكتيكاً أم مكن, جنوب المضي عسكرياً أخر بل, و كلا فبعد الشهير اليميني.`
 	par = c.NewParagraph(arabic.Shape(textArabic))
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
-	par.SetTextAlignment(creator.TextAlignmentRight)
-	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
-	err = c.Draw(par)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	par = c.NewParagraph("Let's try to adding number 300 and 500")
 	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
@@ -131,6 +141,16 @@ func main() {
 
 	par = c.NewParagraph("How about we add more paragraphs?")
 	par.SetTextAlignment(creator.TextAlignmentRight)
+	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
+	err = c.Draw(par)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	textMixed := fmt.Sprintf("The names of these states in Arabic are %s and %s respectively. Add another word here, should be in new line.", arabic.Shape("مصر, البحري"), arabic.Shape("الكويت"))
+	par = c.NewParagraph(textMixed)
+	par.SetFont(arabicFont)
+	par.SetFontSize(fontSize)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
 	if err != nil {
