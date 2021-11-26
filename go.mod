@@ -2,6 +2,7 @@ module github.com/unidoc/unidoc-examples
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
+	github.com/abdullahdiaa/garabic v0.0.0-20210618210345-00e1a0d4b691 // indirect
 	github.com/adrg/strutil v0.2.3 // indirect
 	github.com/adrg/sysfont v0.1.2 // indirect
 	github.com/adrg/xdg v0.3.3 // indirect
