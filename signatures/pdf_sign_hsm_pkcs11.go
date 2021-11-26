@@ -82,7 +82,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-	defer crypto11.Close()
+	defer func() {
+		crypto11.Close()
+	}()
 
 	switch action {
 	case "add":

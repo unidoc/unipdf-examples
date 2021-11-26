@@ -93,7 +93,9 @@ func main() {
 	}
 	compDir := makeUniqueDir(outputDir)
 	fmt.Fprintf(os.Stderr, "compDir=%#q\n", compDir)
-	defer removeDir(compDir)
+	defer func() {
+		removeDir(compDir)
+	}()
 
 	writers := []io.Writer{os.Stderr}
 	if len(results) > 0 {
@@ -101,7 +103,9 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		defer f.Close()
+		defer func() {
+			f.Close()
+		}()
 		writers = append(writers, f)
 	}
 

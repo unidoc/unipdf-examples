@@ -126,13 +126,17 @@ func main() {
 			fmt.Printf("Error: %v\n", err)
 			os.Exit(1)
 		}
-		defer f.Close()
+		defer func() {
+			f.Close()
+		}()
 		err = pprof.StartCPUProfile(f)
 		if err != nil {
 			fmt.Printf("Error: %v\n", err)
 			os.Exit(1)
 		}
-		defer pprof.StopCPUProfile()
+		defer func() {
+			pprof.StopCPUProfile()
+		}()
 	}
 
 	fmt.Printf("With GS validation: %t\n", params.gsValidation)

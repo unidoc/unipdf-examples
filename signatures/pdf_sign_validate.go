@@ -29,7 +29,9 @@ func main() {
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
 	}
-	defer file.Close()
+	defer func() {
+		file.Close()
+	}()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {

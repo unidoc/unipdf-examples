@@ -40,7 +40,9 @@ func main() {
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
 	}
-	defer inputFile.Close()
+	defer func() {
+		inputFile.Close()
+	}()
 
 	reader, err := model.NewPdfReader(inputFile)
 	if err != nil {
@@ -87,7 +89,9 @@ func main() {
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
 	}
-	defer outputFile.Close()
+	defer func() {
+		outputFile.Close()
+	}()
 
 	// Write output file.
 	err = writer.Write(outputFile)
