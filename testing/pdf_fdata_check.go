@@ -10,7 +10,7 @@ import (
 func init() {
 	// Make sure to load your metered License API key prior to using the library.
 	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
-	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`)) //license.SetMeteredKey("08fddff07958eaa43970d606bcda148243769221cb3e160bd1e24b2460e3ced4")
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
 	}
