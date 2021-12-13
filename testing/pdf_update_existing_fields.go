@@ -107,6 +107,7 @@ func updatePdfFields(inputPath, outputPath string) error { //
 		objectString := core.MakeString(name.Name)
 		field.T = objectString
 		field.SetFlag(name.Flag)
+		fmt.Println(field.Annotations[0].C)
 		font, err := model.NewStandard14Font(name.Font)
 		if err != nil {
 			return err
