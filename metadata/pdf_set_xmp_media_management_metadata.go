@@ -24,7 +24,7 @@ func init() {
 func main() {
 	args := os.Args
 	if len(args) < 3 {
-		fmt.Printf(usage, os.Args[0])
+		fmt.Printf( "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH\n", os.Args[0])
 		return
 	}
 	inputPath := args[1]
