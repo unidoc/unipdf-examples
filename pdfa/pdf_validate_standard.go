@@ -29,7 +29,7 @@ func init() {
 func main() {
 	args := os.Args
 	if len(args) < 2 {
-		fmt.Printf(usage, os.Args[0])
+		fmt.Printf("Usage: %s INPUT_PDF_PATH", os.Args[0])
 		return
 	}
 	inputPath := args[1]
