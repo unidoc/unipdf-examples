@@ -111,7 +111,7 @@ func main() {
 	if len(mm.Versions) > 0 {
 		fmt.Println("Versions:")
 		for _, v := range mm.Versions {
-			fmt.Printf("\t%+v,\n", v)
+			fmt.Printf("\t%#v,\n", v)
 		}
 	}
 }

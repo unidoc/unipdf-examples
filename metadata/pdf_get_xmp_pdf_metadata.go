@@ -82,7 +82,7 @@ func main() {
 			log.Fatalf("Err: %v", err)
 		}
 
-		fmt.Printf("InfoDict: %+v", infoDict)
+		fmt.Printf("InfoDict: %#v\n", infoDict)
 	}
 
 	if pdfInfoMetadata.PdfVersion != "" {
