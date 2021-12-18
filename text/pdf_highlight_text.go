@@ -1,7 +1,7 @@
 /*
- * Highlight text: Hightlight target texts in side the PDF file.
+ * Highlight text: Hightlight target texts inside the PDF file.
  *
- * Run as: go run pdf_text_locations.go file.pdf term
+ * Run as: go run pdf_highlight_text.go inputFile.pdf outputFile.pdf term
  */
 
 package main
