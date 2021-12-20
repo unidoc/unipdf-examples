@@ -1,5 +1,5 @@
 /*
- * Highlight text: Hightlight target texts inside the PDF file.
+ * Highlight text: High light target texts inside the Pdf file.
  *
  * Run as: go run pdf_highlight_text.go inputFile.pdf outputFile.pdf term
  */
@@ -10,20 +10,22 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/extractor"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-func init() {
-	err := license.SetMeteredKey(`put your license key here`)
-	if err != nil {
-		panic(err)
-	}
-}
 func main() {
+	// Make sure to enter a valid license key.
+	// Otherwise the code will exit with a panic error.
+	// License keys are available via: https://unidoc.io
+	/*
+			license.SetLicenseKey(`
+		-----BEGIN UNIDOC LICENSE KEY-----
+		...key contents...
+		-----END UNIDOC LICENSE KEY-----
+		`)
+	*/
 	if len(os.Args) < 4 {
 		fmt.Printf("Usage: go run pdf_highlight_text.go <input.pdf> <output.pdf> <term> \n")
 		os.Exit(0)
@@ -32,14 +34,16 @@ func main() {
 	outputPath := os.Args[2]
 	term := os.Args[3]
 
-	err := hightlightWords(inputPath, outputPath, term)
+	err := highlightWords(inputPath, outputPath, term)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Successfully highlighted the word %s and created %s\n", term, outputPath)
 }
+
+// getBoundingBoxes returns the bounding boxes of all instances of search`term` in the Pdf file.
 func getBoundingBoxes(page *model.PdfPage, term string) ([]*model.PdfRectangle, error) {
-	boundingBox := []*model.PdfRectangle{}
+	boundingBoxes := []*model.PdfRectangle{}
 	ex, _ := extractor.New(page)
 	pageText, _, _, err := ex.ExtractPageText()
 	if err != nil {
@@ -61,11 +65,13 @@ func getBoundingBoxes(page *model.PdfPage, term string) ([]*model.PdfRectangle, 
 		if !ok {
 			return nil, fmt.Errorf("spanMarks.BBox has no bounding box. spanMarks=%s", spanMarks)
 		}
-		boundingBox = append(boundingBox, &bbox)
+		boundingBoxes = append(boundingBoxes, &bbox)
 	}
-	return boundingBox, nil
+	return boundingBoxes, nil
 
 }
+
+// indexAllSubstrings gets the begning indexes where `term` occures inside `text`.
 func indexAllSubstrings(text, term string) []int {
 	if len(term) == 0 {
 		return nil
@@ -81,7 +87,9 @@ func indexAllSubstrings(text, term string) []int {
 	}
 	return indexes
 }
-func hightlightWords(inputPath, outputPath, term string) error {
+
+// highlightWords highlights all occurrences of the search term.
+func highlightWords(inputPath, outputPath, term string) error {
 	reader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		panic(err)
