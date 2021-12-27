@@ -1,27 +1,34 @@
 package main
 
-//func init() {
-//	// Make sure to load your metered License API key prior to using the library.
-//	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
-//	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
-//	if err != nil {
-//		panic(err)
-//	}
-//}
-//
-//func main() {
-//	if len(os.Args) < 3 {
-//		fmt.Printf("Syntax: go run pdf_update_existing_fields.go sample_form.pdf sample_form2.pdf\n")
-//	}
-//	inputPath := os.Args[1]
-//	outputPath := os.Args[2]
-//
-//	err := updatePdfFields(inputPath, outputPath) //
-//	if err != nil {
-//		fmt.Printf("Error: %v\n", err)
-//		os.Exit(1)
-//	}
-//}
+import (
+	"fmt"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"os"
+)
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
+
+func main() {
+	if len(os.Args) < 3 {
+		fmt.Printf("Syntax: go run pdf_update_existing_fields.go sample_form.pdf sample_form2.pdf\n")
+	}
+	//inputPath := os.Args[1]
+	//outputPath := os.Args[2]
+
+	//err := updatePdfFields(inputPath, outputPath) //
+	//if err != nil {
+	//	fmt.Printf("Error: %v\n", err)
+	//	os.Exit(1)
+	//}
+}
+
 //
 //type NewData struct {
 //	NewName  string
