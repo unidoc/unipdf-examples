@@ -21,7 +21,7 @@ func init() {
 
 func main() {
 	if len(os.Args) < 4 {
-		fmt.Printf("Syntax: go run pdf_update_existing_fields.go sample_form.pdf sample_form2.pdf formdata.json\n")
+		fmt.Printf("Syntax: go run pdf_update_fields.go sample_form.pdf sample_form2.pdf formdata.json\n")
 	}
 	inputPath := os.Args[1]
 	outputPath := os.Args[2]
@@ -41,6 +41,7 @@ type NewUpdatedData struct {
 	FontSize int
 }
 
+// NewNames represent the new names, Flags to be included, font and font size for the fields of the outputPath from the inputPath.
 var NewNames = map[string]NewUpdatedData{
 	"name3[first]":         {"firstName", model.FieldFlagMultiline, model.HelveticaBoldObliqueName, 16},
 	"name3[last]":          {"lastName", model.FieldFlagMultiline, model.TimesItalicName, 12},
@@ -53,6 +54,8 @@ var NewNames = map[string]NewUpdatedData{
 	"fakeSubmitButton":     {"buttonText", model.FieldFlagDoNotScroll, model.ZapfDingbatsName, 12},
 }
 
+// updateExistingPdfFields The function loads field data from `fileJson` and used to fill in form data in `inputPath` and outputs
+// with new field names, flags, font and font size extracted from the NewNames Global Variable.
 func updateExistingPdfFields(inputPath, outputPath, fileJson string) error { //
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -74,7 +77,8 @@ func updateExistingPdfFields(inputPath, outputPath, fileJson string) error { //
 			field.T = objectString
 		}
 	}
-	fdata, err := fjson.LoadFromJSONFile(fileJson)
+	// We Extract Fields Data from the fileJson Path.
+	fieldsData, err := fjson.LoadFromJSONFile(fileJson)
 	if err != nil {
 		return err
 	}
@@ -106,12 +110,12 @@ func updateExistingPdfFields(inputPath, outputPath, fileJson string) error { //
 	}
 	fieldAppearance.SetStyle(style)
 
-	err = acroForm.FillWithAppearance(fdata, fieldAppearance)
+	err = acroForm.FillWithAppearance(fieldsData, fieldAppearance)
 	if err != nil {
 		return err
 	}
 
-	//	// You can comment to not Flatten if you don't need it.
+	// You can comment to not Flatten if you don't need it.
 	//	err = pdfReader.FlattenFields(true, fieldAppearance)
 	//	if err != nil {
 	//		return err
