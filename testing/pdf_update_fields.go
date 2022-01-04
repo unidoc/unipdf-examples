@@ -8,6 +8,7 @@ import (
 	"github.com/unidoc/unipdf/v3/fjson"
 	"github.com/unidoc/unipdf/v3/model"
 	"os"
+	"strconv"
 )
 
 func init() {
@@ -39,19 +40,20 @@ type NewUpdatedData struct {
 	Flag     model.FieldFlag
 	Font     model.StdFontName
 	FontSize int
+	Color    string
 }
 
 // NewNames represent the new names, Flags to be included, font and font size for the fields of the outputPath from the inputPath.
 var NewNames = map[string]NewUpdatedData{
-	"name3[first]":         {"firstName", model.FieldFlagMultiline, model.HelveticaBoldObliqueName, 16},
-	"name3[last]":          {"lastName", model.FieldFlagMultiline, model.TimesItalicName, 12},
-	"email4":               {"email", model.FieldFlagMultiline, model.TimesBoldItalicName, 28},
-	"address5[addr_line1]": {"addressL1", model.FieldFlagMultiline, model.CourierName, 10},
-	"address5[addr_line2]": {"addressL2", model.FieldFlagMultiline, model.CourierBoldObliqueName, 8},
-	"address5[city]":       {"addressCity", model.FieldFlagMultiline, model.CourierBoldName, 14},
-	"address5[state]":      {"addressState", model.FieldFlagMultiline, model.HelveticaBoldObliqueName, 16},
-	"address5[postal]":     {"addressPostal", model.FieldFlagMultiline, model.HelveticaObliqueName, 14},
-	"fakeSubmitButton":     {"buttonText", model.FieldFlagDoNotScroll, model.ZapfDingbatsName, 12},
+	"name3[first]":         {"firstName", model.FieldFlagMultiline, model.HelveticaBoldObliqueName, 16, "0.000 g"},
+	"name3[last]":          {"lastName", model.FieldFlagMultiline, model.TimesItalicName, 12, "1.000 1.000 1.000 rg"},
+	"email4":               {"email", model.FieldFlagMultiline, model.TimesBoldItalicName, 28, "0.000 g"},
+	"address5[addr_line1]": {"addressL1", model.FieldFlagMultiline, model.CourierName, 10, "0.300 0.400 0.900 rg"},
+	"address5[addr_line2]": {"addressL2", model.FieldFlagMultiline, model.CourierBoldObliqueName, 8, "0.300 0.400 0.900 rg"},
+	"address5[city]":       {"addressCity", model.FieldFlagMultiline, model.CourierBoldName, 14, "0.300 0.400 0.900 rg"},
+	"address5[state]":      {"addressState", model.FieldFlagMultiline, model.HelveticaBoldObliqueName, 16, "0.000 g"},
+	"address5[postal]":     {"addressPostal", model.FieldFlagMultiline, model.HelveticaObliqueName, 14, "1.000 1.000 1.000 rg"},
+	"fakeSubmitButton":     {"buttonText", model.FieldFlagDoNotScroll, model.ZapfDingbatsName, 12, "0.000 g"},
 }
 
 // updateExistingPdfFields The function loads field data from `fileJson` and used to fill in form data in `inputPath` and outputs
@@ -67,7 +69,12 @@ func updateExistingPdfFields(inputPath, outputPath, fileJson string) error { //
 		return err
 	}
 	acroForm := pdfReader.AcroForm
-
+	variableTextDAs := make(map[string]string)
+	for _, v := range NewNames {
+		newFont := model.NewStandard14FontMustCompile(v.Font)
+		acroForm.DR.SetFontByName(*core.MakeName(newFont.BaseFont()), newFont.ToPdfObject())
+		variableTextDAs[v.Name] = "/" + newFont.BaseFont() + " " + strconv.Itoa(v.FontSize) + " " + " Tf " + v.Color
+	}
 	fields := acroForm.AllFields()
 	for _, field := range fields {
 		if v, ok := NewNames[field.T.String()]; ok {
@@ -75,6 +82,22 @@ func updateExistingPdfFields(inputPath, outputPath, fileJson string) error { //
 			field.SetFlag(v.Flag)
 			objectString := core.MakeString(name)
 			field.T = objectString
+			l := model.PdfFieldText{
+				PdfField: field,
+				DA:       core.MakeString(variableTextDAs[name]),
+				Q:        field.VariableText.Q,
+				DS:       field.VariableText.DS,
+				RV:       field.VariableText.RV,
+				MaxLen:   nil,
+			}
+			l2 := model.VariableText{
+				DA: core.MakeString(variableTextDAs[name]),
+				Q:  field.VariableText.Q,
+				DS: field.VariableText.DS,
+				RV: field.VariableText.RV,
+			}
+			field.SetContext(&l)
+			field.VariableText = &l2
 		}
 	}
 	// We Extract Fields Data from the fileJson Path.
@@ -83,7 +106,7 @@ func updateExistingPdfFields(inputPath, outputPath, fileJson string) error { //
 		return err
 	}
 	fieldFallBacks := make(map[string]*annotator.AppearanceFont)
-	fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: true, RegenerateTextFields: true}
+	fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: false, RegenerateTextFields: true}
 	for _, v := range NewNames {
 		font, err := model.NewStandard14Font(v.Font)
 		if err != nil {
