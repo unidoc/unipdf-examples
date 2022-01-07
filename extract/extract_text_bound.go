@@ -49,7 +49,7 @@ var pageDataList []*PageData
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("Syntax: extract_text_bound <file.pdf>\n")
+		fmt.Printf("Syntax: go run extract_text_bound.go testing.pdf\n")
 		os.Exit(1)
 	}
 
@@ -143,11 +143,11 @@ func extractWordsDataOnPage(pdfReader *model.PdfReader, pageNumber int) error {
 			curMarkArray.Elements()[curMarkArray.Len()-1].BBox.Lly > textMark.BBox.Lly {
 			// If current char is at a new line then the word is splitted into multiple line
 			// store each part data separately.
+			curMarkArray.Append(textMark)
 			if trackingWord {
 				trackingWord = false
 				textMarkArrays = append(textMarkArrays, curMarkArray)
 				curMarkArray = new(extractor.TextMarkArray)
-				curMarkArray.Append(textMark)
 			}
 		} else {
 			if !trackingWord {
