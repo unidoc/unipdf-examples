@@ -110,7 +110,7 @@ func retrievePreviousRevision(reader *model.PdfReader, outputPath string) error 
 }
 
 func retrieveSpecificRevision(reader *model.PdfReader, revisionNumber int, outputPath string) error {
-	prevReader, err := reader.GetReader(revisionNumber)
+	prevReader, err := reader.GetRevision(revisionNumber)
 	if err != nil {
 		return err
 	}
