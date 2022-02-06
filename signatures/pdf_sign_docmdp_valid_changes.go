@@ -23,7 +23,7 @@ import (
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
-	"github.com/unidoc/unipdf/v3/model/diffpolicy"
+	"github.com/unidoc/unipdf/v3/model/mdp"
 	"github.com/unidoc/unipdf/v3/model/sighandler"
 )
 
@@ -171,7 +171,7 @@ func addSignature(reader *model.PdfReader, pageNum int, outputPath string) ([]by
 		return nil, err
 	}
 
-	handler, err := sighandler.NewDocMDPHandler(inner_handler, diffpolicy.FillingFormsAndAnnotations)
+	handler, err := sighandler.NewDocMDPHandler(inner_handler, mdp.FillFormsAndAnnots)
 	if err != nil {
 		return nil, err
 	}
