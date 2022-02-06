@@ -74,7 +74,7 @@ func flattenPdf(inputPath, outputPath string) error {
 	}
 
 	fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: true}
-	err = pdfReader.FlattenFields(false, fieldAppearance)
+	err = pdfReader.FlattenFields(true, fieldAppearance)
 	if err != nil {
 		return err
 	}
