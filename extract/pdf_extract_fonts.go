@@ -60,21 +60,21 @@ func extractFontToArchive(inputPath string, outputPath string) error {
 		pdfExtractor, err := extractor.New(page)
 		lFont, err := pdfExtractor.ExtractPageFonts()
 		for _, f := range lFont.Fonts {
-			if !InsideBag(afont, f.FontName) { //Check Duplicate Font from other Page
-				if f.FontDescriptor.FontFile2 != nil { //Check TTF File
-					fname := f.FontName + ".ttf"
-					zipFile, err := zipw.Create(fname)
-					if err != nil {
-						return err
-					}
-					_, err = zipFile.Write(f.TTFFile)
-					if err != nil {
-						return err
-					}
-				}
-				afont = append(afont, f.FontName)
-				fmt.Printf("Font Name : %s , Type : %s , Encoding : %s\n", f.FontName, f.Type, f.Encoding)
+			if InsideBag(afont, f.FontName) { //Check Duplicate Font from other Page
+				continue
 			}
+			if f.FontFileName != "" {
+				zipFile, err := zipw.Create(f.FontFileName)
+				if err != nil {
+					return err
+				}
+				_, err = zipFile.Write(f.FontData)
+				if err != nil {
+					return err
+				}
+			}
+			afont = append(afont, f.FontName)
+			fmt.Printf("Font Name \t: %s\nType \t\t: %s\nEncoding \t: %v\nIsCID\t\t: %t\nIsSimple\t: %t\nToUnicode\t: %t\n  \n\n", f.FontName, f.FontType, f.PdfFont.Encoder().String(), f.IsCID, f.IsSimple, f.ToUnicode)
 		}
 
 		if err != nil {
@@ -88,6 +88,7 @@ func extractFontToArchive(inputPath string, outputPath string) error {
 	return nil
 }
 
+//InsideBag is for check duplicate font in every page.
 func InsideBag(afont []string, s string) bool {
 	for _, v := range afont {
 		if v == s {
