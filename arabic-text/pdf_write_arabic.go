@@ -17,6 +17,7 @@ import (
 	"github.com/unidoc/unipdf/v3/model"
 
 	arabic "github.com/abdullahdiaa/garabic"
+	"golang.org/x/text/unicode/bidi"
 )
 
 func init() {
@@ -157,6 +158,114 @@ func main() {
 		fmt.Println(err)
 	}
 
+	textArabic = `ما فائدته ؟`
+	par = c.NewParagraph(arabic.Shape(textArabic))
+	par.SetFont(arabicFont)
+	par.SetFontSize(fontSize)
+	par.SetTextAlignment(creator.TextAlignmentRight)
+	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
+	err = c.Draw(par)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	textArabic = `هناك حقيقة مثبتة منذ زمن طويل وهي أن المحتوى المقروء لصفحة ما سيلهي القارئ عن التركيز على الشكل الخارجي للنص أو شكل توضع الفقرات في الصفحة التي يقرأها. ولذلك يتم استخدام طريقة لوريم إيبسوم لأنها تعطي توزيعاَ طبيعياَ -إلى حد ما- للأحرف عوضاً عن استخدام "هنا يوجد محتوى نصي، هنا يوجد محتوى نصي" فتجعلها تبدو (أي الأحرف) وكأنها نص مقروء. العديد من برامح النشر المكتبي وبرامح تحرير صفحات الويب تستخدم لوريم إيبسوم بشكل إفتراضي كنموذج عن النص، وإذا قمت بإدخال "lorem ipsum" في أي محرك بحث ستظهر العديد من المواقع الحديثة العهد في نتائج البحث. على مدى السنين ظهرت نسخ جديدة ومختلفة من نص لوريم إيبسوم، أحياناً عن طريق الصدفة، وأحياناً عن عمد كإدخال بعض العبارات الفكاهية إليها.؟`
+	par = c.NewParagraph(arabic.Shape(textArabic))
+	par.SetFont(arabicFont)
+	par.SetFontSize(fontSize)
+	par.SetTextAlignment(creator.TextAlignmentRight)
+	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
+	err = c.Draw(par)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	textArabic = `أين أجده ؟`
+	par = c.NewParagraph(arabic.Shape(textArabic))
+	par.SetFont(arabicFont)
+	par.SetFontSize(fontSize)
+	par.SetTextAlignment(creator.TextAlignmentRight)
+	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
+	err = c.Draw(par)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	textArabic = `هنالك العديد من الأنواع المتوفرة لنصوص لوريم إيبسوم، ولكن الغالبية تم تعديلها بشكل ما عبر إدخال بعض النوادر أو الكلمات العشوائية إلى النص. إن كنت تريد أن تستخدم نص لوريم إيبسوم ما، عليك أن تتحقق أولاً أن ليس هناك أي كلمات أو عبارات محرجة أو غير لائقة مخبأة في هذا النص. بينما تعمل جميع مولّدات نصوص لوريم إيبسوم على الإنترنت على إعادة تكرار مقاطع من نص لوريم إيبسوم نفسه عدة مرات بما تتطلبه الحاجة، يقوم مولّدنا هذا باستخدام كلمات من قاموس يحوي على أكثر من 200 كلمة لا تينية، مضاف إليها مجموعة من الجمل النموذجية، لتكوين نص لوريم إيبسوم ذو شكل منطقي قريب إلى النص الحقيقي. وبالتالي يكون النص الناتح خالي من التكرار، أو أي كلمات أو عبارات غير لائقة أو ما شابه. وهذا ما يجعله أول مولّد نص لوريم إيبسوم حقيقي على الإنترنت.`
+	par = c.NewParagraph(arabic.Shape(textArabic))
+	par.SetFont(arabicFont)
+	par.SetFontSize(fontSize)
+	par.SetTextAlignment(creator.TextAlignmentRight)
+	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
+	err = c.Draw(par)
+	if err != nil {
+		fmt.Println(err)
+	}
+	shaped := arabic.Shape(textArabic)
+	fmt.Println("----")
+	fmt.Println(arabic.Shape(textArabic))
+	runes := []rune(shaped)
+	for i, r := range runes {
+		fmt.Printf("index: %v, char: %v\n", i, string(r))
+	}
+	fmt.Println("----")
+	fmt.Println(textArabic)
+	fmt.Println(bidi.ReverseString(arabic.Shape(textArabic)))
+
+	textArabic = `عرض عن الشرق، وتتحمّل الموسوعة. بحق ترتيب الساحة اسبوعين تم, عل لإعادة يتعلّق بها, ومن إذ أفاق وباءت العظمى. زهاء فمرّ فهرست لم عدد, مع عرض حالية إبّان مشاركة. على عل وترك حالية جزيرتي, جعل وسوء الحكم للجزر هو. وبعد إحتار تكتيكاً أم مكن, جنوب المضي عسكرياً أخر بل, و كلا فبعد الشهير اليميني.`
+	par = c.NewParagraph(arabic.Shape(textArabic))
+	par.SetFont(arabicFont)
+	par.SetFontSize(fontSize)
+	par.SetTextAlignment(creator.TextAlignmentRight)
+	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
+	err = c.Draw(par)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	textArabic = `أثره، كُلفة الحدود من هذا, مئات بمعارضة الإحتفاظ أسر هو. دول أي أملاً بتخصيص, بل وبدأت والفلبين البولندي بحث. وصل بحشد قِبل والديون كل, ان كلا وإيطالي ايطاليا، الأوربيين, أي الأرواح والكساد الخارجية على. حين الأمم ويعزى التاريخ، أي, أم قام أراضي الشرقي ليرتفع.`
+	par = c.NewParagraph(arabic.Shape(textArabic))
+	par.SetFont(arabicFont)
+	par.SetFontSize(fontSize)
+	par.SetTextAlignment(creator.TextAlignmentRight)
+	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
+	err = c.Draw(par)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	textArabic = `فقد ثم إعمار لبلجيكا،, وحرمان الأوروبية ثم على, ميناء الولايات بل قام. إذ كانت بداية النفط أما, اتّجة الخطّة تزامناً تم إيو. لم وتنصيب المنتصر أوراقهم هذه. أم مدن لدحر طوكيو الأسيوي. أم أما السبب العناد الإتفاقية, أملاً والقرى الشهيرة بعد أم. أي لكون الستار الولايات بال, تم بلاده قتيل، فعل. على الشتاء واتّجه الهادي و.`
+	par = c.NewParagraph(arabic.Shape(textArabic))
+	par.SetFont(arabicFont)
+	par.SetFontSize(fontSize)
+	par.SetTextAlignment(creator.TextAlignmentRight)
+	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
+	err = c.Draw(par)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	textArabic = `غريمه الوزراء لم مدن, به، أن النزاع باستخدام الإتفاقية, يعادل ليتسنّى الحكومة على أي. أي تحت قررت سنغافورة, بـ وبعض الأولى هذه. شعار كنقطة والحزب لان ما, دنو من فقامت لهيمنة. الا قررت تشكيل وباستثناء أن, إذ الصين التبرعات كلا. مكن هو وتزويده لبلجيكا،, عقبت أسابيع الإكتفاء كل حتى. الشمل العمليات إذ وفي, الشرق، الإقتصادي لمّ قد.`
+	par = c.NewParagraph(arabic.Shape(arabic.RemoveHarakat(textArabic)))
+	par.SetFont(arabicFont)
+	par.SetFontSize(fontSize)
+	par.SetTextAlignment(creator.TextAlignmentRight)
+	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
+	err = c.Draw(par)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	textArabic = `هنالك العديد من الأنواع المتوفرة لنصوص لوريم إيبسوم، ولكن الغالبية تم تعديلها بشكل ما عبر إدخال بعض النوادر أو الكلمات العشوائية إلى النص. إن كنت تريد أن تستخدم نص لوريم إيبسوم ما، عليك أن تتحقق أولاً أن ليس هناك أي كلمات أو عبارات محرجة أو غير لائقة مخبأة في هذا النص. بينما تعمل جميع مولّدات نصوص لوريم إيبسوم على الإنترنت على إعادة تكرار مقاطع من نص لوريم إيبسوم نفسه عدة مرات بما تتطلبه الحاجة، يقوم مولّدنا هذا باستخدام كلمات من قاموس يحوي على أكثر من 200 كلمة لا تينية، مضاف إليها مجموعة من الجمل النموذجية، لتكوين نص لوريم إيبسوم ذو شكل منطقي قريب إلى النص الحقيقي. وبالتالي يكون النص الناتح خالي من التكرار، أو أي كلمات أو عبارات غير لائقة أو ما شابه. وهذا ما يجعله أول مولّد نص لوريم إيبسوم حقيقي على الإنترنت.`
+	par = c.NewParagraph(arabic.Shape(arabic.RemoveHarakat(textArabic)))
+	par.SetFont(arabicFont)
+	par.SetFontSize(fontSize)
+	par.SetTextAlignment(creator.TextAlignmentRight)
+	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
+	err = c.Draw(par)
+	if err != nil {
+		fmt.Println(err)
+	}
 	// Make sure to check error.
 	err = c.WriteToFile("arabic-text.pdf")
 	if err != nil {

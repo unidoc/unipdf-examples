@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/unidoc/unipdf/v3/annotator"
+	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
@@ -31,6 +32,8 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
+
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 }
 
 var now = time.Now()
@@ -165,6 +168,35 @@ func main() {
 			log.Fatalf("Fail: %v\n", err)
 		}
 	}
+
+	// Test add custom info.
+	title := "Pdf Title"
+	author := "Test Author"
+	subject := "Test Writer Doc Info"
+	keywords := "Keyword#1"
+	creator := "TestWriterDocInfo"
+	producer := "UniPdf"
+	currentTime := time.Date(2020, time.November, 6, 10, 15, 20, 0, time.UTC)
+	customInfo := "Custom Info Test"
+
+	currentPdfDate, _ := model.NewPdfDateFromTime(currentTime)
+
+	writePdfInfo := &model.PdfInfo{
+		Title:        core.MakeString(title),
+		Author:       core.MakeString(author),
+		Subject:      core.MakeString(subject),
+		Keywords:     core.MakeString(keywords),
+		Creator:      core.MakeString(creator),
+		Producer:     core.MakeString(producer),
+		CreationDate: &currentPdfDate,
+		ModifiedDate: &currentPdfDate,
+	}
+	err = writePdfInfo.AddCustomInfo("custom_info#1", customInfo)
+	if err != nil {
+		log.Fatal("Fail: %v\n", err)
+	}
+
+	appender.SetDocInfo(writePdfInfo)
 
 	// Write output PDF file.
 	err = appender.WriteToFile(outputPath)
