@@ -1,7 +1,7 @@
 /*
- * PDF to text: Extract all text for each page of a pdf file.
+ * Redact text: Redacts text that match given regexp patterns on a PDF document.
  *
- * Run as: go run pdf_extract_text.go input.pdf
+ * Run as: go run redact_text.go input.pdf output.pdf
  */
 
 package main
@@ -11,7 +11,6 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/model"
 	"github.com/unidoc/unipdf/v3/redactor"
 )
@@ -19,10 +18,10 @@ import (
 func init() {
 	// Make sure to load your metered License API key prior to using the library.
 	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
-	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
-	if err != nil {
-		panic(err)
-	}
+	// err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	// if err != nil {
+	// 	panic(err)
+	// }
 }
 
 func main() {
@@ -44,6 +43,15 @@ func main() {
 	}
 	// Replace the first matches i.e the credit cards with `*` and the emails with `#`.
 	replacements := []string{"*", "#"}
+	err := redactText(patterns, replacements, inputFile, outputFile)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("successfully redacted.")
+}
+
+// redactText redacts the text in `inputFile` according to given patterns and saves result at `outputFile`.
+func redactText(patterns, replacements []string, inputFile, outputFile string) error {
 	terms := []redactor.RedactionTerm{}
 	for i, pattern := range patterns {
 		regexp, err := regexp.Compile(pattern)
@@ -73,6 +81,7 @@ func main() {
 	// Write the redacted document to outputFile.
 	err = red.WriteToFile(outputFile)
 	if err != nil {
-		panic(err)
+		return err
 	}
+	return nil
 }
