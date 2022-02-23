@@ -15,20 +15,23 @@ import (
 	"github.com/unidoc/unipdf/v3/redactor"
 )
 
-func init() {
-	// Make sure to load your metered License API key prior to using the library.
-	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
-	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
-	if err != nil {
-		panic(err)
-	}
-}
-
 func main() {
 	if len(os.Args) < 3 {
 		fmt.Printf("Usage: go run redact_text.go inputFile.pdf outputFile.pdf \n")
 		os.Exit(1)
 	}
+
+	// Make sure to enter a valid license key.
+	// Otherwise text is truncated and a watermark added to the text.
+	// License keys are available via: https://unidoc.io
+	/*
+			license.SetLicenseKey(`
+		-----BEGIN UNIDOC LICENSE KEY-----
+		...key contents...
+		-----END UNIDOC LICENSE KEY-----
+		`)
+	*/
+
 	inputFile := os.Args[1]
 
 	outputFile := os.Args[2]
