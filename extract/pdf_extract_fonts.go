@@ -18,12 +18,15 @@ import (
 // 	}
 // }
 func main() {
-	if len(os.Args) < 3 {
-		fmt.Printf("Syntax: go run pdf_extract_fonts.go input.pdf output.zip\n")
+	var outputPath string
+	if len(os.Args) < 2 {
+		fmt.Printf("Syntax: go run extract/pdf_extract_fonts.go input.pdf output.zip\n")
 		os.Exit(1)
 	}
 	inputPath := os.Args[1]
-	outputPath := os.Args[2]
+	if len(os.Args) == 3 {
+		outputPath = os.Args[2]
+	}
 
 	err := extractFontToArchive(inputPath, outputPath)
 	if err != nil {
@@ -31,69 +34,64 @@ func main() {
 		os.Exit(1)
 	}
 }
+
+// extractFontToArchive prints out font information from pdf to stdout, can add to archive if has output path.
 func extractFontToArchive(inputPath string, outputPath string) error {
+	var (
+		pdfFont *extractor.PageFonts
+		zipFile *os.File
+		zipw    *zip.Writer
+	)
 
 	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	numPages, err := pdfReader.GetNumPages()
+	pdfPage, err := pdfReader.GetNumPages()
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-	fmt.Printf("PDF Num Pages: %d\n", numPages)
-	zipFile, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-	defer zipFile.Close()
-	zipw := zip.NewWriter(zipFile)
-	afont := []string{} //Font Bag
-
-	for i := 0; i < numPages; i++ {
-		page, err := pdfReader.GetPage(i + 1)
+	for i := 0; i < pdfPage; i++ {
+		currentPage, err := pdfReader.GetPage(i + 1)
 		if err != nil {
 			return err
 		}
-		pdfExtractor, err := extractor.New(page)
-		lFont, err := pdfExtractor.ExtractPageFonts()
-		for _, f := range lFont.Fonts {
-			if InsideBag(afont, f.FontName) { //Check Duplicate Font from other Page
-				continue
-			}
-			if f.FontFileName != "" {
-				zipFile, err := zipw.Create(f.FontFileName)
-				if err != nil {
-					return err
-				}
-				_, err = zipFile.Write(f.FontData)
-				if err != nil {
-					return err
-				}
-			}
-			afont = append(afont, f.FontName)
-			fmt.Printf("Font Name \t: %s\nType \t\t: %s\nEncoding \t: %v\nIsCID\t\t: %t\nIsSimple\t: %t\nToUnicode\t: %t\n  \n\n", f.FontName, f.FontType, f.PdfFont.Encoder().String(), f.IsCID, f.IsSimple, f.ToUnicode)
-		}
-
+		pdfExtractor, err := extractor.New(currentPage)
 		if err != nil {
 			return err
 		}
+		pdfFont, err = pdfExtractor.ExtractFonts(pdfFont)
 	}
-	err = zipw.Close()
+
+	if len(outputPath) > 0 {
+		zipFile, err = os.Create(outputPath)
+		if err != nil {
+			return err
+		}
+		zipw = zip.NewWriter(zipFile)
+	}
+
+	for _, font := range pdfFont.Fonts {
+		if len(font.FontFileName) > 0 && len(outputPath) > 0 {
+			zipFile, err := zipw.Create(font.FontFileName)
+			if err != nil {
+				return err
+			}
+			_, err = zipFile.Write(font.FontData)
+			if err != nil {
+				return err
+			}
+		}
+		fmt.Println("------------------------------")
+		fmt.Printf("Font Name \t: %s\nType \t\t: %s\nEncoding \t: %v\nIsCID\t\t: %t\nIsSimple\t: %t\nToUnicode\t: %t", font.FontFileName, font.FontType, font.PdfFont.Encoder().String(), font.IsCID, font.IsSimple, font.ToUnicode)
+		fmt.Println("\n------------------------------\n")
+	}
+	if len(outputPath) > 0 {
+		err = zipw.Close()
+	}
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-//InsideBag is for check duplicate font in every page.
-func InsideBag(afont []string, s string) bool {
-	for _, v := range afont {
-		if v == s {
-			return true
-		}
-	}
-	return false
 }
