@@ -84,7 +84,7 @@ func extractFontToArchive(inputPath string, outputPath string) error {
 			}
 		}
 		fmt.Println("------------------------------")
-		fmt.Printf("Font Name \t: %s\nType \t\t: %s\nEncoding \t: %v\nIsCID\t\t: %t\nIsSimple\t: %t\nToUnicode\t: %t", font.FontFileName, font.FontType, font.PdfFont.Encoder().String(), font.IsCID, font.IsSimple, font.ToUnicode)
+		fmt.Printf("Font Name \t: %s\nType \t\t: %s\nEncoding \t: %v\nIsCID\t\t: %t\nIsSimple\t: %t\nToUnicode\t: %t", font.FontName, font.FontType, font.PdfFont.Encoder().String(), font.IsCID, font.IsSimple, font.ToUnicode)
 		fmt.Println("\n------------------------------\n")
 	}
 	if len(outputPath) > 0 {
