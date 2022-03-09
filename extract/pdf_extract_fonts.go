@@ -38,9 +38,10 @@ func main() {
 // extractFontToArchive prints out font information from pdf to stdout, can add to archive if has output path.
 func extractFontToArchive(inputPath string, outputPath string) error {
 	var (
-		pdfFont *extractor.PageFonts
-		zipFile *os.File
-		zipw    *zip.Writer
+		pdfFont         *extractor.PageFonts
+		zipFile         *os.File
+		zipw            *zip.Writer
+		hasEmbeddedFont = false
 	)
 
 	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
@@ -82,14 +83,19 @@ func extractFontToArchive(inputPath string, outputPath string) error {
 			if err != nil {
 				return err
 			}
+			hasEmbeddedFont = true
 		}
 		fmt.Println("------------------------------")
-		fmt.Printf("Font Name \t: %s\nType \t\t: %s\nEncoding \t: %v\nIsCID\t\t: %t\nIsSimple\t: %t\nToUnicode\t: %t", font.FontName, font.FontType, font.PdfFont.Encoder().String(), font.IsCID, font.IsSimple, font.ToUnicode)
+		fmt.Printf("Font Name \t: %s\nType \t\t: %s\nEncoding \t: %v\nIsCID\t\t: %t\nIsSimple\t: %t\nToUnicode\t: %t\nEmbedded\t: %v\nExtracted\t: %v", font.FontName, font.FontType, font.PdfFont.Encoder().String(), font.IsCID, font.IsSimple, font.ToUnicode, hasEmbeddedFont, hasEmbeddedFont)
 		fmt.Println("\n------------------------------\n")
 	}
 	if len(outputPath) > 0 {
 		err = zipw.Close()
+		if !hasEmbeddedFont {
+			os.Remove(outputPath)
+		}
 	}
+
 	if err != nil {
 		return err
 	}
