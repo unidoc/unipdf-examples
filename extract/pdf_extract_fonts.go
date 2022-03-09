@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/unidoc/unipdf/v3/extractor"
 	"github.com/unidoc/unipdf/v3/model"
@@ -18,30 +19,44 @@ import (
 // 	}
 // }
 func main() {
-	var outputPath string
+	var (
+		outputPath string
+		pageNumber int
+	)
+	const usage = "Usage: go run pdf_extract_fonts.go input.pdf <pagenumber> output.zip\n<pagenumber> is int, set to 0 to extract all page fonts.\n"
 	if len(os.Args) < 2 {
-		fmt.Printf("Syntax: go run extract/pdf_extract_fonts.go input.pdf output.zip\n")
+		fmt.Printf(usage)
 		os.Exit(1)
 	}
 	inputPath := os.Args[1]
-	if len(os.Args) == 3 {
-		outputPath = os.Args[2]
+	if len(os.Args) > 2 {
+		if i, err := strconv.Atoi(os.Args[2]); err == nil {
+			pageNumber = i
+		} else {
+			fmt.Printf("Error: %v\n", err)
+			fmt.Printf(usage)
+			os.Exit(1)
+		}
+	}
+	if len(os.Args) > 3 {
+		outputPath = os.Args[3]
 	}
 
-	err := extractFontToArchive(inputPath, outputPath)
+	err := extractFontToArchive(inputPath, outputPath, pageNumber)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
+		fmt.Printf(usage)
 		os.Exit(1)
 	}
 }
 
 // extractFontToArchive prints out font information from pdf to stdout, can add to archive if has output path.
-func extractFontToArchive(inputPath string, outputPath string) error {
+func extractFontToArchive(inputPath string, outputPath string, page int) error {
 	var (
-		pdfFont         *extractor.PageFonts
-		zipFile         *os.File
-		zipw            *zip.Writer
-		hasEmbeddedFont = false
+		pdfFont           *extractor.PageFonts
+		zipFile           *os.File
+		zipw              *zip.Writer
+		embeddedFontTotal = 0
 	)
 
 	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
@@ -53,16 +68,19 @@ func extractFontToArchive(inputPath string, outputPath string) error {
 	if err != nil {
 		return err
 	}
-	for i := 0; i < pdfPage; i++ {
-		currentPage, err := pdfReader.GetPage(i + 1)
+
+	if page > 0 { // for specific page
+		pdfFont, err = extractSpecificPageFont(pdfFont, pdfReader, page)
 		if err != nil {
 			return err
 		}
-		pdfExtractor, err := extractor.New(currentPage)
-		if err != nil {
-			return err
+	} else { // for range of PDF pages
+		for i := 0; i < pdfPage; i++ {
+			pdfFont, err = extractSpecificPageFont(pdfFont, pdfReader, (i + 1))
+			if err != nil {
+				return err
+			}
 		}
-		pdfFont, err = pdfExtractor.ExtractFonts(pdfFont)
 	}
 
 	if len(outputPath) > 0 {
@@ -74,24 +92,33 @@ func extractFontToArchive(inputPath string, outputPath string) error {
 	}
 
 	for _, font := range pdfFont.Fonts {
-		if len(font.FontFileName) > 0 && len(outputPath) > 0 {
-			zipFile, err := zipw.Create(font.FontFileName)
-			if err != nil {
-				return err
-			}
-			_, err = zipFile.Write(font.FontData)
-			if err != nil {
-				return err
-			}
+		var (
+			hasEmbeddedFont = false
+			extracted       = false
+		)
+		if len(font.FontFileName) > 0 {
 			hasEmbeddedFont = true
+			if len(outputPath) > 0 {
+				zipFile, err := zipw.Create(font.FontFileName)
+				if err != nil {
+					return err
+				}
+				_, err = zipFile.Write(font.FontData)
+				if err != nil {
+					return err
+				}
+				extracted = true
+			}
+			embeddedFontTotal++
+
 		}
 		fmt.Println("------------------------------")
-		fmt.Printf("Font Name \t: %s\nType \t\t: %s\nEncoding \t: %v\nIsCID\t\t: %t\nIsSimple\t: %t\nToUnicode\t: %t\nEmbedded\t: %v\nExtracted\t: %v", font.FontName, font.FontType, font.PdfFont.Encoder().String(), font.IsCID, font.IsSimple, font.ToUnicode, hasEmbeddedFont, hasEmbeddedFont)
+		fmt.Printf("Font Name \t: %s\nType \t\t: %s\nEncoding \t: %v\nIsCID\t\t: %t\nIsSimple\t: %t\nToUnicode\t: %t\nEmbedded\t: %v\nExtracted\t: %v", font.FontName, font.FontType, font.PdfFont.Encoder().String(), font.IsCID, font.IsSimple, font.ToUnicode, hasEmbeddedFont, extracted)
 		fmt.Println("\n------------------------------\n")
 	}
 	if len(outputPath) > 0 {
 		err = zipw.Close()
-		if !hasEmbeddedFont {
+		if embeddedFontTotal == 0 {
 			os.Remove(outputPath)
 		}
 	}
@@ -100,4 +127,17 @@ func extractFontToArchive(inputPath string, outputPath string) error {
 		return err
 	}
 	return nil
+}
+
+func extractSpecificPageFont(pdfFont *extractor.PageFonts, pdfReader *model.PdfReader, page int) (*extractor.PageFonts, error) {
+	currentPage, err := pdfReader.GetPage(page)
+	if err != nil {
+		return nil, err
+	}
+	pdfExtractor, err := extractor.New(currentPage)
+	if err != nil {
+		return nil, err
+	}
+	pdfFont, err = pdfExtractor.ExtractFonts(pdfFont)
+	return pdfFont, nil
 }
