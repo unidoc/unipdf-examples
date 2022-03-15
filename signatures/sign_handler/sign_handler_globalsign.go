@@ -14,9 +14,9 @@ import (
 	"io"
 
 	"github.com/unidoc/globalsign-dss"
+	"github.com/unidoc/pkcs7"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
-	"github.com/wja-id/pkcs7"
 	"golang.org/x/crypto/ocsp"
 )
 
