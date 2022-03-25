@@ -1,34 +1,37 @@
 /*
- * This example showcases how to sign a PDF document with the GlobalSign.
- * The file is signed using a private/public key pair.
+ * This example showcases how to digitally sign a PDF file using an external
+ * signing service which returns PKCS7 package. The external service is
+ * is simulated by signing the file with UniDoc.
  *
- * $ ./pdf_sign_external_globalsign <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
+ * $ ./pdf_sign_external_globalsign <INPUT_PDF_PATH> <OUTPUT_PDF_PATH> <API_KEY> <API_SECRET> <CERT_FILE_PATH> <KEY_FILE_PATH>
  */
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"context"
-	"crypto/rsa"
+	"crypto"
 	"crypto/sha256"
 	"crypto/x509"
+	"encoding/asn1"
+	"encoding/base64"
 	"encoding/pem"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
 
 	"github.com/unidoc/globalsign-dss"
-	"github.com/unidoc/unidoc-examples/signatures/sign_handler"
+	"github.com/unidoc/pkcs7"
 	"github.com/unidoc/unipdf/v3/annotator"
-	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
+
+	"golang.org/x/crypto/ocsp"
 )
 
 func init() {
@@ -38,378 +41,129 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-
-	// Set logger.
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
-
-	// Set signer factory.
-	signerFactories["globalsign"] = NewGlobalSignDssSigner
 }
 
 var (
-	inputFile  string
-	outputFile string
-	email      string
-	fullname   string
-	reason     string
+	sigLen = 8192
 
-	certPath string
-	keyPath  string
-
-	apiKey     = ""
-	apiSecret  = ""
-	apiBaseURL = "https://emea.api.dss.globalsign.com:8443"
+	apiKey, apiSecret, certFilepath, keyFilepath string
 )
 
+const usagef = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH API_KEY API_SECRET CERT_FILE_PATH KEY_FILE_PATH\n"
+
 func main() {
-	flag.StringVar(&inputFile, "input-file", "", "file to be signed (required)")
-	flag.StringVar(&outputFile, "output-file", "", "output result (required)")
-	flag.StringVar(&email, "email", "", "email for signer identity (required)")
-	flag.StringVar(&apiKey, "api-key", "", "API key (required)")
-	flag.StringVar(&apiSecret, "api-secret", "", "API secret (required)")
-	flag.StringVar(&certPath, "cert-file", "tls.cer", "certificate file for API (required)")
-	flag.StringVar(&keyPath, "key-file", "key.pem", "key file for API (required)")
-	flag.StringVar(&fullname, "name", "your n@me", "signer name")
-	flag.StringVar(&reason, "reason", "enter your re@son", "signing reason")
-
-	flag.Parse()
-
-	if inputFile == "" || outputFile == "" || email == "" || apiKey == "" || apiSecret == "" || certPath == "" || keyPath == "" {
-		flag.Usage()
-		os.Exit(1)
+	args := os.Args
+	if len(args) < 7 {
+		fmt.Printf(usagef, os.Args[0])
+		return
 	}
+	inputPath := args[1]
+	outputPath := args[2]
 
-	option := &SignOption{
-		SignedBy: "UniDoc",
-		Fullname: "Alip Sulistio",
-		Reason:   "GlobalSign DSS Testing",
-		Annotate: true,
-	}
+	apiKey = args[3]
+	apiSecret = args[4]
+	certFilepath = args[5]
+	keyFilepath = args[6]
 
-	sigGen := NewGlobalSignDssSigner(map[string]interface{}{
-		"provider.globalsign.api_url":     apiBaseURL,
-		"provider.globalsign.api_key":     apiKey,
-		"provider.globalsign.api_secret":  apiSecret,
-		"provider.globalsign.certificate": certPath,
-		"provider.globalsign.private_key": keyPath,
-	})
-
-	if err := SignFile(context.Background(), inputFile, outputFile, option, sigGen); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	fmt.Println("File signed successfully")
-}
-
-type globalsignDssSigner struct {
-	apiBase      string
-	apiKey       string
-	apiSecret    string
-	certFilepath string
-	keyFilepath  string
-
-	client *globalsign.Client
-}
-
-// Load .
-func (s *globalsignDssSigner) Load() error {
-	// Initiate globalsign client.
-	c, err := globalsign.NewClient(s.apiKey, s.apiSecret, s.certFilepath, s.keyFilepath)
+	// This would be the time to send the PDF buffer to a signing device or
+	// signing web service and get back the signature. We will simulate this by
+	// signing the PDF using UniDoc and returning the signature data.
+	pdfData, signature, err := getExternalSignatureAndSign(inputPath)
 	if err != nil {
-		return err
+		log.Fatalf("Fail signature: %v\n", err)
 	}
-	s.client = c
 
-	return nil
-}
-
-// Sign .
-func (s *globalsignDssSigner) Sign(ctx context.Context, rd *model.PdfReader, option *SignOption) (*model.PdfAppender, error) {
-	// ensure pdf is decrypted
-	isEncrypted, err := rd.IsEncrypted()
+	// Apply external signature to the PDF data buffer.
+	// Overwrite the generated empty signature with the signature
+	// bytes retrieved from the external service.
+	// Parse signature byte range.
+	byteRange, err := parseByteRange(signature.ByteRange)
 	if err != nil {
-		return nil, err
+		log.Fatalf("Fail: %v\n", err)
 	}
 
-	if isEncrypted {
-		log.Println("pdf is encrypted")
-		auth, err := rd.Decrypt([]byte(option.Password))
-		if err != nil {
-			return nil, err
-		}
-		if !auth {
-			return nil, errors.New("cannot open encrypted document, please specify password in option")
-		}
+	signatureData := signature.Contents.Bytes()
+
+	sigBytes := make([]byte, 8192)
+	copy(sigBytes, signatureData)
+
+	sig := core.MakeHexString(string(sigBytes)).WriteString()
+	copy(pdfData[byteRange[1]:byteRange[2]], []byte(sig))
+
+	// Write output file.
+	if err := ioutil.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
+		log.Fatalf("Fail: %v\n", err)
 	}
 
-	isEncrypted, err = rd.IsEncrypted()
-	if err != nil {
-		return nil, err
-	}
-
-	log.Println("pdf is encrypted?", isEncrypted)
-
-	ap, err := model.NewPdfAppender(rd)
-	if err != nil {
-		return nil, err
-	}
-
-	signerIdentity := map[string]interface{}{
-		"common_name": option.Fullname,
-	}
-
-	// Create signature handler.
-	handler, err := sign_handler.NewGlobalSignDSS(context.Background(), s.client, option.SignedBy, signerIdentity)
-	if err != nil {
-		return nil, err
-	}
-
-	field, err := createSignatureField(option, handler)
-	if err != nil {
-		return nil, err
-	}
-
-	// get cert chain
-	var certChain []*x509.Certificate
-	if getter, ok := handler.(sign_handler.CertificateChainGetter); ok {
-		certChain = getter.GetCertificateChain()
-	}
-
-	// only sign first page
-	if err = ap.Sign(1, field); err != nil {
-		return nil, err
-	}
-
-	// add tlv
-	ltv, err := model.NewLTV(ap)
-	if err != nil {
-		return nil, err
-	}
-	ltv.CertClient.HTTPClient.Timeout = 30 * time.Second
-	ltv.OCSPClient.HTTPClient.Timeout = 30 * time.Second
-	ltv.CRLClient.HTTPClient.Timeout = 1 * time.Microsecond // attempt to exclude crl
-
-	err = ltv.EnableChain(certChain)
-	if err != nil {
-		return nil, err
-	}
-
-	return ap, nil
-}
-
-// NewGlobalSignDssSigner create and return instance signature
-// generator backed by global sign
-func NewGlobalSignDssSigner(param map[string]interface{}) Signer {
-	mReader := NewMapReader(param)
-	apiURL := mReader.String("provider.globalsign.api_url", "")
-	apiKey := mReader.String("provider.globalsign.api_key", "")
-	apiSecret := mReader.String("provider.globalsign.api_secret", "")
-	apiCertFile := mReader.String("provider.globalsign.certificate", "")
-	keyFile := mReader.String("provider.globalsign.private_key", "")
-
-	return &globalsignDssSigner{
-		apiBase:      apiURL,
-		apiKey:       apiKey,
-		apiSecret:    apiSecret,
-		certFilepath: apiCertFile,
-		keyFilepath:  keyFile,
-	}
-}
-
-// SignOption contains both digital signing
-// and annotation properties
-type SignOption struct {
-	SignedBy string
-	Fullname string
-	Reason   string
-	Location string
-
-	// Annonate signature?
-	Annotate bool
-
-	// position of annotation
-	Position []float64
-
-	// Annotation font size
-	FontSize int
-
-	// extra signature annotation fields
-	Extra map[string]string
-
-	FilePath string
-
-	// just in case source file is protected
-	// and defalt password is not empty
-	Password string
-}
-
-func defaultSignOption() *SignOption {
-	return &SignOption{
-		FontSize: 11,
-	}
+	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)
 }
 
 // generateSignedFile generates a signed version of the input PDF file using the
 // specified signature handler.
-func generateSignedFile(inputPath string, handler model.SignatureHandler, option *SignOption) ([]byte, *model.PdfSignature, error) {
-	if option == nil {
-		option = defaultSignOption()
-	}
-
-	// generate timestamp
-	now := time.Now()
-
+func generateSignedFile(inputPath string, handler model.SignatureHandler, field *model.PdfFieldSignature) ([]byte, error) {
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		return nil, nil, err
+		log.Println("aa")
+		return nil, err
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		return nil, nil, err
+		log.Println("bb")
+		return nil, err
 	}
 
-	// Create pdf appender.
+	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		return nil, nil, err
-	}
-
-	// Create signature.
-	signature := model.NewPdfSignature(handler)
-	signature.SetName(option.SignedBy)
-	signature.SetReason(option.Reason)
-	signature.SetDate(now, time.RFC1123)
-	signature.SetLocation(option.Location)
-
-	if err := signature.Initialize(); err != nil {
-		return nil, nil, err
-	}
-
-	// Create signature field and appearance.
-	var field *model.PdfFieldSignature
-
-	// onyl when annotate option is enabled
-	if option.Annotate {
-		opts := annotator.NewSignatureFieldOpts()
-		opts.FontSize = 10
-
-		// set default position
-		opts.Rect = []float64{10, 25, 75, 60}
-		if option.Position != nil && len(option.Position) == 4 {
-			opts.Rect = option.Position
-		}
-
-		signatureFields := []*annotator.SignatureLine{
-			annotator.NewSignatureLine("Signed By", option.SignedBy),
-			annotator.NewSignatureLine("Date", now.Format(time.RFC1123)),
-			annotator.NewSignatureLine("Reason", option.Reason),
-			annotator.NewSignatureLine("Location", option.Location),
-		}
-
-		for k, v := range option.Extra {
-			signatureFields = append(signatureFields, annotator.NewSignatureLine(k, v))
-		}
-
-		field, err = annotator.NewSignatureField(
-			signature,
-			signatureFields,
-			opts,
-		)
-		field.T = core.MakeString("Signature")
+		log.Println("cc")
+		return nil, err
 	}
 
 	if err = appender.Sign(1, field); err != nil {
-		return nil, nil, err
+		log.Println("ee")
+		return nil, err
 	}
 
 	// Write PDF file to buffer.
 	pdfBuf := bytes.NewBuffer(nil)
 	if err = appender.Write(pdfBuf); err != nil {
-		return nil, nil, err
-	}
-
-	return pdfBuf.Bytes(), signature, nil
-}
-
-// SignerFactory .
-type SignerFactory func(map[string]interface{}) Signer
-
-var signerFactories = make(map[string]SignerFactory)
-
-// CreateSigner .
-func CreateSigner(signerType string, param map[string]interface{}) Signer {
-	factory, ok := signerFactories[signerType]
-	if !ok {
-		return nil
-	}
-
-	return factory(param)
-}
-
-// Sign apply digital signing from inputFile to outputFile
-// with signature generator callback
-func SignFile(ctx context.Context, inputFile, outputFile string, option *SignOption, signer Signer) error {
-
-	fin, err := os.Open(inputFile)
-	if err != nil {
-		return err
-	}
-	defer fin.Close()
-
-	rd, err := model.NewPdfReader(fin)
-	if err != nil {
-		return err
-	}
-
-	ap, err := Sign(ctx, rd, option, signer)
-	if err != nil {
-		return err
-	}
-
-	fout, err := os.Create(outputFile)
-	if err != nil {
-		return err
-	}
-	defer fout.Close()
-
-	return ap.Write(fout)
-}
-
-// Sign apply digital signing to given pdf reader which return pdf appender
-func Sign(ctx context.Context, rd *model.PdfReader, option *SignOption, signer Signer) (*model.PdfAppender, error) {
-	if signer == nil {
-		return nil, errors.New("signer not provided")
-	}
-
-	if err := signer.Load(); err != nil {
+		log.Println("ff")
 		return nil, err
 	}
 
-	if option == nil {
-		option = defaultSignOption()
+	return pdfBuf.Bytes(), nil
+}
+
+// getExternalSignature simulates an external service which signs the specified
+// PDF file and returns its signature.
+func getExternalSignatureAndSign(inputPath string) ([]byte, *model.PdfSignature, error) {
+	// Create signature handler.
+	handler, err := NewGlobalSignPdfSignature()
+	if err != nil {
+		log.Println(err)
 	}
 
-	return signer.Sign(ctx, rd, option)
-}
+	option := &SignOption{
+		Fullname: "GLOBALSIGN TEST ACCOUNT - FOR TESTING PURPOSE ONLY",
+		Reason:   "Testing GlobalSign DSS",
+		Location: "GLOBALSIGN TEST ACCOUNT - FOR TESTING PURPOSE ONLY",
+		Annotate: true,
+	}
+	signatureField, signature, err := createSignatureField(option, handler)
+	if err != nil {
+		log.Printf("InitSignature err: %v\n", err)
+	}
 
-// Signer abstract pdf signer implementation
-type Signer interface {
-	// Load init and prepare signer
-	// it may fail on bad configuration
-	Load() error
+	pdfData, err := generateSignedFile(inputPath, handler, signatureField)
+	if err != nil {
+		log.Println("cc:", err)
+		return nil, nil, err
+	}
 
-	// Sign .
-	Sign(context.Context, *model.PdfReader, *SignOption) (*model.PdfAppender, error)
-}
-
-// UpdateInfo set tool author info for created pdf
-func UpdateInfo(author, creator string) {
-	model.SetPdfAuthor(author)
-	model.SetPdfCreator(creator)
+	return pdfData, signature, nil
 }
 
 // parseByteRange parses the ByteRange value of the signature field.
@@ -442,76 +196,312 @@ func parseByteRange(byteRange *core.PdfObjectArray) ([]int64, error) {
 	return []int64{s1, s1 + l1, s2, s2 + l2}, nil
 }
 
-// GenerateChecksum returns checksum of a reader,
-// reader seek head will be returned to 0 (beginning of file)
-func GenerateChecksum(r io.ReadSeeker) []byte {
-	bufferedReader := bufio.NewReader(r)
-	computedChecksum := sha256.New()
-	_, err := bufferedReader.WriteTo(computedChecksum)
-	defer r.Seek(0, io.SeekStart)
-	if err != nil {
-		return make([]byte, 0)
-	}
+// externalSigner is wrapper for third-party signer,
+// needs to implement function of model.SignatureHandler.
+// in this example, we use GlobalSign as third-party signer.
+type externalSigner struct {
+	// ocsp retrieved during identity request.
+	ocsp      []byte
+	certChain []*x509.Certificate
 
-	return computedChecksum.Sum(nil)
+	// client is third-party api client.
+	// We make client as interface for supporting another third-party signer.
+	client interface{}
+
+	ctx context.Context
 }
 
-func loadPrivateKey(privateKeyData string) (*rsa.PrivateKey, error) {
-	// Decode PEM block.
-	block, _ := pem.Decode([]byte(privateKeyData))
-
-	// Parse private key data.
-	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+// NewGlobalSignPdfSignature wrap externalSigner to model.SignatureHandler.
+// With this, you can implement any third-party client signer into signature handler.
+func NewGlobalSignPdfSignature() (model.SignatureHandler, error) {
+	ctx := context.Background()
+	// Initiate globalsign client.
+	c, err := globalsign.NewClient(apiKey, apiSecret, certFilepath, keyFilepath)
 	if err != nil {
 		return nil, err
 	}
 
-	return privateKey, nil
+	return &externalSigner{
+		client: c,
+		ctx:    ctx,
+	}, nil
 }
 
-func loadCertificates(certData string) (*x509.Certificate, *core.PdfObjectArray, error) {
-	parseCert := func(data []byte) (*x509.Certificate, []byte, error) {
-		// Decode PEM block.
-		block, rest := pem.Decode(data)
-
-		// Parse certificate.
-		cert, err := x509.ParseCertificate(block.Bytes)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		return cert, rest, nil
+// InitSignature sets the PdfSignature parameters.
+func (es *externalSigner) InitSignature(sig *model.PdfSignature) error {
+	gsClient, ok := es.client.(*globalsign.Client)
+	if !ok {
+		return fmt.Errorf("Not GlobalSign client.")
 	}
 
-	// Create PDF array object which will contain the certificate chain data,
-	// loaded from the PEM file. The first element of the array must be the
-	// signing certificate. The rest of the certificate chain is used for
-	// validating the authenticity of the signing certificate.
-	pdfCerts := core.MakeArray()
-
-	// Parse signing certificate.
-	signingCert, pemUnparsedData, err := parseCert([]byte(certData))
+	// Request new identification based on signer.
+	identity, err := globalsign.DSSService.DSSGetIdentity(gsClient.DSSService, es.ctx, "GLOBALSIGN TEST ACCOUNT - FOR TESTING PURPOSE ONLY", &globalsign.IdentityRequest{
+		SubjectDn: globalsign.SubjectDn{},
+	})
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
-	pdfCerts.Append(core.MakeString(string(signingCert.Raw)))
 
-	// Parse the rest of the certificates contained in the PEM file,
-	// if any, and add them to the PDF certificates array.
-	for len(pemUnparsedData) != 0 {
-		cert, rest, err := parseCert(pemUnparsedData)
-		if err != nil {
-			return nil, nil, err
+	// OCSP Response in base64 format.
+	ocsp, err := base64.StdEncoding.DecodeString(identity.OCSP)
+	if err != nil {
+		return fmt.Errorf("invalid ocsp response, err: %v", err)
+	}
+	es.ocsp = ocsp
+
+	// Create certificate chain from signing and CA cert.
+	var certChain []*x509.Certificate
+	issuerCertData := []byte(identity.SigningCert)
+	for len(issuerCertData) != 0 {
+		var block *pem.Block
+		block, issuerCertData = pem.Decode(issuerCertData)
+		if block == nil {
+			break
 		}
 
-		pdfCerts.Append(core.MakeString(string(cert.Raw)))
-		pemUnparsedData = rest
+		issuer, err := x509.ParseCertificate(block.Bytes)
+		if err != nil {
+			return err
+		}
+
+		certChain = append(certChain, issuer)
 	}
 
-	return signingCert, pdfCerts, nil
+	caCertData := []byte(identity.CA)
+	for len(caCertData) != 0 {
+		var block *pem.Block
+		block, caCertData = pem.Decode(caCertData)
+		if block == nil {
+			break
+		}
+
+		issuer, err := x509.ParseCertificate(block.Bytes)
+		if err != nil {
+			return err
+		}
+
+		certChain = append(certChain, issuer)
+	}
+	es.certChain = certChain
+
+	// Create PDF array object which will contain the certificate chain data.
+	pdfCerts := core.MakeArray()
+	for _, cert := range certChain {
+		pdfCerts.Append(core.MakeString(string(cert.Raw)))
+	}
+
+	// Append cert to signature.
+	sig.Cert = pdfCerts
+
+	handler := *es
+	sig.Handler = &handler
+	sig.Filter = core.MakeName("Adobe.PPKLite")
+	sig.SubFilter = core.MakeName("adbe.pkcs7.detached")
+	sig.Reference = nil
+
+	// Reserve initial size
+	return es.Sign(sig, nil)
 }
 
-func createSignatureField(option *SignOption, handler model.SignatureHandler, certChain ...*x509.Certificate) (*model.PdfFieldSignature, error) {
+// Sign return error on failed sign.
+func (es *externalSigner) Sign(sig *model.PdfSignature, digest model.Hasher) error {
+	if digest == nil {
+		sig.Contents = core.MakeHexString(string(make([]byte, sigLen)))
+		return nil
+	}
+
+	gsClient, ok := es.client.(*globalsign.Client)
+	if !ok {
+		return fmt.Errorf("Not GlobalSign client.")
+	}
+
+	buffer := digest.(*bytes.Buffer)
+	signedData, err := pkcs7.NewSignedData(buffer.Bytes())
+	if err != nil {
+		return err
+	}
+
+	// Set digest algorithm which supported by globalsign.
+	signedData.SetDigestAlgorithm(pkcs7.OIDDigestAlgorithmSHA256)
+
+	// Get certificate chain.
+	certs := es.certChain
+
+	// Callback.
+	cb := func(rand io.Reader, digest []byte, opts crypto.SignerOpts) ([]byte, error) {
+		log.Println("digest nil: ", digest == nil)
+		// Sign digest.
+		signature, err := gsClient.DSSService.DSSIdentitySign(es.ctx, "GLOBALSIGN TEST ACCOUNT - FOR TESTING PURPOSE ONLY", &globalsign.IdentityRequest{SubjectDn: globalsign.SubjectDn{}}, digest)
+		if err != nil {
+			return nil, err
+		}
+
+		return signature, nil
+	}
+
+	siConfig := pkcs7.SignerInfoConfig{}
+	if len(certs) > 1 {
+		// Verify OCSP response.
+		_, err := ocsp.ParseResponseForCert(es.ocsp, certs[0], certs[1])
+		if err != nil {
+			return err
+		}
+
+		siConfig.ExtraSignedAttributes = []pkcs7.Attribute{
+			{
+				Type: pkcs7.OIDAttributeAdobeRevocation,
+				Value: RevocationInfoArchival{
+					Crl: []asn1.RawValue{},
+					Ocsp: []asn1.RawValue{
+						{FullBytes: es.ocsp},
+					},
+					OtherRevInfo: []asn1.RawValue{},
+				},
+			},
+		}
+	}
+
+	// If contains certificate chains.
+	if len(certs) > 1 {
+		err = signedData.AddSignerChain(certs[0], NewSigner(cb), certs[1:], siConfig)
+		if err != nil {
+			return err
+		}
+	} else if len(certs) == 1 {
+		err = signedData.AddSigner(certs[0], NewSigner(cb), siConfig)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Add timestamp token to first signer.
+	err = signedData.RequestSignerTimestampToken(0, func(digest []byte) ([]byte, error) {
+		hasher := sha256.New()
+		hasher.Write(digest)
+		hasher.Sum(nil)
+
+		// Request timestamp token.
+		t, err := gsClient.DSSService.DSSIdentityTimestamp(es.ctx, "UniDoc", &globalsign.IdentityRequest{SubjectDn: globalsign.SubjectDn{}}, hasher.Sum(nil))
+		if err != nil {
+			return nil, err
+		}
+
+		return t, nil
+	})
+	if err != nil {
+		return err
+	}
+
+	// Call Detach() is you want to remove content from the signature
+	// and generate an S/MIME detached signature.
+	signedData.Detach()
+	// Finish() to obtain the signature bytes.
+	detachedSignature, err := signedData.Finish()
+	if err != nil {
+		return err
+	}
+
+	data := make([]byte, sigLen)
+	copy(data, detachedSignature)
+
+	sig.Contents = core.MakeHexString(string(data))
+	return nil
+}
+
+// IsApplicable .
+func (es *externalSigner) IsApplicable(sig *model.PdfSignature) bool {
+	if sig == nil || sig.Filter == nil || sig.SubFilter == nil {
+		return false
+	}
+
+	return (*sig.Filter == "Adobe.PPKMS" || *sig.Filter == "Adobe.PPKLite") && *sig.SubFilter == "adbe.pkcs7.detached"
+}
+
+// NewDigest creates a new digest.
+func (es *externalSigner) NewDigest(sig *model.PdfSignature) (model.Hasher, error) {
+	return bytes.NewBuffer(nil), nil
+}
+
+// Validate validates PdfSignature.
+func (es *externalSigner) Validate(sig *model.PdfSignature, digest model.Hasher) (model.SignatureValidationResult, error) {
+	return model.SignatureValidationResult{
+		IsSigned:   true,
+		IsVerified: true,
+	}, nil
+}
+
+// RevocationInfoArchival is OIDAttributeAdobeRevocation attribute.
+type RevocationInfoArchival struct {
+	Crl          []asn1.RawValue `asn1:"explicit,tag:0,optional"`
+	Ocsp         []asn1.RawValue `asn1:"explicit,tag:1,optional"`
+	OtherRevInfo []asn1.RawValue `asn1:"explicit,tag:2,optional"`
+}
+
+// SignerCallback .
+type SignerCallback func(rand io.Reader, digest []byte, opts crypto.SignerOpts) ([]byte, error)
+
+// Signer implements custom crypto.Signer which utilize globalsign DSS API
+// to sign signature digest.
+type Signer struct {
+	// sign callback
+	callback SignerCallback
+}
+
+func (s *Signer) EncryptionAlgorithmOID() asn1.ObjectIdentifier {
+	return pkcs7.OIDEncryptionAlgorithmRSA
+}
+
+// Public returns PublicKey.
+func (s *Signer) Public() crypto.PublicKey {
+	return nil
+}
+
+// Sign with custom crypto.Signer which utilize globalsign DSS API.
+func (s *Signer) Sign(rand io.Reader, digest []byte, opts crypto.SignerOpts) (signature []byte, err error) {
+	log.Println("signer.Sign")
+	if s.callback == nil {
+		return nil, errors.New("signer func not implemented")
+	}
+
+	return s.callback(rand, digest, opts)
+}
+
+// NewSigner create crypto.Signer implementation
+func NewSigner(cb SignerCallback) crypto.Signer {
+	return &Signer{
+		callback: cb,
+	}
+}
+
+// SignOption contains both digital signing
+// and annotation properties.
+type SignOption struct {
+	SignedBy string
+	Fullname string
+	Reason   string
+	Location string
+
+	// Annonate signature?
+	Annotate bool
+
+	// position of annotation
+	Position []float64
+
+	// Annotation font size
+	FontSize int
+
+	// extra signature annotation fields
+	Extra map[string]string
+
+	FilePath string
+
+	// just in case source file is protected
+	// and defalt password is not empty
+	Password string
+}
+
+// createSignatureField returns signature field, signature, returns error if fails.
+func createSignatureField(option *SignOption, handler model.SignatureHandler, certChain ...*x509.Certificate) (*model.PdfFieldSignature, *model.PdfSignature, error) {
 	// Create signature.
 	signature := model.NewPdfSignature(handler)
 
@@ -529,7 +519,7 @@ func createSignatureField(option *SignOption, handler model.SignatureHandler, ce
 	}
 
 	if err := signature.Initialize(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	now := time.Now()
@@ -542,13 +532,13 @@ func createSignatureField(option *SignOption, handler model.SignatureHandler, ce
 	signatureFields := make([]*annotator.SignatureLine, 0)
 	opts := annotator.NewSignatureFieldOpts()
 
-	// onyl when annotate option is enabled
+	// Only when annotate option is enabled.
 	if option.Annotate {
 		if option.FontSize > 0 {
 			opts.FontSize = float64(option.FontSize)
 		}
 
-		// set default position
+		// Set default position.
 		opts.Rect = []float64{10, 25, 75, 60}
 		if option.Position != nil && len(option.Position) == 4 {
 			opts.Rect = option.Position
@@ -572,85 +562,10 @@ func createSignatureField(option *SignOption, handler model.SignatureHandler, ce
 		opts,
 	)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	field.T = core.MakeString("Signature")
+	field.T = core.MakeString("External Signature")
 
-	return field, nil
-}
-
-// MapReader .
-type MapReader struct {
-	m map[string]interface{}
-}
-
-func (m *MapReader) String(key string, def ...string) string {
-	if len(def) == 0 {
-		def = []string{""}
-	}
-
-	v, ok := m.m[key]
-	if !ok {
-		return def[0]
-	}
-
-	vv, ok := v.(string)
-	if !ok {
-		return def[0]
-	}
-
-	return vv
-}
-
-// NewMapReader .
-func NewMapReader(m map[string]interface{}) *MapReader {
-	return &MapReader{m: flatten(m)}
-}
-
-func flatten(value interface{}) map[string]interface{} {
-	return flattenPrefixed(value, "")
-}
-
-func flattenPrefixed(value interface{}, prefix string) map[string]interface{} {
-	m := make(map[string]interface{})
-	flattenPrefixedToResult(value, prefix, m)
-	return m
-}
-
-func flattenPrefixedToResult(value interface{}, prefix string, m map[string]interface{}) {
-	base := ""
-	if prefix != "" {
-		base = prefix + "."
-	}
-
-	cm, ok := value.(map[string]interface{})
-	if ok {
-		for k, v := range cm {
-			flattenPrefixedToResult(v, base+k, m)
-		}
-	} else {
-		if prefix != "" {
-			m[prefix] = value
-		}
-	}
-}
-
-// CopyFile the src file to dst. Any existing file will be overwritten and will not
-// copy file attributes.
-func CopyFile(src, dst string) error {
-	in, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer in.Close()
-
-	out, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, in)
-	return err
+	return field, signature, nil
 }

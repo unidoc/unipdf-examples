@@ -1,6 +1,9 @@
 module github.com/unidoc/unidoc-examples
 
-replace github.com/unidoc/globalsign-dss => ../../sampila/globalsign-dss
+replace (
+	github.com/unidoc/globalsign-dss => ../../sampila/globalsign-dss
+	github.com/unidoc/pkcs7 => ../../sampila/pkcs7
+)
 
 require (
 	github.com/ThalesIgnite/crypto11 v1.2.4
@@ -14,11 +17,11 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/trimmer-io/go-xmp v1.0.0
-	github.com/unidoc/globalsign-dss v0.0.0-20220314134452-20701e7af4b6 // indirect
+	github.com/unidoc/globalsign-dss v0.0.0-20220314134452-20701e7af4b6
+	github.com/unidoc/pkcs7 v0.1.0
 	github.com/unidoc/unipdf/v3 v3.33.0
 	github.com/wcharczuk/go-chart/v2 v2.1.0
-	github.com/wja-id/pkcs7 v0.0.3 // indirect
-	golang.org/x/crypto v0.0.0-20220313003712-b769efc7c000
+	golang.org/x/crypto v0.0.0-20220315160706-3147a52a75dd
 	golang.org/x/text v0.3.6
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/gographics/imagick.v2 v2.6.0
