@@ -104,33 +104,47 @@ func generateSignedFile(inputPath string, handler model.SignatureHandler, field 
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Println("aa")
 		return nil, err
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Println("bb")
 		return nil, err
 	}
 
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		log.Println("cc")
 		return nil, err
 	}
 
 	if err = appender.Sign(1, field); err != nil {
-		log.Println("ee")
+		return nil, err
+	}
+
+	// Add LTV into signature.
+	var certChain []*x509.Certificate
+	if getter, ok := handler.(*externalSigner); ok {
+		certChain = getter.getCertificateChain()
+	}
+
+	ltv, err := model.NewLTV(appender)
+	if err != nil {
+		return nil, err
+	}
+	ltv.CertClient.HTTPClient.Timeout = 30 * time.Second
+	ltv.OCSPClient.HTTPClient.Timeout = 30 * time.Second
+	ltv.CRLClient.HTTPClient.Timeout = 30 * time.Second
+
+	err = ltv.EnableChain(certChain)
+	if err != nil {
 		return nil, err
 	}
 
 	// Write PDF file to buffer.
 	pdfBuf := bytes.NewBuffer(nil)
 	if err = appender.Write(pdfBuf); err != nil {
-		log.Println("ff")
 		return nil, err
 	}
 
@@ -143,7 +157,7 @@ func getExternalSignatureAndSign(inputPath string) ([]byte, *model.PdfSignature,
 	// Create signature handler.
 	handler, err := NewGlobalSignPdfSignature()
 	if err != nil {
-		log.Println(err)
+		return nil, nil, err
 	}
 
 	option := &SignOption{
@@ -154,12 +168,11 @@ func getExternalSignatureAndSign(inputPath string) ([]byte, *model.PdfSignature,
 	}
 	signatureField, signature, err := createSignatureField(option, handler)
 	if err != nil {
-		log.Printf("InitSignature err: %v\n", err)
+		return nil, nil, err
 	}
 
 	pdfData, err := generateSignedFile(inputPath, handler, signatureField)
 	if err != nil {
-		log.Println("cc:", err)
 		return nil, nil, err
 	}
 
@@ -329,13 +342,11 @@ func (es *externalSigner) Sign(sig *model.PdfSignature, digest model.Hasher) err
 
 	// Callback.
 	cb := func(rand io.Reader, digest []byte, opts crypto.SignerOpts) ([]byte, error) {
-		log.Println("digest nil: ", digest == nil)
 		// Sign digest.
 		signature, err := gsClient.DSSService.DSSIdentitySign(es.ctx, "GLOBALSIGN TEST ACCOUNT - FOR TESTING PURPOSE ONLY", &globalsign.IdentityRequest{SubjectDn: globalsign.SubjectDn{}}, digest)
 		if err != nil {
 			return nil, err
 		}
-
 		return signature, nil
 	}
 
@@ -430,6 +441,11 @@ func (es *externalSigner) Validate(sig *model.PdfSignature, digest model.Hasher)
 	}, nil
 }
 
+// getCertificateChain returns certificate chain.
+func (es *externalSigner) getCertificateChain() []*x509.Certificate {
+	return es.certChain
+}
+
 // RevocationInfoArchival is OIDAttributeAdobeRevocation attribute.
 type RevocationInfoArchival struct {
 	Crl          []asn1.RawValue `asn1:"explicit,tag:0,optional"`
@@ -447,6 +463,7 @@ type Signer struct {
 	callback SignerCallback
 }
 
+// EncryptionAlgorithmOID returns asn1.ObjectIdentifier with value of pcks7.OIDEncryptionAlgorithmRSA.
 func (s *Signer) EncryptionAlgorithmOID() asn1.ObjectIdentifier {
 	return pkcs7.OIDEncryptionAlgorithmRSA
 }
@@ -458,11 +475,9 @@ func (s *Signer) Public() crypto.PublicKey {
 
 // Sign with custom crypto.Signer which utilize globalsign DSS API.
 func (s *Signer) Sign(rand io.Reader, digest []byte, opts crypto.SignerOpts) (signature []byte, err error) {
-	log.Println("signer.Sign")
 	if s.callback == nil {
 		return nil, errors.New("signer func not implemented")
 	}
-
 	return s.callback(rand, digest, opts)
 }
 
@@ -481,22 +496,22 @@ type SignOption struct {
 	Reason   string
 	Location string
 
-	// Annonate signature?
+	// Annonate signature.
 	Annotate bool
 
-	// position of annotation
+	// Position of annotation.
 	Position []float64
 
-	// Annotation font size
+	// Annotation font size.
 	FontSize int
 
-	// extra signature annotation fields
+	// Extra signature annotation fields.
 	Extra map[string]string
 
 	FilePath string
 
-	// just in case source file is protected
-	// and defalt password is not empty
+	// Just in case source file is protected
+	// and defalt password is not empty.
 	Password string
 }
 
