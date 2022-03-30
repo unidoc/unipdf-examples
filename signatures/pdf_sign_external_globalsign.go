@@ -68,27 +68,10 @@ func main() {
 	// This would be the time to send the PDF buffer to a signing device or
 	// signing web service and get back the signature. We will simulate this by
 	// signing the PDF using UniDoc and returning the signature data.
-	pdfData, signature, err := getExternalSignatureAndSign(inputPath)
+	pdfData, _, err := getExternalSignatureAndSign(inputPath)
 	if err != nil {
 		log.Fatalf("Fail signature: %v\n", err)
 	}
-
-	// Apply external signature to the PDF data buffer.
-	// Overwrite the generated empty signature with the signature
-	// bytes retrieved from the external service.
-	// Parse signature byte range.
-	byteRange, err := parseByteRange(signature.ByteRange)
-	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
-	}
-
-	signatureData := signature.Contents.Bytes()
-
-	sigBytes := make([]byte, 8192)
-	copy(sigBytes, signatureData)
-
-	sig := core.MakeHexString(string(sigBytes)).WriteString()
-	copy(pdfData[byteRange[1]:byteRange[2]], []byte(sig))
 
 	// Write output file.
 	if err := ioutil.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
@@ -177,36 +160,6 @@ func getExternalSignatureAndSign(inputPath string) ([]byte, *model.PdfSignature,
 	}
 
 	return pdfData, signature, nil
-}
-
-// parseByteRange parses the ByteRange value of the signature field.
-func parseByteRange(byteRange *core.PdfObjectArray) ([]int64, error) {
-	if byteRange == nil {
-		return nil, errors.New("byte range cannot be nil")
-	}
-	if byteRange.Len() != 4 {
-		return nil, errors.New("invalid byte range length")
-	}
-
-	s1, err := core.GetNumberAsInt64(byteRange.Get(0))
-	if err != nil {
-		return nil, errors.New("invalid byte range value")
-	}
-	l1, err := core.GetNumberAsInt64(byteRange.Get(1))
-	if err != nil {
-		return nil, errors.New("invalid byte range value")
-	}
-
-	s2, err := core.GetNumberAsInt64(byteRange.Get(2))
-	if err != nil {
-		return nil, errors.New("invalid byte range value")
-	}
-	l2, err := core.GetNumberAsInt64(byteRange.Get(3))
-	if err != nil {
-		return nil, errors.New("invalid byte range value")
-	}
-
-	return []int64{s1, s1 + l1, s2, s2 + l2}, nil
 }
 
 // externalSigner is wrapper for third-party signer,
@@ -419,7 +372,7 @@ func (es *externalSigner) Sign(sig *model.PdfSignature, digest model.Hasher) err
 	return nil
 }
 
-// IsApplicable .
+// IsApplicable returns true if the signature handler is applicable for the PdfSignature.
 func (es *externalSigner) IsApplicable(sig *model.PdfSignature) bool {
 	if sig == nil || sig.Filter == nil || sig.SubFilter == nil {
 		return false
@@ -453,7 +406,7 @@ type RevocationInfoArchival struct {
 	OtherRevInfo []asn1.RawValue `asn1:"explicit,tag:2,optional"`
 }
 
-// SignerCallback .
+// SignerCallback callback function of `Signer`.
 type SignerCallback func(rand io.Reader, digest []byte, opts crypto.SignerOpts) ([]byte, error)
 
 // Signer implements custom crypto.Signer which utilize globalsign DSS API
