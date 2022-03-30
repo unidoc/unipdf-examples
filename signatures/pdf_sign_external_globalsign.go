@@ -1,7 +1,5 @@
 /*
- * This example showcases how to digitally sign a PDF file using an external
- * signing service which returns PKCS7 package. The external service is
- * is simulated by signing the file with UniDoc.
+ * This example showcases how to digitally sign a PDF file using the GlobalSign DSS API.
  *
  * $ ./pdf_sign_external_globalsign <INPUT_PDF_PATH> <OUTPUT_PDF_PATH> <API_KEY> <API_SECRET> <CERT_FILE_PATH> <KEY_FILE_PATH>
  */
@@ -65,9 +63,8 @@ func main() {
 	certFilepath = args[5]
 	keyFilepath = args[6]
 
-	// This would be the time to send the PDF buffer to a signing device or
-	// signing web service and get back the signature. We will simulate this by
-	// signing the PDF using UniDoc and returning the signature data.
+	// We will simulate this by signing the PDF using GlobalSign DSS Service
+	// and returning the signatured PDF data.
 	pdfData, _, err := getExternalSignatureAndSign(inputPath)
 	if err != nil {
 		log.Fatalf("Fail signature: %v\n", err)
@@ -134,7 +131,7 @@ func generateSignedFile(inputPath string, handler model.SignatureHandler, field 
 	return pdfBuf.Bytes(), nil
 }
 
-// getExternalSignature simulates an external service which signs the specified
+// getExternalSignatureAndSign get external signature, signs the specified
 // PDF file and returns its signature.
 func getExternalSignatureAndSign(inputPath string) ([]byte, *model.PdfSignature, error) {
 	// Create signature handler.
@@ -265,7 +262,6 @@ func (es *externalSigner) InitSignature(sig *model.PdfSignature) error {
 	sig.SubFilter = core.MakeName("adbe.pkcs7.detached")
 	sig.Reference = nil
 
-	// Reserve initial size
 	return es.Sign(sig, nil)
 }
 
@@ -434,7 +430,7 @@ func (s *Signer) Sign(rand io.Reader, digest []byte, opts crypto.SignerOpts) (si
 	return s.callback(rand, digest, opts)
 }
 
-// NewSigner create crypto.Signer implementation
+// NewSigner returns a new crypto.Signer implementation.
 func NewSigner(cb SignerCallback) crypto.Signer {
 	return &Signer{
 		callback: cb,
@@ -464,13 +460,14 @@ type SignOption struct {
 	FilePath string
 
 	// Just in case source file is protected
-	// and defalt password is not empty.
+	// and default password is not empty.
 	Password string
 }
 
-// createSignatureField returns signature field, signature, returns error if fails.
+// createSignatureField creates a signature field and an associated signature,
+// based on the specified options.
 func createSignatureField(option *SignOption, handler model.SignatureHandler, certChain ...*x509.Certificate) (*model.PdfFieldSignature, *model.PdfSignature, error) {
-	// Create signature.
+	// Create new signature.
 	signature := model.NewPdfSignature(handler)
 
 	if len(certChain) > 0 {
