@@ -27,12 +27,16 @@ func init() {
 }
 
 func main() {
-	hPageMargin, hContentMargin := 50.0, 20.0
+	var (
+		hPageMargin    = 50.0
+		hContentMargin = 20.0
+	)
 
 	c := creator.New()
 	c.SetPageMargins(hPageMargin, hPageMargin, 25, 25)
 	c.NewPage()
 
+	// Set optimizer.
 	c.SetOptimizer(optimize.New(optimize.Options{
 		CombineDuplicateDirectObjects:   true,
 		CombineIdenticalIndirectObjects: true,
@@ -54,7 +58,7 @@ func main() {
 	cell := headerTable.NewCell()
 	cell.SetBackgroundColor(creator.ColorRGBFromHex("#eeeeee"))
 	if err := cell.SetContent(p); err != nil {
-		log.Fatalf("failed to add div1 to cell: %v", err)
+		log.Fatalf("failed to add paragraph to header cell: %v", err)
 	}
 
 	if err := c.Draw(headerTable); err != nil {
