@@ -1,9 +1,8 @@
 /*
- * Merging of PDF files and add text to each pages.
- * Simply loads all pages for each file, add page into creator and writes to the output file.
- * See pdf_merge_advanced.go for a more advanced version which handles merging document forms (acro forms) also.
+ * Merging of PDF files and add footer with page numbers to each pages.
+ * Simply loads all pages for each file, add page with page numbers using creator and writes to the output file.
  *
- * Run as: go run pdf_merge_with_footer.go output.pdf input1.pdf input2.pdf input3.pdf ...
+ * Run as: go run pdf_merge_with_page_numbers.go output.pdf input1.pdf input2.pdf input3.pdf ...
  */
 
 package main
@@ -29,7 +28,7 @@ func init() {
 func main() {
 	if len(os.Args) < 4 {
 		fmt.Printf("Requires at least 3 arguments: output_path and 2 input paths\n")
-		fmt.Printf("Usage: go run pdf_merge_with_footer.go output.pdf input1.pdf input2.pdf input3.pdf ...\n")
+		fmt.Printf("Usage: go run pdf_merge_with_page_numbers.go output.pdf input1.pdf input2.pdf input3.pdf ...\n")
 		os.Exit(0)
 	}
 
@@ -98,7 +97,7 @@ func mergePdf(inputPaths []string, outputPath string) error {
 		}
 	}
 
-	// Draw footer to pdf pages.
+	// Draw footer with page numbers and total pages to pdf pages.
 	c.DrawFooter(func(block *creator.Block, args creator.FooterFunctionArgs) {
 		p := c.NewStyledParagraph()
 		p.SetTextAlignment(creator.TextAlignmentCenter)
