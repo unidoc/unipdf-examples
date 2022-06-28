@@ -114,8 +114,12 @@ func generateSignedFile(inputPath string, handler model.SignatureHandler, field 
 		return nil, err
 	}
 	ltv.CertClient.HTTPClient.Timeout = 30 * time.Second
+
+	// Set OCSPClient to nil if you want to exclude the OCSP into DSS.
 	ltv.OCSPClient.HTTPClient.Timeout = 30 * time.Second
-	ltv.CRLClient.HTTPClient.Timeout = 30 * time.Second
+
+	// Set CRLClient to nil if you want to exclude the CRL into DSS.
+	ltv.CRLClient = nil
 
 	err = ltv.EnableChain(certChain)
 	if err != nil {
