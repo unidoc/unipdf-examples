@@ -15,38 +15,41 @@ import (
 	"github.com/unidoc/unipdf/v3/redactor"
 )
 
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	if len(os.Args) < 3 {
 		fmt.Printf("Usage: go run redact_text.go inputFile.pdf outputFile.pdf \n")
 		os.Exit(1)
 	}
 
-	// Make sure to enter a valid license key.
-	// Otherwise text is truncated and a watermark added to the text.
-	// License keys are available via: https://unidoc.io
-	/*
-			license.SetLicenseKey(`
-		-----BEGIN UNIDOC LICENSE KEY-----
-		...key contents...
-		-----END UNIDOC LICENSE KEY-----
-		`)
-	*/
-
 	inputFile := os.Args[1]
 
 	outputFile := os.Args[2]
 
 	// List of regex patterns and replacement strings
-
 	patterns := []string{
 		// Regex for matching credit card number.
 		`(^|\s+)(\d{4}[ -]\d{4}[ -]\d{4}[ -]\d{4})(?:\s+|$)`,
 		// Regex for matching emails.
 		`[a-zA-Z0-9\.\-+_]+@[a-zA-Z0-9\.\-+_]+\.[a-z]+`,
 	}
-	// Replace the first matches i.e the credit cards with `*` and the emails with `#`.
-	replacements := []string{"*", "#"}
-	err := redactText(patterns, replacements, inputFile, outputFile)
+
+	// Initialize the RectangleProps object.
+	rectProps := &redactor.RectangleProps{
+		FillColor:   creator.ColorBlack,
+		BorderWidth: 0.0,
+		FillOpacity: 1.0,
+	}
+
+	err := redactText(patterns, rectProps, inputFile, destFile)
 	if err != nil {
 		panic(err)
 	}
@@ -54,35 +57,36 @@ func main() {
 }
 
 // redactText redacts the text in `inputFile` according to given patterns and saves result at `outputFile`.
-func redactText(patterns, replacements []string, inputFile, outputFile string) error {
+func redactText(patterns []string, rectProps *redactor.RectangleProps, inputFile, destFile string) error {
+
+	// Initialize RedactionTerms with regex patterns.
 	terms := []redactor.RedactionTerm{}
-	for i, pattern := range patterns {
+	for _, pattern := range patterns {
 		regexp, err := regexp.Compile(pattern)
 		if err != nil {
 			panic(err)
 		}
-		replacement := replacements[i]
-		redTerm := redactor.RedactionTerm{Pattern: regexp, Replacement: replacement}
+		redTerm := redactor.RedactionTerm{Pattern: regexp}
 		terms = append(terms, redTerm)
 	}
+
 	pdfReader, f, err := model.NewPdfReaderFromFile(inputFile, nil)
 	if err != nil {
 		panic(err)
 	}
 	defer f.Close()
-	// Define RedactionOptions
+	// Define RedactionOptions.
 	options := redactor.RedactionOptions{Terms: terms}
-	red, err := redactor.New(pdfReader, &options)
+	red := redactor.New(pdfReader, &options, rectProps)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	// Execute redaction on the file.
 	err = red.Redact()
 	if err != nil {
-		panic(err)
+		return err
 	}
-	// Write the redacted document to outputFile.
-	err = red.WriteToFile(outputFile)
+	// write the redacted document to file
+	err = red.WriteToFile(destFile)
 	if err != nil {
 		return err
 	}
