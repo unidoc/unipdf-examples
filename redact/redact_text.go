@@ -11,6 +11,8 @@ import (
 	"os"
 	"regexp"
 
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 	"github.com/unidoc/unipdf/v3/redactor"
 )
@@ -49,7 +51,7 @@ func main() {
 		FillOpacity: 1.0,
 	}
 
-	err := redactText(patterns, rectProps, inputFile, destFile)
+	err := redactText(patterns, rectProps, inputFile, outputFile)
 	if err != nil {
 		panic(err)
 	}
