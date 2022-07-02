@@ -87,7 +87,7 @@ func redactText(patterns []string, rectProps *redactor.RectangleProps, inputFile
 	if err != nil {
 		return err
 	}
-	// write the redacted document to file
+	// write the redacted document to destFile.
 	err = red.WriteToFile(destFile)
 	if err != nil {
 		return err
