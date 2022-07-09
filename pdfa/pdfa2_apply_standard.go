@@ -1,7 +1,7 @@
 /*
- * PDF optimization (compression) example.
+ * PDF/A-2 optimization (compression) example.
  *
- * Run as: go run pdf_apply_standard.go <input.pdf> <output.pdf>
+ * Run as: go run pdfa2_apply_standard.go <input.pdf> <output.pdf>
  */
 
 package main
@@ -16,7 +16,6 @@ import (
 	"github.com/unidoc/unipdf/v3/model"
 	"github.com/unidoc/unipdf/v3/model/pdfa"
 )
-
 
 func init() {
 	// Make sure to load your metered License API key prior to using the library.
@@ -52,8 +51,8 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Apply standard PDF/A-1B.
-	pdfWriter.ApplyStandard(pdfa.NewProfile1B(nil))
+	// Apply standard PDF/A-2B.
+	pdfWriter.ApplyStandard(pdfa.NewProfile2B(nil))
 
 	// Create output file.
 	err = pdfWriter.WriteToFile(outputPath)
@@ -64,4 +63,3 @@ func main() {
 	duration := float64(time.Since(start)) / float64(time.Millisecond)
 	fmt.Printf("Processing time: %.2f ms\n", duration)
 }
-

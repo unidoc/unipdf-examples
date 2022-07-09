@@ -47,6 +47,9 @@ type PageData struct {
 
 var pageDataList []*PageData
 
+// tolerancePoints is value for tolerance subscript letter.
+const tolerancePoints = 1.6
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Printf("Syntax: extract_text_bound <file.pdf>\n")
@@ -140,7 +143,7 @@ func extractWordsDataOnPage(pdfReader *model.PdfReader, pageNumber int) error {
 				curMarkArray = new(extractor.TextMarkArray)
 			}
 		} else if curMarkArray.Elements() != nil &&
-			curMarkArray.Elements()[curMarkArray.Len()-1].BBox.Lly > textMark.BBox.Lly {
+			curMarkArray.Elements()[curMarkArray.Len()-1].BBox.Lly > textMark.BBox.Lly+tolerancePoints {
 			// If current char is at a new line then the word is splitted into multiple line
 			// store each part data separately.
 			if trackingWord {

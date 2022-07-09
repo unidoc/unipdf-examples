@@ -1,7 +1,7 @@
 /*
- * PDF optimization (compression) example.
+ * PDF/A-2 optimization (compression) example.
  *
- * Run as: go run pdf_apply_standard.go <input.pdf> <output.pdf>
+ * Run as: go run pdfa2_validate_standard.go <input.pdf>
  */
 
 package main
@@ -17,7 +17,6 @@ import (
 	"github.com/unidoc/unipdf/v3/model/pdfa"
 )
 
-
 func init() {
 	// Make sure to load your metered License API key prior to using the library.
 	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
@@ -29,39 +28,41 @@ func init() {
 
 func main() {
 	args := os.Args
-	if len(args) < 3 {
-		fmt.Printf("Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH", os.Args[0])
+	if len(args) < 2 {
+		fmt.Printf("Usage: %s INPUT_PDF_PATH", os.Args[0])
 		return
 	}
 	inputPath := args[1]
-	outputPath := args[2]
 
 	// Initialize starting time.
 	start := time.Now()
 
 	// Create reader.
-	reader, file, err := model.NewPdfReaderFromFile(inputPath, nil)
+	inputFile, err := os.Open(inputPath)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-	defer file.Close()
+	defer inputFile.Close()
 
-	// Generate a PDFWriter from PDFReader.
-	pdfWriter, err := reader.ToWriter(nil)
+	detailedReader, err := model.NewCompliancePdfReader(inputFile)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Apply standard PDF/A-1B.
-	pdfWriter.ApplyStandard(pdfa.NewProfile1B(nil))
+	// Apply standard PDF/A-2.
+	standards := []model.StandardImplementer{
+		pdfa.NewProfile2A(nil),
+		pdfa.NewProfile2B(nil),
+		pdfa.NewProfile2U(nil),
+	}
 
-	// Create output file.
-	err = pdfWriter.WriteToFile(outputPath)
-	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
+	// Iterate over input standards and check if the document passes its requirements.
+	for _, standard := range standards {
+		if err = standard.ValidateStandard(detailedReader); err != nil {
+			fmt.Printf("Input document didn't pass the standard: %s - %v\n", standard.StandardName(), err)
+		}
 	}
 
 	duration := float64(time.Since(start)) / float64(time.Millisecond)
 	fmt.Printf("Processing time: %.2f ms\n", duration)
 }
-

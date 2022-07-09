@@ -55,7 +55,7 @@ func main() {
 	fmt.Printf("Complete, see output file: %s\n", outputPath)
 }
 
-// Rotate all pages by 90 degrees.
+// Rotate all pages by degrees.
 func rotatePdf(inputPath string, degrees int64, outputPath string) error {
 	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
@@ -68,8 +68,8 @@ func rotatePdf(inputPath string, degrees int64, outputPath string) error {
 		return nil
 	}
 
-	// Rotate all page 90 degrees.
-	err = pdfWriter.SetRotation(90)
+	// Rotate all page degrees.
+	err = pdfWriter.SetRotation(degrees)
 	if err != nil {
 		return nil
 	}
