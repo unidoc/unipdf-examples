@@ -18,7 +18,6 @@ import (
 	"time"
 
 	"github.com/unidoc/unipdf/v3/annotator"
-	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
@@ -32,8 +31,6 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 }
 
 var now = time.Now()
