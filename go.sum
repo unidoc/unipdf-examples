@@ -72,8 +72,8 @@ github.com/unidoc/timestamp v0.0.0-20200412005513-91597fd3793a h1:RLtvUhe4DsUDl6
 github.com/unidoc/timestamp v0.0.0-20200412005513-91597fd3793a/go.mod h1:j+qMWZVpZFTvDey3zxUkSgPJZEX33tDgU/QIA0IzCUw=
 github.com/unidoc/unichart v0.1.0 h1:GoJ/rxSoOYZsqlG3yOJpKkwgfsIQgb9hHX7bILZHcCg=
 github.com/unidoc/unichart v0.1.0/go.mod h1:9sJXeqxIIsU2D07tmhpDMoND0mBFRGfKBJnXZMsJnzk=
-github.com/unidoc/unipdf/v3 v3.36.0 h1:MONcxN+hWOCEJ8YtDDIyXc5CVjSZqbIr9DnYIjc+zmk=
-github.com/unidoc/unipdf/v3 v3.36.0/go.mod h1:7IIrUW7ef0ygNcjNB38wc9mL3ISmpoeuUjhMXsINgzk=
+github.com/unidoc/unipdf/v3 v3.37.0 h1:zAwtIL9upuk9IobyzOLjThT4fFsul2j14P4enjly0Lk=
+github.com/unidoc/unipdf/v3 v3.37.0/go.mod h1:obDrJyvay9tDiCMKUhzqffm0ZEwtQGWJTcY2QLx1U8w=
 github.com/unidoc/unitype v0.2.1 h1:x0jMn7pB/tNrjEVjy3Ukpxo++HOBQaTCXcTYFA6BH3w=
 github.com/unidoc/unitype v0.2.1/go.mod h1:mafyug7zYmDOusqa7G0dJV45qp4b6TDAN+pHN7ZUIBU=
 github.com/wcharczuk/go-chart/v2 v2.1.0 h1:tY2slqVQ6bN+yHSnDYwZebLQFkphK4WNrVwnt7CJZ2I=
