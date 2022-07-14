@@ -14,16 +14,22 @@ import (
 	"os"
 	"strconv"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/annotator"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/contentstream/draw"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-func main() {
-	// Debug log mode.
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
+func main() {
 	if len(os.Args) < 8 {
 		fmt.Printf("go run pdf_annotate_add_line.go input.pdf <page> <x1> <y1> <x2> <y2> output.pdf\n")
 		os.Exit(1)
@@ -67,7 +73,7 @@ func main() {
 	lineDef := annotator.LineAnnotationDef{}
 	lineDef.X1, lineDef.Y1 = x1, y1
 	lineDef.X2, lineDef.Y2 = x2, y2
-	lineDef.LineColor = pdf.NewPdfColorDeviceRGB(1.0, 0.0, 0.0) // Red.
+	lineDef.LineColor = model.NewPdfColorDeviceRGB(1.0, 0.0, 0.0) // Red.
 	lineDef.Opacity = 0.50
 	lineDef.LineEndingStyle1 = draw.LineEndingStyleNone
 	lineDef.LineEndingStyle2 = draw.LineEndingStyleArrow
@@ -83,11 +89,7 @@ func main() {
 }
 
 // Annotate pdf file.
-func annotatePdfAddLineAnnotation(inputPath string, pageNum int64, outputPath string, lineDef annotator.LineAnnotationDef) error {
-	unicommon.Log.Debug("Input PDF: %v", inputPath)
-
-	pdfWriter := pdf.NewPdfWriter()
-
+func annotatePdfAddLineAnnotation(inputPath string, targetPageNum int64, outputPath string, lineDef annotator.LineAnnotationDef) error {
 	// Read the input pdf file.
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -95,48 +97,37 @@ func annotatePdfAddLineAnnotation(inputPath string, pageNum int64, outputPath st
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
 
-	numPages, err := pdfReader.GetNumPages()
-	if err != nil {
-		return err
-	}
+	// Process each page using the following callback
+	// when generating PdfWriter.
+	opt := &model.ReaderToWriterOpts{
+		PageProcessCallback: func(pageNum int, page *model.PdfPage) error {
+			if int(targetPageNum) == pageNum {
+				lineAnnotation, err := annotator.CreateLineAnnotation(lineDef)
+				if err != nil {
+					return err
+				}
 
-	for i := 0; i < numPages; i++ {
-		// Read the page.
-		page, err := pdfReader.GetPage(int(i + 1))
-		if err != nil {
-			return err
-		}
-
-		if int(pageNum) == (i + 1) {
-			lineAnnotation, err := annotator.CreateLineAnnotation(lineDef)
-			if err != nil {
-				return err
+				// Add to the page annotations.
+				page.AddAnnotation(lineAnnotation)
 			}
 
-			// Add to the page annotations.
-			page.AddAnnotation(lineAnnotation)
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			unicommon.Log.Error("Failed to add page: %s", err)
-			return err
-		}
+			return nil
+		},
 	}
 
-	fWrite, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
 
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err
 	}

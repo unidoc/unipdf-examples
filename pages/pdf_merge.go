@@ -9,17 +9,20 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
 func init() {
-	// Debug log level.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
@@ -54,35 +57,14 @@ func main() {
 }
 
 func mergePdf(inputPaths []string, outputPath string) error {
-	pdfWriter := pdf.NewPdfWriter()
+	pdfWriter := model.NewPdfWriter()
 
 	for _, inputPath := range inputPaths {
-		f, err := os.Open(inputPath)
+		pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 		if err != nil {
 			return err
 		}
-
 		defer f.Close()
-
-		pdfReader, err := pdf.NewPdfReader(f)
-		if err != nil {
-			return err
-		}
-
-		isEncrypted, err := pdfReader.IsEncrypted()
-		if err != nil {
-			return err
-		}
-
-		if isEncrypted {
-			auth, err := pdfReader.Decrypt([]byte(""))
-			if err != nil {
-				return err
-			}
-			if !auth {
-				return errors.New("Cannot merge encrypted, password protected document")
-			}
-		}
 
 		numPages, err := pdfReader.GetNumPages()
 		if err != nil {

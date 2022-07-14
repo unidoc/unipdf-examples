@@ -11,15 +11,21 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
-	pdfcore "github.com/unidoc/unipdf/v3/core"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/core"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-func main() {
-	// Debug log mode.
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
+func main() {
 	if len(os.Args) < 4 {
 		fmt.Printf("go run pdf_annotate_add_text.go input.pdf output.pdf text\n")
 		os.Exit(1)
@@ -40,10 +46,6 @@ func main() {
 
 // Annotate pdf file.
 func annotatePdfAddText(inputPath string, outputPath string, annotationText string) error {
-	unicommon.Log.Debug("Input PDF: %v", inputPath)
-
-	pdfWriter := pdf.NewPdfWriter()
-
 	// Read the input pdf file.
 	f, err := os.Open(inputPath)
 	if err != nil {
@@ -51,49 +53,36 @@ func annotatePdfAddText(inputPath string, outputPath string, annotationText stri
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
 
-	numPages, err := pdfReader.GetNumPages()
+	// Process each page using the following callback
+	// when generating PdfWriter.
+	opt := &model.ReaderToWriterOpts{
+		PageProcessCallback: func(pageNum int, page *model.PdfPage) error {
+			// New text annotation.
+			textAnnotation := model.NewPdfAnnotationText()
+			textAnnotation.Contents = core.MakeString(annotationText)
+			// The rect specifies the location of the markup.
+			textAnnotation.Rect = core.MakeArray(core.MakeInteger(20), core.MakeInteger(100), core.MakeInteger(10+50), core.MakeInteger(100+50))
+
+			// Add to the page annotations.
+			page.AddAnnotation(textAnnotation.PdfAnnotation)
+
+			return nil
+		},
+	}
+
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
 
-	for i := 0; i < numPages; i++ {
-		pageNum := i + 1
-
-		// Read the page.
-		page, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		// New text annotation.
-		textAnnotation := pdf.NewPdfAnnotationText()
-		textAnnotation.Contents = pdfcore.MakeString(annotationText)
-		// The rect specifies the location of the markup.
-		textAnnotation.Rect = pdfcore.MakeArray(pdfcore.MakeInteger(20), pdfcore.MakeInteger(100), pdfcore.MakeInteger(10+50), pdfcore.MakeInteger(100+50))
-
-		// Add to the page annotations.
-		page.AddAnnotation(textAnnotation.PdfAnnotation)
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			unicommon.Log.Error("Failed to add page: %s", err)
-			return err
-		}
-	}
-
-	fWrite, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err
 	}

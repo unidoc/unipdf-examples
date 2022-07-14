@@ -11,19 +11,25 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Printf("Usage: go run pdf_forms_list_fields.go input.pdf [input2.pdf] ...\n")
 		os.Exit(1)
 	}
-
-	// When debugging, enable debug-level logging via console:
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	for _, inputPath := range os.Args[1:len(os.Args)] {
 		err := listFormFields(inputPath)
@@ -62,7 +68,7 @@ func listFormFields(inputPath string) error {
 	fmt.Printf(" Q: %v\n", acroForm.Q)
 	fmt.Printf(" XFA: %v\n", acroForm.XFA)
 	if acroForm.Fields != nil {
-		fmt.Printf(" #Fields: %d\n", len(*acroForm.Fields))
+		fmt.Printf(" #Fields: %d\n", len(acroForm.AllFields()))
 	} else {
 		fmt.Printf("No fields set\n")
 	}
@@ -100,8 +106,10 @@ func listFormFields(inputPath string) error {
 				fmt.Printf(" - Radio\n")
 			}
 			fmt.Printf(" - '%v'\n", t.V)
+
 		case *model.PdfFieldText:
 			fmt.Printf(" Text\n")
+			fmt.Printf(" - DA: %v\n", getDictEntry(field, "DA"))
 			fmt.Printf(" - '%v'\n", t.V)
 			if str, ok := core.GetString(t.V); ok {
 				fmt.Printf(" - Decoded: '%s'\n", str.Decoded())
@@ -110,9 +118,11 @@ func listFormFields(inputPath string) error {
 		case *model.PdfFieldChoice:
 			fmt.Printf(" Choice\n")
 			fmt.Printf(" - '%v'\n", t.V)
+
 		case *model.PdfFieldSignature:
 			fmt.Printf(" Signature\n")
 			fmt.Printf(" - '%v'\n", t.V)
+
 		default:
 			fmt.Printf(" Unknown\n")
 			continue
@@ -194,6 +204,24 @@ func listFormFields(inputPath string) error {
 
 			} else {
 				fmt.Printf("   - Appearance dict not present: %s\n", apDict)
+			}
+		}
+	}
+
+	return nil
+}
+
+// Returns the object corresponding with the specified
+// key in the field or from the field's parent.
+// Return nil if not found.
+func getDictEntry(f *model.PdfField, key core.PdfObjectName) core.PdfObject {
+	for _, fc := range []*model.PdfField{f, f.Parent} {
+		if fc == nil {
+			continue
+		}
+		if d, ok := core.GetDict(fc.GetContainingPdfObject()); ok {
+			if val := d.Get(key); val != nil {
+				return val
 			}
 		}
 	}

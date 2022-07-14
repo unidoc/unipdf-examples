@@ -18,10 +18,19 @@ import (
 	"os"
 	"sort"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -29,9 +38,6 @@ func main() {
 		fmt.Printf("Usage: go run pdf_metadata_get_xml.go input1.pdf [input2.pdf] ...\n")
 		os.Exit(1)
 	}
-
-	// Enable debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	fmt.Printf("XML metadata for root catalog\n")
 	for _, inputPath := range os.Args[1:len(os.Args)] {
@@ -56,14 +62,7 @@ func printXMLMetadataForPdf(inputPath string) error {
 	if err != nil {
 		return err
 	}
-	/*
-		numPages, err := pdfReader.GetNumPages()
-		if err != nil {
-			return err
-		}
-	*/
 
-	// XXX/FIXME: Much of the clunky type casting and tracing is being improved in v3.
 	catalogDict, err := getRootCatalog(pdfReader)
 	if err != nil {
 		return err

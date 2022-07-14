@@ -10,29 +10,25 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/extractor"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Printf("Usage: go run pdf_extract_text.go input.pdf\n")
 		os.Exit(1)
 	}
-
-	// Make sure to enter a valid license key.
-	// Otherwise text is truncated and a watermark added to the text.
-	// License keys are available via: https://unidoc.io
-	/*
-			license.SetLicenseKey(`
-		-----BEGIN UNIDOC LICENSE KEY-----
-		...key contents...
-		-----END UNIDOC LICENSE KEY-----
-		`)
-	*/
-
-	// For debugging.
-	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	inputPath := os.Args[1]
 
@@ -52,7 +48,7 @@ func outputPdfText(inputPath string) error {
 
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}

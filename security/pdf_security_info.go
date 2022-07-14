@@ -10,14 +10,17 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
 func init() {
-	// Set debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
@@ -43,7 +46,7 @@ func printSecurityInfo(inputPath string) error {
 
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}

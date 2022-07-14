@@ -7,22 +7,28 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"sort"
 
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Printf("Syntax: go run pdf_inspector.go input.pdf\n")
 		os.Exit(1)
 	}
-
-	// Enable debug-level logging.
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	inputPath := os.Args[1]
 
@@ -35,34 +41,11 @@ func main() {
 }
 
 func inspectPdf(inputPath string) error {
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
-
-	pdfReader, err := pdf.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting with an empty one.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-
-		if !auth {
-			return errors.New("Unable to decrypt password protected file - need to specify pass to Decrypt")
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {

@@ -13,15 +13,21 @@ import (
 	"path/filepath"
 	"sort"
 
-	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/annotator"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-func main() {
-	// When debugging, enable debug-level logging via console:
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
+func main() {
 	if len(os.Args) < 3 {
 		fmt.Printf("Usage: go run pdf_form_flatten.go <outputdir> <input1.pdf> [input2.pdf] ...\n")
 		os.Exit(1)
@@ -68,27 +74,23 @@ func flattenPdf(inputPath, outputPath string) error {
 	}
 
 	fieldAppearance := annotator.FieldAppearance{OnlyIfMissing: true}
-	err = pdfReader.FlattenFields(false, fieldAppearance)
+	err = pdfReader.FlattenFields(true, fieldAppearance)
 	if err != nil {
 		return err
 	}
 
-	pdfWriter := model.NewPdfWriter()
-	pdfWriter.SetForms(nil)
-
-	for _, p := range pdfReader.PageList {
-		err := pdfWriter.AddPage(p)
-		if err != nil {
-			return err
-		}
+	// AcroForm field is no longer needed.
+	opt := &model.ReaderToWriterOpts{
+		SkipAcroForm: true,
 	}
 
-	fout, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
-	defer fout.Close()
 
-	err = pdfWriter.Write(fout)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }

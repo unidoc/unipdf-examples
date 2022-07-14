@@ -12,9 +12,19 @@ import (
 	"os"
 	"strconv"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/model"
 	pdf "github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -35,9 +45,6 @@ func main() {
 		pageNum = int(num)
 	}
 
-	// Enable debug-level logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
 	fmt.Printf("Input file: %s\n", inputPath)
 
 	err := printPdfPageProperties(inputPath, pageNum)
@@ -48,33 +55,11 @@ func main() {
 }
 
 func printPdfPageProperties(inputPath string, pageNum int) error {
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-
-	pdfReader, err := pdf.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting with an empty one.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !auth {
-			unicommon.Log.Debug("Encrypted - unable to access - update code to specify pass")
-			return nil
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
@@ -110,12 +95,10 @@ func printPdfPageProperties(inputPath string, pageNum int) error {
 }
 
 func processPage(page *pdf.PdfPage) error {
-	mBox, err := page.GetMediaBox()
+	pageWidth, pageHeight, err := page.Size()
 	if err != nil {
 		return err
 	}
-	pageWidth := mBox.Urx - mBox.Llx
-	pageHeight := mBox.Ury - mBox.Lly
 
 	fmt.Printf(" Page: %+v\n", page)
 	if page.Rotate != nil {

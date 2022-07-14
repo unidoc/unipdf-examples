@@ -20,9 +20,20 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/unidoc/unipdf/v3/model"
+
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core/security"
-	pdf "github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 5 {
@@ -46,8 +57,6 @@ func main() {
 }
 
 func protectPdf(inputPath string, outputPath string, userPassword, ownerPassword string) error {
-	pdfWriter := pdf.NewPdfWriter()
-
 	permissions := security.PermPrinting | // Allow printing with low quality
 		security.PermFullPrintQuality |
 		security.PermModify | // Allow modifications.
@@ -57,23 +66,17 @@ func protectPdf(inputPath string, outputPath string, userPassword, ownerPassword
 		security.PermExtractGraphics | // Allow extracting graphics.
 		security.PermDisabilityExtract // Allow extracting graphics (accessibility)
 
-	encryptOptions := &pdf.EncryptOptions{
+	encryptOptions := &model.EncryptOptions{
 		Permissions: permissions,
-	}
-
-	err := pdfWriter.Encrypt([]byte(userPassword), []byte(ownerPassword), encryptOptions)
-	if err != nil {
-		return err
 	}
 
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -86,36 +89,19 @@ func protectPdf(inputPath string, outputPath string, userPassword, ownerPassword
 		return fmt.Errorf("The PDF is already locked (need to unlock first)")
 	}
 
-	numPages, err := pdfReader.GetNumPages()
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(nil)
 	if err != nil {
 		return err
 	}
 
-	for i := 0; i < numPages; i++ {
-		pageNum := i + 1
-
-		page, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			return err
-		}
-	}
-
-	fWrite, err := os.Create(outputPath)
+	// Encrypt document before writing to file.
+	err = pdfWriter.Encrypt([]byte(userPassword), []byte(ownerPassword), encryptOptions)
 	if err != nil {
 		return err
 	}
 
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
+	return err
 }

@@ -9,16 +9,24 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/contentstream/draw"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-func main() {
-	// For development:
-	//common.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
+func main() {
 	// Create report fonts.
 	font, err := model.NewStandard14Font("Helvetica")
 	if err != nil {

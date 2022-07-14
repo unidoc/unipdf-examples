@@ -13,19 +13,25 @@ import (
 	"os"
 	"strconv"
 
-	//unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 7 {
 		fmt.Printf("Usage: go run pdf_insert_text.go input.pdf <page> <xpos> <ypos> \"text\" output.pdf\n")
 		os.Exit(1)
 	}
-
-	// When debugging, log to console:
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	inputPath := os.Args[1]
 	pageNumStr := os.Args[2]
@@ -67,7 +73,7 @@ func addTextToPdf(inputPath string, outputPath string, text string, pageNum int,
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -94,7 +100,7 @@ func addTextToPdf(inputPath string, outputPath string, text string, pageNum int,
 		if i == pageNum || pageNum == -1 {
 			p := c.NewParagraph(text)
 			// Change to times bold font (default is helvetica).
-			timesBold, err := pdf.NewStandard14Font("Times-Bold")
+			timesBold, err := model.NewStandard14Font("Times-Bold")
 			if err != nil {
 				panic(err)
 			}

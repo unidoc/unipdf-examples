@@ -9,18 +9,21 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
 func init() {
-	// Use debug-mode log level.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
@@ -43,33 +46,11 @@ func main() {
 
 // Flatten the PDF's rotation flags.  For each page rotate page contents with page.Rotate, then set page.Rotate to 0.
 func rotateFlattenPdf(inputPath, outputPath string) error {
-
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-
-	pdfReader, err := pdf.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting both with given password and an empty one if that fails.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !auth {
-			return errors.New("Unable to decrypt pdf with empty pass")
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
@@ -90,30 +71,19 @@ func rotateFlattenPdf(inputPath, outputPath string) error {
 			return err
 		}
 
-		rotateDeg := int64(0)
+		var rotateDeg int64
 		if page.Rotate != nil && *page.Rotate != 0 {
-			rotateDeg = 360 - *page.Rotate
+			rotateDeg = -*page.Rotate
 		}
 
-		// Rotate the page block if needed.
-		if rotateDeg != 0 {
-			block.SetAngle(float64(rotateDeg))
-		}
+		// Rotate the page block. If the page is not rotated, this is a no-op.
+		block.SetAngle(float64(rotateDeg))
+		w, h := block.RotatedSize()
+		block.SetPos((w-block.Width())/2, (h-block.Height())/2)
 
-		// Set page size in creator.
-		// Account for translation that is needed when rotating about the upper left corner.
-		if rotateDeg == 90 || rotateDeg == 270 {
-			// Swap width and height.
-			c.SetPageSize(creator.PageSize{block.Height(), block.Width()})
-			block.SetPos(0, block.Width())
-		} else {
-			c.SetPageSize(creator.PageSize{block.Width(), block.Height()})
-			block.SetPos(0, 0)
-		}
-
+		c.SetPageSize(creator.PageSize{w, h})
 		c.NewPage()
-		err = c.Draw(block)
-		if err != nil {
+		if err = c.Draw(block); err != nil {
 			return err
 		}
 	}

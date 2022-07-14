@@ -13,9 +13,19 @@ import (
 
 	"strconv"
 
-	pdfcontent "github.com/unidoc/unipdf/v3/contentstream"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/contentstream"
+	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -35,9 +45,6 @@ func main() {
 		pageNum = int(val)
 	}
 
-	//When debugging:
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
 	fmt.Println(inputPath)
 	err := listContentStreams(inputPath, pageNum)
 	if err != nil {
@@ -47,35 +54,11 @@ func main() {
 }
 
 func listContentStreams(inputPath string, targetPageNum int) error {
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
-
-	pdfReader, err := pdf.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	if isEncrypted {
-		fmt.Println("Is encrypted!")
-		// Try decrypting with empty pass.  Or can specify user/owner password by modifying the line below.
-		ok, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !ok {
-			fmt.Println("Unable to decrypt with empty string - skipping")
-			return nil
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
@@ -112,7 +95,7 @@ func listContentStreams(inputPath string, targetPageNum int) error {
 		}
 		fmt.Printf("%s\n", pageContentStr)
 
-		cstreamParser := pdfcontent.NewContentStreamParser(pageContentStr)
+		cstreamParser := contentstream.NewContentStreamParser(pageContentStr)
 		operations, err := cstreamParser.Parse()
 		if err != nil {
 			return err

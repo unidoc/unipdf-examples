@@ -3,10 +3,10 @@
  * with UniDoc.
  *
  * To create a key pair:
- * $ ./pdf_sign_hsm_pkcs11 add test <PIN> <keypair_label>
+ * $ ./pdf_sign_hsm_pkcs11_cgo add test <PIN> <keypair_label>
  *
  * To sign a PDF:
- * $ ./pdf_sign_hsm_pkcs11 sign test <PIN> <keypair_label> input.pdf input_signed.pdf
+ * $ ./pdf_sign_hsm_pkcs11_cgo sign test <PIN> <keypair_label> input.pdf input_signed.pdf
  *
  * See instructions for testing via SoftHSM in README.md.
  */
@@ -26,13 +26,22 @@ import (
 	"time"
 
 	"github.com/ThalesIgnite/crypto11"
-	"github.com/miekg/pkcs11"
 
 	"github.com/unidoc/unipdf/v3/annotator"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
 	"github.com/unidoc/unipdf/v3/model/sighandler"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 // Library path might be different on different operating systems.
 const PathSoftHSM = "/usr/local/lib/softhsm/libsofthsm2.so"
@@ -80,29 +89,30 @@ func main() {
 	// possible while a session is open.
 	ctx, err := initPKCS11Session(tokenLabel, tokenPin)
 	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
+		log.Fatalf("Init Fail: %v\n", err)
 	}
-	defer crypto11.Close()
+	defer ctx.Close()
 
 	switch action {
 	case "add":
 		if _, err := addKeyPair(ctx, keypairLabel); err != nil {
-			log.Fatalf("Fail: %v\n", err)
+			log.Fatalf("Add Key Pair Fail: %v\n", err)
 		}
 
 		log.Printf("Key pair successfully added for token %s\n", tokenLabel)
 	case "sign":
-		// Get private key.
-		priv, err := getKeyPair(keypairLabel)
+		// Get a signer object associated with the keypair label.
+		signer, err := getKeyPair(ctx, keypairLabel)
 		if err != nil {
 			log.Fatalf("Fail: %v\n", err)
 		}
-		rsaPriv, ok := priv.(*crypto11.PKCS11PrivateKeyRSA)
-		if !ok {
-			log.Fatal("Fail: unsupported private key\n")
+
+		if signer == nil {
+			log.Printf("Fail: KeyPair with the specified label not found")
+			return
 		}
 
-		cert, err := generateCertificate(rsaPriv)
+		cert, err := generateCertificate(signer)
 		if err != nil {
 			log.Fatalf("Fail: %v\n", err)
 		}
@@ -110,7 +120,7 @@ func main() {
 		inputPath := args[5]
 		outputPath := args[6]
 
-		if err := sign(rsaPriv, cert, inputPath, outputPath); err != nil {
+		if err := sign(signer, cert, inputPath, outputPath); err != nil {
 			log.Fatalf("Fail: %v\n", err)
 		}
 
@@ -119,8 +129,8 @@ func main() {
 }
 
 // initPKCS11Session initializes a PKCS11 store and creates a new session.
-func initPKCS11Session(tokenLabel, tokenPin string) (*pkcs11.Ctx, error) {
-	conf := crypto11.PKCS11Config{
+func initPKCS11Session(tokenLabel, tokenPin string) (*crypto11.Context, error) {
+	conf := crypto11.Config{
 		Path:       PathSoftHSM,
 		TokenLabel: tokenLabel,
 		Pin:        tokenPin,
@@ -130,28 +140,26 @@ func initPKCS11Session(tokenLabel, tokenPin string) (*pkcs11.Ctx, error) {
 }
 
 // getKeyPair retrieves the key pair with the specified label.
-func getKeyPair(keypairLabel string) (crypto.PrivateKey, error) {
-	return crypto11.FindKeyPair(nil, []byte(keypairLabel))
+func getKeyPair(ctx *crypto11.Context, keypairLabel string) (crypto11.Signer, error) {
+	return ctx.FindKeyPair(nil, []byte(keypairLabel))
 }
 
 // addKeyPair adds a new public/private key pair with the specified label
 // to the PKCS11 store.
-func addKeyPair(ctx *pkcs11.Ctx, keypairLabel string) (crypto.PrivateKey, error) {
-	// Get slot list.
-	slots, err := ctx.GetSlotList(true)
-	if err != nil {
-		return nil, err
-	}
+func addKeyPair(ctx *crypto11.Context, keypairLabel string) (crypto11.SignerDecrypter, error) {
+	// Generate random keypair id.
+	resultId := make([]byte, 32)
+	rand.Read(resultId)
 
 	// Generate key pair.
-	return crypto11.GenerateRSAKeyPairOnSlot(slots[0], nil, []byte(keypairLabel), 2048)
+	return ctx.GenerateRSAKeyPairWithLabel([]byte(resultId), []byte(keypairLabel), 2048)
 }
 
 // generateCertificate generates a X509 certificate based on the specified private key.
-func generateCertificate(priv *crypto11.PKCS11PrivateKeyRSA) (*x509.Certificate, error) {
+func generateCertificate(signer crypto.Signer) (*x509.Certificate, error) {
 	// Initialize X509 certificate template.
 	now := time.Now()
-	template := x509.Certificate{
+	template := &x509.Certificate{
 		SerialNumber: big.NewInt(1),
 		Subject: pkix.Name{
 			Organization: []string{"Test Company"},
@@ -165,7 +173,7 @@ func generateCertificate(priv *crypto11.PKCS11PrivateKeyRSA) (*x509.Certificate,
 	}
 
 	// Generate X509 certificate.
-	certData, err := x509.CreateCertificate(rand.Reader, &template, &template, priv.Public(), priv)
+	certData, err := x509.CreateCertificate(rand.Reader, template, template, signer.Public(), signer)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +183,7 @@ func generateCertificate(priv *crypto11.PKCS11PrivateKeyRSA) (*x509.Certificate,
 
 // sign signs the specified input PDF file using an adobeX509RSASHA1 signature handler
 // and saves the result at the destination specified by the outputPath parameter.
-func sign(priv *crypto11.PKCS11PrivateKeyRSA, certificate *x509.Certificate, inputPath, outputPath string) error {
+func sign(signer crypto.Signer, certificate *x509.Certificate, inputPath, outputPath string) error {
 	// Open input file.
 	file, err := os.Open(inputPath)
 	if err != nil {
@@ -202,7 +210,7 @@ func sign(priv *crypto11.PKCS11PrivateKeyRSA, certificate *x509.Certificate, inp
 			return nil, errors.New("hash type error")
 		}
 
-		return priv.Sign(rand.Reader, h.Sum(nil), crypto.SHA1)
+		return signer.Sign(rand.Reader, h.Sum(nil), crypto.SHA1)
 	}
 
 	// Create custom signature handler.

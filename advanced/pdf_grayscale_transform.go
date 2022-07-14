@@ -12,17 +12,24 @@ package main
 import (
 	"errors"
 	"fmt"
+
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
-	pdfcontent "github.com/unidoc/unipdf/v3/contentstream"
-	pdfcore "github.com/unidoc/unipdf/v3/core"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/contentstream"
+	"github.com/unidoc/unipdf/v3/core"
+	"github.com/unidoc/unipdf/v3/model"
 	"github.com/unidoc/unipdf/v3/ps"
 )
 
 func init() {
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
@@ -44,36 +51,11 @@ func main() {
 }
 
 func convertPdfToGrayscale(inputPath, outputPath string) error {
-	pdfWriter := pdf.NewPdfWriter()
-
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
-
-	pdfReader, err := pdf.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting with an empty one.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			// Encrypted and we cannot do anything about it.
-			return err
-		}
-		if !auth {
-			return errors.New("Need to decrypt with password")
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
@@ -81,31 +63,29 @@ func convertPdfToGrayscale(inputPath, outputPath string) error {
 	}
 	fmt.Printf("PDF Num Pages: %d\n", numPages)
 
-	for i := 0; i < numPages; i++ {
-		fmt.Printf("Processing page %d/%d\n", i+1, numPages)
-		page, err := pdfReader.GetPage(i + 1)
-		if err != nil {
-			return err
-		}
+	// Process each page using the following callback
+	// when generating PdfWriter.
+	opts := &model.ReaderToWriterOpts{
+		PageProcessCallback: func(pageNum int, page *model.PdfPage) error {
+			fmt.Printf("Processing page %d/%d\n", pageNum, numPages)
 
-		err = convertPageToGrayscale(page)
-		if err != nil {
-			return err
-		}
+			err = convertPageToGrayscale(page)
+			if err != nil {
+				return err
+			}
 
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			return err
-		}
+			return nil
+		},
 	}
 
-	fWrite, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opts)
 	if err != nil {
 		return err
 	}
-	defer fWrite.Close()
 
-	err = pdfWriter.Write(fWrite)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err
 	}
@@ -115,7 +95,7 @@ func convertPdfToGrayscale(inputPath, outputPath string) error {
 
 // Replaces color objects on the page with grayscale ones.  Also references XObject Images and Forms
 // to convert those to grayscale.
-func convertPageToGrayscale(page *pdf.PdfPage) error {
+func convertPageToGrayscale(page *model.PdfPage) error {
 	// For each page, we go through the resources and look for the images.
 	contents, err := page.GetAllContentStreams()
 	if err != nil {
@@ -126,7 +106,7 @@ func convertPageToGrayscale(page *pdf.PdfPage) error {
 	if err != nil {
 		return err
 	}
-	page.SetContentStreams([]string{string(grayContent)}, pdfcore.NewFlateEncoder())
+	page.SetContentStreams([]string{string(grayContent)}, core.NewFlateEncoder())
 
 	//fmt.Printf("Processed contents: %s\n", grayContent)
 
@@ -134,28 +114,28 @@ func convertPageToGrayscale(page *pdf.PdfPage) error {
 }
 
 // Check if colorspace represents a Pattern colorspace.
-func isPatternCS(cs pdf.PdfColorspace) bool {
-	_, isPattern := cs.(*pdf.PdfColorspaceSpecialPattern)
+func isPatternCS(cs model.PdfColorspace) bool {
+	_, isPattern := cs.(*model.PdfColorspaceSpecialPattern)
 	return isPattern
 }
 
-func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageResources) ([]byte, error) {
-	cstreamParser := pdfcontent.NewContentStreamParser(contents)
+func transformContentStreamToGrayscale(contents string, resources *model.PdfPageResources) ([]byte, error) {
+	cstreamParser := contentstream.NewContentStreamParser(contents)
 	operations, err := cstreamParser.Parse()
 	if err != nil {
 		return nil, err
 	}
-	processedOperations := &pdfcontent.ContentStreamOperations{}
+	processedOperations := &contentstream.ContentStreamOperations{}
 
-	transformedPatterns := map[pdfcore.PdfObjectName]bool{} // List of already transformed patterns. Avoid multiple conversions.
-	transformedShadings := map[pdfcore.PdfObjectName]bool{} // List of already transformed shadings. Avoid multiple conversions.
+	transformedPatterns := map[core.PdfObjectName]bool{} // List of already transformed patterns. Avoid multiple conversions.
+	transformedShadings := map[core.PdfObjectName]bool{} // List of already transformed shadings. Avoid multiple conversions.
 
 	// The content stream processor keeps track of the graphics state and we can make our own handlers to process certain commands,
 	// using the AddHandler method.  In this case, we hook up to color related operands, and for image and form handling.
-	processor := pdfcontent.NewContentStreamProcessor(*operations)
+	processor := contentstream.NewContentStreamProcessor(*operations)
 	// Add handlers for colorspace related functionality.
-	processor.AddHandler(pdfcontent.HandlerConditionEnumAllOperands, "",
-		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
+	processor.AddHandler(contentstream.HandlerConditionEnumAllOperands, "",
+		func(op *contentstream.ContentStreamOperation, gs contentstream.GraphicsState, resources *model.PdfPageResources) error {
 			operand := op.Operand
 			switch operand {
 			case "CS": // Set colorspace operands (stroking).
@@ -164,23 +144,23 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					// If has an underlying colorspace, then go and change it to DeviceGray.
 					// Needs to be specified externally in the colorspace resources.
 
-					csname := op.Params[0].(*pdfcore.PdfObjectName)
+					csname := op.Params[0].(*core.PdfObjectName)
 					if *csname != "Pattern" {
 						// Update if referring to an external colorspace in resources.
 						cs, ok := resources.GetColorspaceByName(*csname)
 						if !ok {
-							unicommon.Log.Debug("Undefined colorspace for pattern (%s)", csname)
+							common.Log.Debug("Undefined colorspace for pattern (%s)", csname)
 							return errors.New("Colorspace not defined")
 						}
 
-						patternCS, ok := cs.(*pdf.PdfColorspaceSpecialPattern)
+						patternCS, ok := cs.(*model.PdfColorspaceSpecialPattern)
 						if !ok {
 							return errors.New("Type error")
 						}
 
 						if patternCS.UnderlyingCS != nil {
 							// Swap out for a gray colorspace.
-							patternCS.UnderlyingCS = pdf.NewPdfColorspaceDeviceGray()
+							patternCS.UnderlyingCS = model.NewPdfColorspaceDeviceGray()
 						}
 
 						err = resources.SetColorspaceByName(*csname, patternCS)
@@ -192,9 +172,9 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					return nil
 				}
 
-				op := pdfcontent.ContentStreamOperation{}
+				op := contentstream.ContentStreamOperation{}
 				op.Operand = operand
-				op.Params = []pdfcore.PdfObject{pdfcore.MakeName("DeviceGray")}
+				op.Params = []core.PdfObject{core.MakeName("DeviceGray")}
 				*processedOperations = append(*processedOperations, &op)
 				return nil
 			case "cs": // Set colorspace operands (non-stroking).
@@ -203,23 +183,23 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					// If has an underlying colorspace, then go and change it to DeviceGray.
 					// Needs to be specified externally in the colorspace resources.
 
-					csname := op.Params[0].(*pdfcore.PdfObjectName)
+					csname := op.Params[0].(*core.PdfObjectName)
 					if *csname != "Pattern" {
 						// Update if referring to an external colorspace in resources.
 						cs, ok := resources.GetColorspaceByName(*csname)
 						if !ok {
-							unicommon.Log.Debug("Undefined colorspace for pattern (%s)", csname)
+							common.Log.Debug("Undefined colorspace for pattern (%s)", csname)
 							return errors.New("Colorspace not defined")
 						}
 
-						patternCS, ok := cs.(*pdf.PdfColorspaceSpecialPattern)
+						patternCS, ok := cs.(*model.PdfColorspaceSpecialPattern)
 						if !ok {
 							return errors.New("Type error")
 						}
 
 						if patternCS.UnderlyingCS != nil {
 							// Swap out for a gray colorspace.
-							patternCS.UnderlyingCS = pdf.NewPdfColorspaceDeviceGray()
+							patternCS.UnderlyingCS = model.NewPdfColorspaceDeviceGray()
 						}
 
 						resources.SetColorspaceByName(*csname, patternCS)
@@ -228,19 +208,19 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					return nil
 				}
 
-				op := pdfcontent.ContentStreamOperation{}
+				op := contentstream.ContentStreamOperation{}
 				op.Operand = operand
-				op.Params = []pdfcore.PdfObject{pdfcore.MakeName("DeviceGray")}
+				op.Params = []core.PdfObject{core.MakeName("DeviceGray")}
 				*processedOperations = append(*processedOperations, &op)
 				return nil
 
 			case "SC", "SCN": // Set stroking color.  Includes pattern colors.
 				if isPatternCS(gs.ColorspaceStroking) {
-					op := pdfcontent.ContentStreamOperation{}
+					op := contentstream.ContentStreamOperation{}
 					op.Operand = operand
-					op.Params = []pdfcore.PdfObject{}
+					op.Params = []core.PdfObject{}
 
-					patternColor, ok := gs.ColorStroking.(*pdf.PdfColorPattern)
+					patternColor, ok := gs.ColorStroking.(*model.PdfColorPattern)
 					if !ok {
 						return errors.New("Invalid stroking color type")
 					}
@@ -251,15 +231,15 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 							fmt.Printf("Error: %v\n", err)
 							return err
 						}
-						rgbColor := color.(*pdf.PdfColorDeviceRGB)
+						rgbColor := color.(*model.PdfColorDeviceRGB)
 						grayColor := rgbColor.ToGray()
 
-						op.Params = append(op.Params, pdfcore.MakeFloat(grayColor.Val()))
+						op.Params = append(op.Params, core.MakeFloat(grayColor.Val()))
 					}
 
 					if _, has := transformedPatterns[patternColor.PatternName]; has {
 						// Already processed, need not change anything, except underlying color if used.
-						op.Params = append(op.Params, pdfcore.MakeName(string(patternColor.PatternName)))
+						op.Params = append(op.Params, core.MakeName(string(patternColor.PatternName)))
 						*processedOperations = append(*processedOperations, &op)
 						return nil
 					}
@@ -273,12 +253,12 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 					grayPattern, err := convertPatternToGray(pattern)
 					if err != nil {
-						unicommon.Log.Debug("Unable to convert pattern to grayscale: %v", err)
+						common.Log.Debug("Unable to convert pattern to grayscale: %v", err)
 						return err
 					}
 					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
 
-					op.Params = append(op.Params, pdfcore.MakeName(string(patternColor.PatternName)))
+					op.Params = append(op.Params, core.MakeName(string(patternColor.PatternName)))
 					*processedOperations = append(*processedOperations, &op)
 				} else {
 					color, err := gs.ColorspaceStroking.ColorToRGB(gs.ColorStroking)
@@ -286,23 +266,23 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						fmt.Printf("Error with ColorToRGB: %v\n", err)
 						return err
 					}
-					rgbColor := color.(*pdf.PdfColorDeviceRGB)
+					rgbColor := color.(*model.PdfColorDeviceRGB)
 					grayColor := rgbColor.ToGray()
 
-					op := pdfcontent.ContentStreamOperation{}
+					op := contentstream.ContentStreamOperation{}
 					op.Operand = operand
-					op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
+					op.Params = []core.PdfObject{core.MakeFloat(grayColor.Val())}
 					*processedOperations = append(*processedOperations, &op)
 				}
 
 				return nil
 			case "sc", "scn": // Set nonstroking color.
 				if isPatternCS(gs.ColorspaceNonStroking) {
-					op := pdfcontent.ContentStreamOperation{}
+					op := contentstream.ContentStreamOperation{}
 					op.Operand = operand
-					op.Params = []pdfcore.PdfObject{}
+					op.Params = []core.PdfObject{}
 
-					patternColor, ok := gs.ColorNonStroking.(*pdf.PdfColorPattern)
+					patternColor, ok := gs.ColorNonStroking.(*model.PdfColorPattern)
 					if !ok {
 						return errors.New("Invalid stroking color type")
 					}
@@ -313,15 +293,15 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 							fmt.Printf("Error : %v\n", err)
 							return err
 						}
-						rgbColor := color.(*pdf.PdfColorDeviceRGB)
+						rgbColor := color.(*model.PdfColorDeviceRGB)
 						grayColor := rgbColor.ToGray()
 
-						op.Params = append(op.Params, pdfcore.MakeFloat(grayColor.Val()))
+						op.Params = append(op.Params, core.MakeFloat(grayColor.Val()))
 					}
 
 					if _, has := transformedPatterns[patternColor.PatternName]; has {
 						// Already processed, need not change anything, except underlying color if used.
-						op.Params = append(op.Params, pdfcore.MakeName(string(patternColor.PatternName)))
+						op.Params = append(op.Params, core.MakeName(string(patternColor.PatternName)))
 						*processedOperations = append(*processedOperations, &op)
 						return nil
 					}
@@ -335,12 +315,12 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 
 					grayPattern, err := convertPatternToGray(pattern)
 					if err != nil {
-						unicommon.Log.Debug("Unable to convert pattern to grayscale: %v", err)
+						common.Log.Debug("Unable to convert pattern to grayscale: %v", err)
 						return err
 					}
 					resources.SetPatternByName(patternColor.PatternName, grayPattern.ToPdfObject())
 
-					op.Params = append(op.Params, pdfcore.MakeName(string(patternColor.PatternName)))
+					op.Params = append(op.Params, core.MakeName(string(patternColor.PatternName)))
 					*processedOperations = append(*processedOperations, &op)
 				} else {
 					color, err := gs.ColorspaceNonStroking.ColorToRGB(gs.ColorNonStroking)
@@ -348,12 +328,12 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 						fmt.Printf("Error: %v\n", err)
 						return err
 					}
-					rgbColor := color.(*pdf.PdfColorDeviceRGB)
+					rgbColor := color.(*model.PdfColorDeviceRGB)
 					grayColor := rgbColor.ToGray()
 
-					op := pdfcontent.ContentStreamOperation{}
+					op := contentstream.ContentStreamOperation{}
 					op.Operand = operand
-					op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
+					op.Params = []core.PdfObject{core.MakeFloat(grayColor.Val())}
 
 					*processedOperations = append(*processedOperations, &op)
 				}
@@ -364,12 +344,12 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					fmt.Printf("Error: %v\n", err)
 					return err
 				}
-				rgbColor := color.(*pdf.PdfColorDeviceRGB)
+				rgbColor := color.(*model.PdfColorDeviceRGB)
 				grayColor := rgbColor.ToGray()
 
-				op := pdfcontent.ContentStreamOperation{}
+				op := contentstream.ContentStreamOperation{}
 				op.Operand = "G"
-				op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
+				op.Params = []core.PdfObject{core.MakeFloat(grayColor.Val())}
 
 				*processedOperations = append(*processedOperations, &op)
 				return nil
@@ -379,12 +359,12 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					fmt.Printf("Error: %v\n", err)
 					return err
 				}
-				rgbColor := color.(*pdf.PdfColorDeviceRGB)
+				rgbColor := color.(*model.PdfColorDeviceRGB)
 				grayColor := rgbColor.ToGray()
 
-				op := pdfcontent.ContentStreamOperation{}
+				op := contentstream.ContentStreamOperation{}
 				op.Operand = "g"
-				op.Params = []pdfcore.PdfObject{pdfcore.MakeFloat(grayColor.Val())}
+				op.Params = []core.PdfObject{core.MakeFloat(grayColor.Val())}
 
 				*processedOperations = append(*processedOperations, &op)
 				return nil
@@ -392,7 +372,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				if len(op.Params) != 1 {
 					return errors.New("Params to sh operator should be 1")
 				}
-				shname, ok := op.Params[0].(*pdfcore.PdfObjectName)
+				shname, ok := op.Params[0].(*core.PdfObjectName)
 				if !ok {
 					return errors.New("sh parameter should be a name")
 				}
@@ -421,14 +401,14 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 		})
 	// Add handler for image related handling.  Note that inline images are completely stored with a ContentStreamInlineImage
 	// object as the parameter for BI.
-	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "BI",
-		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
+	processor.AddHandler(contentstream.HandlerConditionEnumOperand, "BI",
+		func(op *contentstream.ContentStreamOperation, gs contentstream.GraphicsState, resources *model.PdfPageResources) error {
 			if len(op.Params) != 1 {
 				fmt.Printf("BI Error invalid number of params\n")
 				return errors.New("invalid number of parameters")
 			}
 			// Inline image.
-			iimg, ok := op.Params[0].(*pdfcontent.ContentStreamInlineImage)
+			iimg, ok := op.Params[0].(*contentstream.ContentStreamInlineImage)
 			if !ok {
 				fmt.Printf("Error: Invalid handling for inline image\n")
 				return errors.New("Invalid inline image parameter")
@@ -450,7 +430,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				fmt.Printf("Error converting image to rgb: %v\n", err)
 				return err
 			}
-			rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
+			rgbColorSpace := model.NewPdfColorspaceDeviceRGB()
 			grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
 			if err != nil {
 				fmt.Printf("Error converting img to gray: %v\n", err)
@@ -464,18 +444,18 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				fmt.Printf("Error getting encoder for inline image: %v\n", err)
 				return err
 			}
-			if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
+			if dctEncoder, is := encoder.(*core.DCTEncoder); is {
 				dctEncoder.ColorComponents = 1
 			}
 
-			grayInlineImg, err := pdfcontent.NewInlineImageFromImage(grayImage, encoder)
+			grayInlineImg, err := contentstream.NewInlineImageFromImage(grayImage, encoder)
 			if err != nil {
-				if err == pdfcore.ErrUnsupportedEncodingParameters {
+				if err == core.ErrUnsupportedEncodingParameters {
 					// Unsupported encoding parameters, revert to a basic flate encoder without predictor.
-					encoder = pdfcore.NewFlateEncoder()
+					encoder = core.NewFlateEncoder()
 				}
 				// Try again, fail on error.
-				grayInlineImg, err = pdfcontent.NewInlineImageFromImage(grayImage, encoder)
+				grayInlineImg, err = contentstream.NewInlineImageFromImage(grayImage, encoder)
 				if err != nil {
 					fmt.Printf("Error making a new inline image object: %v\n", err)
 					return err
@@ -483,9 +463,9 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			}
 
 			// Replace inline image data with the gray image.
-			pOp := pdfcontent.ContentStreamOperation{}
+			pOp := contentstream.ContentStreamOperation{}
 			pOp.Operand = "BI"
-			pOp.Params = []pdfcore.PdfObject{grayInlineImg}
+			pOp.Params = []core.PdfObject{grayInlineImg}
 			*processedOperations = append(*processedOperations, &pOp)
 
 			return nil
@@ -494,15 +474,15 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 	// Handler for XObject Image and Forms.
 	processedXObjects := map[string]bool{} // Keep track of processed XObjects to avoid repetition.
 
-	processor.AddHandler(pdfcontent.HandlerConditionEnumOperand, "Do",
-		func(op *pdfcontent.ContentStreamOperation, gs pdfcontent.GraphicsState, resources *pdf.PdfPageResources) error {
+	processor.AddHandler(contentstream.HandlerConditionEnumOperand, "Do",
+		func(op *contentstream.ContentStreamOperation, gs contentstream.GraphicsState, resources *model.PdfPageResources) error {
 			if len(op.Params) < 1 {
 				fmt.Printf("ERROR: Invalid number of params for Do object.\n")
 				return errors.New("Range check")
 			}
 
 			// XObject.
-			name := op.Params[0].(*pdfcore.PdfObjectName)
+			name := op.Params[0].(*core.PdfObjectName)
 
 			// Only process each one once.
 			_, has := processedXObjects[string(*name)]
@@ -512,7 +492,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 			processedXObjects[string(*name)] = true
 
 			_, xtype := resources.GetXObjectByName(*name)
-			if xtype == pdf.XObjectTypeImage {
+			if xtype == model.XObjectTypeImage {
 				//fmt.Printf(" XObject Image: %s\n", *name)
 
 				ximg, err := resources.GetXObjectImageByName(*name)
@@ -533,7 +513,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					return err
 				}
 
-				rgbColorSpace := pdf.NewPdfColorspaceDeviceRGB()
+				rgbColorSpace := model.NewPdfColorspaceDeviceRGB()
 				grayImage, err := rgbColorSpace.ImageToGray(rgbImg)
 				if err != nil {
 					fmt.Printf("Error ImageToGray: %v\n", err)
@@ -543,19 +523,19 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 				// Update the XObject image.
 				// Use same encoder as input data.  Make sure for DCT filter it is updated to 1 color component.
 				encoder := ximg.Filter
-				if dctEncoder, is := encoder.(*pdfcore.DCTEncoder); is {
+				if dctEncoder, is := encoder.(*core.DCTEncoder); is {
 					dctEncoder.ColorComponents = 1
 				}
 
-				ximgGray, err := pdf.NewXObjectImageFromImage(&grayImage, nil, encoder)
+				ximgGray, err := model.NewXObjectImageFromImage(&grayImage, nil, encoder)
 				if err != nil {
-					if err == pdfcore.ErrUnsupportedEncodingParameters {
+					if err == core.ErrUnsupportedEncodingParameters {
 						// Unsupported encoding parameters, revert to a basic flate encoder without predictor.
-						encoder = pdfcore.NewFlateEncoder()
+						encoder = core.NewFlateEncoder()
 					}
 
 					// Try again, fail if error.
-					ximgGray, err = pdf.NewXObjectImageFromImage(&grayImage, nil, encoder)
+					ximgGray, err = model.NewXObjectImageFromImage(&grayImage, nil, encoder)
 					if err != nil {
 						fmt.Printf("Error creating image: %v\n", err)
 						return err
@@ -568,7 +548,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 					fmt.Printf("Failed setting x object: %v (%s)\n", err, string(*name))
 					return err
 				}
-			} else if xtype == pdf.XObjectTypeForm {
+			} else if xtype == model.XObjectTypeForm {
 				//fmt.Printf(" XObject Form: %s\n", *name)
 
 				// Go through the XObject Form content stream.
@@ -629,7 +609,7 @@ func transformContentStreamToGrayscale(contents string, resources *pdf.PdfPageRe
 }
 
 // Convert a pattern to grayscale (tiling or shading pattern).
-func convertPatternToGray(pattern *pdf.PdfPattern) (*pdf.PdfPattern, error) {
+func convertPatternToGray(pattern *model.PdfPattern) (*model.PdfPattern, error) {
 	// Case 1: Colored tiling patterns.  Need to process the content stream and replace.
 	if pattern.IsTiling() {
 		tilingPattern := pattern.GetAsTilingPattern()
@@ -673,7 +653,7 @@ func convertPatternToGray(pattern *pdf.PdfPattern) (*pdf.PdfPattern, error) {
 // This one is slightly involved as a shading defines a color as function of position, i.e. color(x,y) = F(x,y).
 // Since the function can be challenging to change, we define new DeviceN colorspace with a color conversion
 // function.
-func convertShadingToGray(shading *pdf.PdfShading) (*pdf.PdfShading, error) {
+func convertShadingToGray(shading *model.PdfShading) (*model.PdfShading, error) {
 	cs := shading.ColorSpace
 
 	if cs.GetNumComponents() == 1 {
@@ -683,7 +663,7 @@ func convertShadingToGray(shading *pdf.PdfShading) (*pdf.PdfShading, error) {
 		// Create a new DeviceN colorspace that converts R,G,B -> Grayscale
 		// Use: gray := 0.3*R + 0.59G + 0.11B
 		// PS program: { 0.11 mul exch 0.59 mul add exch 0.3 mul add }.
-		transformFunc := &pdf.PdfFunctionType4{}
+		transformFunc := &model.PdfFunctionType4{}
 		transformFunc.Domain = []float64{0, 1, 0, 1, 0, 1}
 		transformFunc.Range = []float64{0, 1}
 		rgbToGrayPsProgram := ps.NewPSProgram()
@@ -700,9 +680,9 @@ func convertShadingToGray(shading *pdf.PdfShading) (*pdf.PdfShading, error) {
 		transformFunc.Program = rgbToGrayPsProgram
 
 		// Define the DeviceN colorspace that performs the R,G,B -> Gray conversion for us.
-		transformcs := pdf.NewPdfColorspaceDeviceN()
-		transformcs.AlternateSpace = pdf.NewPdfColorspaceDeviceGray()
-		transformcs.ColorantNames = pdfcore.MakeArray(pdfcore.MakeName("R"), pdfcore.MakeName("G"), pdfcore.MakeName("B"))
+		transformcs := model.NewPdfColorspaceDeviceN()
+		transformcs.AlternateSpace = model.NewPdfColorspaceDeviceGray()
+		transformcs.ColorantNames = core.MakeArray(core.MakeName("R"), core.MakeName("G"), core.MakeName("B"))
 		transformcs.TintTransform = transformFunc
 
 		// Replace the old colorspace with the new.
@@ -713,7 +693,7 @@ func convertShadingToGray(shading *pdf.PdfShading) (*pdf.PdfShading, error) {
 		// Create a new DeviceN colorspace that converts C,M,Y,K -> Grayscale.
 		// Use: gray = 1.0 - min(1.0, 0.3*C + 0.59*M + 0.11*Y + K)  ; where BG(k) = k simply.
 		// PS program: {exch 0.11 mul add exch 0.59 mul add exch 0.3 mul add dup 1.0 ge { pop 1.0 } if}
-		transformFunc := &pdf.PdfFunctionType4{}
+		transformFunc := &model.PdfFunctionType4{}
 		transformFunc.Domain = []float64{0, 1, 0, 1, 0, 1, 0, 1}
 		transformFunc.Range = []float64{0, 1}
 
@@ -742,9 +722,9 @@ func convertShadingToGray(shading *pdf.PdfShading) (*pdf.PdfShading, error) {
 		transformFunc.Program = cmykToGrayPsProgram
 
 		// Define the DeviceN colorspace that performs the R,G,B -> Gray conversion for us.
-		transformcs := pdf.NewPdfColorspaceDeviceN()
-		transformcs.AlternateSpace = pdf.NewPdfColorspaceDeviceGray()
-		transformcs.ColorantNames = pdfcore.MakeArray(pdfcore.MakeName("C"), pdfcore.MakeName("M"), pdfcore.MakeName("Y"), pdfcore.MakeName("K"))
+		transformcs := model.NewPdfColorspaceDeviceN()
+		transformcs.AlternateSpace = model.NewPdfColorspaceDeviceGray()
+		transformcs.ColorantNames = core.MakeArray(core.MakeName("C"), core.MakeName("M"), core.MakeName("Y"), core.MakeName("K"))
 		transformcs.TintTransform = transformFunc
 
 		// Replace the old colorspace with the new.
@@ -752,7 +732,7 @@ func convertShadingToGray(shading *pdf.PdfShading) (*pdf.PdfShading, error) {
 
 		return shading, nil
 	} else {
-		unicommon.Log.Debug("Cannot convert to shading pattern grayscale, color space N = %d", cs.GetNumComponents())
+		common.Log.Debug("Cannot convert to shading pattern grayscale, color space N = %d", cs.GetNumComponents())
 		return nil, errors.New("Unsupported pattern colorspace for grayscale conversion")
 	}
 }

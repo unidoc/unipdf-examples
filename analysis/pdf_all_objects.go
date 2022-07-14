@@ -7,14 +7,23 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"os"
 
-	pdfcore "github.com/unidoc/unipdf/v3/core"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/core"
+	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 type cmdOptions struct {
 	pdfPassword string
@@ -30,9 +39,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Enable debug-level logging.
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
-
 	inputPath := args[0]
 
 	fmt.Printf("Input file: %s\n", inputPath)
@@ -44,40 +50,14 @@ func main() {
 }
 
 func inspectPdf(inputPath string, opt cmdOptions) error {
-	f, err := os.Open(inputPath)
+	readerOpts := model.NewReaderOpts()
+	readerOpts.Password = opt.pdfPassword
+
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-
-	pdfReader, err := pdf.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting with an empty one.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(opt.pdfPassword))
-		if err != nil {
-			return err
-		}
-
-		if !auth {
-			return errors.New("Unable to decrypt password protected file - need to specify pass to Decrypt")
-		}
-	}
-
-	numPages, err := pdfReader.GetNumPages()
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("PDF Num Pages: %d\n", numPages)
 
 	objNums := pdfReader.GetObjectNums()
 
@@ -90,13 +70,13 @@ func inspectPdf(inputPath string, opt cmdOptions) error {
 		}
 		fmt.Println("=========================================================")
 		fmt.Printf("%3d: %d 0 %T\n", i, objNum, obj)
-		if stream, is := obj.(*pdfcore.PdfObjectStream); is {
-			decoded, err := pdfcore.DecodeStream(stream)
+		if stream, is := obj.(*core.PdfObjectStream); is {
+			decoded, err := core.DecodeStream(stream)
 			if err != nil {
 				return err
 			}
 			fmt.Printf("Decoded:\n%s\n", decoded)
-		} else if indObj, is := obj.(*pdfcore.PdfIndirectObject); is {
+		} else if indObj, is := obj.(*core.PdfIndirectObject); is {
 			fmt.Printf("%T\n", indObj.PdfObject)
 			fmt.Printf("%s\n", indObj.PdfObject.String())
 		}

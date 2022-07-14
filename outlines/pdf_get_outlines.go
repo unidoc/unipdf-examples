@@ -13,9 +13,18 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -24,9 +33,6 @@ func main() {
 	}
 
 	inputPath := os.Args[1]
-
-	// Enable debug-level logging.
-	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	fmt.Printf("Input file: %s\n", inputPath)
 
@@ -38,33 +44,11 @@ func main() {
 }
 
 func getOutlines(inputPath string) error {
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting with an empty one.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !auth {
-			common.Log.Debug("Encrypted - unable to access - update code to specify pass")
-			return nil
-		}
-	}
 
 	outlines, err := pdfReader.GetOutlines()
 	if err != nil {

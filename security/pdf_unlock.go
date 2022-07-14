@@ -11,8 +11,18 @@ import (
 	"fmt"
 	"os"
 
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 4 {
@@ -34,8 +44,6 @@ func main() {
 }
 
 func unlockPdf(inputPath string, outputPath string, password string) error {
-	pdfWriter := pdf.NewPdfWriter()
-
 	f, err := os.Open(inputPath)
 	if err != nil {
 		return err
@@ -43,7 +51,7 @@ func unlockPdf(inputPath string, outputPath string, password string) error {
 
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}
@@ -64,36 +72,13 @@ func unlockPdf(inputPath string, outputPath string, password string) error {
 		}
 	}
 
-	numPages, err := pdfReader.GetNumPages()
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(nil)
 	if err != nil {
 		return err
 	}
 
-	for i := 0; i < numPages; i++ {
-		pageNum := i + 1
-
-		page, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			return err
-		}
-	}
-
-	fWrite, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
+	return err
 }

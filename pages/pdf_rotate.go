@@ -1,27 +1,30 @@
 /*
- * Rotate pages in a PDF file.  Degrees needs to be a multiple of 90.
- * Example of how to manipulate pages with the pdf creator.
+ * Rotate pages in a PDF file using global flag instead of
+ * rotating each page one by one.
+ * Degrees needs to be a multiple of 90.
  *
- * Run as: go run pdf_rotate.go output.pdf <angle> input.pdf
+ * Run as: go run pdf_rotate.go input.pdf <angle> output.pdf
  * The angle is specified in degrees.
  */
 
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
-	"github.com/unidoc/unipdf/v3/creator"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
 func init() {
-	// Use debug-mode log level.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
@@ -52,58 +55,26 @@ func main() {
 	fmt.Printf("Complete, see output file: %s\n", outputPath)
 }
 
-// Rotate all pages by 90 degrees.
+// Rotate all pages by degrees.
 func rotatePdf(inputPath string, degrees int64, outputPath string) error {
-	c := creator.New()
-
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfWriter, err := pdfReader.ToWriter(&model.ReaderToWriterOpts{})
 	if err != nil {
-		return err
+		return nil
 	}
 
-	isEncrypted, err := pdfReader.IsEncrypted()
+	// Rotate all page degrees.
+	err = pdfWriter.SetRotation(degrees)
 	if err != nil {
-		return err
+		return nil
 	}
 
-	// Try decrypting both with given password and an empty one if that fails.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !auth {
-			return errors.New("Unable to decrypt pdf with empty pass")
-		}
-	}
+	pdfWriter.WriteToFile(outputPath)
 
-	numPages, err := pdfReader.GetNumPages()
-	if err != nil {
-		return err
-	}
-
-	for i := 0; i < numPages; i++ {
-		pageNum := i + 1
-
-		page, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		err = c.AddPage(page)
-		if err != nil {
-			return err
-		}
-
-		_ = c.RotateDeg(degrees)
-	}
-
-	err = c.WriteToFile(outputPath)
 	return err
 }

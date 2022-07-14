@@ -21,7 +21,7 @@ package main
 
 import (
 	"fmt"
-	goimage "image"
+	"image"
 	"math"
 	"os"
 	"strconv"
@@ -29,19 +29,25 @@ import (
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/ean"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 8 {
 		fmt.Printf("Usage: go run pdf_add_barcode.go input.pdf <page> <code> <xpos> <ypos> <width> output.pdf\n")
 		os.Exit(1)
 	}
-
-	// Use debug logging.
-	unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
 
 	inputPath := os.Args[1]
 	pageNumStr := os.Args[2]
@@ -89,7 +95,7 @@ func main() {
 // Prepare the barcode. The oversampling ratio specifies how many pixels/point to use.  The default resolution of
 // PDFs is 72PPI (points per inch). A higher PPI allows higher resolution QR code generation which is particularly
 // important if the document is scaled (zoom in).
-func makeBarcode(codeStr string, width float64, oversampling int) (goimage.Image, error) {
+func makeBarcode(codeStr string, width float64, oversampling int) (image.Image, error) {
 	bcode, err := ean.Encode(codeStr)
 	if err != nil {
 		return nil, err

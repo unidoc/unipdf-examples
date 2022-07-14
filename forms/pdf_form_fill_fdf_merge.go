@@ -11,10 +11,19 @@ import (
 	"os"
 
 	"github.com/unidoc/unipdf/v3/annotator"
-	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/fdf"
 	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 // Example of merging fdf data into a form.
 func main() {
@@ -23,9 +32,6 @@ func main() {
 		fmt.Printf("Usage: go run pdf_form_fill_fdf_merge.go template.pdf input.fdf output.pdf\n")
 		os.Exit(1)
 	}
-
-	// Enable debug-level logging.
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	templatePath := os.Args[1]
 	fdfPath := os.Args[2]
@@ -107,28 +113,18 @@ func fdfMerge(templatePath, fdfPath, outputPath string, flatten bool) error {
 		}
 	}
 
-	// Write out.
-	pdfWriter := model.NewPdfWriter()
-	if flatten {
-		pdfWriter.SetForms(nil)
-	} else {
-		pdfReader.AcroForm.ToPdfObject()
-		pdfWriter.SetForms(pdfReader.AcroForm)
+	// Don't copy AcroForm when flattening.
+	opt := &model.ReaderToWriterOpts{
+		SkipAcroForm: flatten,
 	}
 
-	for _, p := range pdfReader.PageList {
-		err := pdfWriter.AddPage(p)
-		if err != nil {
-			return err
-		}
-	}
-
-	fout, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
-	defer fout.Close()
 
-	err = pdfWriter.Write(fout)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }

@@ -11,10 +11,19 @@ import (
 	"os"
 	"sort"
 
-	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/fdf"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -24,7 +33,7 @@ func main() {
 	}
 
 	// Enable debug-level logging.
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	for _, inputPath := range os.Args[1:len(os.Args)] {
 		fmt.Printf("Input file: %s\n", inputPath)

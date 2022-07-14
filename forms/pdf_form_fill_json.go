@@ -10,11 +10,20 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/annotator"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/fjson"
 	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 // Example of filling PDF formdata with a form.
 func main() {
@@ -27,9 +36,6 @@ func main() {
 		fmt.Printf("  go run pdf_form_fill_json.go input.pdf formdata.json output.pdf\n")
 		os.Exit(1)
 	}
-
-	// Enable debug-level logging.
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 
 	var (
 		inputPath    string
@@ -120,23 +126,13 @@ func fillFields(inputPath, jsonPath, outputPath string) error {
 		return err
 	}
 
-	// Write out.
-	pdfWriter := model.NewPdfWriter()
-	pdfWriter.SetForms(nil)
-
-	for _, p := range pdfReader.PageList {
-		err := pdfWriter.AddPage(p)
-		if err != nil {
-			return err
-		}
-	}
-
-	fout, err := os.Create(outputPath)
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(nil)
 	if err != nil {
 		return err
 	}
-	defer fout.Close()
 
-	err = pdfWriter.Write(fout)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	return err
 }

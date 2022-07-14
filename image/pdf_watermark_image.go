@@ -10,15 +10,22 @@ import (
 	"fmt"
 	"os"
 
-	unicommon "github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-func main() {
-	// Enable console-level debug-mode logging when debugging:
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
+func main() {
 	if len(os.Args) < 4 {
 		fmt.Printf("go run pdf_watermark_image.go input.pdf watermark.jpg output.pdf\n")
 		os.Exit(1)
@@ -39,8 +46,8 @@ func main() {
 
 // Watermark pdf file based on an image.
 func addWatermarkImage(inputPath string, outputPath string, watermarkPath string) error {
-	unicommon.Log.Debug("Input PDF: %v", inputPath)
-	unicommon.Log.Debug("Watermark image: %s", watermarkPath)
+	common.Log.Debug("Input PDF: %v", inputPath)
+	common.Log.Debug("Watermark image: %s", watermarkPath)
 
 	c := creator.New()
 
@@ -56,7 +63,7 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 	}
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
 		return err
 	}

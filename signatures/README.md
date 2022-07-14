@@ -1,22 +1,18 @@
 # Digital signatures.
 
 Examples for digital signing of PDF files with UniDoc:
-- pdf_sign_generate_keys.go  
-  Example of signing using generated private/public key pair.
-- pdf_sign_pkcs12.go  
-  Example of signing using PKCS12 (.p12/.pfx) file.
-- pdf_sign_external.go  
-  Example of PKCS7 signing with an external service with an interim step,
-  creating a PDF with a blank signature and then replacing the blank signature
-  with the actual signature from the signing service.
-- pdf_sign_pkcs11.go  
-  Example of signing with a PKCS11 service using SoftHSM and the crypto11 package.
-- pdf_sign_appearance.go  
-  Example of creating signature appearance fields.
-- pdf_sign_validate.go  
-  Example of signature validation.
+- [pdf_sign_generate_keys.go](pdf_sign_generate_keys.go) Example of signing using generated private/public key pair.
+- [pdf_sign_pkcs12.go](pdf_sign_pkcs12.go) Example of signing using PKCS12 (.p12/.pfx) file.
+- [pdf_sign_external.go](pdf_sign_external.go) Example of PKCS7 signing with an external service with an interim step, creating a PDF with a blank signature and then replacing the blank signature with the actual signature from the signing service.
+- [pdf_sign_hsm_pkcs11_cgo.go](pdf_sign_hsm_pkcs11_cgo.go) Example of signing with a PKCS11 service using SoftHSM and the crypto11 package.
+- [pdf_sign_new_page.go](pdf_sign_new_page.go) Example of appending a new page with signature to a PDF document.
+- [pdf_sign_appearance.go](pdf_sign_appearance.go) Example of creating signature appearance fields.
+- [pdf_sign_validate.go](pdf_sign_validate.go) Example of signature validation.
+- [pdf_sign_pem_multicert.go](pdf_sign_pem_multicert.go) Example of signing using a certificate chain and a private key, extracted from PEM files.
 
-## pkcs_sign_hsm_pkcs11.go
+For LTV enabling digital signatures, see the [LTV](ltv) guide and samples.
+
+## pdf_sign_hsm_pkcs11_cgo.go
 
 The code example shows how to sign with a HSM via PKCS11 as supported by the
 crypto11 library.  
@@ -80,12 +76,12 @@ $ softhsm2-util --init-token --slot 0 --label "test"
 
 Create a key pair:
 ```bash
-$ go run pdf_sign_hsm_pkcs11.go add test <PIN> <KEYPAIR_LABEL>
+$ go run pdf_sign_hsm_pkcs11_cgo.go add test <PIN> <KEYPAIR_LABEL>
 ```
 
 Sign PDF file:
 ```bash
-$ go run pdf_sign_hsm_pkcs11.go sign test <PIN> <KEYPAIR_LABEL> input.pdf input_signed.pdf
+$ go run pdf_sign_hsm_pkcs11_cgo.go sign test <PIN> <KEYPAIR_LABEL> input.pdf input_signed.pdf
 ```
 
-Signed output is in `input_signed.pdf`
+Signed output is in `input_signed.pdf`.

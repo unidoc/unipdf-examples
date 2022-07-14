@@ -13,10 +13,20 @@ import (
 	"os"
 	"strings"
 
-	pdfcontent "github.com/unidoc/unipdf/v3/contentstream"
-	pdfcore "github.com/unidoc/unipdf/v3/core"
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/contentstream"
+	"github.com/unidoc/unipdf/v3/core"
+	"github.com/unidoc/unipdf/v3/model"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -34,29 +44,11 @@ func main() {
 }
 
 func detectSignatureInput(inputPath string) error {
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
-
-	pdfReader, err := pdf.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	if isEncrypted {
-		_, err = pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
@@ -89,7 +81,7 @@ func detectSignatureInput(inputPath string) error {
 	return nil
 }
 
-func locateSignatureLine(page *pdf.PdfPage) (bool, float64, float64, error) {
+func locateSignatureLine(page *model.PdfPage) (bool, float64, float64, error) {
 	found := false
 	x := float64(0)
 	y := float64(0)
@@ -99,7 +91,7 @@ func locateSignatureLine(page *pdf.PdfPage) (bool, float64, float64, error) {
 		return found, x, y, err
 	}
 
-	cstreamParser := pdfcontent.NewContentStreamParser(pageContentStr)
+	cstreamParser := contentstream.NewContentStreamParser(pageContentStr)
 	if err != nil {
 		return found, x, y, err
 	}
@@ -112,16 +104,16 @@ func locateSignatureLine(page *pdf.PdfPage) (bool, float64, float64, error) {
 	for _, op := range *operations {
 		switch {
 		case op.Operand == "Tm" && len(op.Params) == 6:
-			if val, has := pdfcore.GetFloatVal(op.Params[4]); has {
+			if val, has := core.GetFloatVal(op.Params[4]); has {
 				x = val
 			}
 
-			if val, has := pdfcore.GetFloatVal(op.Params[5]); has {
+			if val, has := core.GetFloatVal(op.Params[5]); has {
 				y = val
 			}
 
 		case op.Operand == "Tj" && len(op.Params) == 1:
-			str, isStr := pdfcore.GetStringVal(op.Params[0])
+			str, isStr := core.GetStringVal(op.Params[0])
 			if isStr {
 				if strings.Contains(str, "________________") {
 					fmt.Printf("Tj: %s\n", str)

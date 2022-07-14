@@ -8,18 +8,24 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
 
-	pdf "github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-func main() {
-	// When debugging: log to console.
-	//unicommon.SetLogger(unicommon.NewConsoleLogger(unicommon.LogLevelDebug))
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
+func main() {
 	if len(os.Args) < 3 {
 		fmt.Printf("Usage: go run pdf_crop.go input.pdf <percentage> output.pdf\n")
 		os.Exit(1)
@@ -50,80 +56,45 @@ func main() {
 
 // Crop all pages by a given percentage.
 func cropPdf(inputPath string, outputPath string, percentage int64) error {
-	pdfWriter := pdf.NewPdfWriter()
-
-	f, err := os.Open(inputPath)
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
-
 	defer f.Close()
 
-	pdfReader, err := pdf.NewPdfReader(f)
+	// Process each page using the following callback
+	// when generating PdfWriter from PdfReader.
+	opts := &model.ReaderToWriterOpts{
+		PageProcessCallback: func(pageNum int, page *model.PdfPage) error {
+			bbox, err := page.GetMediaBox()
+			if err != nil {
+				return err
+			}
+
+			// Zoom in on the page middle, with a scaled width and height.
+			width := (*bbox).Urx - (*bbox).Llx
+			height := (*bbox).Ury - (*bbox).Lly
+			newWidth := width * float64(percentage) / 100.0
+			newHeight := height * float64(percentage) / 100.0
+			(*bbox).Llx += newWidth / 2
+			(*bbox).Lly += newHeight / 2
+			(*bbox).Urx -= newWidth / 2
+			(*bbox).Ury -= newHeight / 2
+
+			page.MediaBox = bbox
+
+			return nil
+		},
+	}
+
+	// Generate a PdfWriter instance from existing PdfReader.
+	pdfWriter, err := pdfReader.ToWriter(opts)
 	if err != nil {
 		return err
 	}
 
-	isEncrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-
-	// Try decrypting both with given password and an empty one if that fails.
-	if isEncrypted {
-		auth, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !auth {
-			return errors.New("Unable to decrypt pdf with empty pass")
-		}
-	}
-
-	numPages, err := pdfReader.GetNumPages()
-	if err != nil {
-		return err
-	}
-
-	for i := 0; i < numPages; i++ {
-		pageNum := i + 1
-
-		page, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		bbox, err := page.GetMediaBox()
-		if err != nil {
-			return err
-		}
-
-		// Zoom in on the page middle, with a scaled width and height.
-		width := (*bbox).Urx - (*bbox).Llx
-		height := (*bbox).Ury - (*bbox).Lly
-		newWidth := width * float64(percentage) / 100.0
-		newHeight := height * float64(percentage) / 100.0
-		(*bbox).Llx += newWidth / 2
-		(*bbox).Lly += newHeight / 2
-		(*bbox).Urx -= newWidth / 2
-		(*bbox).Ury -= newHeight / 2
-
-		page.MediaBox = bbox
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			return err
-		}
-	}
-
-	fWrite, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
+	// Write to file.
+	err = pdfWriter.WriteToFile(outputPath)
 	if err != nil {
 		return err
 	}

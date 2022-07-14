@@ -8,17 +8,26 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strings"
 
 	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/contentstream"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
 	"github.com/unidoc/unipdf/v3/model/optimize"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 5 {
@@ -39,31 +48,12 @@ func main() {
 }
 
 func searchReplace(inputPath, outputPath, searchText, replaceText string) error {
-	f, err := os.Open(inputPath)
+	pdfWriter := model.NewPdfWriter()
+	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return err
-	}
-
-	pdfWriter := model.NewPdfWriter()
-
-	encrypted, err := pdfReader.IsEncrypted()
-	if err != nil {
-		return err
-	}
-	if encrypted {
-		ok, err := pdfReader.Decrypt([]byte(""))
-		if err != nil {
-			return err
-		}
-		if !ok {
-			return errors.New("Encrypted")
-		}
-	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
@@ -139,9 +129,9 @@ func searchReplacePageText(page *model.PdfPage, searchText, replaceText string) 
 					return nil
 				}
 				replaceFunc(&op.Params[0])
-			case `''`:
+			case `"`:
 				if len(op.Params) != 3 {
-					common.Log.Debug("Invalid: '' with invalid set of parameters - skip")
+					common.Log.Debug("Invalid: \" with invalid set of parameters - skip")
 					return nil
 				}
 				replaceFunc(&op.Params[3])

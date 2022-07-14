@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/contentstream"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/creator"
@@ -31,22 +32,18 @@ import (
 	"github.com/unidoc/unipdf/v3/model"
 )
 
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
+
 var saveParams saveMarkedupParams
 
 func main() {
-	// Make sure to enter a valid license key.
-	// Otherwise text is truncated and a watermark added to the text.
-	// License keys are available via: https://unidoc.io
-	/*
-			license.SetLicenseKey(`
-		-----BEGIN UNIDOC LICENSE KEY-----
-		...key contents...
-		-----END UNIDOC LICENSE KEY-----
-		`, "Customer Name")
-	*/
-	// Alternatively license can be loaded via UNIPDF_LICENSE_PATH and UNIPDF_CUSTOMER_NAME environment variables,
-	// where UNIPDF_LICENSE_PATH points to the file containing the license key and the UNIPDF_CUSTOMER_NAME
-	// the explicitly specified customer name to which the key is licensed.
 	var (
 		loglevel   string
 		saveMarkup string

@@ -46,6 +46,7 @@ gin-bin
 pkg/buildinfo/buildinfo.go
 temp/
 buildinfo.json
+.vscode
 
 pdf/bak
 

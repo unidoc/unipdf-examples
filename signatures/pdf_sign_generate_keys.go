@@ -18,19 +18,29 @@ import (
 	"time"
 
 	"github.com/unidoc/unipdf/v3/annotator"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
 	"github.com/unidoc/unipdf/v3/model/sighandler"
 )
 
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
+
 var now = time.Now()
 
-const usage = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH\n"
+const usagef = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH\n"
 
 func main() {
 	args := os.Args
 	if len(args) < 3 {
-		fmt.Printf(usage, os.Args[0])
+		fmt.Printf(usagef, os.Args[0])
 		return
 	}
 	inputPath := args[1]
@@ -114,16 +124,17 @@ func generateKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 
 	// Initialize X509 certificate template.
 	template := x509.Certificate{
-		SerialNumber: big.NewInt(1),
+		SerialNumber: new(big.Int),
 		Subject: pkix.Name{
+			CommonName:   "any",
 			Organization: []string{"Test Company"},
 		},
-		NotBefore: now.Add(-time.Hour),
-		NotAfter:  now.Add(time.Hour * 24 * 365),
-
-		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
+		NotBefore:          now.Add(-time.Hour).UTC(),
+		NotAfter:           now.Add(time.Hour * 24 * 365).UTC(),
+		PublicKeyAlgorithm: x509.RSA,
+		KeyUsage: x509.KeyUsageKeyEncipherment |
+			x509.KeyUsageDigitalSignature |
+			x509.KeyUsageDataEncipherment,
 	}
 
 	// Generate X509 certificate.
