@@ -293,7 +293,9 @@ func drawLinesInsideTable(c *creator.Creator) error {
 
 	// Draw table content.
 	table := c.NewTable(5)
-	table.SetColumnWidths(0.3, 0.175, 0.175, 0.175, 0.175)
+	if err := table.SetColumnWidths(0.3, 0.175, 0.175, 0.175, 0.175); err != nil {
+		return err
+	}
 
 	for _, content := range contents {
 		cell := table.NewCell()
