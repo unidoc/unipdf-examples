@@ -6,3 +6,4 @@ objects can always be applied to the content stream directly.
 ## Examples
 
 - [pdf_draw_shapes.go](pdf_draw_shapes.go) draws multiple shapes in a new PDF file.
+- [pdf_draw_lines.go](pdf_draw_lines.go) showcases the capabilities of creator lines.
