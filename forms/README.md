@@ -15,7 +15,7 @@ forms.
 - [fdf_fields_info.go](fdf_fields_info.go) outputs information about fields in a Field Data Format (FDF) file.
 - [pdf_form_get_field_data.go](pdf_form_get_field_data.go) gets field data for a single field by field name.
 - [pdf_form_list_fields.go](pdf_form_list_fields.go) lists form fields in a PDF.
-- [pdf_images_and_fields_rotations.go](pdf_images_and_fields_rotations.go) images and form fields with customized rotation in a PDF.
+- [pdf_form_fields_rotations.go](pdf_form_fields_rotations.go) form fields with customized rotation in a PDF.
 
 ## Use cases
 
