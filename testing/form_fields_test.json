@@ -1,0 +1,14 @@
+[
+  {
+    "name": "textfield1",
+    "value": "Test Text Fill"
+  },
+  {
+    "name": "cb1",
+    "value": "true"
+  },
+  {
+    "name": "cb2",
+    "value": "true"
+  }
+]
