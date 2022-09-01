@@ -1,6 +1,6 @@
 # PDF Page Manipulation
 
-The example explains how to work with and manipulate PDF pages using UniPDF library. You can perform a number of manipulations such as crop, merge, rotate and many more. 
+The example explains how to work with and manipulate PDF pages using UniPDF library. You can perform a number of manipulations such as crop, merge, rotate and many more.
 
 ## Examples
 
@@ -15,3 +15,4 @@ The example explains how to work with and manipulate PDF pages using UniPDF libr
 - [pdf_rotate.go](pdf_rotate.go) The example rotate pages in a PDF file using global flag instead of rotating each page one by one. Degrees needs to be a multiple of 90.
 - [pdf_split.go](pdf_split.go) The example highlights basic PDF split example: Splitting by page range.
 - [pdf_split_advanced.go](pdf_split_advanced.go) The example highlights advanced PDF split example: Takes into account optional content - OCProperties (rarely used).
+- [pdf_append_contents.go](pdf_append_contents.go) The example for append PDF Files contents into single PDF file.
