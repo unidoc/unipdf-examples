@@ -47,9 +47,6 @@ type PageData struct {
 
 var pageDataList []*PageData
 
-// defaultTolerancePoint is value for tolerance subscript letter.
-var defaultTolerancePoint = 1.6
-
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Printf("Syntax: extract_text_bound <file.pdf>\n")
@@ -221,14 +218,11 @@ func extractSingleWordData(textMarkArray *extractor.TextMarkArray, pageNumber in
 
 // getTolerancePoint calculate tolerance point based on smallest font size.
 func getTolerancePoint(textMarkArray *extractor.TextMarkArray) float64 {
-	tolerancePoint := defaultTolerancePoint
 	minFontSize := textMarkArray.Elements()[0].FontSize
 	for _, textMark := range textMarkArray.Elements() {
 		if textMark.FontSize < minFontSize && textMark.FontSize > 0 {
 			minFontSize = textMark.FontSize
 		}
 	}
-
-	tolerancePoint = minFontSize / defaultTolerancePoint
-	return tolerancePoint
+	return minFontSize
 }
