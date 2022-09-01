@@ -47,9 +47,6 @@ type PageData struct {
 
 var pageDataList []*PageData
 
-// tolerancePoints is value for tolerance subscript letter.
-const tolerancePoints = 1.6
-
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Printf("Syntax: extract_text_bound <file.pdf>\n")
@@ -130,6 +127,9 @@ func extractWordsDataOnPage(pdfReader *model.PdfReader, pageNumber int) error {
 	var textMarkArrays []*extractor.TextMarkArray
 	curMarkArray := new(extractor.TextMarkArray)
 
+	// getTolerancePoint for better subscript/superscript text poisition.
+	tolerancePoint := getTolerancePoint(textMarks)
+
 	for _, textMark := range textMarks.Elements() {
 		runes := []rune(textMark.Text)
 		if len(runes) != 1 {
@@ -143,7 +143,7 @@ func extractWordsDataOnPage(pdfReader *model.PdfReader, pageNumber int) error {
 				curMarkArray = new(extractor.TextMarkArray)
 			}
 		} else if curMarkArray.Elements() != nil &&
-			curMarkArray.Elements()[curMarkArray.Len()-1].BBox.Lly > textMark.BBox.Lly+tolerancePoints {
+			curMarkArray.Elements()[curMarkArray.Len()-1].BBox.Lly > textMark.BBox.Lly+tolerancePoint {
 			// If current char is at a new line then the word is splitted into multiple line
 			// store each part data separately.
 			if trackingWord {
@@ -214,4 +214,15 @@ func extractSingleWordData(textMarkArray *extractor.TextMarkArray, pageNumber in
 	wordData.Text = string(wordString)
 
 	return wordData, nil
+}
+
+// getTolerancePoint calculate tolerance point based on smallest font size.
+func getTolerancePoint(textMarkArray *extractor.TextMarkArray) float64 {
+	minFontSize := textMarkArray.Elements()[0].FontSize
+	for _, textMark := range textMarkArray.Elements() {
+		if textMark.FontSize < minFontSize && textMark.FontSize > 0 {
+			minFontSize = textMark.FontSize
+		}
+	}
+	return minFontSize
 }
