@@ -1,5 +1,5 @@
 /*
- * Get form fields appearance rotation value.
+ * Fill form fields and set form fields appearance rotation value.
  *
  * Run as: go run pdf_images_and_fields_rotations.go output.pdf
  */
