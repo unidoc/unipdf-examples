@@ -10,4 +10,4 @@ modified without the need to rebuild the application.
 
 ## Examples
 
-- [Sample Security Report](security-report/pdf_security_report.go)
+- [Sample Security Report](security-report/pdf_security_report.go): showcases the usage of creator templates by creating a sample security report.
