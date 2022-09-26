@@ -1,7 +1,8 @@
-Sample security report
-======================
+<h1 align="center">Sample security report</h1>
 
 This example showcases the usage of creator templates by creating a sample
 security report.
 
-![sample-security-report-preview](templates/res/pages.png)
+<p align="center">
+    <img src="templates/res/pages.png" alt="sample-security-report-preview" width="80%" />
+</p>
