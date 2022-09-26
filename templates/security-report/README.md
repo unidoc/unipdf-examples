@@ -1,4 +1,5 @@
-<h1 align="center">Sample security report</h1>
+Sample security report
+======================
 
 This example showcases the usage of creator templates by creating a sample
 security report.
