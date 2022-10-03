@@ -145,6 +145,7 @@ func readTemplate(tplFile string) (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 
 	buf := bytes.NewBuffer(nil)
 	if _, err = io.Copy(buf, file); err != nil {
