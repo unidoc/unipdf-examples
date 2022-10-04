@@ -16,9 +16,13 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/boombuler/barcode"
+	"github.com/boombuler/barcode/qr"
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/creator"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
 func init() {
@@ -48,12 +52,38 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Create QR code image.
+	qrCode, err := createQRCode("https://github.com/unidoc/unipdf-examples/tree/master/templates/airplane-ticket", 500, 500)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Draw main content teplate.
 	tplOpts := &creator.TemplateOptions{
+		ImageMap: map[string]*model.Image{
+			"qr-code-1": qrCode,
+		},
 		HelperFuncMap: template.FuncMap{
 			"formatTime": func(val, format string) string {
 				t, _ := time.Parse("2006-01-02T15:04:05", val)
 				return t.Format(format)
+			},
+			"extendDict": func(m map[string]interface{}, params ...interface{}) (map[string]interface{}, error) {
+				lenParams := len(params)
+				if lenParams%2 != 0 {
+					return nil, core.ErrRangeError
+				}
+
+				for i := 0; i < lenParams; i += 2 {
+					key, ok := params[i].(string)
+					if !ok {
+						return nil, core.ErrTypeError
+					}
+
+					m[key] = params[i+1]
+				}
+
+				return m, nil
 			},
 		},
 	}
@@ -137,4 +167,25 @@ func readTicket(jsonFile string) (*Ticket, error) {
 	}
 
 	return ticket, nil
+}
+
+// createQRCode creates a new QR code image encoding the provided text, having
+// the specified with and height.
+func createQRCode(text string, width, height int) (*model.Image, error) {
+	qrCode, err := qr.Encode(text, qr.M, qr.Auto)
+	if err != nil {
+		return nil, err
+	}
+
+	qrCode, err = barcode.Scale(qrCode, width, height)
+	if err != nil {
+		return nil, err
+	}
+
+	img, err := model.ImageHandling.NewImageFromGoImage(qrCode)
+	if err != nil {
+		return nil, err
+	}
+
+	return img, nil
 }
