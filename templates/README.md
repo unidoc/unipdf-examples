@@ -11,3 +11,4 @@ modified without the need to rebuild the application.
 ## Examples
 
 - [Sample Security Report](security-report): showcases the usage of creator templates by creating a sample security report.
+- [Sample Airplane Ticket](airplane-ticket): showcases the usage of creator templates by creating a sample airplane ticket.

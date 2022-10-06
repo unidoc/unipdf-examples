@@ -1,0 +1,88 @@
+{
+    "status": "Confirmed",
+    "passenger": "John Doe",
+    "document": "123456789",
+    "number": "123-1234567890",
+    "order": "XXX1234X",
+    "issued": "2020-05-12T00:00:00",
+    "routes": [
+        {
+            "flight": "Sample 168",
+            "flightCompany": "Sample Airlines",
+            "flightPlaner": "Airbus A321",
+            "departure": "2020-06-16T07:05:00",
+            "departureAirport": "Istanbul, SAW",
+            "arrival": "2020-06-16T07:30:00",
+            "arrivalAirport": "New York, JFK",
+            "class": "Economy",
+            "classAdd": "Flexible",
+            "baggage": "1 place 23 kg",
+            "baggageAdd": "Cabin 10 kg",
+            "checkIn": "2020-06-16T06:25:00",
+            "checkInAirport": "Istanbul, SAW"
+        },
+        {
+            "flight": "Sample 169",
+            "flightCompany": "Sample Airlines",
+            "flightPlaner": "Airbus A321-100/200",
+            "departure": "2020-07-04T10:20:00",
+            "departureAirport": "New York, JFK",
+            "arrival": "2020-07-05T05:30:00",
+            "arrivalAirport": "Istanbul, SAW",
+            "class": "Economy",
+            "classAdd": "Flexible",
+            "baggage": "1 place 23 kg",
+            "baggageAdd": "Cabin 10 kg",
+            "checkIn": "2020-07-04T09:40:00",
+            "checkInAirport": "New York, JFK"
+        }
+    ],
+    "fares": [
+        {
+            "name": "Base fare",
+            "charge": 1650
+        },
+        {
+            "name": "Airline fuel charge",
+            "charge": 150
+        },
+        {
+            "name": "Passenger service fee",
+            "charge": 332
+        },
+        {
+            "name": "User development fee",
+            "charge": 238
+        },
+        {
+            "name": "Govt. Service Tax",
+            "charge": 125
+        },
+        {
+            "name": "Congestion fee",
+            "charge": 25
+        },
+        {
+            "name": "Other Charges and Taxes",
+            "charge": 30
+        },
+        {
+            "name": "Total fare",
+            "charge": 2550
+        }
+    ],
+    "phoneNumbers": [
+        {
+            "Name": "Company support",
+            "Value": "+1 124 5677 8765"
+        },
+        {
+            "Name": "Airline helpline",
+            "Value": "+1 124 5677 8766"
+        },
+        {
+            "Name": "Need a hotel",
+            "Value": "+1 124 5677 8767"
+        }
+    ]
+}
