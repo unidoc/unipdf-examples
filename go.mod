@@ -11,13 +11,13 @@ require (
 	github.com/miekg/pkcs11 v1.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
-	github.com/stretchr/testify v1.7.1 // indirect
+	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/trimmer-io/go-xmp v1.0.0
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.1.1-0.20220329190817-dd59b9eba14c
 	github.com/unidoc/unichart v0.1.0
 	github.com/unidoc/unipdf/v3 v3.40.0
-	github.com/unidoc/unitype v0.2.1 // indirect
+	github.com/unidoc/unitype v0.3.0 // indirect
 	github.com/wcharczuk/go-chart/v2 v2.1.0
 	golang.org/x/crypto v0.1.0
 	golang.org/x/sys v0.1.0 // indirect
