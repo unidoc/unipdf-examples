@@ -1,0 +1,10 @@
+2.2. Put your cursor in a paragraph of the style you want to modify. So if you want to modify the
+style Body Text, put your cursor in a paragraph of Body Text style.
+2.3. Use Format > Font, Format > Paragraph, Format > Borders and Shading etc to make the
+required changes
+2.4. If you're modifying a paragraph style, click within the paragraph (so no text is selected) or,
+select the whole paragraph (triple-click to select the whole paragraph). If you're modifying
+a character style, select one or more characters in that character style.
+2.5. From the "Styles" box on the Formatting toolbar, re-choose the name of the style. Word
+will ask if you want to update the style, or reapply the current style to the selected text, as
+shown in Figure 1. If you want to say sane, do not tick the Automatically Update Style box.
