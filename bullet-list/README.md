@@ -33,4 +33,4 @@ This can be done as follows.
 	}
 	ex, err := extractor.NewWithOptions(pdfPage, options)
 ```
-If the pdf document was tagged poorly, especially the if the bullet lists were not tagged with appropriate tag structures, then the second way of extracting may give a better result. This way we can take advantage of both extraction methods. 
+If the pdf document was tagged poorly, especially if the bullet lists were not tagged with appropriate tag structures, then the second way of extracting may give a better result. This way we can take advantage of both extraction methods. 
