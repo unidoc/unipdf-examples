@@ -1,0 +1,334 @@
+{
+    "bankName":"UniPDF Bank",
+    "bankNameState":"N.A.",
+    "accountNumber":"1234567890",
+    "dateBegin":"2020-05-26T00:00:00",
+    "dateEnd":"2020-06-24T00:00:00",
+    "companyName":"Sample Company",
+    "companyAddress":"123 Main Street\nAnywhere NY\n12345-6789",
+    "reportAddress":"Overdraft Collections and Recovery, P.O. Box 1234, Anywhere, OR 12345-6789",
+    "phoneFree":"1-800-CALL-XXXXX",
+    "phone":"1-234-567-8900",
+    "tTY":"1-234-567-8900",
+    "online":"unidoc.io",
+    "white":"UniPDF Bank, N.A.\nP.O. Box 1234\nNewYork, OR\n12345-6789",
+    "businessPlanURL":"unidoc.io/unipdf",
+    "accountOptionsURL":"unidoc.io/pricing",
+    "advt":"The UniPDF Bank Mobile App is now available in Spanish!\n\nYou can securely manage your finances virtually anytime, anywhere in Spanish.\nOnce you have downloaded the latest version of the UniPDF Bank Mobile ® App from Google Play or the Apple App Store, go to Mobile Settings and set your language preference to Spanish.",
+    "beginningBalance":550,
+    "withdrawals":-1639.32,
+    "deposits":3820,
+    "endingBalance":2417.96,
+    "averageBalance":1186.58,
+    "depositRTN":"123456789",
+    "wireRTN":"987654321",
+    "standardServiceFee":10,
+    "minimumRequired":500,
+    "serviceFee":0,
+    "serviceDiscount":5,
+    "transactionUnits":17,
+    "transactionUnitsIncluded":50,
+    "transactionExcessUnits":0,
+    "serviceCharge":0.50,
+    "totalServiceCharge":0,
+    "feedbackPhone":"1-234-XXX-CARE",
+    "transactionDeposits": 5700,
+    "transactionWithdrawals": 3832.04,
+    "transactions":[
+        {
+            "date":"2020-05-26T00:00:00",
+            "check":"",
+            "details":"Mobile Deposit : Ref Number :677577755404",
+            "deposits":300,
+            "withdrawals":0,
+            "endingDailyBalance":850
+        },
+        {
+            "date":"2020-05-27T00:00:00",
+            "check":"",
+            "details":"Purchase authorized amazon.com",
+            "deposits":0,
+            "withdrawals":178.15,
+            "endingDailyBalance":671.85
+        },
+        {
+            "date":"2020-05-28T00:00:00",
+            "check":"",
+            "details":"Mobile Deposit : Ref Number :824527230250",
+            "deposits":450,
+            "withdrawals":0,
+            "endingDailyBalance":1121.85
+        },
+        {
+            "date":"2020-05-28T00:00:00",
+            "check":"",
+            "details":"Purchase authorized Shoprite #4512",
+            "deposits":0,
+            "withdrawals":87.15,
+            "endingDailyBalance":1034.7
+        },
+        {
+            "date":"2020-05-28T00:00:00",
+            "check":"",
+            "details":"Purchase authorized amazon.com",
+            "deposits":0,
+            "withdrawals":17.92,
+            "endingDailyBalance":1016.78
+        },
+        {
+            "date":"2020-05-28T00:00:00",
+            "check":"",
+            "details":"Mobile Deposit : Ref Number :107043500279",
+            "deposits":150,
+            "withdrawals":0,
+            "endingDailyBalance":1166.78
+        },
+        {
+            "date":"2020-06-01T00:00:00",
+            "check":"",
+            "details":"PayPal Transfer : Ref Number : Q4THK3mqAjKK4DJ",
+            "deposits":1000,
+            "withdrawals":0,
+            "endingDailyBalance":2166.78
+        },
+        {
+            "date":"2020-06-02T00:00:00",
+            "check":"",
+            "details":"Purchase authorized Shoprite #4512",
+            "deposits":0,
+            "withdrawals":43.2,
+            "endingDailyBalance":2123.58
+        },
+        {
+            "date":"2020-06-03T00:00:00",
+            "check":"",
+            "details":"Mobile Deposit : Ref Number :310455748540",
+            "deposits":200,
+            "withdrawals":0,
+            "endingDailyBalance":2323.58
+        },
+        {
+            "date":"2020-06-03T00:00:00",
+            "check":"",
+            "details":"Mobile Deposit : Ref Number :511250576650",
+            "deposits":100,
+            "withdrawals":0,
+            "endingDailyBalance":2423.58
+        },
+        {
+            "date":"2020-06-03T00:00:00",
+            "check":"",
+            "details":"Purchase authorized Games Inc.",
+            "deposits":0,
+            "withdrawals":399,
+            "endingDailyBalance":2024.58
+        },
+        {
+            "date":"2020-06-03T00:00:00",
+            "check":"",
+            "details":"Purchase authorized amazon.com",
+            "deposits":0,
+            "withdrawals":325,
+            "endingDailyBalance":1699.58
+        },
+        {
+            "date":"2020-06-04T00:00:00",
+            "check":"1247",
+            "details":"Check",
+            "deposits":0,
+            "withdrawals":230,
+            "endingDailyBalance":1469.58
+        },
+        {
+            "date":"2020-06-05T00:00:00",
+            "check":"1248",
+            "details":"Check",
+            "deposits":0,
+            "withdrawals":193.12,
+            "endingDailyBalance":1276.46
+        },
+        {
+            "date":"2020-06-09T00:00:00",
+            "check":"1249",
+            "details":"Check",
+            "deposits":0,
+            "withdrawals":1204.1,
+            "endingDailyBalance":72.36
+        },
+        {
+            "date":"2020-06-10T00:00:00",
+            "check":"",
+            "details":"Purchase authorized Sunoco Gas",
+            "deposits":0,
+            "withdrawals":45.1,
+            "endingDailyBalance":27.26
+        },
+        {
+            "date":"2020-06-11T00:00:00",
+            "check":"",
+            "details":"Purchase authorized Shoprite #4512",
+            "deposits":0,
+            "withdrawals":23,
+            "endingDailyBalance":4.26
+        },
+        {
+            "date":"2020-06-12T00:00:00",
+            "check":"1251",
+            "details":"Check",
+            "deposits":0,
+            "withdrawals":0,
+            "endingDailyBalance":4.26
+        },
+        {
+            "date":"2020-06-12T00:00:00",
+            "check":"",
+            "details":"Mobile Deposit : Ref Number :511250576650",
+            "deposits":350,
+            "withdrawals":0,
+            "endingDailyBalance":354.26
+        },
+        {
+            "date":"2020-06-12T00:00:00",
+            "check":"",
+            "details":"Mobile Deposit : Ref Number :656808908596",
+            "deposits":700,
+            "withdrawals":0,
+            "endingDailyBalance":1054.26
+        },
+        {
+            "date":"2020-06-12T00:00:00",
+            "check":"",
+            "details":"Purchase authorized Walmart",
+            "deposits":0,
+            "withdrawals":124.1,
+            "endingDailyBalance":930.16
+        },
+        {
+            "date":"2020-06-12T00:00:00",
+            "check":"",
+            "details":"Purchase authorized CVS #12349",
+            "deposits":0,
+            "withdrawals":1.13,
+            "endingDailyBalance":929.03
+        },
+        {
+            "date":"2020-06-12T00:00:00",
+            "check":"",
+            "details":"Purchase authorized Shoprite #4512",
+            "deposits":0,
+            "withdrawals":94.3,
+            "endingDailyBalance":834.73
+        },
+        {
+            "date":"2020-06-18T00:00:00",
+            "check":"",
+            "details":"Purchase authorized Shoprite #4512",
+            "deposits":0,
+            "withdrawals":45.8,
+            "endingDailyBalance":788.93
+        },
+        {
+            "date":"2020-06-19T00:00:00",
+            "check":"1250",
+            "details":"Check",
+            "deposits":0,
+            "withdrawals":25.1,
+            "endingDailyBalance":763.83
+        },
+        {
+            "date":"2020-06-20T00:00:00",
+            "check":"1254",
+            "details":"Check",
+            "deposits":0,
+            "withdrawals":340,
+            "endingDailyBalance":423.83
+        },
+        {
+            "date":"2020-06-21T00:00:00",
+            "check":"",
+            "details":"PayPal Transfer : Ref Number : s9Wb9ejIBemLrqY",
+            "deposits":1500,
+            "withdrawals":0,
+            "endingDailyBalance":1923.83
+        },
+        {
+            "date":"2020-06-22T00:00:00",
+            "check":"",
+            "details":"PayPal Transfer : Ref Number : ztnneHwt28flJvp",
+            "deposits":700,
+            "withdrawals":0,
+            "endingDailyBalance":2623.83
+        },
+        {
+            "date":"2020-06-23T00:00:00",
+            "check":"",
+            "details":"PayPal Transfer : Ref Number : oQ3f6fi1fp1O7tS",
+            "deposits":250,
+            "withdrawals":0,
+            "endingDailyBalance":2873.83
+        },
+        {
+            "date":"2020-06-23T00:00:00",
+            "check":"",
+            "details":"Purchase authorized amazon.com",
+            "deposits":0,
+            "withdrawals":62.1,
+            "endingDailyBalance":2811.73
+        },
+        {
+            "date":"2020-06-23T00:00:00",
+            "check":"",
+            "details":"Purchase authorized Walmart",
+            "deposits":0,
+            "withdrawals":23.2,
+            "endingDailyBalance":2788.53
+        },
+        {
+            "date":"2020-06-24T00:00:00",
+            "check":"",
+            "details":"Purchase authorized Shoprite #4512",
+            "deposits":0,
+            "withdrawals":94.2,
+            "endingDailyBalance":2694.33
+        },
+        {
+            "date":"2020-06-24T00:00:00",
+            "check":"1255",
+            "details":"Check",
+            "deposits":0,
+            "withdrawals":125.1,
+            "endingDailyBalance":2569.23
+        },
+        {
+            "date":"2020-06-24T00:00:00",
+            "check":"1256",
+            "details":"Check",
+            "deposits":0,
+            "withdrawals":93.21,
+            "endingDailyBalance":2476.02
+        },
+        {
+            "date":"2020-06-24T00:00:00",
+            "check":"1257",
+            "details":"Check",
+            "deposits":0,
+            "withdrawals":15.13,
+            "endingDailyBalance":2460.89
+        },
+        {
+            "date":"2020-06-24T00:00:00",
+            "check":"1258",
+            "details":"Check",
+            "deposits":0,
+            "withdrawals":42.93,
+            "endingDailyBalance":2417.96
+        }
+    ],
+    "accountOptionsLabels": [
+        "Business Online Banking",
+        "Online Statements",
+        "Business Bill Pay",
+        "Business Spending Report",
+        "Overdraft Protection"
+    ]
+}
