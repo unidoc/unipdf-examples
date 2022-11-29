@@ -20,26 +20,24 @@
 {{end}}
 
 {{define "gradeBarSection"}}
-    <table-cell background-color="{{.BackgroundColor}}" vertical-align="middle">
-        {{$label := .Label}}
-        {{if not .ShowLabel}}
-            {{$label = ""}}
-        {{end}}
+    {{$label := .Label}}
+    {{if not .ShowLabel}}
+        {{$label = " "}}
+    {{end}}
 
-        <paragraph margin="{{.Margin}}" vertical-text-align="center">
-            <text-chunk font="helvetica-bold" font-size="{{.FontSize}}" color="#ffffff">{{$label}}</text-chunk>
-        </paragraph>
-    </table-cell>
+    <gradientStop label="{{$label}}" point="{{.Point}}" color="{{.Color}}" labelColor="#ffffff" 
+        fontSize="{{.FontSize}}" margin="{{.Margin}}" 
+    />
 {{end}}
 
 {{define "gradeBar"}}
-    <table columns="5" column-widths="0.3 0.2 0.15 0.15 0.2" margin="{{.Margin}}">
-        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Very Poor" "BackgroundColor" "#F7000B"}}
-        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Poor" "BackgroundColor" "#F95A0C"}}
-        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Fair" "BackgroundColor" "#F9C20E"}}
-        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Good" "BackgroundColor" "#98ED1B"}}
-        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Excellent" "BackgroundColor" "#27C729"}}
-    </table>
+    <linearGradient stops="5" margin="{{.Margin}}">
+        {{template "gradeBarSection" dict "Label" "Very Poor" "Point" 0.0 "Color" "#F7000B" "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels }}
+        {{template "gradeBarSection" dict "Label" "Poor" "Point" 0.3 "Color" "#F95A0C" "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels }}
+        {{template "gradeBarSection" dict "Label" "Fair" "Point" 0.5 "Color" "#F9C20E" "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels }}
+        {{template "gradeBarSection" dict "Label" "Good" "Point" 0.65 "Color" "#98ED1B" "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels }}
+        {{template "gradeBarSection" dict "Label" "Excellent" "Point" 0.8 "Color" "#27C729" "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels }}
+    </linearGradient>
 {{end}}
 
 {{define "sectionTitle"}}
