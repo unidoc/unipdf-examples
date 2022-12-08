@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/unidoc/unipdf/v3/common/license"
@@ -94,7 +95,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = os.WriteFile(outputPath, outDoc.Bytes(), 0777)
+	err = ioutil.WriteFile(outputPath, outDoc.Bytes(), 0777)
 	if err != nil {
 		panic(err)
 	}
