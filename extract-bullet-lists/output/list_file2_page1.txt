@@ -1,0 +1,44 @@
+1. Use a dialog box to modify a style (Method 1)
+   1.1. Open the Modify Style dialog
+      1.1.1. If you're using Word 95, 97 or 2000:
+         • From the main menu, Format > Style
+         • In the Styles list, choose the style you want to Modify. If you can't find the style you
+         want to modify, in the Category box, choose "All Styles". (Tip: You can see a
+         description of the style below the Preview.)
+         • Click Modify. You're now at the Modify Style dialog.
+      1.1.2. If you're using Microsoft Word 2002 or Word 2003:
+         • From the main menu, Format > Styles and Formatting.
+         • In the panel, find the style you want to Modify. (Note: If you don't see the style
+         listed, under Show, choose All Styles. If you still don't see your style listed, tick your
+         style and click OK. Then, choose All Styles.)
+         • Right-click on the style name and choose Modify. You're now at the Modify Style
+         dialog.
+      1.1.3. If you're using Microsoft Word 2007 or Word 2010:
+         • If you're a keyboard junkie: do ctrl-Shift-S. That opens the Apply Styles pane. Use
+         the drop-down list to select a style or type the style name into the box. Tab to the
+         Modify button and press Enter. You're now at the Modify Style dialog.
+         • If you're a mouse user: on the home tab, in the Styles gallery, right-click the
+         thumbnail for the style you want to modify and choose Modify. You're now at the
+         Modify Style dialog.
+         • If you could not find your style that way, then you need the Styles pane. Press Alt-
+         Ctrl-Shift-S to open the Styles pane. Or, click the dialog launcher (the little tiny
+         arrow) at the far bottom right of the Styles group. That pops open the Styles pane.
+         At the bottom of the Styles pane, click Options and choose to show All styles. Back
+         in the Styles pane, find your style in the list, right-click and choose Modify. (Yes,
+         Virginia: Microsoft adds more built-in styles to every version of Word. And with
+         every version, makes it harder to find them!)
+   1.2. Modify your style
+      1.2.1.From the Modify Style dialog you can change:
+         • The base style for your style (which controls how style cascade).
+         • The style to use for the following paragraph. (For example, perhaps you frequently
+         type a paragraph using the Title style, and you follow it with a paragraph in style
+         Subtitle. You can modify the style Title to be followed by style Subtitle.)
+         • If you tick Add to template, your change will be saved in the template on which this
+         document is based.
+      1.2.2.In the Modify Style dialog, click Format. Choose one of the characteristics of the style
+      to modify: Font, Paragraph etc.
+      1.2.3.Make your changes and click OK, OK and either Apply or Close.
+2. Modify a style by example (Method 2)
+This method of modifying a style does not use the Modify Style dialog box. Instead, you make
+the changes right in your text, then tell Word to update the style to reflect those changes.
+   2.1. Ensure that you have ticked the box at Tools > Options > Edit > Prompt to Update Style.
