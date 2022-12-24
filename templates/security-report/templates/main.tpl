@@ -34,10 +34,10 @@
 
 {{define "gradeBar"}}
     <table columns="5" column-widths="0.3 0.2 0.15 0.15 0.2" margin="{{.Margin}}">
-        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Very Poor" "BackgroundColor" "#F7000B"}}
-        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Poor" "BackgroundColor" "#F95A0C"}}
-        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Fair" "BackgroundColor" "#F9C20E"}}
-        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Good" "BackgroundColor" "#98ED1B"}}
+        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Very Poor" "BackgroundColor" "linear-gradient(#F7000B, #F95A0C)"}}
+        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Poor" "BackgroundColor" "linear-gradient(#F95A0C, #F9C20E)"}}
+        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Fair" "BackgroundColor" "linear-gradient(#F9C20E, #98ED1B)"}}
+        {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Good" "BackgroundColor" "linear-gradient(#98ED1B, #27C729)"}}
         {{template "gradeBarSection" dict "FontSize" .SectionFontSize "Margin" .SectionMargin "ShowLabel" .ShowLabels "Label" "Excellent" "BackgroundColor" "#27C729"}}
     </table>
 {{end}}
