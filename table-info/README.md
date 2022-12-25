@@ -7,7 +7,7 @@ Generally it returns two kinds of information about the textMark in relation to 
 This is given as `[][]int` of row, column values.
 
 ## What can we do with this information?
-Getting the table information from the text side gives us an access to the text related information of the tables. Here are some sample usages.
+Getting the table information from the text side gives us an access to the text related information of the tables. Here are some sample usages of this method.
 1. Text distribution </br>
 The distribution of the text inside tables vs out side tables. </br>
 The code at [table_info.go](./table_info.go) demonstrates how to calculate the distribution of the page content.
