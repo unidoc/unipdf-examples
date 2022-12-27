@@ -2,7 +2,7 @@
 * This example shows how to divide the extracted text into inside table content and
 * outside table content.
 * Run as : go run partition_text.go inputFile.pdf pageNum
-*/
+ */
 
 package main
 
@@ -11,19 +11,18 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/extractor"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-func init() {
-	// Make sure to load your metered License API key prior to using the library.
-	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
-	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
-	if err != nil {
-		panic(err)
-	}
-}
+// func init() {
+// 	// Make sure to load your metered License API key prior to using the library.
+// 	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+// 	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// }
 func main() {
 
 	if len(os.Args) < 3 {
@@ -86,15 +85,15 @@ func partitionText(inputFile string, pageNum int) {
 		idx2 := idx[1]
 		fmt.Printf("\n------------------- outside table begins ---------------\n")
 		fmt.Print(text[beg:idx1])
-		fmt.Printf("\n---------------- outside table ends -----------------\n")
-		fmt.Printf("\n------------- inside table begins-----------\n")
+		fmt.Printf("\n------------------- outside table ends ------------------\n")
+		fmt.Printf("\n------------------- inside table begins -----------------\n")
 		fmt.Print(text[idx1:idx2])
-		fmt.Printf("\n----------------------- inside table ends ---------------\n")
+		fmt.Printf("\n------------------- inside table ends -------------------\n")
 		beg = idx2
 		if i == len(indexes)-1 {
-			fmt.Printf("\n------------- out side table  begins --------------\n")
+			fmt.Printf("\n--------------- out side table  begins --------------\n")
 			fmt.Print(text[beg:])
-			fmt.Printf("\n------------- outside table ends    -----------\n")
+			fmt.Printf("\n--------------- outside table ends ------------------\n")
 		}
 	}
 }
