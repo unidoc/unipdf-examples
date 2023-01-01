@@ -5,7 +5,7 @@ require (
 	github.com/adrg/strutil v0.2.3 // indirect
 	github.com/adrg/sysfont v0.1.2 // indirect
 	github.com/adrg/xdg v0.3.3 // indirect
-	github.com/aws/aws-sdk-go v1.44.171
+	github.com/aws/aws-sdk-go v1.44.130
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/boombuler/barcode v1.0.1
 	github.com/kr/text v0.2.0 // indirect
