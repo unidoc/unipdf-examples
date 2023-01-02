@@ -28,8 +28,8 @@ import (
 	"time"
 
 	kms "cloud.google.com/go/kms/apiv1"
-	"cloud.google.com/go/kms/apiv1/kmspb"
 	gcOption "google.golang.org/api/option"
+	kmspb "google.golang.org/genproto/googleapis/cloud/kms/v1"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/unidoc/pkcs7"
@@ -203,12 +203,12 @@ func getExternalSignatureAndSign(inputPath, credPath, keyName string) ([]byte, [
 	// We sign certificate using external signer that implement `crypto.Signer`.
 	certData, err := x509.CreateCertificate(rand.Reader, &template, &template, gcKmsSign.getPublicKey(), gcKmsSign.signer)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	cert, err := x509.ParseCertificate(certData)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	certChain := []*x509.Certificate{cert}

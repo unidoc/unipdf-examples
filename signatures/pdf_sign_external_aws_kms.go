@@ -198,12 +198,12 @@ func getExternalSignatureAndSign(inputPath string, keyId string) ([]byte, []byte
 	// We sign certificate using external signer that implement `crypto.Signer`.
 	certData, err := x509.CreateCertificate(rand.Reader, &template, &template, awsKmsSign.getPublicKey(), awsKmsSign.signer)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	cert, err := x509.ParseCertificate(certData)
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 
 	certChain := []*x509.Certificate{cert}
