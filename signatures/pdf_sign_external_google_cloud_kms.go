@@ -1,8 +1,10 @@
 /*
  * This example showcases how to digitally sign a PDF file using an external
- * signing service AWS KMS, you will need AWS KMS ASYMMETRIC KEY with SIGN AND VERIFY Key Usage.
+ * signing service Google Cloud KMS, you will need Google Cloud KMS KEY with `Asymmetric sign` Purpose.
  *
- * $ ./pdf_sign_external_aws_kms <INPUT_PDF_PATH> <OUTPUT_PDF_PATH> <KEY_ID>
+ * $ ./pdf_sign_external_google_cloud_kms <INPUT_PDF_PATH> <OUTPUT_PDF_PATH> <GOOGLE_CLOUD_CREDENTIALS_PATH> <KEY_NAME>
+ *
+ * <KEY_NAME> format example: projects/my-project/locations/us-east1/keyRings/my-key-ring/cryptoKeys/my-key/cryptoKeyVersions/123
  */
 package main
 
@@ -14,8 +16,10 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/asn1"
+	"encoding/pem"
 	"errors"
 	"fmt"
+	"hash/crc32"
 	"io"
 	"io/ioutil"
 	"log"
@@ -23,9 +27,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/kms"
+	kms "cloud.google.com/go/kms/apiv1"
+	"cloud.google.com/go/kms/apiv1/kmspb"
+	gcOption "google.golang.org/api/option"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/unidoc/pkcs7"
 	"github.com/unidoc/unipdf/v3/annotator"
@@ -51,17 +56,18 @@ var (
 	sigLen = 8192
 )
 
-const usagef = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH KEY_ID\n"
+const usagef = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH GOOGLE_CLOUD_CREDENTIALS_PATH KEY_NAME\n"
 
 func main() {
 	args := os.Args
-	if len(args) < 4 {
+	if len(args) < 5 {
 		fmt.Printf(usagef, os.Args[0])
 		return
 	}
 	inputPath := args[1]
 	outputPath := args[2]
-	keyId := args[3]
+	gcCredentialsPath := args[3]
+	keyName := args[4]
 
 	// Generate PDF file signed with empty signature.
 	handler, err := sighandler.NewEmptyAdobePKCS7Detached(sigLen)
@@ -74,8 +80,6 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	log.Println("Do sign contents")
-
 	// Parse signature byte range.
 	byteRange, err := parseByteRange(signature.ByteRange)
 	if err != nil {
@@ -85,7 +89,7 @@ func main() {
 	// This would be the time to send the PDF buffer to a signing device or
 	// signing web service and get back the signature. We will simulate this by
 	// signing the PDF using UniDoc and returning the signature data.
-	signatureData, pdfData, err := getExternalSignatureAndSign(inputPath, keyId)
+	signatureData, pdfData, err := getExternalSignatureAndSign(inputPath, gcCredentialsPath, keyName)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
@@ -130,8 +134,8 @@ func generateSignedFile(inputPath string, handler model.SignatureHandler) ([]byt
 
 	// Create signature.
 	signature := model.NewPdfSignature(handler)
-	signature.SetName("AWS KMS Sign")
-	signature.SetReason("TestAwsKMSSignature")
+	signature.SetName("GOOGLECLOUD KMS Sign")
+	signature.SetReason("TestGCKMSSignature")
 	signature.SetDate(now, "")
 
 	if err := signature.Initialize(); err != nil {
@@ -148,7 +152,7 @@ func generateSignedFile(inputPath string, handler model.SignatureHandler) ([]byt
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
 			annotator.NewSignatureLine("Date", "2023.01.01"),
-			annotator.NewSignatureLine("Reason", "AWS KMS Sing Test"),
+			annotator.NewSignatureLine("Reason", "GC KMS Sing Test"),
 		},
 		opts,
 	)
@@ -173,11 +177,12 @@ func generateSignedFile(inputPath string, handler model.SignatureHandler) ([]byt
 
 // getExternalSignatureAndSign simulates an external service which signs the specified
 // PDF file and returns its pdf signed bytes and signature.
-func getExternalSignatureAndSign(inputPath string, keyId string) ([]byte, []byte, error) {
-	awsKmsSign, err := AwsKmsExternalSigner(keyId)
+func getExternalSignatureAndSign(inputPath, credPath, keyName string) ([]byte, []byte, error) {
+	gcKmsSign, err := GcKmsExternalSigner(credPath, keyName)
 	if err != nil {
 		return nil, nil, err
 	}
+	defer gcKmsSign.client.Close()
 
 	now := time.Now()
 
@@ -196,7 +201,7 @@ func getExternalSignatureAndSign(inputPath string, keyId string) ([]byte, []byte
 	}
 
 	// We sign certificate using external signer that implement `crypto.Signer`.
-	certData, err := x509.CreateCertificate(rand.Reader, &template, &template, awsKmsSign.getPublicKey(), awsKmsSign.signer)
+	certData, err := x509.CreateCertificate(rand.Reader, &template, &template, gcKmsSign.getPublicKey(), gcKmsSign.signer)
 	if err != nil {
 		panic(err)
 	}
@@ -208,10 +213,10 @@ func getExternalSignatureAndSign(inputPath string, keyId string) ([]byte, []byte
 
 	certChain := []*x509.Certificate{cert}
 
-	awsKmsSign.certChain = certChain
+	gcKmsSign.certChain = certChain
 
 	// Sign input file.
-	handler := awsKmsSign.toSigHandler()
+	handler := gcKmsSign.toSigHandler()
 
 	pdfBytes, signature, err := generateSignedFile(inputPath, handler)
 	if err != nil {
@@ -256,8 +261,8 @@ type SignerCallback func(rand io.Reader, digest []byte, opts crypto.SignerOpts) 
 
 // CryptoSigner Customize crypto signer wrapper to implement `crypto.Signer`.
 type CryptoSigner struct {
-	keyId  string
-	client *kms.KMS
+	keyName string
+	client  *kms.KeyManagementClient
 
 	callback SignerCallback
 }
@@ -273,19 +278,44 @@ func (cs *CryptoSigner) Public() crypto.PublicKey {
 		return nil
 	}
 
-	publicKeyResp, err := cs.client.GetPublicKey(&kms.GetPublicKeyInput{
-		KeyId: aws.String(cs.keyId),
-	})
+	ctx := context.Background()
+	// Build the request.
+	req := &kmspb.GetPublicKeyRequest{
+		Name: cs.keyName,
+	}
+
+	// Call the API.
+	result, err := cs.client.GetPublicKey(ctx, req)
 	if err != nil {
 		return nil
 	}
 
-	spki, err := x509.ParsePKIXPublicKey(publicKeyResp.PublicKey)
-	if err != nil {
+	// The 'Pem' field is the raw string representation of the public key.
+	// Convert 'Pem' into bytes for further processing.
+	key := []byte(result.Pem)
+
+	// Optional, but recommended: perform integrity verification on result.
+	// For more details on ensuring E2E in-transit integrity to and from Cloud KMS visit:
+	// https://cloud.google.com/kms/docs/data-integrity-guidelines
+	crc32c := func(data []byte) uint32 {
+		t := crc32.MakeTable(crc32.Castagnoli)
+		return crc32.Checksum(data, t)
+	}
+	if int64(crc32c(key)) != result.PemCrc32C.Value {
+		log.Fatal("getPublicKey: response corrupted in-transit")
 		return nil
 	}
 
-	return spki
+	// Optional - parse the public key. This transforms the string key into a Go
+	// PublicKey.
+	block, _ := pem.Decode(key)
+	publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+		return nil
+	}
+
+	return publicKey
 }
 
 // Sign with customized `crypto.Signer`.
@@ -293,29 +323,54 @@ func (cs *CryptoSigner) Sign(rand io.Reader, digest []byte, opts crypto.SignerOp
 	if cs.callback != nil {
 		return cs.callback(rand, digest, opts)
 	}
-	// Encrypt the data.
-	result, err := cs.client.Sign(&kms.SignInput{
-		KeyId:   aws.String(cs.keyId),
-		Message: digest,
-		// Set AWS `MessageType` to digest as we send the digest instead raw message.
-		MessageType: aws.String("DIGEST"),
-		// SigningAlgorithm must be match with digest algorithm.
-		// Use:
-		// - `crypto.SHA256` for `RSASSA_PKCS1_V1_5_SHA_256` and `RSASSA_PSS_SHA_256`
-		// - `crypto.SHA384` for `RSASSA_PKCS1_V1_5_SHA_384` and `RSASSA_PSS_SHA_384`
-		// - `crypto.SHA512` for `RSASSA_PKCS1_V1_5_SHA_512` and `RSASSA_PSS_SHA_512`
-		SigningAlgorithm: aws.String("RSASSA_PKCS1_V1_5_SHA_256"),
-	})
+	ctx := context.Background()
+
+	// Sign the data.
+	// Optional but recommended: Compute digest's CRC32C.
+	crc32c := func(data []byte) uint32 {
+		t := crc32.MakeTable(crc32.Castagnoli)
+		return crc32.Checksum(data, t)
+
+	}
+	digestCRC32C := crc32c(digest)
+
+	// Build the signing request.
+	//
+	// Note: Key algorithms will require a varying hash function. For example,
+	// EC_SIGN_P384_SHA384 requires SHA-384.
+	req := &kmspb.AsymmetricSignRequest{
+		Name: cs.keyName,
+		Digest: &kmspb.Digest{
+			Digest: &kmspb.Digest_Sha256{
+				Sha256: digest,
+			},
+		},
+		DigestCrc32C: wrapperspb.Int64(int64(digestCRC32C)),
+	}
+
+	// Call the API.
+	result, err := cs.client.AsymmetricSign(ctx, req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to sign digest: %v", err)
+	}
+
+	// Optional, but recommended: perform integrity verification on result.
+	// For more details on ensuring E2E in-transit integrity to and from Cloud KMS visit:
+	// https://cloud.google.com/kms/docs/data-integrity-guidelines
+	if !result.VerifiedDigestCrc32C {
+		return nil, errors.New("AsymmetricSign: request corrupted in-transit")
+	}
+
+	if int64(crc32c(result.Signature)) != result.SignatureCrc32C.Value {
+		return nil, errors.New("AsymmetricSign: response corrupted in-transit")
 	}
 
 	return result.Signature, nil
 }
 
-func NewCryptoSigner(c *kms.KMS, keyId string, cb SignerCallback) crypto.Signer {
+func NewCryptoSigner(c *kms.KeyManagementClient, keyName string, cb SignerCallback) crypto.Signer {
 	return &CryptoSigner{
-		keyId:    keyId,
+		keyName:  keyName,
 		client:   c,
 		callback: cb,
 	}
@@ -323,15 +378,15 @@ func NewCryptoSigner(c *kms.KMS, keyId string, cb SignerCallback) crypto.Signer 
 
 // externalSigner is wrapper for third-party signer,
 // needs to implement function of model.SignatureHandler.
-// in this example, we use AWS KMS as third-party signer.
+// in this example, we use Google Cloud KMS as third-party signer.
 type externalSigner struct {
 	certChain []*x509.Certificate
 
-	// keyId AWS KMS ASYMMETRIC KEY_ID.
-	keyId string
+	// keyName GC KMS ASYMMETRIC KEY_NAME.
+	keyName string
 	// client is third-party api client.
 	// We make client as interface for supporting another third-party signer.
-	client *kms.KMS
+	client *kms.KeyManagementClient
 
 	// signer customized `crypto.Signer`
 	signer crypto.Signer
@@ -339,29 +394,25 @@ type externalSigner struct {
 	ctx context.Context
 }
 
-// AwsKmsExternalSigner wrap externalSigner to model.SignatureHandler.
+// GcKmsExternalSigner wrap externalSigner to model.SignatureHandler.
 // With this, you can implement any third-party client signer into signature handler.
-func AwsKmsExternalSigner(keyId string) (*externalSigner, error) {
+func GcKmsExternalSigner(credPath, keyName string) (*externalSigner, error) {
 	ctx := context.Background()
 
-	// Initiate AWS session.
-	sess, err := session.NewSession(&aws.Config{
-		CredentialsChainVerboseErrors: aws.Bool(true),
-		Region:                        aws.String("us-west-1"),
-	})
+	// Initiate Google Cloud KMS client.
+	client, err := kms.NewKeyManagementClient(ctx, gcOption.WithCredentialsFile(credPath))
 	if err != nil {
 		return nil, err
 	}
-	svc := kms.New(sess)
 
 	// Generate external `crypto.Singer`.
-	extSigner := NewCryptoSigner(svc, keyId, nil)
+	extSigner := NewCryptoSigner(client, keyName, nil)
 
 	return &externalSigner{
-		keyId:  keyId,
-		client: svc,
-		ctx:    ctx,
-		signer: extSigner,
+		keyName: keyName,
+		client:  client,
+		ctx:     ctx,
+		signer:  extSigner,
 	}, nil
 }
 
@@ -403,24 +454,55 @@ func (es *externalSigner) Sign(sig *model.PdfSignature, digest model.Hasher) err
 		return err
 	}
 
-	// Set digest algorithm which supported by AWS KMS.
+	// Set digest algorithm which supported by Google Cloud KMS.
 	signedData.SetDigestAlgorithm(pkcs7.OIDDigestAlgorithmSHA256)
 
 	// Use customized callback if you want use different signature algorithm.
 	/* cb := func(rand io.Reader, digest []byte, opts crypto.SignerOpts) ([]byte, error) {
-		* Sign digest.
-		*	signResult, err := es.client.Sign(&kms.SignInput{
-		*		KeyId:            aws.String(es.keyId),
-		*		Message:          digest,
-		*		MessageType:      aws.String("DIGEST"),
-		*		SigningAlgorithm: aws.String("RSASSA_PKCS1_V1_5_SHA_256"),
-		*	})
-		*	if err != nil {
-		*		return nil, err
-		*	}
-	  *
-		*	return signResult.Signature, nil
-		*}
+			Sign digest.
+	    ctx := context.Background()
+
+	  	// Sign the data.
+	  	// Optional but recommended: Compute digest's CRC32C.
+	  	crc32c := func(data []byte) uint32 {
+	  		t := crc32.MakeTable(crc32.Castagnoli)
+	  		return crc32.Checksum(data, t)
+
+	  	}
+	  	digestCRC32C := crc32c(digest)
+
+	  	// Build the signing request.
+	  	//
+	  	// Note: Key algorithms will require a varying hash function. For example,
+	  	// EC_SIGN_P384_SHA384 requires SHA-384.
+	  	req := &kmspb.AsymmetricSignRequest{
+	  		Name: cs.keyName,
+	  		Digest: &kmspb.Digest{
+	  			Digest: &kmspb.Digest_Sha256{
+	  				Sha256: digest,
+	  			},
+	  		},
+	  		DigestCrc32C: wrapperspb.Int64(int64(digestCRC32C)),
+	  	}
+
+	  	// Call the API.
+	  	result, err := cs.client.AsymmetricSign(ctx, req)
+	  	if err != nil {
+	  		return nil, fmt.Errorf("failed to sign digest: %v", err)
+	  	}
+
+	  	// Optional, but recommended: perform integrity verification on result.
+	  	// For more details on ensuring E2E in-transit integrity to and from Cloud KMS visit:
+	  	// https://cloud.google.com/kms/docs/data-integrity-guidelines
+	  	if !result.VerifiedDigestCrc32C {
+	  		return nil, erros.new("AsymmetricSign: request corrupted in-transit")
+	  	}
+
+	  	if int64(crc32c(result.Signature)) != result.SignatureCrc32C.Value {
+	  		return nil, errors.New("AsymmetricSign: response corrupted in-transit")
+	  	}
+
+	  	return result.Signature, nil
 	*/
 
 	siConfig := pkcs7.SignerInfoConfig{}
