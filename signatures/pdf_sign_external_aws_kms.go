@@ -1,6 +1,6 @@
 /*
  * This example showcases how to digitally sign a PDF file using an external
- * signing service AWS KMS, you will need AWS KMS ASYMMETRIC KEY with SIGN AND VERIFY Key Spec.
+ * signing service AWS KMS, you will need AWS KMS ASYMMETRIC KEY with SIGN AND VERIFY Key Usage.
  *
  * $ ./pdf_sign_external_aws_kms <INPUT_PDF_PATH> <OUTPUT_PDF_PATH> <KEY_ID>
  */
