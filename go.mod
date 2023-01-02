@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.130
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/boombuler/barcode v1.0.1
-	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.6.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/miekg/pkcs11 v1.0.3 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
