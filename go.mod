@@ -1,7 +1,9 @@
 module github.com/unidoc/unidoc-examples
 
 require (
-	cloud.google.com/go/kms v1.7.0
+	cloud.google.com/go/iam v0.7.0 // indirect
+	cloud.google.com/go/kms v1.5.0
+	cloud.google.com/go/longrunning v0.3.0 // indirect
 	github.com/ThalesIgnite/crypto11 v1.2.4
 	github.com/adrg/strutil v0.2.3 // indirect
 	github.com/adrg/sysfont v0.1.2 // indirect
