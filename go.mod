@@ -5,11 +5,11 @@ require (
 	github.com/adrg/strutil v0.2.3 // indirect
 	github.com/adrg/sysfont v0.1.2 // indirect
 	github.com/adrg/xdg v0.3.3 // indirect
+	github.com/aws/aws-sdk-go v1.44.130
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/boombuler/barcode v1.0.1
 	github.com/kr/text v0.2.0 // indirect
 	github.com/miekg/pkcs11 v1.0.3 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/trimmer-io/go-xmp v1.0.0
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
