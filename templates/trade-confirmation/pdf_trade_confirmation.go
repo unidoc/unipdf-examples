@@ -28,7 +28,7 @@ func init() {
 func main() {
 	c := creator.New()
 	c.SetPageMargins(50, 50, 25, 25)
-	up
+
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
 	if err != nil {
