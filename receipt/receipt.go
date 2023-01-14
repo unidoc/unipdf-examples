@@ -15,7 +15,10 @@ type Field struct {
 	FieldValue string `json:"FieldValue"`
 }
 type Reciept struct {
-	Fields []Field
+	Title   string
+	Content string
+	Email   string
+	Fields  []Field
 }
 
 func main() {
@@ -61,6 +64,12 @@ func readReceipt(jsonFile string) (*Reciept, error) {
 		return nil, err
 	}
 	receipt := Reciept{
+		Title: "Receipt",
+		Content: "Membership fees are billed at the beginning of each period" +
+			"and may take a few days after the billing date to appear on your account. Sales tax may apply." +
+			" Thanks for staying with us! " +
+			"If you have any questions, please contact",
+		Email:  "support@unidocprovider.com",
 		Fields: fields,
 	}
 	return &receipt, nil
