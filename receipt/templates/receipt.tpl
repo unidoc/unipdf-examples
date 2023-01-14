@@ -1,5 +1,5 @@
 <division margin="0 0 0 0" padding="5, 5, 5, 5">
-    <image src="path('./assets/unidoc-logo.png')" width="77.611" height="25" margin="0 0 0 0" align="center"></image>
+    <image src="path('./templates/res/unidoc-logo.png')" width="77.611" height="25" margin="0 0 0 0" align="center"></image>
     <paragraph text-align="center" margin="0 0 15 15">
         <text-chunk font="times-italic" font-size="28"> Receipt </text-chunk>    
     </paragraph>

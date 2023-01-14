@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -20,9 +19,12 @@ type Reciept struct {
 }
 
 func main() {
-	fmt.Println("test")
 	filePath := "./contents/receipt.json"
 	receipt, err := readReceipt(filePath)
+	if err != nil {
+		panic(err)
+	}
+
 	if err != nil {
 		panic(err)
 	}
