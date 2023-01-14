@@ -1,6 +1,5 @@
 /*
- * PDF to text: Extract all text for each page of a pdf file
- * using simpler procedure which skip tables processing and topological ordering.
+ * Using simple extraction procedure in text extraction process which skips table processing and topological ordering
  *
  * Run as: go run pdf_simple_extraction.go input.pdf
  */
