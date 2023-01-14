@@ -66,7 +66,7 @@ func readReceipt(jsonFile string) (*Reciept, error) {
 
 func process(reciept *Reciept) {
 	c := creator.New()
-	tpl, err := readTemplate("./templates/receipt/receipt.tpl")
+	tpl, err := readTemplate("./templates/receipt.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
