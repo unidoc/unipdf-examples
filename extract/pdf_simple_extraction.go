@@ -1,5 +1,5 @@
 /*
- * Using simple extraction procedure in text extraction process which skips table processing and topological ordering
+ * Using a simple extraction procedure in the text extraction process, which skips table processing and topological ordering.
  *
  * Run as: go run pdf_simple_extraction.go input.pdf
  */
