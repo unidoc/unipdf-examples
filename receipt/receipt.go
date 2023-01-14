@@ -1,3 +1,8 @@
+/*
+ * This example showcases the usage of creator templates to create a reciept document
+ *
+ * Run as: go run receipt.go.go
+ */
 package main
 
 import (
@@ -7,18 +12,32 @@ import (
 	"log"
 	"os"
 
+	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 )
 
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io.
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+}
+
+// Field represents field item.
 type Field struct {
 	FieldName  string `json:"FieldName"`
 	FieldValue string `json:"FieldValue"`
 }
+
+// Reciept represent Recipt object.
 type Reciept struct {
-	Title   string
-	Content string
-	Email   string
-	Fields  []Field
+	Title  string
+	Fields []Field
 }
 
 func main() {
@@ -31,9 +50,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	process(receipt)
+	render(receipt)
 }
 
+// readTemplate reads template file.
 func readTemplate(tplFile string) (io.Reader, error) {
 	file, err := os.Open(tplFile)
 	if err != nil {
@@ -49,6 +69,7 @@ func readTemplate(tplFile string) (io.Reader, error) {
 	return buf, nil
 }
 
+// readReceipt reads the reciept json file and decods it to `Reciept` object.
 func readReceipt(jsonFile string) (*Reciept, error) {
 	file, err := os.Open(jsonFile)
 	if err != nil {
@@ -64,18 +85,14 @@ func readReceipt(jsonFile string) (*Reciept, error) {
 		return nil, err
 	}
 	receipt := Reciept{
-		Title: "Receipt",
-		Content: "Membership fees are billed at the beginning of each period" +
-			"and may take a few days after the billing date to appear on your account. Sales tax may apply." +
-			" Thanks for staying with us! " +
-			"If you have any questions, please contact",
-		Email:  "support@unidocprovider.com",
+		Title:  "Receipt",
 		Fields: fields,
 	}
 	return &receipt, nil
 }
 
-func process(reciept *Reciept) {
+// process reads template file and draws the template content to output file.
+func render(reciept *Reciept) {
 	c := creator.New()
 	tpl, err := readTemplate("./templates/receipt.tpl")
 	if err != nil {
