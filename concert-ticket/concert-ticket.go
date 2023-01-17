@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -9,8 +11,24 @@ import (
 	"github.com/unidoc/unipdf/v3/creator"
 )
 
+type Field struct {
+	FieldName  string `json:"field_name"`
+	FieldValue string `json:"field_value"`
+}
+type Ticket struct {
+	Detail            []Field  `json:"ticket_detail"`
+	RulesOfAttendance []string `json:"rules_of_attendance"`
+	RulesOfPurchase   []string `json:"rules_of_purchase"`
+}
+
 func main() {
-	process()
+	// process()
+	ticket, err := readTemplateData("./templates/concert-ticket.json")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("type %T  and value %v\n", *ticket, *ticket)
 }
 func readTemplate(tplFile string) (io.Reader, error) {
 	file, err := os.Open(tplFile)
@@ -28,6 +46,7 @@ func readTemplate(tplFile string) (io.Reader, error) {
 }
 func process() {
 	c := creator.New()
+	c.SetPageMargins(20, 20, 20, 20)
 	tpl, err := readTemplate("./templates/ticket.tpl")
 	if err != nil {
 		log.Fatal(err)
@@ -42,4 +61,22 @@ func process() {
 	if err := c.WriteToFile("ticket.pdf"); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func readTemplateData(filePath string) (*Ticket, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var ticket Ticket
+	decoder := json.NewDecoder(file)
+
+	err = decoder.Decode(&ticket)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ticket, nil
 }

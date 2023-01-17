@@ -1,7 +1,42 @@
-<division margin="0 0 0 0" padding="5, 5, 5, 5">
-    <image src="path('./assets/unidoc-logo.png')" width="77.611" height="25" margin="0 0 0 0" align="center"></image>
-    <paragraph text-align="center" margin="0 0 15 15">
-        <text-chunk font="times-italic" font-size="28"> Receipt </text-chunk>    
-    </paragraph>
-    <line fit-mode="fill-width" position="relative" thickness= "1.2" margin="0 0 5 5"></line>
-</division>
+{
+    "ticket_detail": [
+        {
+            "field_name": "admission",
+            "field_value": "Generaladmission"
+        },
+        {
+            "field_name": "ticket_type",
+            "field_value": "Adult"
+        },
+        {
+            "field_name": "price",
+            "field_value": "$32"
+        },
+        {
+            "field_name": "name",
+            "filed_value": "Coleman R. Merrell"
+        },
+        {
+            "field_name": "address",
+            "filed_value": "107 Pickens Way"
+        }
+    ],
+    "rules_of_attendance": [
+        "1. Do not stand up in front of people who are sitting down",
+        "2. Do not take up too much space in a pit/GA section",
+        "3. DO NOT force your way to the front of the stage",
+        "4. Let people pass through if they are trying to exit",
+        "5. Make friends with those around you",
+        "6. Let shorter people stand in front of you",
+        "7. Sharing is caring!",
+        "8. Do not interrupt those sitting near you with a drink run every other song",
+        "9. Do not talk loudly during the concert",
+        "10. Rock out and have fun!"
+    ],
+    "rules_of_purchase": [
+        "No refunds or exchanges.",
+        "Unused tickets may be converted to a tax - deductible donation",
+        "All photography, video and audio recording is prohibited.",
+        "Cameras and tape or video recorders are not allowed in the theater due to copyright law."
+    ]
+}
