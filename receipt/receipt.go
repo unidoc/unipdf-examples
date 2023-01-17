@@ -94,11 +94,12 @@ func readReceipt(jsonFile string) (*Reciept, error) {
 // process reads template file and draws the template content to output file.
 func render(reciept *Reciept) {
 	c := creator.New()
+	c.SetPageMargins(15, 15, 20, 20)
+	c.SetPageSize(creator.PageSizeA5)
 	tpl, err := readTemplate("./templates/receipt.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	// Draw front page template.
 	if err := c.DrawTemplate(tpl, reciept, nil); err != nil {
 		log.Fatal(err)
