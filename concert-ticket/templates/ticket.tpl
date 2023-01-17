@@ -13,15 +13,8 @@
     <table-cell vertical-align="middle" indent="0">
         <division margin="7 0 0 0">
             <paragraph text-align="left" margin="0 0 0 0">
-                <text-chunk font="times" font-size="14">{{.FieldName}}}</text-chunk>
+                <text-chunk font="times" font-size="14">{{.}}</text-chunk>
             </paragraph>
-        </division>
-    </table-cell>
-    <table-cell vertical-align="middle" indent="0">
-        <division margin="7 0 0 0">
-        <paragraph text-align="left" margin="0 0 0 0">
-            <text-chunk font="times" font-size="14">{{.FieldValue}}</text-chunk>
-        </paragraph>
         </division>
     </table-cell>
 {{end}}
@@ -46,94 +39,10 @@
     </table-cell>
     <table-cell>
         <table columns="2">
-            <table-cell vertical-align="middle" indent="0">
-                <division margin="7 0 0 0">
-                    <paragraph text-align="left" margin="0 0 0 0">
-                        <text-chunk font="times" font-size="14">Admission</text-chunk>
-                    </paragraph>
-                </division>
-            </table-cell>
-            <table-cell vertical-align="middle" indent="0">
-                <division margin="7 0 0 0">
-                <paragraph text-align="left" margin="0 0 0 0">
-                    <text-chunk font="times" font-size="14">General admission</text-chunk>
-                </paragraph>
-                </division>
-            </table-cell>
-
-            <table-cell vertical-align="middle" indent="0">
-                <division margin="7 0 0 0">
-                <paragraph text-align="left" margin="0 0 0 0">
-                    <text-chunk font="times" font-size="14">Ticket type</text-chunk>
-                </paragraph>
-                </division>
-            </table-cell>
-            <table-cell vertical-align="middle" indent="0">
-                <division margin="7 0 0 0">
-                <paragraph text-align="left" margin="0 0 0 0">
-                    <text-chunk font="times" font-size="14">Adult</text-chunk>
-                </paragraph>
-                </division>
-            </table-cell>
-
-            <table-cell vertical-align="middle" indent="0">
-                <division margin="7 0 0 0">
-                <paragraph text-align="left" margin="0 0 0 0">
-                    <text-chunk font="times" font-size="14">Price</text-chunk>
-                </paragraph>
-                </division>
-            </table-cell>
-            <table-cell vertical-align="middle" indent="0">
-                <division margin="7 0 0 0">
-                <paragraph text-align="left" margin="0 0 0 0">
-                    <text-chunk font="times" font-size="14">$45</text-chunk>
-                </paragraph>
-                </division>
-            </table-cell>
-            <table-cell vertical-align="middle" indent="0">
-                <division margin="7 0 0 0">
-                    <paragraph text-align="left" margin="0 0 0 0">
-                        <text-chunk font="times" font-size="14">Name</text-chunk>
-                    </paragraph>
-                </division>
-            </table-cell>
-            <table-cell vertical-align="middle" indent="0">
-                <division margin="7 0 0 0">
-                <paragraph text-align="left" margin="0 0 0 0">
-                    <text-chunk font="times" font-size="14">John Smith</text-chunk>
-                </paragraph>
-                </division>
-            </table-cell>
-
-            <table-cell vertical-align="middle" indent="0">
-                <division margin="7 0 0 0">
-                <paragraph text-align="left" margin="0 0 0 0">
-                    <text-chunk font="times" font-size="14">Venue</text-chunk>
-                </paragraph>
-                </division>
-            </table-cell>
-            <table-cell vertical-align="middle" indent="0">
-                <division margin="7 0 0 0">
-                <paragraph text-align="left" margin="0 0 0 0">
-                    <text-chunk font="times" font-size="14">Concert Hall</text-chunk>
-                </paragraph>
-                </division>
-            </table-cell>
-
-            <table-cell vertical-align="middle" indent="0">
-                <division margin="7 0 0 0">
-                <paragraph text-align="left" margin="0 0 0 0">
-                    <text-chunk font="times" font-size="14">Address</text-chunk>
-                </paragraph>
-                </division>
-            </table-cell>
-            <table-cell vertical-align="middle" indent="0">
-                <division margin="7 0 0 0">
-                <paragraph text-align="left" margin="0 0 0 0">
-                    <text-chunk font="times" font-size="14">205 1st St.</text-chunk>
-                </paragraph>
-                </division>
-            </table-cell>
+            {{range .Detail}}
+            {{template "ticket-detail" .FieldName}}
+            {{template "ticket-detail" .FieldValue}}
+            {{end}}
         </table>
     </table-cell>
 </table>
@@ -141,15 +50,31 @@
 
 </table-cell>
 </table>
-
-
-<table border-width="1" columns="1" margin="0 0 0 15">
- <table-cell vertical-align="middle" indent="0" border-style="single" border-width="1.0">
- <division margin="0 0 0 0" padding="0, 0, 0, 0">
-    <paragraph text-align="left" margin="15 15 15 15">
-        <text-chunk font="times" font-size="14">Sample Content</text-chunk> 
-    </paragraph>
-</division>
+Rules of purchase
+<table columns="2" margin="0 0 0 15">
+ <table-cell border-width-top="0.5" border-width-bottom="0.5" border-width-left="0.5" vertical-align="top" indent="0.5" border-style="single">
+    <division margin="0 0 15 15" padding="0, 0, 0, 0">
+        <paragraph text-align="left" margin="0 0 10 0">
+            <text-chunk font="times-bold" font-size="12">Rules of attendance</text-chunk>
+        </paragraph>
+        {{range .RulesOfAttendance}}
+            <paragraph text-align="left" margin="0 0 0 0">
+                <text-chunk font="times" font-size="11">{{.}}</text-chunk>
+            </paragraph>
+        {{end}}
+    </division>
+ </table-cell>
+ <table-cell border-width-top="0.5" border-width-bottom="0.5" border-width-right="0.5" vertical-align="top" indent="0" border-style="single">
+    <division margin="0 0 15 15" padding="0, 0, 0, 0">
+        <paragraph text-align="left" margin="0 0 10 0">
+            <text-chunk font="times-bold" font-size="12">Rules of purchase</text-chunk>
+        </paragraph>
+        {{range .RulesOfPurchase}}
+            <paragraph text-align="left" margin="0 0 0 0">
+                <text-chunk font="times" font-size="11">{{.}}</text-chunk>
+            </paragraph>
+        {{end}}
+    </division>
  </table-cell>
 </table>
         

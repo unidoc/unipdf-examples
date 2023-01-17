@@ -14,11 +14,11 @@
         },
         {
             "field_name": "name",
-            "filed_value": "Coleman R. Merrell"
+            "field_value": "Coleman R. Merrell"
         },
         {
             "field_name": "address",
-            "filed_value": "107 Pickens Way"
+            "field_value": "107 Pickens Way"
         }
     ],
     "rules_of_attendance": [
@@ -34,9 +34,9 @@
         "10. Rock out and have fun!"
     ],
     "rules_of_purchase": [
-        "No refunds or exchanges.",
-        "Unused tickets may be converted to a tax - deductible donation",
-        "All photography, video and audio recording is prohibited.",
-        "Cameras and tape or video recorders are not allowed in the theater due to copyright law."
+        "- No refunds or exchanges.",
+        "- Unused tickets may be converted to a tax - deductible donation.",
+        "- All photography, video and audio recording is prohibited.",
+        "- Cameras and tape or video recorders are not allowed in the theater due to copyright law."
     ]
 }

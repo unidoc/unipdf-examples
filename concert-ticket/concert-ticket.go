@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -22,13 +21,13 @@ type Ticket struct {
 }
 
 func main() {
-	// process()
+
 	ticket, err := readTemplateData("./templates/concert-ticket.json")
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Printf("type %T  and value %v\n", *ticket, *ticket)
+	process(ticket)
+	// fmt.Printf("type %T  and value %v\n", ticket.RulesOfAttendance, ticket.RulesOfAttendance)
 }
 func readTemplate(tplFile string) (io.Reader, error) {
 	file, err := os.Open(tplFile)
@@ -44,7 +43,7 @@ func readTemplate(tplFile string) (io.Reader, error) {
 
 	return buf, nil
 }
-func process() {
+func process(ticket *Ticket) {
 	c := creator.New()
 	c.SetPageMargins(20, 20, 20, 20)
 	tpl, err := readTemplate("./templates/ticket.tpl")
@@ -53,7 +52,7 @@ func process() {
 	}
 	// opts := creator.TemplateOptions{}
 	// Draw front page template.
-	if err := c.DrawTemplate(tpl, nil, nil); err != nil {
+	if err := c.DrawTemplate(tpl, ticket, nil); err != nil {
 		log.Fatal(err)
 	}
 
