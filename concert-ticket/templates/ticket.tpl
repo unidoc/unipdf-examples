@@ -6,7 +6,7 @@
         <paragraph text-align="left" margin="5 5 0 0">
             <text-chunk font="times" font-size="14">25.05.2021  7:30PM</text-chunk> 
         </paragraph>
-        <line fit-mode="fill-width" position="relative" thickness= "1.2" margin="5 0 0 0"></line>
+        <line fit-mode="fill-width" position="relative" thickness= "2.0" margin="5 0 0 0"></line>
     </division>
 {{end}}
 {{define "ticket-detail"}}
@@ -77,5 +77,45 @@ Rules of purchase
     </division>
  </table-cell>
 </table>
-        
 
+<table columns="3" margin="20 0 0 10" column-widths="0.5 0.20 0.30">
+    <table-cell vertical-align="top">
+        <division margin="0 0 0 0" padding="0, 0, 0, 0">
+            <paragraph text-align="top" margin="0 0 0 0">
+                <text-chunk font="times-bold" font-size="12">Program/Bands List/Event Description</text-chunk>
+            </paragraph>
+            <paragraph text-align="top" margin="5 0 0 0">
+                <text-chunk font="times" font-size="12">A City literally built on Rock n' Roll in Cadott WI, </text-chunk>
+                <text-chunk font="times" font-size="12"> Rock Fest is the true Rock experience you can't miss. In its 26th year, </text-chunk>
+                <text-chunk font="times" font-size="12"> it is THE top venue for people of all ages to come together for one common purpose: </text-chunk>
+                <text-chunk font="times" font-size="12">to congregate with other rock fans from across the world, in a place where rock music still matters.</text-chunk>
+                <text-chunk font="times" font-size="12">Featuring the very best of active and classic rock and legendary names in Rock Music, entertainment and experience are the first priority.</text-chunk>
+                <text-chunk font="times" font-size="12">Aerosmith, Iron Maiden, Avenged Sevenfold, Kiss, Motley Crue, Fleetwood Mac, Tom Petty, Kid Rock, Shinedown,</text-chunk>
+                <text-chunk font="times" font-size="12">Five Finger Death Punch, Rob Zombie, Korn &amp; many more rock legends have graced this permanent Main Stage over the course of the last two and a half decades.</text-chunk>
+            </paragraph>
+        </division>
+    </table-cell>
+    <table-cell vertical-align="top">
+        <image src="path('./res/2.png')" height="180" width="100" margin="5 0 0 0"></image>
+    </table-cell>
+    <table-cell vertical-align="middle">
+        <division>
+        <paragraph text-align="top" margin="0 0 0 0">
+                <text-chunk font="times-bold" font-size="12">How to find us</text-chunk>
+        </paragraph>
+        <paragraph text-align="top" margin="0 0 0 0">
+        <text-chunk font="times" font-size="12">Concert Hall is located three blocks west of the park and three blocks north the library.</text-chunk>
+        <text-chunk font="times" font-size="12">Free parking is available nearby, which fills up close to showtime, and on the streets around.</text-chunk>
+        <text-chunk font="times" font-size="12">Bike racks are located outside the main entrance tothe Hall.</text-chunk>
+        </paragraph>
+        <paragraph text-align="top" margin="10 0 0 0">
+        <text-chunk font="times-bold" font-size="12">Learn More At</text-chunk>
+        </paragraph>
+        <paragraph text-align="top" margin="0 0 0 0">
+        <text-chunk font="times" font-size="11">Facebook /ConcertHall</text-chunk>
+        <text-chunk font="times" font-size="11">Twitter @ConcertHall</text-chunk>
+        <text-chunk font="times" font-size="11">Instagram @ConcertHall</text-chunk>
+        </paragraph>
+        </division>
+    </table-cell>
+</table>
