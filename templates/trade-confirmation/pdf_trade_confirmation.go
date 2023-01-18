@@ -1,3 +1,10 @@
+/*
+ * This example showcases the usage of creator templates by creating a sample
+ * trade confirmation document.
+ *
+ * Run as: go run pdf_trade_confirmation.go
+ */
+
 package main
 
 import (
@@ -35,7 +42,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Draw main content teplate.
+	// Read trading data json.
+	trade, err := readTradeData("trade.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Draw main content template.
 	tplOpts := &creator.TemplateOptions{
 		HelperFuncMap: template.FuncMap{
 			"extendDict": func(m map[string]interface{}, params ...interface{}) (map[string]interface{}, error) {
@@ -56,12 +69,6 @@ func main() {
 				return m, nil
 			},
 		},
-	}
-
-	// Read trading data json.
-	trade, err := readTradeData("trade.json")
-	if err != nil {
-		log.Fatal(err)
 	}
 
 	data := map[string]interface{}{
