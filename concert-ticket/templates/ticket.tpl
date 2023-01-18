@@ -119,3 +119,31 @@ Rules of purchase
         </division>
     </table-cell>
 </table>
+
+<table columns="1">
+    <table-cell>
+        {{template "header"}}
+    </table-cell>
+    <table-cell>
+        <table columns="2">
+           <table-cell>
+                <division margin="0 0 0 0">
+                    <table columns="2">
+                        {{range .Detail}}
+                        {{template "ticket-detail" .FieldName}}
+                        {{template "ticket-detail" .FieldValue}}
+                        {{end}}
+                    </table>
+                </division>
+           </table-cell>
+           <table-cell>
+                <division>
+                    <image src="path('./res/1.png')" height="50" width="50" margin="5 0 0 0"></image>
+                <paragraph text-align="top" margin="0 0 0 0">
+                    <text-chunk font="times" font-size="10">000385724</text-chunk>
+                </paragraph>
+                </division>
+           </table-cell> 
+        </table>
+    </table-cell>
+</table>
