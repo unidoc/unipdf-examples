@@ -19,38 +19,41 @@
     </table-cell>
 {{end}}
 <table columns="2" margin = "0 0 10 10" padding="0, 0, 30, 30" column-widths="0.25 0.75">
-<table-cell>
-<image src="path('./res/0.png')" fit-mode="fill-width"  margin="5 0 0 0"></image>
-</table-cell>
-<table-cell>
-<division>
-    <division margin="0 0 0 15">
-    {{template "header"}}
-    </division>
-        <table columns="2" padding="0, 0, 0, 0" column-widths="0.3 0.7">
-        <table-cell vertical-align="bottom">
-            <division margin="0 0 0 0" padding="0, 0, 0, 0">
-                <paragraph text-align="left" margin="0 0 0 15">
-                    <text-chunk font="times" font-size="14">E - ticket</text-chunk>
-                </paragraph>
-                <paragraph text-align="left" margin="0 0 0 15">
-                    <text-chunk font="times" font-size="14">000385724</text-chunk>
-                </paragraph>
-                <image src="qr-code" height="100" width="100" margin="0 0 0 5"></image>
+    <table-cell>
+        <image src="path('./res/0.png')" fit-mode="fill-width"  margin="5 0 0 0"></image>
+    </table-cell>
+    <table-cell>
+        <division>
+            <division margin="0 0 0 15">
+            {{template "header"}}
             </division>
-        </table-cell>
-        <table-cell>
-            <table columns="2">
-                {{range .Detail}}
-                {{template "ticket-detail" .FieldName}}
-                {{template "ticket-detail" .FieldValue}}
-                {{end}}
+                <table columns="2" padding="0, 0, 0, 0" column-widths="0.3 0.7">
+                <table-cell vertical-align="bottom">
+                    <table columns="1">
+                        <table-cell vertical-align="bottom">
+                            <division margin="0 0 0 0" padding="0, 0, 0, 0">
+                                <paragraph text-align="left" margin="0 0 0 15">
+                                    <text-chunk font="times" font-size="14">E - ticket</text-chunk>
+                                </paragraph>
+                                    <paragraph text-align="left" margin="0 0 0 15">
+                                        <text-chunk font="times" font-size="14">000385724</text-chunk>
+                                    </paragraph>
+                                <image src="qr-code" height="95" width="95" margin="0 0 0 5"></image>
+                            </division>
+                        </table-cell>
+                    </table>
+                </table-cell>
+                <table-cell>
+                    <table columns="2">
+                        {{range .Detail}}
+                        {{template "ticket-detail" .FieldName}}
+                        {{template "ticket-detail" .FieldValue}}
+                        {{end}}
+                    </table>
+                </table-cell>
             </table>
-        </table-cell>
-    </table>
-</division>
-
-</table-cell>
+        </division>
+    </table-cell>
 </table>
 Rules of purchase
 <table columns="2" margin="0 0 0 15">
