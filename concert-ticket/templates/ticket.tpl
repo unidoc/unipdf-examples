@@ -26,7 +26,7 @@
 <division>
     {{template "header"}}
 <table columns="2" padding="0, 0, 0, 0" column-widths="0.3 0.7">
-    <table-cell>
+    <table-cell vertical-align="middle">
         <division margin="7 0 0 0" padding="5, 5, 0, 0">
             <paragraph text-align="left" margin="0 0 0 0">
                 <text-chunk font="times" font-size="14">E - ticket</text-chunk>
