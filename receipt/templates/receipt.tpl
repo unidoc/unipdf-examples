@@ -18,7 +18,7 @@
 <division margin="0 0 10 10" padding="5, 5, 5, 5">
     <paragraph text-align="left">
         <text-chunk font="times" font-size="11">Membership fees are billed at the beginning of each period</text-chunk>
-        <text-chunk font="times" font-size="11">and may take a few days after the billing date to appear on your account. Sales tax may apply.</text-chunk>
+        <text-chunk font="times" font-size="11"> and may take a few days after the billing date to appear on your account. Sales tax may apply.</text-chunk>
         <text-chunk font="times" font-size="11"> Thanks for staying with us!</text-chunk>
         <text-chunk font="times" font-size="11"> If you have any questions, please contact</text-chunk>
         <text-chunk font="times" color="#0000ff" font-size="12"> support@unidocprovider.com</text-chunk>
