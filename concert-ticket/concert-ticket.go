@@ -98,7 +98,7 @@ func process(ticket *Ticket, qrCode *model.Image) {
 	}
 
 	// Write output file.
-	if err := c.WriteToFile("ticket.pdf"); err != nil {
+	if err := c.WriteToFile("unipdf_ticket.pdf"); err != nil {
 		log.Fatal(err)
 	}
 }
