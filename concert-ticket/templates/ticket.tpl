@@ -19,33 +19,35 @@
     </table-cell>
 {{end}}
 <table columns="2" margin = "0 0 10 10" padding="0, 0, 30, 30" column-widths="0.25 0.75">
-<table-cell >
-<image src="path('./res/0.png')" height="180" width="100" margin="5 0 0 0"></image>
+<table-cell>
+<image src="path('./res/0.png')" fit-mode="fill-width"  margin="5 0 0 0"></image>
 </table-cell>
 <table-cell>
 <division>
+    <division margin="0 0 0 15">
     {{template "header"}}
-<table columns="2" padding="0, 0, 0, 0" column-widths="0.3 0.7">
-    <table-cell vertical-align="middle">
-        <division margin="7 0 0 0" padding="5, 5, 0, 0">
-            <paragraph text-align="left" margin="0 0 0 0">
-                <text-chunk font="times" font-size="14">E - ticket</text-chunk>
-            </paragraph>
-            <paragraph text-align="left" margin="0 0 0 0">
-                <text-chunk font="times" font-size="14">000385724</text-chunk>
-            </paragraph>
-            <image src="path('./res/1.png')" height="90" width="90" margin="5 0 0 0"></image>
-        </division>
-    </table-cell>
-    <table-cell>
-        <table columns="2">
-            {{range .Detail}}
-            {{template "ticket-detail" .FieldName}}
-            {{template "ticket-detail" .FieldValue}}
-            {{end}}
-        </table>
-    </table-cell>
-</table>
+    </division>
+        <table columns="2" padding="0, 0, 0, 0" column-widths="0.3 0.7">
+        <table-cell vertical-align="bottom">
+            <division margin="0 0 0 0" padding="0, 0, 0, 0">
+                <paragraph text-align="left" margin="0 0 0 15">
+                    <text-chunk font="times" font-size="14">E - ticket</text-chunk>
+                </paragraph>
+                <paragraph text-align="left" margin="0 0 0 15">
+                    <text-chunk font="times" font-size="14">000385724</text-chunk>
+                </paragraph>
+                <image src="qr-code" height="100" width="100" margin="0 0 0 5"></image>
+            </division>
+        </table-cell>
+        <table-cell>
+            <table columns="2">
+                {{range .Detail}}
+                {{template "ticket-detail" .FieldName}}
+                {{template "ticket-detail" .FieldValue}}
+                {{end}}
+            </table>
+        </table-cell>
+    </table>
 </division>
 
 </table-cell>
@@ -100,22 +102,22 @@ Rules of purchase
     </table-cell>
     <table-cell vertical-align="top">
         <division>
-        <paragraph text-align="top" margin="0 0 0 0">
-                <text-chunk font="times-bold" font-size="12">How to find us</text-chunk>
-        </paragraph>
-        <paragraph text-align="top" margin="0 0 0 0">
-        <text-chunk font="times" font-size="12">Concert Hall is located three blocks west of the park and three blocks north the library.</text-chunk>
-        <text-chunk font="times" font-size="12">Free parking is available nearby, which fills up close to showtime, and on the streets around.</text-chunk>
-        <text-chunk font="times" font-size="12">Bike racks are located outside the main entrance tothe Hall.</text-chunk>
-        </paragraph>
-        <paragraph text-align="top" margin="10 0 0 0">
-        <text-chunk font="times-bold" font-size="12">Learn More At</text-chunk>
-        </paragraph>
-        <paragraph text-align="top" margin="0 0 0 0">
-        <text-chunk font="times" font-size="11">Facebook /ConcertHall</text-chunk>
-        <text-chunk font="times" font-size="11">Twitter @ConcertHall</text-chunk>
-        <text-chunk font="times" font-size="11">Instagram @ConcertHall</text-chunk>
-        </paragraph>
+            <paragraph text-align="top" margin="0 0 0 0">
+                    <text-chunk font="times-bold" font-size="12">How to find us</text-chunk>
+            </paragraph>
+            <paragraph text-align="top" margin="0 0 0 0">
+                <text-chunk font="times" font-size="12">Concert Hall is located three blocks west of the park and three blocks north the library.</text-chunk>
+                <text-chunk font="times" font-size="12">Free parking is available nearby, which fills up close to showtime, and on the streets around.</text-chunk>
+                <text-chunk font="times" font-size="12">Bike racks are located outside the main entrance tothe Hall.</text-chunk>
+            </paragraph>
+            <paragraph text-align="top" margin="10 0 0 0">
+                <text-chunk font="times-bold" font-size="12">Learn More At</text-chunk>
+            </paragraph>
+            <paragraph text-align="top" margin="0 0 0 0">
+                <text-chunk font="times" font-size="11">Facebook /ConcertHall</text-chunk>
+                <text-chunk font="times" font-size="11">Twitter @ConcertHall</text-chunk>
+                <text-chunk font="times" font-size="11">Instagram @ConcertHall</text-chunk>
+            </paragraph>
         </division>
     </table-cell>
 </table>
@@ -123,46 +125,46 @@ Rules of purchase
 <table columns="2">
     <table-cell vertical-align="middle">
         <division margin="0 0 0 10">
-        <paragraph text-align="top" margin="0 0 0 0">
-        <text-chunk font="times" font-size="11">This is your ticket. Print this Entire page, fold it and bring it with you to the event.</text-chunk>
-        <text-chunk font="times" font-size="11"> Please make sure the QR code is visible.</text-chunk>
-        </paragraph>
-        <image src="path('./res/3.png')" height="80" width="100" margin="5 0 0 0"></image>
+            <paragraph text-align="top" margin="0 0 0 0">
+                <text-chunk font="times" font-size="11">This is your ticket. Print this Entire page, fold it and bring it with you to the event.</text-chunk>
+                <text-chunk font="times" font-size="11"> Please make sure the QR code is visible.</text-chunk>
+            </paragraph>
+            <image src="path('./res/3.png')" height="80" width="100" margin="5 0 0 0"></image>
         </division>
     </table-cell>
     <table-cell>
         <division>
-        <division margin="0 0 0 0" padding="5, 5, 5, 5">
-        <paragraph text-align="left" margin="0 0 0 0">
-            <text-chunk font="times-bold" font-size="16">Epic Rock Concert</text-chunk>
-        </paragraph>
-        <paragraph text-align="left" margin="5 5 0 0">
-            <text-chunk font="times" font-size="12">25.05.2021  7:30PM</text-chunk> 
-        </paragraph>
-        <line fit-mode="fill-width" position="relative" thickness= "2.0" margin="5 0 0 0"></line>
-    </division>
-        <table columns="2">
-           <table-cell>
-                <division margin="0 0 0 0">
-                    <table columns="2">
-                        {{range .Detail}}
-                        {{if ne .FieldName "address"}}
-                            {{template "ticket-detail" .FieldName}}
-                            {{template "ticket-detail" .FieldValue}}
-                        {{end}}
-                        {{end}}
-                    </table>
-                </division>
-           </table-cell>
-           <table-cell>
-                <division>
-                    <image src="path('./res/1.png')" height="100" width="100" margin="5 0 0 0"></image>
-                <paragraph text-align="top" margin="0 0 0 0">
-                    <text-chunk font="times" font-size="10">000385724</text-chunk>
+            <division margin="0 0 0 0" padding="5, 5, 5, 5">
+                <paragraph text-align="left" margin="0 0 0 0">
+                    <text-chunk font="times-bold" font-size="16">Epic Rock Concert</text-chunk>
                 </paragraph>
-                </division>
-           </table-cell> 
-        </table>
+                <paragraph text-align="left" margin="5 5 0 0">
+                    <text-chunk font="times" font-size="12">25.05.2021  7:30PM</text-chunk> 
+                </paragraph>
+                <line fit-mode="fill-width" position="relative" thickness= "2.0" margin="5 0 0 0"></line>
+            </division>
+            <table columns="2">
+            <table-cell>
+                    <division margin="0 0 0 0">
+                        <table columns="2">
+                            {{range .Detail}}
+                            {{if ne .FieldName "address"}}
+                                {{template "ticket-detail" .FieldName}}
+                                {{template "ticket-detail" .FieldValue}}
+                            {{end}}
+                            {{end}}
+                        </table>
+                    </division>
+            </table-cell>
+            <table-cell>
+                    <division>
+                        <image src="qr-code" height="100" width="100" margin="0 0 0 0"></image>
+                        <paragraph text-align="top" margin="0 0 0 10">
+                            <text-chunk font="times" font-size="10">000385724</text-chunk>
+                        </paragraph>
+                    </division>
+            </table-cell> 
+            </table>
         </division>
     </table-cell>
 </table>
