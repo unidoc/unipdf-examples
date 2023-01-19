@@ -1,19 +1,19 @@
 {
     "ticket_detail": [
         {
-            "field_name": "admission",
+            "field_name": "Admission",
             "field_value": "Generaladmission"
         },
         {
-            "field_name": "ticket_type",
+            "field_name": "Ticket type",
             "field_value": "Adult"
         },
         {
-            "field_name": "price",
+            "field_name": "Price",
             "field_value": "$32"
         },
         {
-            "field_name": "name",
+            "field_name": "Name",
             "field_value": "Coleman R. Merrell"
         },
         {
