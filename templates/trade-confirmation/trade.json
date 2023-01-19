@@ -1,0 +1,31 @@
+{
+    "date": "May 21, 2021",
+    "accountNumber": "1234567890",
+    "userName": "Jane Doe",
+    "userAddress": "123 Retail Customer Street\nPortland, ME 12345",
+    "actionName": "Buy",
+    "productDesc": "CUSIP 99999999 SCHOOL DISTRICT BOND Unlimited Tax General Obligation 3.25% Due 04/01/36",
+    "boughtUnit": "15,000",
+    "boughtPrice": "100,000",
+    "orderNumber": "0000001",
+    "data": {
+        "principalAmount": "$15,000.00",
+        "accruedInterest": "$70.42",
+        "transactionFee": "$4.95",
+        "total": "$15,075,37",
+        "bankQualified": "No",
+        "state": "ME",
+        "datedToDate": "04/01/1996",
+        "yieldToMaturity": "3.25",
+        "yieldToCall": "3.25",
+        "callable": "04 / 01 / 27 @100",
+        "taxExcempt": "Yes",
+        "capacity": "Principal",
+        "bondForm": "Book Entry",
+        "tradeDate": "05/21/2021",
+        "tradeTime": "2:55 PM",
+        "settlementDate": "05/23/2021"
+    },
+    "markupValue": "$150.00",
+    "infoUrl": "https://emma.msjjb.org/CUSIP/999999999"
+}
