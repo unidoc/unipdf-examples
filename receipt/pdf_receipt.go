@@ -1,7 +1,7 @@
 /*
- * This example showcases the usage of creator templates to create a reciept document
+ * This example showcases the usage of creator templates to create a receipt document
  *
- * Run as: go run receipt.go.go
+ * Run as: go run pdf_receipt.go
  */
 package main
 
@@ -12,21 +12,19 @@ import (
 	"log"
 	"os"
 
-	"github.com/unidoc/unipdf/v3/common"
-	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 )
 
-func init() {
-	// Make sure to load your metered License API key prior to using the library.
-	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io.
-	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
-	if err != nil {
-		panic(err)
-	}
+// func init() {
+// 	// Make sure to load your metered License API key prior to using the library.
+// 	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io.
+// 	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
-}
+// 	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+// }
 
 // Field represents field item.
 type Field struct {
@@ -34,8 +32,8 @@ type Field struct {
 	FieldValue string `json:"FieldValue"`
 }
 
-// Reciept represent Recipt object.
-type Reciept struct {
+// Receipt represent Receipt object.
+type Receipt struct {
 	Title  string
 	Fields []Field
 }
@@ -69,8 +67,8 @@ func readTemplate(tplFile string) (io.Reader, error) {
 	return buf, nil
 }
 
-// readReceipt reads the reciept json file and decods it to `Reciept` object.
-func readReceipt(jsonFile string) (*Reciept, error) {
+// readReceipt reads the receipt json file and decods it to `Receipt` object.
+func readReceipt(jsonFile string) (*Receipt, error) {
 	file, err := os.Open(jsonFile)
 	if err != nil {
 		return nil, err
@@ -84,15 +82,15 @@ func readReceipt(jsonFile string) (*Reciept, error) {
 	if err != nil {
 		return nil, err
 	}
-	receipt := Reciept{
+	receipt := Receipt{
 		Title:  "Receipt",
 		Fields: fields,
 	}
 	return &receipt, nil
 }
 
-// process reads template file and draws the template content to output file.
-func render(reciept *Reciept) {
+// render reads template file and draws the template content to output file.
+func render(receipt *Receipt) {
 	c := creator.New()
 	c.SetPageMargins(15, 15, 20, 20)
 	c.SetPageSize(creator.PageSizeA5)
@@ -101,12 +99,12 @@ func render(reciept *Reciept) {
 		log.Fatal(err)
 	}
 	// Draw front page template.
-	if err := c.DrawTemplate(tpl, reciept, nil); err != nil {
+	if err := c.DrawTemplate(tpl, receipt, nil); err != nil {
 		log.Fatal(err)
 	}
 
 	// Write output file.
-	if err := c.WriteToFile("receipt.pdf"); err != nil {
+	if err := c.WriteToFile("unipdf-receipt.pdf"); err != nil {
 		log.Fatal(err)
 	}
 }
