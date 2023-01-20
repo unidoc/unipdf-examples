@@ -40,16 +40,30 @@ type Receipt struct {
 }
 
 func main() {
+	c := creator.New()
+	c.SetPageMargins(15, 15, 20, 20)
+	c.SetPageSize(creator.PageSizeA5)
+	tpl, err := readTemplate("./templates/main.tpl")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	filePath := "./contents/receipt.json"
+	// Read receipt data
 	receipt, err := readReceipt(filePath)
 	if err != nil {
 		panic(err)
 	}
 
-	if err != nil {
-		panic(err)
+	// Draw content template.
+	if err := c.DrawTemplate(tpl, receipt, nil); err != nil {
+		log.Fatal(err)
 	}
-	render(receipt)
+
+	// Write to output file.
+	if err := c.WriteToFile("unipdf-receipt.pdf"); err != nil {
+		log.Fatal(err)
+	}
 }
 
 // readTemplate reads template file.
@@ -68,7 +82,7 @@ func readTemplate(tplFile string) (io.Reader, error) {
 	return buf, nil
 }
 
-// readReceipt reads the receipt json file and decods it to `Receipt` object.
+// readReceipt reads the receipt json file and decodes it to `Receipt` object.
 func readReceipt(jsonFile string) (*Receipt, error) {
 	file, err := os.Open(jsonFile)
 	if err != nil {
@@ -88,24 +102,4 @@ func readReceipt(jsonFile string) (*Receipt, error) {
 		Fields: fields,
 	}
 	return &receipt, nil
-}
-
-// render reads template file and draws the template content to output file.
-func render(receipt *Receipt) {
-	c := creator.New()
-	c.SetPageMargins(15, 15, 20, 20)
-	c.SetPageSize(creator.PageSizeA5)
-	tpl, err := readTemplate("./templates/receipt.tpl")
-	if err != nil {
-		log.Fatal(err)
-	}
-	// Draw front page template.
-	if err := c.DrawTemplate(tpl, receipt, nil); err != nil {
-		log.Fatal(err)
-	}
-
-	// Write output file.
-	if err := c.WriteToFile("unipdf-receipt.pdf"); err != nil {
-		log.Fatal(err)
-	}
 }
