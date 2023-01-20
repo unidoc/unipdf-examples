@@ -36,7 +36,7 @@
                                     <text-chunk font="times" font-size="14">E - ticket</text-chunk>
                                 </paragraph>
                                     <paragraph text-align="left" margin="0 0 0 15">
-                                        <text-chunk font="times" font-size="14">000385724</text-chunk>
+                                        <text-chunk font="times" font-size="14">060778723</text-chunk>
                                     </paragraph>
                                 <image src="qr-code" height="95" width="95" margin="0 0 0 5"></image>
                             </division>
@@ -163,7 +163,7 @@ Rules of purchase
                     <division>
                         <image src="qr-code" height="100" width="100" margin="0 0 0 0"></image>
                         <paragraph text-align="top" margin="0 0 0 10">
-                            <text-chunk font="times" font-size="10">000385724</text-chunk>
+                            <text-chunk font="times" font-size="10">060778723</text-chunk>
                         </paragraph>
                     </division>
             </table-cell> 
