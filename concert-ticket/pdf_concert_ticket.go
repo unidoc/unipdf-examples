@@ -10,6 +10,8 @@ import (
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
+	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
@@ -25,16 +27,16 @@ type Ticket struct {
 	RulesOfPurchase   []string `json:"rules_of_purchase"`
 }
 
-// func init() {
-// 	// Make sure to load your metered License API key prior to using the library.
-// 	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io.
-// 	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
-// 	if err != nil {
-// 		panic(err)
-// 	}
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io.
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
 
-//		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
-//	}
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+}
 func main() {
 	qrCode, err := createQRCode("https://github.com/unidoc/unipdf-examples/tree/master/concert-ticket/", 50, 50)
 	if err != nil {

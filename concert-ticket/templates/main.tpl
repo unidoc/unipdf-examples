@@ -1,10 +1,12 @@
 {{define "header"}}
+{{$fontSize := .FontSize}}
+{{$subFont := .SubFont}}
     <division margin="0 0 0 0" padding="5, 5, 5, 5">
         <paragraph text-align="left" margin="0 0 0 0">
-            <text-chunk font="times-bold" font-size="22">Epic Rock Concert</text-chunk>
+            <text-chunk font="times-bold" font-size="{{$fontSize}}">Epic Rock Concert</text-chunk>
         </paragraph>
         <paragraph text-align="left" margin="5 5 0 0">
-            <text-chunk font="times" font-size="14">25.05.2021  7:30PM</text-chunk> 
+            <text-chunk font="times" font-size="{{$subFont}}">25.05.2021  7:30PM</text-chunk> 
         </paragraph>
         <line fit-mode="fill-width" position="relative" thickness= "2.0" margin="5 0 0 0"></line>
     </division>
@@ -21,13 +23,13 @@
     </table-cell>
 {{end}}
 <table columns="2" margin = "0 0 10 10" padding="0, 0, 30, 30" column-widths="0.25 0.75">
-    <table-cell>
+    <table-cell vertical-align="top">
         <image src="path('./res/0.png')" fit-mode="fill-width"  margin="5 0 0 0"></image>
     </table-cell>
-    <table-cell>
+    <table-cell vertical-align="top">
         <division>
             <division margin="0 0 0 15">
-            {{template "header"}}
+            {{template "header" dict "FontSize" 22 "SubFont" 14}}
             </division>
                 <table columns="2" padding="0, 0, 0, 0" column-widths="0.3 0.7">
                 <table-cell vertical-align="bottom">
@@ -138,16 +140,8 @@ Rules of purchase
         </division>
     </table-cell>
     <table-cell>
-        <division>
-            <division margin="0 0 0 0" padding="5, 5, 5, 5">
-                <paragraph text-align="left" margin="0 0 0 0">
-                    <text-chunk font="times-bold" font-size="16">Epic Rock Concert</text-chunk>
-                </paragraph>
-                <paragraph text-align="left" margin="5 5 0 0">
-                    <text-chunk font="times" font-size="12">25.05.2021  7:30PM</text-chunk> 
-                </paragraph>
-                <line fit-mode="fill-width" position="relative" thickness= "1.0" margin="5 5 0 0"></line>
-            </division>
+        <division margin="10 0 0 0">
+            {{template "header" dict "FontSize" 14 "SubFont" 10}}
             <table columns="2">
             <table-cell>
                     <division margin="5 0 0 0">
