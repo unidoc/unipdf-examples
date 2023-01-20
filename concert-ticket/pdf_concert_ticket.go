@@ -38,58 +38,24 @@ func init() {
 	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 }
 func main() {
+	c := creator.New()
+	c.SetPageMargins(20, 20, 20, 20)
+	// Create qrCode.
 	qrCode, err := createQRCode("https://github.com/unidoc/unipdf-examples/tree/master/concert-ticket/", 50, 50)
 	if err != nil {
 		panic(err)
 	}
+	// Read ticket data.
 	ticket, err := readTemplateData("./templates/concert-ticket.json")
 	if err != nil {
 		panic(err)
 	}
-	process(ticket, qrCode)
-}
-
-// createQRCode creates a new QR code image encoding the provided text with the specified width and height.
-func createQRCode(text string, width, height int) (*model.Image, error) {
-	qrCode, err := qr.Encode(text, qr.M, qr.Auto)
-	if err != nil {
-		return nil, err
-	}
-
-	qrCode, err = barcode.Scale(qrCode, width, height)
-	if err != nil {
-		return nil, err
-	}
-
-	img, err := model.ImageHandling.NewImageFromGoImage(qrCode)
-	if err != nil {
-		return nil, err
-	}
-
-	return img, nil
-}
-func readTemplate(tplFile string) (io.Reader, error) {
-	file, err := os.Open(tplFile)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	buf := bytes.NewBuffer(nil)
-	if _, err = io.Copy(buf, file); err != nil {
-		return nil, err
-	}
-
-	return buf, nil
-}
-func process(ticket *Ticket, qrCode *model.Image) {
-	c := creator.New()
-	c.SetPageMargins(20, 20, 20, 20)
+	// Read template file.
 	tpl, err := readTemplate("./templates/main.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Draw main content teplate.
+	// Draw main content template.
 	tplOpts := &creator.TemplateOptions{
 		ImageMap: map[string]*model.Image{
 			"qr-code": qrCode,
@@ -119,17 +85,54 @@ func process(ticket *Ticket, qrCode *model.Image) {
 			},
 		},
 	}
-	// Draw front page template.
+	// Draw main content template.
 	if err := c.DrawTemplate(tpl, ticket, tplOpts); err != nil {
 		log.Fatal(err)
 	}
 
-	// Write output file.
+	// Write to output file.
 	if err := c.WriteToFile("unipdf_ticket.pdf"); err != nil {
 		log.Fatal(err)
 	}
 }
 
+// createQRCode creates a new QR code image encoding the provided text with the specified width and height.
+func createQRCode(text string, width, height int) (*model.Image, error) {
+	qrCode, err := qr.Encode(text, qr.M, qr.Auto)
+	if err != nil {
+		return nil, err
+	}
+
+	qrCode, err = barcode.Scale(qrCode, width, height)
+	if err != nil {
+		return nil, err
+	}
+
+	img, err := model.ImageHandling.NewImageFromGoImage(qrCode)
+	if err != nil {
+		return nil, err
+	}
+
+	return img, nil
+}
+
+// readTemplate reads template file and returns an io.Reader.
+func readTemplate(tplFile string) (io.Reader, error) {
+	file, err := os.Open(tplFile)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	buf := bytes.NewBuffer(nil)
+	if _, err = io.Copy(buf, file); err != nil {
+		return nil, err
+	}
+
+	return buf, nil
+}
+
+// readTemplateData reads the ticket data from the json file provided by `filePath`.
 func readTemplateData(filePath string) (*Ticket, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
