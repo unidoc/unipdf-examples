@@ -24,7 +24,7 @@
 {{end}}
 <table columns="2" margin = "0 0 10 10" padding="0, 0, 30, 30" column-widths="0.25 0.75">
     <table-cell vertical-align="top">
-        <image src="path('./res/0.png')" fit-mode="fill-width"  margin="5 0 0 0"></image>
+        <image src="path('./res/0.png')" width="120" height="200" margin="5 0 0 0"></image>
     </table-cell>
     <table-cell vertical-align="top">
         <division>
@@ -59,11 +59,10 @@
         </division>
     </table-cell>
 </table>
-Rules of purchase
 <table columns="2" margin="0 0 0 15">
  <table-cell border-width-top="0.5" border-width-bottom="0.5" border-width-left="0.5" vertical-align="top" indent="0.5" border-style="single">
     <division margin="0 0 15 15" padding="0, 0, 0, 0">
-        <paragraph text-align="left" margin="0 0 10 0">
+        <paragraph text-align="left" margin="10 0 10 0">
             <text-chunk font="times-bold" font-size="12">Rules of attendance</text-chunk>
         </paragraph>
         {{range .RulesOfAttendance}}
@@ -75,7 +74,7 @@ Rules of purchase
  </table-cell>
  <table-cell border-width-top="0.5" border-width-bottom="0.5" border-width-right="0.5" vertical-align="top" indent="0" border-style="single">
     <division margin="0 0 15 15" padding="0, 0, 0, 0">
-        <paragraph text-align="left" margin="0 0 10 0">
+        <paragraph text-align="left" margin="10 0 10 0">
             <text-chunk font="times-bold" font-size="12">Rules of purchase</text-chunk>
         </paragraph>
         {{range .RulesOfPurchase}}
@@ -96,7 +95,7 @@ Rules of purchase
             <paragraph text-align="top" margin="5 0 0 0">
                 <text-chunk font="times" font-size="11">A City literally built on Rock n' Roll in Cadott WI, </text-chunk>
                 <text-chunk font="times" font-size="11"> Rock Fest is the true Rock experience you can't miss. In its 26th year, </text-chunk>
-                <text-chunk font="times" font-size="11"> it is THE top venue for people of all ages to come together for one common purpose: </text-chunk>
+                <text-chunk font="times" font-size="11"> it is the top venue for people of all ages to come together for one common purpose: </text-chunk>
                 <text-chunk font="times" font-size="11">to congregate with other rock fans from across the world, in a place where rock music still matters.</text-chunk>
                 <text-chunk font="times" font-size="11">Featuring the very best of active and classic rock and legendary names in Rock Music, entertainment and experience are the first priority.</text-chunk>
                 <text-chunk font="times" font-size="11">Aerosmith, Iron Maiden, Avenged Sevenfold, Kiss, Motley Crue, Fleetwood Mac, Tom Petty, Kid Rock, Shinedown,</text-chunk>
