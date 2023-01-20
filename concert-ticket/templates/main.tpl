@@ -10,10 +10,12 @@
     </division>
 {{end}}
 {{define "ticket-detail"}}
-    <table-cell vertical-align="middle" indent="0">
-        <division margin="7 0 0 0">
+{{$fieled := .Name}}
+{{$fontSize := .FontSize}}
+    <table-cell vertical-align="top" indent="0">
+        <division margin="10 0 0 0">
             <paragraph text-align="left" margin="0 0 0 0">
-                <text-chunk font="times" font-size="14">{{.}}</text-chunk>
+                <text-chunk font="times" font-size="{{$fontSize}}">{{$fieled}}</text-chunk>
             </paragraph>
         </division>
     </table-cell>
@@ -31,14 +33,14 @@
                 <table-cell vertical-align="bottom">
                     <table columns="1">
                         <table-cell vertical-align="bottom">
-                            <division margin="0 0 0 0" padding="0, 0, 0, 0">
-                                <paragraph text-align="left" margin="0 0 0 15">
+                            <division margin="5 0 0 0" padding="0, 0, 0, 0">
+                                <paragraph text-align="left" margin="0 0 0 10">
                                     <text-chunk font="times" font-size="14">E - ticket</text-chunk>
                                 </paragraph>
-                                    <paragraph text-align="left" margin="0 0 0 15">
+                                    <paragraph text-align="left" margin="0 0 0 10">
                                         <text-chunk font="times" font-size="14">060778723</text-chunk>
                                     </paragraph>
-                                <image src="qr-code" height="95" width="95" margin="0 0 0 5"></image>
+                                <image src="qr-code" height="95" width="95" margin="0 0 0 0"></image>
                             </division>
                         </table-cell>
                     </table>
@@ -46,8 +48,8 @@
                 <table-cell>
                     <table columns="2">
                         {{range .Detail}}
-                        {{template "ticket-detail" .FieldName}}
-                        {{template "ticket-detail" .FieldValue}}
+                        {{template "ticket-detail" dict "FontSize" 14 "Name" .FieldName}}
+                        {{template "ticket-detail" dict "FontSize" 14 "Name" .FieldValue}}
                         {{end}}
                     </table>
                 </table-cell>
@@ -144,16 +146,16 @@ Rules of purchase
                 <paragraph text-align="left" margin="5 5 0 0">
                     <text-chunk font="times" font-size="12">25.05.2021  7:30PM</text-chunk> 
                 </paragraph>
-                <line fit-mode="fill-width" position="relative" thickness= "2.0" margin="5 0 0 0"></line>
+                <line fit-mode="fill-width" position="relative" thickness= "1.0" margin="5 5 0 0"></line>
             </division>
             <table columns="2">
             <table-cell>
-                    <division margin="0 0 0 0">
+                    <division margin="5 0 0 0">
                         <table columns="2">
                             {{range .Detail}}
                             {{if ne .FieldName "address"}}
-                                {{template "ticket-detail" .FieldName}}
-                                {{template "ticket-detail" .FieldValue}}
+                                {{template "ticket-detail" dict "FontSize" 12 "Name" .FieldName}}
+                                {{template "ticket-detail" dict "FontSize" 12 "Name" .FieldValue}}
                             {{end}}
                             {{end}}
                         </table>
@@ -161,8 +163,8 @@ Rules of purchase
             </table-cell>
             <table-cell>
                     <division>
-                        <image src="qr-code" height="100" width="100" margin="0 0 0 0"></image>
-                        <paragraph text-align="top" margin="0 0 0 10">
+                        <image src="qr-code" height="100" width="100" margin="5 0 0 0"></image>
+                        <paragraph text-align="top" margin="0 0 0 15">
                             <text-chunk font="times" font-size="10">060778723</text-chunk>
                         </paragraph>
                     </division>
