@@ -83,7 +83,7 @@ func readTemplate(tplFile string) (io.Reader, error) {
 func process(ticket *Ticket, qrCode *model.Image) {
 	c := creator.New()
 	c.SetPageMargins(20, 20, 20, 20)
-	tpl, err := readTemplate("./templates/ticket.tpl")
+	tpl, err := readTemplate("./templates/main.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
