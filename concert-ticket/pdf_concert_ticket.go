@@ -1,3 +1,9 @@
+/*
+ * This example demonstrates creating a concert ticket using the creator templates
+ *
+ * Run as: go run pdf_concert_ticket.go
+ */
+
 package main
 
 import (
@@ -17,10 +23,13 @@ import (
 	"github.com/unidoc/unipdf/v3/model"
 )
 
+// Field represents a single filed with name and value.
 type Field struct {
 	FieldName  string `json:"field_name"`
 	FieldValue string `json:"field_value"`
 }
+
+// Ticket holds all data related to a ticket.
 type Ticket struct {
 	Detail            []Field  `json:"ticket_detail"`
 	RulesOfAttendance []string `json:"rules_of_attendance"`
