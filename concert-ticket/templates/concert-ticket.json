@@ -2,7 +2,7 @@
     "ticket_detail": [
         {
             "field_name": "Admission",
-            "field_value": "Generaladmission"
+            "field_value": "General admission"
         },
         {
             "field_name": "Ticket type",
