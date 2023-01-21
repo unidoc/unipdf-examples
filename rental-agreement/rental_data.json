@@ -1,0 +1,18 @@
+{
+    "date": "2020-12-09T00:00:00",
+    "company_name": "Best Landlord Company",
+    "company_address": "2 Maple Ln, Suite A, Best Town, Alabama, 29227",
+    "tenants": [
+        "Alex Tenant",
+        "Joanna Tenant"
+    ],
+    "apartment_address": "1 Main Street, Apt 4, Small Town, Alabama, 20992",
+    "beginning_date": "2020-12-03T00:00:00",
+    "ending_date": "2033-11-29T00:00:00",
+    "monthly_installment": "1,873.00",
+    "ins_fee_amount": "45.00",
+    "late_fee_amount": "50.00",
+    "sec_deposit_amount": "1,873.00",
+    "purchase_deposit_amount": "4,500.00",
+    "pet_fee_amount": "300.00"
+}
