@@ -23,9 +23,9 @@
         </division>
     </table-cell>
 {{end}}
-<table columns="2" margin = "0 0 10 10" padding="0, 0, 30, 30" column-widths="0.25 0.75">
+<table columns="2" margin = "0 0 10 10" padding="0, 0, 30, 30" column-widths="0.20 0.80">
     <table-cell vertical-align="top">
-        <image src="path('./res/0.png')" width="120" height="200" margin="5 0 0 0"></image>
+        <image src="path('./res/red-guitar.png')" width="100" height="160" margin="5 0 0 0"></image>
     </table-cell>
     <table-cell vertical-align="top">
         <division>
@@ -105,7 +105,7 @@
         </division>
     </table-cell>
     <table-cell vertical-align="top">
-        <image src="path('./res/2.png')" height="160" width="100" margin="5 0 0 0"></image>
+        <image src="path('./res/map.png')" height="160" width="100" margin="5 0 0 0"></image>
     </table-cell>
     <table-cell vertical-align="top">
         <division>
@@ -140,7 +140,7 @@
                 <text-chunk font="helvetica" font-size="9">This is your ticket. Print this Entire page, fold it and bring it with you to the event.</text-chunk>
                 <text-chunk font="helvetica" font-size="9"> Please make sure the QR code is visible.</text-chunk>
             </paragraph>
-            <image src="path('./res/3.png')" height="80" width="100" margin="5 0 0 0"></image>
+            <image src="path('./res/ticket-img.png')" height="80" width="100" margin="5 0 0 0"></image>
         </division>
     </table-cell>
     <table-cell>
