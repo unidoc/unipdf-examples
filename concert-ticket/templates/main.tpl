@@ -43,7 +43,7 @@
                                     <paragraph text-align="left" margin="0 0 0 10">
                                         <text-chunk font="helvetica" font-size="10">000385724</text-chunk>
                                     </paragraph>
-                                <image src="qr-code" height="95" width="95" margin="0 0 0 0"></image>
+                                <image src="qr-code" height="70" width="70" margin="5 0 0 10"></image>
                             </division>
                         </table-cell>
                     </table>
@@ -118,11 +118,15 @@
                 <text-chunk font="helvetica" font-size="9">Bike racks are located outside the main entrance tothe Hall.</text-chunk>
             </paragraph>
             <paragraph text-align="top" margin="10 0 0 0">
-                <text-chunk font="times-bold" font-size="12">Learn More At</text-chunk>
+                <text-chunk font="helvetica-bold" font-size="12">Learn More At</text-chunk>
             </paragraph>
-            <paragraph text-align="top" margin="5 0 0 0">
+            <paragraph margin="5 0 0 0">
                 <text-chunk font="helvetica" font-size="9">Facebook /ConcertHall</text-chunk>
+            </paragraph>
+            <paragraph margin="2 0 0 0">
                 <text-chunk font="helvetica" font-size="9">Twitter @ConcertHall</text-chunk>
+            </paragraph>
+            <paragraph margin="2 0 0 0">
                 <text-chunk font="helvetica" font-size="9">Instagram @ConcertHall</text-chunk>
             </paragraph>
         </division>
@@ -133,8 +137,8 @@
     <table-cell vertical-align="middle">
         <division margin="0 0 0 10">
             <paragraph text-align="top" margin="0 0 0 0">
-                <text-chunk font="helvetica" font-size="11">This is your ticket. Print this Entire page, fold it and bring it with you to the event.</text-chunk>
-                <text-chunk font="helvetica" font-size="11"> Please make sure the QR code is visible.</text-chunk>
+                <text-chunk font="helvetica" font-size="9">This is your ticket. Print this Entire page, fold it and bring it with you to the event.</text-chunk>
+                <text-chunk font="helvetica" font-size="9"> Please make sure the QR code is visible.</text-chunk>
             </paragraph>
             <image src="path('./res/3.png')" height="80" width="100" margin="5 0 0 0"></image>
         </division>
@@ -157,9 +161,9 @@
             </table-cell>
             <table-cell>
                     <division>
-                        <image src="qr-code" height="100" width="100" margin="5 0 0 0"></image>
+                        <image src="qr-code" height="75" width="75" margin="15 0 0 10"></image>
                         <paragraph text-align="top" margin="0 0 0 15">
-                            <text-chunk font="helvetica" font-size="10">060778723</text-chunk>
+                            <text-chunk font="helvetica" font-size="10">000385724</text-chunk>
                         </paragraph>
                     </division>
             </table-cell> 
