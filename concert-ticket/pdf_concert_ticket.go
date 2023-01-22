@@ -12,13 +12,9 @@ import (
 	"io"
 	"log"
 	"os"
-	"text/template"
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
-	"github.com/unidoc/unipdf/v3/common"
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 )
@@ -36,16 +32,16 @@ type Ticket struct {
 	RulesOfPurchase   []string `json:"rules_of_purchase"`
 }
 
-func init() {
-	// Make sure to load your metered License API key prior to using the library.
-	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io.
-	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
-	if err != nil {
-		panic(err)
-	}
+// func init() {
+// 	// Make sure to load your metered License API key prior to using the library.
+// 	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io.
+// 	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
-}
+//		common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+//	}
 func main() {
 	c := creator.New()
 	c.SetPageMargins(20, 20, 20, 20)
@@ -68,30 +64,6 @@ func main() {
 	tplOpts := &creator.TemplateOptions{
 		ImageMap: map[string]*model.Image{
 			"qr-code": qrCode,
-		},
-		HelperFuncMap: template.FuncMap{
-			"extendDict": func(m map[string]interface{}, params ...interface{}) (map[string]interface{}, error) {
-				lenParams := len(params)
-				if lenParams%2 != 0 {
-					return nil, core.ErrRangeError
-				}
-
-				out := make(map[string]interface{}, len(m))
-				for key, val := range m {
-					out[key] = val
-				}
-
-				for i := 0; i < lenParams; i += 2 {
-					key, ok := params[i].(string)
-					if !ok {
-						return nil, core.ErrTypeError
-					}
-
-					out[key] = params[i+1]
-				}
-
-				return out, nil
-			},
 		},
 	}
 	// Draw main content template.
