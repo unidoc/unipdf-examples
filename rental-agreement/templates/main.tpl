@@ -1,4 +1,3 @@
-<division>
 <paragraph margin="0 0 0 0" text-align = "center">
    <text-chunk font="times-bold" font-size="21.5"> LEASE WITH OPTION TO PURCHASE </text-chunk>
 </paragraph>
@@ -64,5 +63,25 @@ shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to b
 less the Security Deposit.</text-chunk>
  </paragraph>
  
- </division>
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">LEASE TERM: </text-chunk>
+<text-chunk font="times" font-size="13"> This Agreement shall be a fixed-period arrangement beginning on December
+03 2020 and ending on November 29 2033 with the Tenant(s) having the option to continue to
+occupy the Premises under the same terms and conditions of this Agreement under a
+Month-to-Month arrangement (Tenancy at Will) with either the Landlord or Tenant having the
+option to cancel the tenancy with at least thirty (30) days notice or the minimum time-period set
+by the State, whichever is shorter. For the Tenant to continue under Month-to-Month tenancy at
+the expiration of the Lease Term, the Landlord must be notified within sixty (60) days before
+the end of the Lease Term. Hereinafter known as the “Lease Term”.</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">RENT: </text-chunk>
+<text-chunk font="times" font-size="13">Tenant(s) shall pay the Landlord in equal monthly installments of $1,873.00 (US
+Dollars) hereinafter known as the “Rent”. The Rent will be due on the First (1st) of every
+month and be paid through an electronic payment known as Automated Clearing House or
+“ACH”. Details of the Tenant's banking information and authorization shall be attached to this
+Lease Agreement.</text-chunk>
+</paragraph>
+
 
