@@ -15,7 +15,7 @@
 {{$fieled := .Name}}
 {{$fontSize := .FontSize}}
 {{$fontName := .FontName}}
-    <table-cell vertical-align="top" indent="0">
+    <table-cell indent="0">
         <division margin="10 0 0 0">
             <paragraph text-align="left" margin="0 0 0 0">
                 <text-chunk font="{{$fontName}}" font-size="{{$fontSize}}">{{$fieled}}</text-chunk>
@@ -33,16 +33,16 @@
             {{template "header" dict "FontSize" 19 "SubFont" 11}}
             </division>
                 <table columns="2" padding="0, 0, 0, 0" column-widths="0.3 0.7">
-                <table-cell vertical-align="bottom">
-                    <table columns="1">
-                        <table-cell vertical-align="bottom">
-                            <division margin="5 0 0 0" padding="0, 0, 0, 0">
-                                <paragraph text-align="left" margin="0 0 0 10">
+                <table-cell>
+                    <table columns="1" margin="10 0 0 0">
+                        <table-cell>
+                            <division margin="0 0 0 0" padding="0, 0, 0, 0">
+                                <paragraph text-align="left" margin="0 0 0 10" line-height="1.1">
                                     <text-chunk font="helvetica" font-size="10">E - ticket</text-chunk>
                                 </paragraph>
-                                    <paragraph text-align="left" margin="0 0 0 10">
-                                        <text-chunk font="helvetica" font-size="10">000385724</text-chunk>
-                                    </paragraph>
+                                <paragraph text-align="left" margin="2 0 0 10">
+                                    <text-chunk font="helvetica" font-size="10">000385724</text-chunk>
+                                </paragraph>
                                 <image src="qr-code" height="70" width="70" margin="5 0 0 10"></image>
                             </division>
                         </table-cell>
