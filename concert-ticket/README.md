@@ -31,3 +31,5 @@ Here is how the concert ticket is created using the creator templates.
     // Handle errors here.
 ```
 
+preview of the generated pdf file
+![screenshot-preview](res/screenshot-prev.png)
