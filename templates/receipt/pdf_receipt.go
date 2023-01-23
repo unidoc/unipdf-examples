@@ -48,9 +48,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	filePath := "./contents/receipt.json"
-	// Read receipt data
-	receipt, err := readReceipt(filePath)
+	// Read receipt data.
+	receipt, err := readReceipt("./contents/receipt.json")
 	if err != nil {
 		panic(err)
 	}
@@ -91,15 +90,12 @@ func readReceipt(jsonFile string) (*Receipt, error) {
 	defer file.Close()
 
 	var fields []Field
-	decoder := json.NewDecoder(file)
-
-	err = decoder.Decode(&fields)
+	err = json.NewDecoder(file).Decode(&fields)
 	if err != nil {
 		return nil, err
 	}
-	receipt := Receipt{
+	return &Receipt{
 		Title:  "Receipt",
 		Fields: fields,
-	}
-	return &receipt, nil
+	}, nil
 }
