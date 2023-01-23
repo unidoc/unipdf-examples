@@ -41,7 +41,7 @@
                                     <text-chunk font="helvetica" font-size="10">E - ticket</text-chunk>
                                 </paragraph>
                                 <paragraph text-align="left" margin="2 0 0 10">
-                                    <text-chunk font="helvetica" font-size="10">000385724</text-chunk>
+                                    <text-chunk font="helvetica" font-size="10">{{.TicketNumber}}</text-chunk>
                                 </paragraph>
                                 <image src="qr-code" height="70" width="70" margin="5 0 0 10"></image>
                             </division>
@@ -163,7 +163,7 @@
                     <division>
                         <image src="qr-code" height="75" width="75" margin="15 0 0 10"></image>
                         <paragraph text-align="top" margin="0 0 0 15">
-                            <text-chunk font="helvetica" font-size="10">000385724</text-chunk>
+                            <text-chunk font="helvetica" font-size="10">{{.TicketNumber}}</text-chunk>
                         </paragraph>
                     </division>
             </table-cell> 

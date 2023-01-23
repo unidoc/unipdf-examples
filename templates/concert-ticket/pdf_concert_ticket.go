@@ -29,6 +29,7 @@ type Field struct {
 
 // Ticket holds all data related to a ticket.
 type Ticket struct {
+	TicketNumber      string   `json:"ticket_number"`
 	Detail            []Field  `json:"ticket_detail"`
 	RulesOfAttendance []string `json:"rules_of_attendance"`
 	RulesOfPurchase   []string `json:"rules_of_purchase"`
