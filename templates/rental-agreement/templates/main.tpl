@@ -65,8 +65,7 @@ less the Security Deposit.</text-chunk>
  
 <paragraph margin="20 0 0 0">
 <text-chunk font="times-bold" font-size="13">LEASE TERM: </text-chunk>
-<text-chunk font="times" font-size="13"> This Agreement shall be a fixed-period arrangement beginning on December
-03 2020 and ending on November 29 2033 with the Tenant(s) having the option to continue to
+<text-chunk font="times" font-size="13"> This Agreement shall be a fixed-period arrangement beginning on December 03 2020 and ending on November 29 2033 with the Tenant(s) having the option to continue to
 occupy the Premises under the same terms and conditions of this Agreement under a
 Month-to-Month arrangement (Tenancy at Will) with either the Landlord or Tenant having the
 option to cancel the tenancy with at least thirty (30) days notice or the minimum time-period set
