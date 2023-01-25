@@ -33,7 +33,7 @@ type Field struct {
 	FieldValue string `json:"FieldValue"`
 }
 
-// Receipt represent Receipt object.
+// Receipt represents Receipt object.
 type Receipt struct {
 	Title  string
 	Fields []Field
