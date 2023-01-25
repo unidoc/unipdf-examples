@@ -84,11 +84,5 @@ is due.
 
 <paragraph margin="20 0 0 0">
 <text-chunk font="times-bold" font-size="13">FIRST (1ST) MONTH'S RENT:</text-chunk>
-<text-chunk font="times" font-size="13">First (1st) month's rent shall be due by the Tenant(s) upon the execution of this Agreement.
-PRE-PAYMENT: The Landlord shall not require any pre-payment of rent by the Tenant(s). PRORATION PERIOD: The Tenant(s) will not move into the Premises before the start of the
-</text-chunk>
+<text-chunk font="times" font-size="13">First (1st) month's rent shall be due by the Tenant(s) upon the execution of this Agreement.</text-chunk>
 </paragraph>
-Lease Term.
-SECURITY DEPOSIT: A Security Deposit in the amount of $1,873.00 (US Dollars) shall be required by the Tenant(s) at the execution of this Agreement to the Landlord for the faithful performance of all the terms and conditions. The Security Deposit is to be returned to the Tenant(s) within 14 days after this Agreement has terminated, less any damage charges and without interest. This Security Deposit shall not be credited towards rent unless the Landlord gives their written consent.
-
-
