@@ -1,3 +1,11 @@
+{{define "simple-paragraph"}}
+{{$head_text := .Head}}
+{{$text := .Content}}
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">{{$head_text}}</text-chunk>
+<text-chunk font="times" font-size="13">{{$text}}</text-chunk>
+</paragraph>
+{{end}}
 <paragraph margin="0 0 0 0" text-align = "center">
    <text-chunk font="times-bold" font-size="21.5"> LEASE WITH OPTION TO PURCHASE </text-chunk>
 </paragraph>
@@ -85,4 +93,172 @@ is due.
 <paragraph margin="20 0 0 0">
 <text-chunk font="times-bold" font-size="13">FIRST (1ST) MONTH'S RENT:</text-chunk>
 <text-chunk font="times" font-size="13">First (1st) month's rent shall be due by the Tenant(s) upon the execution of this Agreement.</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">PRE-PAYMENT:</text-chunk>
+<text-chunk font="times" font-size="13">The Landlord shall not require any pre-payment of rent by the Tenant(s).</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">PROBATION PERIOD:</text-chunk>
+<text-chunk font="times" font-size="13">The Tenant(s) will not move into the Premises before the start of the
+Lease Term.
+</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">SECURITY DEPOSIT:</text-chunk>
+<text-chunk font="times" font-size="13">A Security Deposit in the amount of $1,873.00 (US Dollars) shall be
+required by the Tenant(s) at the execution of this Agreement to the Landlord for the faithful
+performance of all the terms and conditions. The Security Deposit is to be returned to the
+Tenant(s) within 14 days after this Agreement has terminated, less any damage charges and
+without interest. This Security Deposit shall not be credited towards rent unless the Landlord
+gives their written consent.
+</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">POSSESSION:</text-chunk>
+<text-chunk font="times" font-size="13">enant(s) has examined the condition of the Premises and by taking
+possession acknowledges that they have accepted the Premises in good order and in its current
+condition except as herein otherwise stated. Failure of the Landlord to deliver possession of the
+Premises at the start of the Lease Term to the Tenant(s) shall terminate this Agreement at the
+option of the Tenant(s). Furthermore, under such failure to deliver possession by the Landlord,
+and if the Tenant(s) cancels this Agreement, the Security Deposit (if any) shall be returned to
+the Tenant(s) along with any other pre-paid rent, fees, including if the Tenant(s) paid a fee
+during the application process before the execution of this Agreement.
+</text-chunk>
+</paragraph>
+
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">OPTION TO PURCHASE.</text-chunk>
+<text-chunk font="times" font-size="13">TThe Tenant(s) shall have the right to purchase the Premises
+described herein for $450,000.00 at any time during the course of the Lease Term, along with
+any renewal periods or extensions, by providing written notice to the Landlord along with a
+deposit of $4,500.00 that is subject to the terms and conditions of a Purchase and Sale
+Agreement to be negotiated, in “good faith”, between the Landlord and Tenant(s).
+</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times" font-size="13">If the Landlord and Tenant(s) cannot produce a signed Purchase and Sale Agreement within a
+reasonable time period then the deposit shall be refunded to the Tenant(s) and this Lease
+Agreement shall continue under its terms and conditions.
+</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times" font-size="13">If the option to purchase is exercised by the Tenant(s) all Rent that is paid to the Landlord shall
+remain separate from any and all deposits, consideration, or payments, made to the Landlord in
+regards to the purchase of the Premises.
+</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">RECORDING.</text-chunk>
+<text-chunk font="times" font-size="13">The Tenant(s) shall be withheld from recording this Option to Purchase unless
+the Tenant(s) has the written consent from the Landlord.
+</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">ACCESS:</text-chunk>
+<text-chunk font="times" font-size="13">TUpon the beginning of the Proration Period or the start of the Lease Term,
+whichever is earlier, the Landlord agrees to give access to the Tenant(s) in the form of keys,
+fobs, cards, or any type of keyless security entry as needed to enter the common areas and the
+Premises. Duplicate copies of the access provided may only be authorized under the consent of
+the Landlord and, if any replacements are needed, the Landlord may provide them for a fee. At
+the end of this Agreement all access provided to the Tenant(s) shall be returned to the Landlord
+or a fee will be charged to the Tenant(s) or the fee will be subtracted from the Security Deposit.
+</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">MOVE-IN INSPECTION:</text-chunk>
+<text-chunk font="times" font-size="13">Before, at the time of the Tenant(s) accepting possession, or
+shortly thereafter, the Landlord and Tenant(s) shall perform an inspection documenting the
+present condition of all appliances, fixtures, furniture, and any existing damage within the
+Premises.
+</text-chunk>
+</paragraph>
+
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">SUBLETTING:</text-chunk>
+<text-chunk font="times" font-size="13">The Tenant(s) shall not have the right to sub-let the Premises or any part
+thereof without the prior written consent of the Landlord. If consent is granted by the Landlord,
+the Tenant(s) will be responsible for all actions and liabilities of the Sublessee including but not
+limited to: damage to the Premises, non-payment of rent, and any eviction process (In the event
+of an eviction the Tenant(s) shall be responsible for all court filing fee(s), representation, and
+any other fee(s) associated with removing the Sublessee). The consent by the Landlord to one
+sub-let shall not be deemed to be consent to any subsequent subletting.
+</text-chunk>
+</paragraph>
+
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">ABANDONMENT:</text-chunk>
+<text-chunk font="times" font-size="13">If the Tenant(s) vacates or abandons the property for a time-period that is
+the minimum set by State law or seven (7) days, whichever is less, the Landlord shall have the
+right to terminate this Agreement immediately and remove all belongings including any
+personal property off of the Premises. If the Tenant(s) vacates or abandons the property, the
+Landlord shall immediately have the right to terminate this Agreement.
+</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">ASSIGNMENT:</text-chunk>
+<text-chunk font="times" font-size="13">Tenant(s) shall not assign this Lease without the prior written consent of the
+Landlord. The consent by the Landlord to one assignment shall not be deemed to be consent to
+any subsequent assignment.
+</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">PARKING:</text-chunk>
+<text-chunk font="times" font-size="13">The Landlord shall provide the Tenant(s) 2 Parking Spaces.
+</text-chunk>
+</paragraph>
+
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times" font-size="13">The Landlord shall not charge a fee for the 2 Parking Spaces. The Parking Space(s) can be
+described as: 1 outdoor parking space and 1 indoor garage parking space provided
+</text-chunk>
+</paragraph>
+
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">RIGHT OF ENTRY:</text-chunk>
+<text-chunk font="times" font-size="13">The Landlord shall have the right to enter the Premises during normal
+working hours by providing notice in accordance with the minimum State requirement in order
+for inspection, make necessary repairs, alterations or improvements, to supply services as
+agreed or for any reasonable purpose. The Landlord may exhibit the Premises to prospective
+purchasers, mortgagees, or lessees upon reasonable notice.
+</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">SALE OF PROPERTY:</text-chunk>
+<text-chunk font="times" font-size="13">If the Premises is sold, the Tenant(s) is to be notified of the new
+Owner, and if there is a new Manager, their contact details for repairs and maintenance shall be
+forwarded. If the Premises is conveyed to another party, the new owner shall not have the right
+to terminate this Agreement and it shall continue under the terms and conditions agreed upon
+by the Landlord and Tenant(s).
+</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="13">UTILITIES:</text-chunk>
+<text-chunk font="times" font-size="13">The Landlord agrees to pay for the following utilities and services:
+</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 0 0">
+<text-chunk font="times" font-size="13">
+Lawn Care, Snow Removal, Trash Removal, Water, and the Landlord shall also provideSome
+great services with all other utilities and services to be the responsibility of the Tenant(s).
+</text-chunk>
 </paragraph>
