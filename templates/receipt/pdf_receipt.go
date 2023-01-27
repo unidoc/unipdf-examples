@@ -1,5 +1,5 @@
 /*
- * This example showcases the usage of creator templates to create a receipt document
+ * This example showcases the usage of creator templates to create a receipt document.
  *
  * Run as: go run pdf_receipt.go
  */
@@ -43,6 +43,8 @@ func main() {
 	c := creator.New()
 	c.SetPageMargins(15, 15, 20, 20)
 	c.SetPageSize(creator.PageSizeA5)
+
+	// Read main content template.
 	tpl, err := readTemplate("./templates/main.tpl")
 	if err != nil {
 		log.Fatal(err)
