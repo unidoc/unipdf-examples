@@ -1,3 +1,34 @@
-<division margin="20 50">
-    <line fit-mode="fill-width" position="relative" thickness= "1.2" margin="0 0 0 0"></line>
-</division>
+<table columns="5" column-widths="0.1 0.2 0.5 0.1 0.1" margin="20 30 0 30">
+    <table-cell vertical-align="middle">
+        <division>
+            <image src="path('templates/res/house.png')" width="50" height="50"></image>
+        </division>
+    </table-cell>
+    <table-cell vertical-align="bottom">
+        <division>
+        <paragraph>
+            <text-chunk font="times" font-size="9">Initials</text-chunk>
+        </paragraph>
+            <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 30"></line>
+        </division>
+    </table-cell>
+    <table-cell vertical-align="bottom">
+        <division>
+        <paragraph>
+            <text-chunk font="times" color="#0000FF" font-size="9" underline="true" underline-thickness="0.5" underline-color="#0000FF"> http://www.bestlandlords.com/billing </text-chunk>
+        </paragraph>
+        </division>
+    </table-cell>
+    <table-cell vertical-align="bottom">
+        <division>
+        <image src="path('templates/res/qr.png')" width="40" height="50"></image>
+        </division>
+    </table-cell>
+    <table-cell vertical-align="bottom">
+        <division>
+        <paragraph>
+            <text-chunk font="times"> {{.PageNum}} of {{.TotalPages}} </text-chunk>
+        </paragraph>
+        </division>
+    </table-cell>
+</table>
