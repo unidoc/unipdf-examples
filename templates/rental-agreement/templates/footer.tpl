@@ -1,4 +1,4 @@
-<table columns="3"  margin="0 30 0 30" column-widths="0.1 0.7 0.2">
+<table columns="3"  margin="30 30 0 30" column-widths="0.1 0.7 0.2">
     <table-cell vertical-align="bottom">
         <division>
             <image src="path('templates/res/house.png')" width="50" height="50"></image>
@@ -13,7 +13,7 @@
                     </paragraph>
                         <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 30"></line>
                 </division>
-        </table-cell>
+            </table-cell>
         <table-cell vertical-align="bottom" margin = "0 0 0 30">
             <paragraph>
             <text-chunk outline-color= "faf9e4" font="times" color="#0000FF" font-size="10" underline="true" underline-thickness="0.5" underline-color="#0000FF"> http://www.bestlandlords.com/billing </text-chunk>

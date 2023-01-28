@@ -102,8 +102,7 @@ is due.
 
 <paragraph margin="20 0 0 0">
 <text-chunk font="times-bold" font-size="13">PROBATION PERIOD:</text-chunk>
-<text-chunk font="times" font-size="13">The Tenant(s) will not move into the Premises before the start of the
-Lease Term.
+<text-chunk font="times" font-size="13">The Tenant(s) will not move into the Premises before the start of the Lease Term.
 </text-chunk>
 </paragraph>
 
@@ -120,21 +119,16 @@ gives their written consent.
 
 <paragraph margin="20 0 0 0">
 <text-chunk font="times-bold" font-size="13">POSSESSION:</text-chunk>
-<text-chunk font="times" font-size="13">enant(s) has examined the condition of the Premises and by taking
-possession acknowledges that they have accepted the Premises in good order and in its current
-condition except as herein otherwise stated. Failure of the Landlord to deliver possession of the
-Premises at the start of the Lease Term to the Tenant(s) shall terminate this Agreement at the
-option of the Tenant(s). Furthermore, under such failure to deliver possession by the Landlord,
-and if the Tenant(s) cancels this Agreement, the Security Deposit (if any) shall be returned to
-the Tenant(s) along with any other pre-paid rent, fees, including if the Tenant(s) paid a fee
-during the application process before the execution of this Agreement.
+<text-chunk font="times" font-size="13">enant(s) has examined the condition of the Premises and by taking possession acknowledges that they have accepted the Premises in good order and in its current 
+condition except as herein otherwise stated. Failure of the Landlord to deliver possession of the Premises at the start of the Lease Term to the Tenant(s) shall terminate this Agreement at the option of the Tenant(s). Furthermore, under such failure to deliver possession by the Landlord, and if the Tenant(s) cancels this Agreement, the Security Deposit (if any) shall be returned to the Tenant(s) along with any other pre-paid rent, fees, including if the Tenant(s) 
+paid a fee during the application process before the execution of this Agreement.
 </text-chunk>
 </paragraph>
 
 
 <paragraph margin="20 0 0 0">
 <text-chunk font="times-bold" font-size="13">OPTION TO PURCHASE.</text-chunk>
-<text-chunk font="times" font-size="13">TThe Tenant(s) shall have the right to purchase the Premises
+<text-chunk font="times" font-size="13"> The Tenant(s) shall have the right to purchase the Premises
 described herein for $450,000.00 at any time during the course of the Lease Term, along with
 any renewal periods or extensions, by providing written notice to the Landlord along with a
 deposit of $4,500.00 that is subject to the terms and conditions of a Purchase and Sale
@@ -150,16 +144,13 @@ Agreement shall continue under its terms and conditions.
 </paragraph>
 
 <paragraph margin="20 0 0 0">
-<text-chunk font="times" font-size="13">If the option to purchase is exercised by the Tenant(s) all Rent that is paid to the Landlord shall
-remain separate from any and all deposits, consideration, or payments, made to the Landlord in
-regards to the purchase of the Premises.
+<text-chunk font="times" font-size="13">If the option to purchase is exercised by the Tenant(s) all Rent that is paid to the Landlord shall remain separate from any and all deposits, consideration, or payments, made to the Landlord in regards to the purchase of the Premises.
 </text-chunk>
 </paragraph>
 
 <paragraph margin="20 0 0 0">
-<text-chunk font="times-bold" font-size="13">RECORDING.</text-chunk>
-<text-chunk font="times" font-size="13">The Tenant(s) shall be withheld from recording this Option to Purchase unless
-the Tenant(s) has the written consent from the Landlord.
+<text-chunk font="times-bold" font-size="13">RECORDING. </text-chunk>
+<text-chunk font="times" font-size="13">The Tenant(s) shall be withheld from recording this Option to Purchase unless the Tenant(s) has the written consent from the Landlord.
 </text-chunk>
 </paragraph>
 
@@ -168,10 +159,7 @@ the Tenant(s) has the written consent from the Landlord.
 <text-chunk font="times" font-size="13">TUpon the beginning of the Proration Period or the start of the Lease Term,
 whichever is earlier, the Landlord agrees to give access to the Tenant(s) in the form of keys,
 fobs, cards, or any type of keyless security entry as needed to enter the common areas and the
-Premises. Duplicate copies of the access provided may only be authorized under the consent of
-the Landlord and, if any replacements are needed, the Landlord may provide them for a fee. At
-the end of this Agreement all access provided to the Tenant(s) shall be returned to the Landlord
-or a fee will be charged to the Tenant(s) or the fee will be subtracted from the Security Deposit.
+Premises. Duplicate copies of the access provided may only be authorized under the consent of the Landlord and, if any replacements are needed, the Landlord may provide them for a fee. At the end of this Agreement all access provided to the Tenant(s) shall be returned to the Landlord or a fee will be charged to the Tenant(s) or the fee will be subtracted from the Security Deposit.
 </text-chunk>
 </paragraph>
 
@@ -599,14 +587,16 @@ LANDLORD(S) SIGNATURE
 </text-chunk>
 </paragraph>
 
-<div margin="20 0 0 0">
-<paragraph margin="20 0 0 0">
-<text-chunk font="times-bold" font-size="10">
-Landlord’s Signature:
-</text-chunk>
-</paragraph>
-<line fit-mode="fill-width" thickness="1.2"> </line>
-</div>
+<table columns="2" margin="0 0 0 0" column-widths="0.3 0.3">
+   <table-cell align="left">
+      <paragraph>
+         <text-chunk font="times-bold" font-size="11">Landlord’s Signature:</text-chunk>
+      </paragraph>
+   </table-cell>
+   <table-cell  align="left">
+      <line fit-mode="fill-width" position="relative" thickness= "0.5"></line>
+   </table-cell>
+</table>
 
 
 
