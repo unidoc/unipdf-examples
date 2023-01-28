@@ -14,5 +14,81 @@
     "late_fee_amount": "50.00",
     "sec_deposit_amount": "1,873.00",
     "purchase_deposit_amount": "4,500.00",
-    "pet_fee_amount": "300.00"
+    "pet_fee_amount": "300.00",
+    "move_in_check_list": {
+        "living_room": [
+            "Floors",
+            "Walls",
+            "Ceiling",
+            "Windows",
+            "Lighting",
+            "Electrical",
+            "Other",
+            "Other"
+        ],
+        "dinning_room": [
+            "Floors",
+            "Walls",
+            "Ceiling",
+            "Windows",
+            "Lighting",
+            "Electrical",
+            "Other",
+            "Other"
+        ],
+        "kitchen": [
+            "Stove",
+            "Refrigerator",
+            "Sink",
+            "Floors",
+            "Walls",
+            "Ceiling",
+            "Windows",
+            "Lighting",
+            "Electrical",
+            "Cabinets",
+            "Closets",
+            "Exhaust Fan",
+            "Fire Alarms",
+            "Other",
+            "Other"
+        ],
+        "bedroom": [
+            "Doors",
+            "Closets",
+            "Floors",
+            "Walls",
+            "Ceiling",
+            "Windows",
+            "Lighting",
+            "Electrical Outlets",
+            "Other",
+            "Other"
+        ],
+        "bathroom": [
+            "Sink",
+            "Shower",
+            "Curtain",
+            "Towel Rack",
+            "Toilet Condition",
+            "Doors",
+            "Floors",
+            "Walls",
+            "Ceiling",
+            "Windows",
+            "Lighting",
+            "Electrical",
+            "Other",
+            "Other"
+        ],
+        "other": [
+            "Heating",
+            "AC Unit",
+            "Hot Water",
+            "Smoke Alarm",
+            "Door Bell",
+            "Other Condition",
+            "Other Condition"
+        ]
+    }
 }

@@ -27,6 +27,13 @@ type RentalAgreement struct {
 	SecurityDeposit       string   `json:"sec_deposit_amount"`
 	PurchaseDepositAmount string   `json:"purchase_deposit_amount"`
 	PetFee                string   `json:"pet_fee_amount"`
+	MoveInCheckList       struct {
+		LivingRoom  []string `json:"living_room"`
+		DinningRoom []string `json:"dinning_room"`
+		Kitchen     []string `json:"kitchen"`
+		Bathroom    []string `json:"bathroom"`
+		Other       []string `json:"other"`
+	} `json:"move_in_check_list"`
 }
 
 func init() {
