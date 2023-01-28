@@ -713,7 +713,7 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
    {{template "checklist" .}}
 {{end}}
 </table>
-<paragraph text-align = "center" margin="20 0 0 0">
+<paragraph text-align = "center" margin="10 0 0 0">
 <text-chunk font="times-bold" font-size="18.5">Dining Room</text-chunk>
 </paragraph>
 <table columns="2" margin="20 0 0 0">
@@ -722,7 +722,7 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
    {{template "checklist" .}}
 {{end}}
 </table>
-<paragraph text-align = "center" margin="20 0 0 0">
+<paragraph text-align = "center" margin="10 0 0 0">
 <text-chunk font="times-bold" font-size="18.5">Kitchen Area</text-chunk>
 </paragraph>
 <table columns="2" margin="20 0 0 0">
@@ -731,7 +731,7 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
    {{template "checklist" .}}
 {{end}}
 </table>
-<paragraph text-align = "center" margin="20 0 0 0">
+<paragraph text-align = "center" margin="10 0 0 0">
 <text-chunk font="times-bold" font-size="18.5">Bedroom(s)</text-chunk>
 </paragraph>
 <table columns="2" margin="20 0 0 0">
@@ -740,7 +740,7 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
    {{template "checklist" .}}
 {{end}}
 </table>
-<paragraph text-align = "center" margin="20 0 0 0">
+<paragraph text-align = "center" margin="10 0 0 0">
 <text-chunk font="times-bold" font-size="18.5">Other</text-chunk>
 </paragraph>
 <table columns="2" margin="20 0 0 0">
