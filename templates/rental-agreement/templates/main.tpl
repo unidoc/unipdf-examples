@@ -7,14 +7,24 @@
 </paragraph>
 {{end}}
 
-{{ define "form"}}
+{{ define "form-sig"}}
    {{$margin := .Margin}}
    {{$text := .Text}}
    <division>
       <paragraph>
-         <text-chunk font="times-bold" font-size="11">{{$text}}: </text-chunk>
+         <text-chunk font= "times-bold" font-size="11">{{$text}}: </text-chunk>
       </paragraph>
-      <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 {{$margin}}"></line>
+      <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="{{$margin}}"></line>
+   </division>
+{{end}}
+{{ define "simple-form"}}
+   {{$margin := .Margin}}
+   {{$text := .Text}}
+   <division>
+      <paragraph>
+         <text-chunk font= "times" font-size="11">{{$text}} </text-chunk>
+      </paragraph>
+      <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="{{$margin}}"></line>
    </division>
 {{end}}
 <paragraph margin="0 0 0 0" text-align = "center">
@@ -598,7 +608,7 @@ LANDLORD(S) SIGNATURE
 </text-chunk>
 </paragraph>
 
-{{template "form" dict "Margin" 110 "Text" "Landlord’s Signature"}}
+{{template "form-sig" dict "Margin" 110 "Text" "Landlord’s Signature"}}
 <paragraph margin = "5 0 0 0">
 <text-chunk font="times" font-size="13">John Landlord as President of Best Landlord Company</text-chunk>
 </paragraph>
@@ -609,27 +619,46 @@ TENANT(S) SIGNATURE
 </text-chunk>
 </paragraph>
 
-{{template "form" dict "Margin" 100 "Text" "Tenant’s Signature"}}
+{{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 
 <division margin="20 0 20 0">
-{{template "form" dict "Margin" 100 "Text" "Tenant’s Signature"}}
+{{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
 
 <paragraph margin="0 0 0 0" text-align = "center">
    <text-chunk font="times-bold" font-size="21.5">Security Deposit Receipt</text-chunk>
 </paragraph>
 
-
-{{template "form" dict "Font" "times-bold" "FontSize" 11 "Margin" 100 "Text" "Tenant's Signature"}}
-
-<division margin="20 0 20 0">
-{{template "form" dict "Font" "times-bold" "FontSize" 11 "Margin" 100 "Text" "Tenant's Signature"}}
-</division>
-
-<paragraph margin="0 0 0 0" text-align = "center">
-   <text-chunk font="times-bold" font-size="21.5">Security Deposit Receipt</text-chunk>
+<division margin="10 0 0 0">
+<paragraph line-height="2.5">
+<text-chunk>
+Date:__________________________________________  
+Dear ___________________________________________[Tenant(s)],
+The Landlord shall hold the Security Deposit in a separate account at a bank
+located at __________________________________________[Street Address] in
+the City of __________________________________________ , State of ___________________
+The Security Deposit in the amount of $ _____________________ (US Dollars) has been deposited in
+___________________ [Bank Name] with the Account Number of _________________ for the full
+performance of the Lease executed on the _____ day of _______________ , 20 ___.
+Sincerely,                                    .
+</text-chunk>
+<text-chunk font="times-bold" font-size="12"> Landlord’s Signature _________________________</text-chunk>
 </paragraph>
-
-<division margin="20 0 20 0">
-{{template "form" dict "Font" "times" "FontSize" 12 "Margin" 100 "Text" "Tenant's Signature"}}
 </division>
+<paragraph line-height="2.5">
+</paragraph>
+<division>
+<paragraph margin="30 0 30 0" text-align = "center">
+   <text-chunk font="times" font-size="13">AMOUNT ($) DUE AT SIGNING</text-chunk>
+</paragraph>
+</division>
+
+<paragraph margin="30 0 30 0" text-align = "left" line-height="2.3">
+<text-chunk font="times-bold" font-size="12">Security Deposit: </text-chunk> 
+<text-chunk font="times" font-size="12">$1,873.00</text-chunk>
+   <text-chunk font="times-bold" font-size="12">
+First (1st) Month's Rent: </text-chunk><text-chunk font="times" font-size="12"> $1,873.00</text-chunk>
+<text-chunk font="times-bold" font-size="12">
+Pet Fee(s):</text-chunk> 
+<text-chunk font="times" font-size="12"> $300.00 for all the Pet(s)</text-chunk>
+</paragraph>
