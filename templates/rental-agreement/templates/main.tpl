@@ -1,3 +1,22 @@
+{{define "checklist" }}
+<table-cell>
+   <division margin="5 0 5 0">
+   <paragraph>
+      <text-chunk>{{.}} Condition </text-chunk>
+   </paragraph>
+   <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 90"></line>
+   </division>
+</table-cell>
+<table-cell >
+   <division margin="5 0 5 0">
+      <paragraph>
+         <text-chunk>Specific Damage </text-chunk>
+      </paragraph>
+      <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 80"></line>
+   </division>
+</table-cell>
+{{end}}
+
 {{define "simple-paragraph"}}
 {{$head_text := .Head}}
 {{$text := .Content}}
@@ -662,3 +681,70 @@ First (1st) Month's Rent: </text-chunk><text-chunk font="times" font-size="12"> 
 Pet Fee(s):</text-chunk> 
 <text-chunk font="times" font-size="12"> $300.00 for all the Pet(s)</text-chunk>
 </paragraph>
+
+<paragraph text-align = "center">
+   <text-chunk font="times-bold" font-size="18.5">Move-in Checklist</text-chunk>
+</paragraph>
+
+<paragraph>
+<text-chunk font="times" font-size="11">
+Property Address: {{.ApartmentAddress}}
+Unit Size: {{.UnitSize}} bedroom(s)
+Move-in Inspection Date: __________________________ Move-out Inspection Date: ___________________                                 
+</text-chunk>
+</paragraph>
+
+<paragraph margin="5 0 0 0">
+<text-chunk font="times" font-size="11" >
+Write the condition of the space along with any specific damage or repairs needed. Be sure to write
+any repair needed such as paint chipping, wall damage, or any lessened area that could be considered
+maintenance needed at the end of the lease, and therefore, be deducted at the end of the Lease Term.
+</text-chunk>
+</paragraph>
+
+<paragraph text-align = "center" margin="5 0 0 0">
+<text-chunk font="times-bold" font-size="18.5">Living Room</text-chunk>
+</paragraph>
+
+{{$move_in_checklist := .MoveInCheckList}}
+<table columns="2" margin="20 0 0 0">
+{{range $move_in_checklist.LivingRoom}}
+   
+   {{template "checklist" .}}
+{{end}}
+</table>
+<paragraph text-align = "center" margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="18.5">Dining Room</text-chunk>
+</paragraph>
+<table columns="2" margin="20 0 0 0">
+{{range $move_in_checklist.DinningRoom}}
+   
+   {{template "checklist" .}}
+{{end}}
+</table>
+<paragraph text-align = "center" margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="18.5">Kitchen Area</text-chunk>
+</paragraph>
+<table columns="2" margin="20 0 0 0">
+{{range $move_in_checklist.Kitchen}}
+   
+   {{template "checklist" .}}
+{{end}}
+</table>
+<paragraph text-align = "center" margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="18.5">Bedroom(s)</text-chunk>
+</paragraph>
+<table columns="2" margin="20 0 0 0">
+{{range $move_in_checklist.Bathroom}}
+   
+   {{template "checklist" .}}
+{{end}}
+</table>
+<paragraph text-align = "center" margin="20 0 0 0">
+<text-chunk font="times-bold" font-size="18.5">Other</text-chunk>
+</paragraph>
+<table columns="2" margin="20 0 0 0">
+{{range $move_in_checklist.Other}}
+   {{template "checklist" .}}
+{{end}}
+</table>

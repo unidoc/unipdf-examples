@@ -7,6 +7,7 @@
         "Joanna Tenant"
     ],
     "apartment_address": "1 Main Street, Apt 4, Small Town, Alabama, 20992",
+    "unit_size": 2,
     "beginning_date": "2020-12-03T00:00:00",
     "ending_date": "2033-11-29T00:00:00",
     "monthly_installment": "1,873.00",
@@ -70,7 +71,7 @@
             "Shower",
             "Curtain",
             "Towel Rack",
-            "Toilet Condition",
+            "Toilet",
             "Doors",
             "Floors",
             "Walls",
@@ -87,8 +88,8 @@
             "Hot Water",
             "Smoke Alarm",
             "Door Bell",
-            "Other Condition",
-            "Other Condition"
+            "Other",
+            "Other"
         ]
     }
 }

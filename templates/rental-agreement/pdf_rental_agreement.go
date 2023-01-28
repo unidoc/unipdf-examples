@@ -19,6 +19,7 @@ type RentalAgreement struct {
 	CompanyAddress        string   `json:"company_address"`
 	Tenants               []string `json:"tenants"`
 	ApartmentAddress      string   `json:"apartment_address"`
+	UnitSize              int64    `json:"unit_size"`
 	BeginningDate         string   `json:"beginning_date"`
 	EndingDate            string   `json:"ending_date"`
 	MonthlyInstallment    string   `json:"monthly_installment"`
