@@ -6,6 +6,17 @@
 <text-chunk font="times" font-size="13">{{$text}}</text-chunk>
 </paragraph>
 {{end}}
+
+{{ define "form"}}
+   {{$margin := .Margin}}
+   {{$text := .Text}}
+   <division>
+      <paragraph>
+         <text-chunk font="times-bold" font-size="11">{{$text}}: </text-chunk>
+      </paragraph>
+      <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 {{$margin}}"></line>
+   </division>
+{{end}}
 <paragraph margin="0 0 0 0" text-align = "center">
    <text-chunk font="times-bold" font-size="21.5"> LEASE WITH OPTION TO PURCHASE </text-chunk>
 </paragraph>
@@ -581,22 +592,44 @@ The parties have agreed and executed this agreement on December 09 2020.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="20 0 0 0">
+<paragraph margin="20 0 10 0">
 <text-chunk font="times-bold" font-size="13">
 LANDLORD(S) SIGNATURE
 </text-chunk>
 </paragraph>
 
-<table columns="2" margin="0 0 0 0" column-widths="0.3 0.3">
-   <table-cell align="left">
-      <paragraph>
-         <text-chunk font="times-bold" font-size="11">Landlord’s Signature:</text-chunk>
-      </paragraph>
-   </table-cell>
-   <table-cell  align="left">
-      <line fit-mode="fill-width" position="relative" thickness= "0.5"></line>
-   </table-cell>
-</table>
+{{template "form" dict "Margin" 110 "Text" "Landlord’s Signature"}}
+<paragraph margin = "5 0 0 0">
+<text-chunk font="times" font-size="13">John Landlord as President of Best Landlord Company</text-chunk>
+</paragraph>
+
+<paragraph margin="20 0 20 0">
+<text-chunk font="times-bold" font-size="13">
+TENANT(S) SIGNATURE
+</text-chunk>
+</paragraph>
+
+{{template "form" dict "Margin" 100 "Text" "Tenant’s Signature"}}
+
+<division margin="20 0 20 0">
+{{template "form" dict "Margin" 100 "Text" "Tenant’s Signature"}}
+</division>
+
+<paragraph margin="0 0 0 0" text-align = "center">
+   <text-chunk font="times-bold" font-size="21.5">Security Deposit Receipt</text-chunk>
+</paragraph>
 
 
+{{template "form" dict "Font" "times-bold" "FontSize" 11 "Margin" 100 "Text" "Tenant's Signature"}}
 
+<division margin="20 0 20 0">
+{{template "form" dict "Font" "times-bold" "FontSize" 11 "Margin" 100 "Text" "Tenant's Signature"}}
+</division>
+
+<paragraph margin="0 0 0 0" text-align = "center">
+   <text-chunk font="times-bold" font-size="21.5">Security Deposit Receipt</text-chunk>
+</paragraph>
+
+<division margin="20 0 20 0">
+{{template "form" dict "Font" "times" "FontSize" 12 "Margin" 100 "Text" "Tenant's Signature"}}
+</division>
