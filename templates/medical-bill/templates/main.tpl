@@ -187,12 +187,111 @@
 
 <page-break></page-break>
 
-{{template "simple-paragraph" dict "Margin" "0 0 15 0" "LineHeight" 1.5 "Font" "helvetica-bold" "FontSize" 16 "TextColor" "#000000" "Text" "The Sample Medical Center financial assistance policy plain language summary"}}
-{{template "simple-paragraph" dict "Margin" "0 0 10 0" "LineHeight" 1.5 "Font" "helvetica" "FontSize" 12 "TextColor" "#000000" "Text" "Sample Medical Center offers financial assistance to eligible patients who are uninsured, underinsured, and ineligible for a government health care program, or who are otherwise unable to pay for medically necessary care based on their individual financial situation.\nPatients seeking financial assistance must apply for the program, which is summarized below."}}
+{{template "simple-paragraph" dict "Margin" "0 0 5 0" "LineHeight" 1.0 "Font" "helvetica-bold" "FontSize" 16 "TextColor" "#000000" "Text" "The Sample Medical Center financial assistance policy plain language summary"}}
+{{template "simple-paragraph" dict "Margin" "0 0 10 0" "LineHeight" 1.0 "Font" "helvetica" "FontSize" 12 "TextColor" "#000000" "Text" "Sample Medical Center offers financial assistance to eligible patients who are uninsured, underinsured, and ineligible for a government health care program, or who are otherwise unable to pay for medically necessary care based on their individual financial situation.\nPatients seeking financial assistance must apply for the program, which is summarized below."}}
 
-{{template "simple-paragraph" dict "Margin" "0" "LineHeight" 1.5 "Font" "helvetica-bold" "FontSize" 14 "TextColor" "#000000" "Text" "Eligible Services"}}
-{{template "simple-paragraph" dict "Margin" "0 0 10 0" "LineHeight" 1.5 "Font" "helvetica" "FontSize" 12 "TextColor" "#000000" "Text" "Eligible services include emergent or medically necessary services provided by the Hospital. Eligible patients include all patients who submit a financial assistance application (including requested documentation) and are determined to be eligible for financial assistance by the Patient Financial Services Department."}}
+{{template "simple-paragraph" dict "Margin" "5 0 5 0" "LineHeight" 1.0 "Font" "helvetica-bold" "FontSize" 14 "TextColor" "#000000" "Text" "Eligible Services"}}
+{{template "simple-paragraph" dict "Margin" "0 0 10 0" "LineHeight" 1.0 "Font" "helvetica" "FontSize" 12 "TextColor" "#000000" "Text" "Eligible services include emergent or medically necessary services provided by the Hospital. Eligible patients include all patients who submit a financial assistance application (including requested documentation) and are determined to be eligible for financial assistance by the Patient Financial Services Department."}}
 
-{{template "simple-paragraph" dict "Margin" "0" "LineHeight" 1.5 "Font" "helvetica-bold" "FontSize" 14 "TextColor" "#000000" "Text" "How to Apply"}}
-{{template "simple-paragraph" dict "Margin" "0 0 10 0" "LineHeight" 1.5 "Font" "helvetica" "FontSize" 12 "TextColor" "#000000" "Text" "Financial Assistance applications may be obtained/completed/submitted as follows:"}}
+{{template "simple-paragraph" dict "Margin" "5 0 5 0" "LineHeight" 1.0 "Font" "helvetica-bold" "FontSize" 14 "TextColor" "#000000" "Text" "How to Apply"}}
+{{template "simple-paragraph" dict "Margin" "0 0 10 0" "LineHeight" 1.0 "Font" "helvetica" "FontSize" 12 "TextColor" "#000000" "Text" "Financial Assistance applications may be obtained/completed/submitted as follows:"}}
 
+<list indent="5">
+    <list-marker font="helvetica" font-size="12" color="#000000">• </list-marker>
+    <list-item>
+        <paragraph>
+            <text-chunk font="helvetica" font-size="12" color="#000000">Obtain an application at The Sample Medical Center's Patient Financial Services Department located at Main Street 123</text-chunk>
+        </paragraph>
+    </list-item>
+    <list-item>
+        <paragraph>
+            <text-chunk font="helvetica" font-size="12" color="#000000">Request to have an application by mail at: 123 Main Street, Anywhere, NY 12345 - 6789.</text-chunk>
+        </paragraph>
+    </list-item>
+    <list-item>
+        <paragraph>
+            <text-chunk font="helvetica" font-size="12" color="#000000">Request to have an application mailed to you by calling 123 - 456 - 7890. Our hours of operation are: Monday-Friday, 8:30a.m.-4:30p.m.</text-chunk>
+        </paragraph>
+    </list-item>
+    <list-item>
+        <paragraph>
+            <text-chunk font="helvetica" font-size="12" color="#000000">Download an application through the Sample Medical Center's website:
+</text-chunk>
+            <text-chunk font="helvetica" font-size="12" link="url('https://www.ourwebsite.com/PatientFinancialServices.aspx')">https://www.ourwebsite.com/PatientFinancialServices.aspx</text-chunk>
+        </paragraph>
+    </list-item>
+</list>
+
+<paragraph line-height="1.0">
+    <text-chunk font="helvetica" font-size="12" color="#000000">Patient Financial Service Counselors are available Monday through Friday, 8:30 a.m. to 4:30 pm via telephone (123) 456-7890 to address questions related to the Financial Assistance Program.
+Please feel free to email us at:</text-chunk>
+    <text-chunk font="helvetica" font-size="12" link="url('mailto:businessoffice@ourwebsite.com')">businessoffice@ourwebsite.com.</text-chunk>
+</paragraph>
+
+{{template "simple-paragraph" dict "Margin" "15 0 5 0" "LineHeight" 1.0 "Font" "helvetica-bold" "FontSize" 14 "TextColor" "#000000" "Text" "Section 1557 — Notice of Nondiscrimination"}}
+{{template "simple-paragraph" dict "Margin" "0 0 10 0" "LineHeight" 1.0 "Font" "helvetica" "FontSize" 12 "TextColor" "#000000" "Text" "The Sample Medical Center complies with applicable Federal civil right laws and does not discriminate on the basis of race, color, national origin, age, disability, or sex."}}
+
+
+{{template "simple-paragraph" dict "Margin" "15 0 0 0" "LineHeight" 1.0 "Font" "helvetica" "FontSize" 10 "TextColor" "#000000" "Text" "If any of this following has changed since your last statement, please indicate..."}}
+
+<table columns="2" column-widths="0.5 0.5" margin="0">
+    <table-cell>
+        <table columns="3" column-widths="0.5 0.25 0.25">
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 3 "BorderBottomSize" 5 "Margin" "0 0 0 0" "Font" "helvetica-bold" "FontSize" 9 "Text" "About you:")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 3 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Your name (Last, First, Middle initial)")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 3 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Address")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "City")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "State")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Zip")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 3 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Telephone")}}
+
+            <table-cell border-width-bottom="1" colspan="3" indent="0">
+                <table columns="6" column-widths="0.15 0.17 0.17 0.17 0.17 0.17">
+                    {{template "table-cell-paragraph" (extendDict $props "BorderBottomSize" 0 "Colspan" 1 "Margin" "-5 0 0 0" "Font" "helvetica" "FontSize" 7 "Text" "Marital status")}}
+                    {{template "table-cell-paragraph" (extendDict $props "Margin" "10 0 0 0" "Font" "helvetica-bold" "FontSize" 9 "Text" "Single")}}
+                    {{template "table-cell-paragraph" (extendDict $props "Margin" "10 0 0 0" "Font" "helvetica-bold" "FontSize" 9 "Text" "Married")}}
+                    {{template "table-cell-paragraph" (extendDict $props "Margin" "10 0 0 0" "Font" "helvetica-bold" "FontSize" 9 "Text" "Separat.")}}
+                    {{template "table-cell-paragraph" (extendDict $props "Margin" "10 0 0 0" "Font" "helvetica-bold" "FontSize" 9 "Text" "Divorced")}}
+                    {{template "table-cell-paragraph" (extendDict $props "Margin" "10 0 0 0" "Font" "helvetica-bold" "FontSize" 9 "Text" "Widowed")}}
+                </table>
+            </table-cell>
+
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Employer's name")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 2 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Telepohone")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 3 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Employer's address")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "City")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "State")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Zip")}}
+
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 3 "BorderBottomSize" 5 "Margin" "6 0 0 0" "Font" "helvetica-bold" "FontSize" 9 "Text" "Comments:")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 3 "BorderBottomSize" 1 "Margin" "0 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" " ")}}
+        </table>
+    </table-cell>
+
+    <table-cell>
+        <table columns="3" column-widths="0.5 0.25 0.25">
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 3 "BorderBottomSize" 5 "Margin" "0 0 0 0" "Font" "helvetica-bold" "FontSize" 9 "Text" "About your insurance:")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Primary insurance company's name")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 2 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Effective date")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Primary insurance company's address")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 2 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Phone")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "City")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "State")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Zip")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Policyholder's ID number")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 2 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Group plan number")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 3 "BorderBottomSize" 5 "Margin" "-5 0 20 0" "Font" "helvetica" "FontSize" 7 "Text" "Relationship to patient")}}
+
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Secondary insurance company’s name")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 2 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Effective date")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Secondary insurance company's address")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 2 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Phone")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "City")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "State")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Zip")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 1 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Policyholder's ID number")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 2 "BorderBottomSize" 1 "Margin" "-5 0 15 0" "Font" "helvetica" "FontSize" 7 "Text" "Group plan number")}}
+            {{template "table-cell-paragraph" (extendDict $props "Colspan" 3 "BorderBottomSize" 1 "Margin" "-5 0 20 0" "Font" "helvetica" "FontSize" 7 "Text" "Relationship to patient")}}
+        </table>
+    </table-cell>
+</table>
