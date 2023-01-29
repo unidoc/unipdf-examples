@@ -1,3 +1,22 @@
+{{define "bold-text"}}
+<text-chunk font="times-bold" font-size="12">{{.}}</text-chunk>
+{{end}}
+
+{{define "simple-text"}}
+<text-chunk font="times" font-size="12" character-spacing="0.3">{{.SimpleText}}</text>
+{{end}}
+
+{{define "paragraph"}}
+<paragraph margin="15 0 0 0" line-height="1.2">
+{{if .BoldText}}
+{{template "bold-text" .BoldText}}
+{{end}}
+{{if .SimpleText}}
+{{template "simple-text" .SimpleText}}
+{{end}}
+</paragraph>
+{{end}}
+
 {{define "checklist" }}
 <table-cell>
    <division margin="5 0 5 0">
@@ -46,14 +65,14 @@
       <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="{{$margin}}"></line>
    </division>
 {{end}}
-<paragraph margin="20 0 10 0" text-align = "center">
-   <text-chunk font="times-bold" font-size="21.5"> LEASE WITH OPTION TO PURCHASE </text-chunk>
+<paragraph margin="10 0 15 0" text-align = "center">
+   <text-chunk font="times-bold" font-size="20"> LEASE WITH OPTION TO PURCHASE </text-chunk>
 </paragraph>
 
-<paragraph margin="20 0 0 0">
-<text-chunk font="times" font-size="12">This agreement, dated December 9 2020, by and between a business entity known as </text-chunk>
-<text-chunk font="times" font-size="12"> {{.CompanyName}} of {{.CompanyAddress}}, hereinafter known as</text-chunk>
-<text-chunk font="times" font-size="12"> the “Landlord”.</text-chunk>
+
+
+<paragraph margin="15 0 0 0" line-height="1.2">
+<text-chunk font="times" font-size="12" character-spacing="0.3">This agreement, dated {{formatTime .Date "December 9 2006"}}, by and between a business entity known as {{.CompanyName}} of {{.CompanyAddress}}, hereinafter known as the “Landlord”.</text-chunk>
 </paragraph>
 
 <paragraph margin="20 0 0 0">
@@ -72,7 +91,7 @@ following Two (2) Occupants to reside on the Premises in addition to the Tenant(
 
 <paragraph margin="20 0 0 0">
 <text-chunk font="times-bold" font-size="12">OFFER TO RENT: </text-chunk>
-<text-chunk font="times" font-size="12">The Landlord hereby rents to the Tenant(s), subject to the following terms and conditions of this Agreement, an apartment with the address of 1 Main Street, Apt 4, Small Town, Alabama, 20992 consisting of 2.5 bathroom(s) and 2 bedroom(s) hereinafter known as the “Premises”. The Landlord may also use the address for notices sent to the Tenant(s).</text-chunk>
+<text-chunk font="times" font-size="12">The Landlord hereby rents to the Tenant(s), subject to the following terms and conditions of this Agreement, an apartment with the address of {{.ApartmentAddress}} consisting of 2.5 bathroom(s) and 2 bedroom(s) hereinafter known as the “Premises”. The Landlord may also use the address for notices sent to the Tenant(s).</text-chunk>
 </paragraph>
 
 <paragraph margin="20 0 0 0">
@@ -103,29 +122,37 @@ other unnamed appliances existing on the Premises. Any damage to the Landlord's 
 shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.</text-chunk>
  </paragraph>
  
-<paragraph margin="20 0 0 0">
+<paragraph margin="20 0 0 0" line-height="1.2">
 <text-chunk font="times-bold" font-size="12">LEASE TERM: </text-chunk>
-<text-chunk font="times" font-size="12"> This Agreement shall be a fixed-period arrangement beginning on December 03 2020 and ending on November 29 2033 with the Tenant(s) having the option to continue to occupy the Premises under the same terms and conditions of this Agreement under a Month-to-Month arrangement (Tenancy at Will) with either the Landlord or Tenant having the option to cancel the tenancy with at least thirty (30) days notice or the minimum time-period set by the State, whichever is shorter. For the Tenant to continue under Month-to-Month tenancy at the expiration of the Lease Term, the Landlord must be notified within sixty (60) days before the end of the Lease Term. Hereinafter known as the “Lease Term”.</text-chunk>
+<text-chunk font="times" font-size="12"> This Agreement shall be a fixed-period arrangement beginning on {{formatTime .BeginningDate "December 9 2006"}} and ending on {{formatTime .EndingDate "December 9 2006"}} with the Tenant(s) having the option to continue to 
+occupy the Premises under the same terms and conditions of this Agreement under a 
+Month-to-Month arrangement (Tenancy at Will) with either the Landlord or Tenant having the 
+option to cancel the tenancy with at least thirty (30) days notice or the minimum time-period set 
+by the State, whichever is shorter. For the Tenant to continue under Month-to-Month tenancy at 
+the expiration of the Lease Term, the Landlord must be notified within sixty (60) days before 
+the end of the Lease Term. Hereinafter known as the “Lease Term”.</text-chunk>
 </paragraph>
 
 <paragraph margin="20 0 0 0">
 <text-chunk font="times-bold" font-size="12">RENT: </text-chunk>
-<text-chunk font="times" font-size="12">Tenant(s) shall pay the Landlord in equal monthly installments of $1,873.00 (US
+<text-chunk font="times" font-size="12">Tenant(s) shall pay the Landlord in equal monthly installments of ${{.MonthlyInstallment}} (US
 Dollars) hereinafter known as the “Rent”. The Rent will be due on the First (1st) of every
-month and be paid through an electronic payment known as Automated Clearing House or “ACH”. Details of the Tenant's banking information and authorization shall be attached to this Lease Agreement.</text-chunk>
+month and be paid through an electronic payment known as Automated Clearing House or 
+“ACH”. Details of the Tenant's banking information and authorization shall be attached to this 
+Lease Agreement.</text-chunk>
 </paragraph>
 
 
 <paragraph margin="20 0 0 0">
 <text-chunk font="times-bold" font-size="12">NON-SUFFICIENT FUNDS (NSF CHECKS):</text-chunk>
-<text-chunk font="times" font-size="12">If the Tenant(s) attempts to pay the rent with a check that is not honored or an electronic transaction (ACH) due to insufficient funds (NSF) there shall be a fee of $45.00 (US Dollars)</text-chunk>
+<text-chunk font="times" font-size="12">If the Tenant(s) attempts to pay the rent with 
+a check that is not honored or an electronic transaction (ACH) due to insufficient funds (NSF) 
+there shall be a fee of ${{.InsufficientFundFee}} (US Dollars)</text-chunk>
 </paragraph>
 <paragraph margin="20 0 0 0">
 <text-chunk font="times-bold" font-size="12">LATE FEE: </text-chunk>
 <text-chunk font="times" font-size="12">If rent is not paid on the due date, there shall be a late fee assessed by the
-Landlord in the amount of:
-
-$50.00 (US Dollars) per occurrence for each month payment that is late after the 3rd Day rent
+Landlord in the amount of: ${{.LatePaymentFee}} (US Dollars) per occurrence for each month payment that is late after the 3rd Day rent
 is due.
 </text-chunk>
 </paragraph>
@@ -148,7 +175,7 @@ is due.
 
 <paragraph margin="20 0 0 0">
 <text-chunk font="times-bold" font-size="12">SECURITY DEPOSIT:</text-chunk>
-<text-chunk font="times" font-size="12">A Security Deposit in the amount of $1,873.00 (US Dollars) shall be
+<text-chunk font="times" font-size="12">A Security Deposit in the amount of ${{.SecurityDeposit}} (US Dollars) shall be
 required by the Tenant(s) at the execution of this Agreement to the Landlord for the faithful
 performance of all the terms and conditions. The Security Deposit is to be returned to the
 Tenant(s) within 14 days after this Agreement has terminated, less any damage charges and
@@ -169,9 +196,9 @@ paid a fee during the application process before the execution of this Agreement
 <paragraph margin="20 0 0 0">
 <text-chunk font="times-bold" font-size="12">OPTION TO PURCHASE.</text-chunk>
 <text-chunk font="times" font-size="12"> The Tenant(s) shall have the right to purchase the Premises
-described herein for $450,000.00 at any time during the course of the Lease Term, along with
+described herein for ${{.PurchaseAmount}} at any time during the course of the Lease Term, along with
 any renewal periods or extensions, by providing written notice to the Landlord along with a
-deposit of $4,500.00 that is subject to the terms and conditions of a Purchase and Sale
+deposit of ${{.PurchaseDepositAmount}} that is subject to the terms and conditions of a Purchase and Sale
 Agreement to be negotiated, in “good faith”, between the Landlord and Tenant(s).
 </text-chunk>
 </paragraph>
@@ -318,7 +345,7 @@ following conditions:
 <paragraph margin="20 0 0 0">
 <text-chunk font="times" font-size="12">
 The Tenant(s) must provide at least 60 days' notice and pay an early termination fee of
-$1,000.00 (US Dollars) which does not include the rent due for the notice period. During the
+${{.TerminationFee}} (US Dollars) which does not include the rent due for the notice period. During the
 notice period of 60 days the rent shall be paid in accordance with this Agreement.
 </text-chunk>
 </paragraph>
@@ -335,7 +362,7 @@ PETS:
 <text-chunk font="times" font-size="12">
 Two (2) pets on the Premises consisting of Birds, Cats, Dogs, Fish, Hamsters, Rabbits, with no
 other types of Pet(s) being allowed on the Premises or common areas, hereinafter known as the
-“Pet(s)”. The Tenant(s) shall be required to pay a pet fee in the amount of $300.00 for all the
+“Pet(s)”. The Tenant(s) shall be required to pay a pet fee in the amount of ${{.PetFee}} for all the
 Pet(s) which is refundable at the end of the Lease Term only if there is no damage to the
 Premises that is caused by the Pet(s). The Tenant(s) is responsible for all damage that any pet
 causes, regardless of ownership of said pet and agrees to restore the property to its original
@@ -530,8 +557,8 @@ following mailing addresses:
 
 <paragraph margin="20 0 0 0">
 <text-chunk font="times" font-size="12">
-Best Landlord Company, ATTN. John Landlord
-2 Maple Ln, Suite A, Best Town, Alabama, 29227
+{{.CompanyName}}, ATTN. John Landlord
+{{.CompanyAddress}}
 </text-chunk>
 </paragraph>
 

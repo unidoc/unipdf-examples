@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"text/template"
 	"time"
 
 	"github.com/unidoc/unipdf/v3/common"
@@ -24,10 +25,12 @@ type RentalAgreement struct {
 	EndingDate            string   `json:"ending_date"`
 	MonthlyInstallment    string   `json:"monthly_installment"`
 	InsufficientFundFee   string   `json:"ins_fee_amount"`
-	LatePaymentFee        string   `json:"50.00"`
+	LatePaymentFee        string   `json:"late_fee_amount"`
 	SecurityDeposit       string   `json:"sec_deposit_amount"`
 	PurchaseDepositAmount string   `json:"purchase_deposit_amount"`
+	PurchaseAmount        string   `json:"purchase_amount"`
 	PetFee                string   `json:"pet_fee_amount"`
+	TerminationFee        string   `json:"termination_fee"`
 	MoveInCheckList       struct {
 		LivingRoom  []string `json:"living_room"`
 		DinningRoom []string `json:"dinning_room"`
@@ -49,19 +52,28 @@ func init() {
 
 func main() {
 	c := creator.New()
-	c.SetPageMargins(70, 50, 100, 120)
+	c.SetPageMargins(70, 50, 90, 120)
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
+	tplOpts := &creator.TemplateOptions{
+		HelperFuncMap: template.FuncMap{
+			"formatTime": func(val, format string) string {
+				t, _ := time.Parse("2006-01-02T00:00:00", val)
+				return t.Format(format)
+			},
+		},
+	}
+
 	// Read data from json.
 	rentalAgreement, err := readRentalAgreement("rental_data.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 	// Draw the main template.
-	if err := c.DrawTemplate(mainTpl, rentalAgreement, nil); err != nil {
+	if err := c.DrawTemplate(mainTpl, rentalAgreement, tplOpts); err != nil {
 		log.Fatal(err)
 	}
 	// Draw header and footer.

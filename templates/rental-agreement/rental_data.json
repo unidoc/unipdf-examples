@@ -14,8 +14,10 @@
     "ins_fee_amount": "45.00",
     "late_fee_amount": "50.00",
     "sec_deposit_amount": "1,873.00",
+    "purchase_amount": "450,000.00",
     "purchase_deposit_amount": "4,500.00",
     "pet_fee_amount": "300.00",
+    "termination_fee": "1,000.00",
     "move_in_check_list": {
         "living_room": [
             "Floors",
