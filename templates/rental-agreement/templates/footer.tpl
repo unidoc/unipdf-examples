@@ -1,4 +1,4 @@
-<table columns="3"  margin="30 30 100 30" column-widths="0.1 0.4 0.5">
+<table columns="3"  margin="30 30 120 30" column-widths="0.1 0.4 0.5">
     <table-cell vertical-align="bottom">
         <division>
             <image src="path('templates/res/house.png')" width="50" height="50"></image>
@@ -23,13 +23,13 @@
                     <text-chunk outline-color= "faf9e4" font="times" color="#0000FF" font-size="10" underline="true" underline-thickness="0.5" underline-color="#0000FF">http://www.bestlandlords.com/billing</text-chunk>
                 </paragraph>
             </table-cell>
-            <table-cell vertical-align="middle">
+            <table-cell vertical-align="top">
                 <division>
-                <image src="path('templates/res/qr.png')" width="50" height="50"></image>
+                <image src="path('templates/res/qr.png')" width="40" height="50" margin="0 0 12 0"></image>
                 </division>
             </table-cell>
             <table-cell vertical-align="bottom">
-                <paragraph>
+                <paragraph margin="0 0 12 0">
                     <text-chunk font="times">Page {{.PageNum}}</text-chunk>
                 </paragraph>
             </table-cell>
