@@ -49,7 +49,7 @@ func main() {
 	c := creator.New()
 	c.SetPageMargins(20, 20, 20, 20)
 	// Create qrCode.
-	qrCode, err := createQRCode("https://github.com/unidoc/unipdf-examples/tree/master/concert-ticket/", 500, 500)
+	qrCode, err := createQRCode("https://github.com/unidoc/unipdf-examples/tree/master/templates/concert-ticket/", 500, 500)
 	if err != nil {
 		panic(err)
 	}
