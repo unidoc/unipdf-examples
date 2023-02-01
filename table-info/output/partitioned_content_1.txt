@@ -1,0 +1,27 @@
+working with page 1 of file ./table-info/test-files/PDF Tables.pdf
+
+------------------- outside table begins ---------------
+PDF Tables
+
+You find tables in a variety of forms. You might have a job application form where tables are used for
+work and education history. You see many tables in point-of-sale purchase forms where you find
+columns of descriptions, quantity, price, and totals across each row. In other forms, you see tables that
+make data entry and exporting data intuitive and easy for form fillers.
+
+Sample Table
+
+
+------------------- outside table ends ------------------
+
+------------------- inside table begins -----------------
+Head1 Head2 
+Row 1 col 1 Row 1 col 2 
+Row 2 col 1 Row 2 col2 
+Row 3 col 1 and col 2 	 
+------------------- inside table ends -------------------
+
+--------------- out side table  begins --------------
+
+
+
+--------------- outside table ends ------------------
