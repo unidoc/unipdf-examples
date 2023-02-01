@@ -15,3 +15,5 @@ modified without the need to rebuild the application.
 - [Sample Bank Account Statement](bank-account-statement): showcases the usage of creator templates by creating a sample bank account statement.
 - [Sample Trade Confirmation Document](trade-confirmation): showcases the usage of creator templates by creating a sample trade confirmation document.
 - [Sample Concert Ticket](concert-ticket): Showcases the usage of creator templates by creating sample concert ticket.
+
+- [Sample Receipt Document](receipt): showcases the usage of creator templates by creating a receipt document.

@@ -1,0 +1,30 @@
+[
+  {
+    "FieldName": "Date",
+    "FieldValue": "2022-07-17 04:45AM UTC"
+  },
+  {
+    "FieldName": "Account billed",
+    "FieldValue": "John Doe (john.doe@example.com)"
+  },
+  {
+    "FieldName": "Description",
+    "FieldValue": "Streaming Service"
+  },
+  {
+    "FieldName": "Service Period",
+    "FieldValue": "2022-07-17 - 2022-08-16"
+  },
+  {
+    "FieldName": "Total",
+    "FieldValue": "$15.49"
+  },
+  {
+    "FieldName": "Charged to",
+    "FieldValue": "American Express (3*** ****** *5072)"
+  },
+  {
+    "FieldName": "Transaction ID",
+    "FieldValue": "XDR678W"
+  }
+]
