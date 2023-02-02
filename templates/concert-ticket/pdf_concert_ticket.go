@@ -1,5 +1,5 @@
 /*
- * This example demonstrates creating a concert ticket using the creator templates
+ * This example demonstrates creating a concert ticket using the creator templates.
  *
  * Run as: go run pdf_concert_ticket.go
  */
@@ -21,7 +21,7 @@ import (
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-// Field represents a single filed with name and value.
+// Field represents a single field with name and value.
 type Field struct {
 	FieldName  string `json:"field_name"`
 	FieldValue string `json:"field_value"`
@@ -69,13 +69,13 @@ func main() {
 			"qr-code": qrCode,
 		},
 	}
-	// Draw main content template.
+
 	if err := c.DrawTemplate(tpl, ticket, tplOpts); err != nil {
 		log.Fatal(err)
 	}
 
 	// Write to output file.
-	if err := c.WriteToFile("unipdf_ticket.pdf"); err != nil {
+	if err := c.WriteToFile("unipdf-ticket.pdf"); err != nil {
 		log.Fatal(err)
 	}
 }
