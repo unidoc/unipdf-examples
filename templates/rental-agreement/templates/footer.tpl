@@ -1,4 +1,4 @@
-<table columns="3"  margin="10 20 50 20" column-widths="0.1 0.4 0.5">
+<table columns="3"  margin="10 20 30 20" column-widths="0.085 0.415 0.5">
     <table-cell vertical-align="bottom">
         {{if gt 10 .PageNum}}
         <division>

@@ -699,12 +699,12 @@ Sincerely,                                    .
 
 <paragraph margin="30 0 30 0" text-align = "left" line-height="2.3">
 <text-chunk font="times-bold" font-size="12">Security Deposit: </text-chunk> 
-<text-chunk font="times" font-size="12">$1,873.00</text-chunk>
+<text-chunk font="times" font-size="12">${{.SecurityDeposit}}</text-chunk>
    <text-chunk font="times-bold" font-size="12">
-First (1st) Month's Rent: </text-chunk><text-chunk font="times" font-size="12"> $1,873.00</text-chunk>
+First (1st) Month's Rent: </text-chunk><text-chunk font="times" font-size="12"> ${{.SecurityDeposit}}</text-chunk>
 <text-chunk font="times-bold" font-size="12">
 Pet Fee(s):</text-chunk> 
-<text-chunk font="times" font-size="12"> $300.00 for all the Pet(s)</text-chunk>
+<text-chunk font="times" font-size="12"> ${{.PetFee}} for all the Pet(s)</text-chunk>
 </paragraph>
 
 <paragraph margin="420 0 10 0" text-align="center">
