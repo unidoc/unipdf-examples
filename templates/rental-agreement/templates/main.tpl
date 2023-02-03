@@ -691,11 +691,8 @@ Sincerely,                                    .
 </text-chunk>
 <text-chunk font="times-bold" font-size="12"> Landlord’s Signature _________________________</text-chunk>
 </paragraph>
-</division>
-<paragraph line-height="2.5">
-</paragraph>
-<division>
-<paragraph margin="30 0 30 0" text-align = "center">
+
+<paragraph margin="480 0 30 0" text-align = "center">
    <text-chunk font="times" font-size="12">AMOUNT ($) DUE AT SIGNING</text-chunk>
 </paragraph>
 </division>
@@ -722,7 +719,7 @@ Move-in Inspection Date: __________________________ Move-out Inspection Date: __
 </text-chunk>
 </paragraph>
 
-<paragraph margin="5 0 0 0">
+<paragraph margin="15 0 0 0">
 <text-chunk font="times" font-size="11" >
 Write the condition of the space along with any specific damage or repairs needed. Be sure to write
 any repair needed such as paint chipping, wall damage, or any lessened area that could be considered
@@ -730,7 +727,7 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
 </text-chunk>
 </paragraph>
 
-<paragraph text-align = "center" margin="5 0 0 0">
+<paragraph margin="15 0 0 0">
 <text-chunk font="times-bold" font-size="18.5">Living Room</text-chunk>
 </paragraph>
 
@@ -741,7 +738,7 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
    {{template "checklist" .}}
 {{end}}
 </table>
-<paragraph text-align = "center" margin="10 0 0 0">
+<paragraph margin="15 0 0 0">
 <text-chunk font="times-bold" font-size="18.5">Dining Room</text-chunk>
 </paragraph>
 <table columns="2" margin="20 0 0 0">
@@ -750,7 +747,7 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
    {{template "checklist" .}}
 {{end}}
 </table>
-<paragraph text-align = "center" margin="10 0 0 0">
+<paragraph margin="15 0 0 0">
 <text-chunk font="times-bold" font-size="18.5">Kitchen Area</text-chunk>
 </paragraph>
 <table columns="2" margin="20 0 0 0">
@@ -759,7 +756,7 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
    {{template "checklist" .}}
 {{end}}
 </table>
-<paragraph text-align = "center" margin="10 0 0 0">
+<paragraph margin="15 0 0 0">
 <text-chunk font="times-bold" font-size="18.5">Bedroom(s)</text-chunk>
 </paragraph>
 <table columns="2" margin="20 0 0 0">
@@ -768,7 +765,7 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
    {{template "checklist" .}}
 {{end}}
 </table>
-<paragraph text-align = "center" margin="10 0 0 0">
+<paragraph margin="15 0 0 0">
 <text-chunk font="times-bold" font-size="18.5">Other</text-chunk>
 </paragraph>
 <table columns="2" margin="20 0 0 0">

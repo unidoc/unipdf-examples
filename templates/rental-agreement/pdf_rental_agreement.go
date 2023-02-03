@@ -12,6 +12,7 @@ import (
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
 type RentalAgreement struct {
@@ -52,13 +53,21 @@ func init() {
 
 func main() {
 	c := creator.New()
-	c.SetPageMargins(70, 50, 90, 120)
+	c.SetPageMargins(90, 60, 90, 120)
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	arialBold, err := model.NewPdfFontFromTTFFile("./templates/res/arialbd.ttf")
+	if err != nil {
+		log.Fatal(err)
+	}
 	tplOpts := &creator.TemplateOptions{
+		FontMap: map[string]*model.PdfFont{
+			"arial-bold": arialBold,
+		},
 		HelperFuncMap: template.FuncMap{
 			"formatTime": func(val, format string) string {
 				t, _ := time.Parse("2006-01-02T00:00:00", val)
