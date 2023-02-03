@@ -124,8 +124,8 @@ func readBillData(jsonFile string) (*Bill, error) {
 // Bill holds the medical bill data.
 type Bill struct {
 	Guarantor     Guarantor         `json:"guarantor"`
-	StatementDate string            `json:"statementDate"`
-	DueDate       string            `json:"dueDate"`
+	StatementDate string            `json:"statement_date"`
+	DueDate       string            `json:"due_date"`
 	Services      []*MedicalService `json:"services"`
 	Total         string            `json:"total"`
 }

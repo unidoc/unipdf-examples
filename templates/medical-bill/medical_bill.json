@@ -5,8 +5,8 @@
         "address1": "123 MAIN STREET",
         "address2": "ANYWHERE, NY 12345 - 6789"
     },
-    "statementDate": "01/02/2023",
-    "dueDate": "Upon Receipt",
+    "statement_date": "01/02/2023",
+    "due_date": "Upon Receipt",
     "services": [
         {
             "items": [
