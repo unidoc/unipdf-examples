@@ -18,6 +18,10 @@
     "purchase_deposit_amount": "4,500.00",
     "pet_fee_amount": "300.00",
     "termination_fee": "1,000.00",
+    "security_deposit_return_time": 14,
+    "number_of_parking_spaces": 2,
+    "early_termination": 60,
+    "number_of_allowed_pets": 2,
     "move_in_check_list": {
         "living_room": [
             "Floors",

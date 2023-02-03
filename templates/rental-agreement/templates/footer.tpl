@@ -1,7 +1,7 @@
-<table columns="3"  margin="30 30 120 30" column-widths="0.1 0.4 0.5">
+<table columns="3"  margin="10 20 50 20" column-widths="0.1 0.4 0.5">
     <table-cell vertical-align="bottom">
         <division>
-            <image src="path('templates/res/house.png')" width="50" height="50"></image>
+            <image src="path('templates/res/house.png')" width="45" height="48"></image>
         </division>
     </table-cell>
     <table-cell vertical-align="bottom">
@@ -20,7 +20,7 @@
         <table columns="3" column-widths="0.6 0.2 0.3">
             <table-cell vertical-align="bottom">
                 <paragraph margin="0 0 10 0">
-                    <text-chunk outline-color= "faf9e4" font="times" color="#0000FF" font-size="10" underline="true" underline-thickness="0.5" underline-color="#0000FF">http://www.bestlandlords.com/billing</text-chunk>
+                    <text-chunk outline-color= "faf9e4" font="times-bold" color="#0000FF" font-size="10" underline="true" underline-thickness="0.5" underline-color="#0000FF">http://www.bestlandlords.com/billing</text-chunk>
                 </paragraph>
             </table-cell>
             <table-cell vertical-align="top">
