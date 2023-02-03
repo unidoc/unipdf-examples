@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"log"
 	"os"
@@ -35,6 +36,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Read medical bill data json.
+	bill, err := readBillData("medical_bill.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// Draw main content teplate.
 	tplOpts := &creator.TemplateOptions{
 		HelperFuncMap: template.FuncMap{
@@ -62,7 +69,16 @@ func main() {
 		},
 	}
 
-	if err := c.DrawTemplate(mainTpl, nil, tplOpts); err != nil {
+	data := map[string]interface{}{
+		"institution": map[string]interface{}{
+			"name":     "UniDoc Medial Center",
+			"address1": "123 Main Street",
+			"address2": "Anywhere, NY 12345 - 6789",
+		},
+		"bill": bill,
+	}
+
+	if err := c.DrawTemplate(mainTpl, data, tplOpts); err != nil {
 		log.Fatal(err)
 	}
 
@@ -87,4 +103,53 @@ func readTemplate(tplFile string) (io.Reader, error) {
 	}
 
 	return buf, nil
+}
+
+// readBillData reads the medical bill data from a specified JSON file.
+func readBillData(jsonFile string) (*Bill, error) {
+	file, err := os.Open(jsonFile)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	bill := &Bill{}
+	if err := json.NewDecoder(file).Decode(bill); err != nil {
+		return nil, err
+	}
+
+	return bill, nil
+}
+
+// Bill holds the medical bill data.
+type Bill struct {
+	Guarantor     Guarantor         `json:"guarantor"`
+	StatementDate string            `json:"statementDate"`
+	DueDate       string            `json:"dueDate"`
+	Services      []*MedicalService `json:"services"`
+	Total         string            `json:"total"`
+}
+
+// Guarantor holds guarantor data.
+type Guarantor struct {
+	Number   string `json:"number"`
+	Name     string `json:"name"`
+	Address1 string `json:"address1"`
+	Address2 string `json:"address2"`
+}
+
+// MedicalService holds medical service list data.
+type MedicalService struct {
+	Items            []*ServiceItem `json:"items"`
+	TotalPayments    string         `json:"total_payments"`
+	TotalAdjustments string         `json:"total_adjustments"`
+	PatientDue       string         `json:"patient_due"`
+}
+
+// ServiceItem holds medical service item data.
+type ServiceItem struct {
+	Date        string `json:"date,omitempty"`
+	Description string `json:"desc"`
+	Charges     string `json:"charges,omitempty"`
+	Payment     string `json:"payment,omitempty"`
 }
