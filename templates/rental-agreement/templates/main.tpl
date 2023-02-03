@@ -231,7 +231,7 @@ Premises. Duplicate copies of the access provided may only be authorized under t
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">MOVE-IN INSPECTION:</text-chunk>
 <text-chunk font="times" font-size="12">Before, at the time of the Tenant(s) accepting possession, or
 shortly thereafter, the Landlord and Tenant(s) shall perform an inspection documenting the
@@ -241,7 +241,7 @@ Premises.
 </paragraph>
 
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">SUBLETTING:</text-chunk>
 <text-chunk font="times" font-size="12">The Tenant(s) shall not have the right to sub-let the Premises or any part
 thereof without the prior written consent of the Landlord. If consent is granted by the Landlord,
@@ -254,7 +254,7 @@ sub-let shall not be deemed to be consent to any subsequent subletting.
 </paragraph>
 
 
-<paragraph margin="20 0 0 0">
+<paragraph margin="20 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">ABANDONMENT:</text-chunk>
 <text-chunk font="times" font-size="12">If the Tenant(s) vacates or abandons the property for a time-period that is
 the minimum set by State law or seven (7) days, whichever is less, the Landlord shall have the
@@ -264,7 +264,7 @@ Landlord shall immediately have the right to terminate this Agreement.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">ASSIGNMENT:</text-chunk>
 <text-chunk font="times" font-size="12">Tenant(s) shall not assign this Lease without the prior written consent of the
 Landlord. The consent by the Landlord to one assignment shall not be deemed to be consent to
@@ -272,21 +272,21 @@ any subsequent assignment.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">PARKING:</text-chunk>
 <text-chunk font="times" font-size="12">The Landlord shall provide the Tenant(s) 2 Parking Spaces.
 </text-chunk>
 </paragraph>
 
 
-<paragraph margin="20 0 0 0">
+<paragraph margin="20 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">The Landlord shall not charge a fee for the 2 Parking Spaces. The Parking Space(s) can be
 described as: 1 outdoor parking space and 1 indoor garage parking space provided
 </text-chunk>
 </paragraph>
 
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">RIGHT OF ENTRY:</text-chunk>
 <text-chunk font="times" font-size="12">The Landlord shall have the right to enter the Premises during normal
 working hours by providing notice in accordance with the minimum State requirement in order
@@ -296,7 +296,7 @@ purchasers, mortgagees, or lessees upon reasonable notice.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="20 0 0 0">
+<paragraph margin="20 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">SALE OF PROPERTY:</text-chunk>
 <text-chunk font="times" font-size="12">If the Premises is sold, the Tenant(s) is to be notified of the new
 Owner, and if there is a new Manager, their contact details for repairs and maintenance shall be
@@ -306,20 +306,20 @@ by the Landlord and Tenant(s).
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">UTILITIES:</text-chunk>
 <text-chunk font="times" font-size="12">The Landlord agrees to pay for the following utilities and services:
 </text-chunk>
 </paragraph>
 
-<paragraph margin="20 0 0 0">
+<paragraph margin="20 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">
 Lawn Care, Snow Removal, Trash Removal, Water, and the Landlord shall also provideSome
 great services with all other utilities and services to be the responsibility of the Tenant(s).
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">MAINTENANCE, REPAIRS, OR ALTERATIONS:</text-chunk>
 <text-chunk font="times" font-size="12"> The Tenant(s) shall, at their own
 expense and at all times, maintain the Premises in a clean and sanitary manner, and shall
@@ -336,14 +336,14 @@ make sure they are fully charged.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="20 0 0 0">
+<paragraph margin="20 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">EARLY TERMINATION:</text-chunk>
 <text-chunk font="times" font-size="12"> The Tenant(s) may be allowed to cancel this Agreement under the
 following conditions:
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">
 The Tenant(s) must provide at least 60 days' notice and pay an early termination fee of
 ${{.TerminationFee}} (US Dollars) which does not include the rent due for the notice period. During the
@@ -351,7 +351,7 @@ notice period of 60 days the rent shall be paid in accordance with this Agreemen
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">
 PETS:
 </text-chunk>
@@ -359,7 +359,7 @@ PETS:
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">
 Two (2) pets on the Premises consisting of Birds, Cats, Dogs, Fish, Hamsters, Rabbits, with no
 other types of Pet(s) being allowed on the Premises or common areas, hereinafter known as the
@@ -371,7 +371,7 @@ condition at their expense. There shall be no limit on the weight of the pet. po
 </text-chunk>
 </paragraph>
 
-<paragraph margin="20 0 0 0">
+<paragraph margin="20 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">NOISE/WASTE: </text-chunk>
 <text-chunk font="times" font-size="12">The Tenant(s) agrees not to commit waste on the Premises, maintain, or
 permit to be maintained, a nuisance thereon, or use, or permit the Premises to be used, in an
@@ -380,7 +380,7 @@ noise ordinances.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">GUESTS: </text-chunk>
 <text-chunk font="times" font-size="12">There shall be no other persons living on the Premises other than the Tenant(s) and
 any Occupant(s). Guests of the Tenant(s) are allowed for periods not lasting for more than
@@ -389,7 +389,7 @@ forty-eight hours unless otherwise approved by the Landlord.
 </paragraph>
 
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">SMOKING POLICY: </text-chunk>
 <text-chunk font="times" font-size="12">Smoking on the Premises is prohibited on the entire property, including
 individual units, common areas, every building and adjoining properties.
@@ -401,7 +401,7 @@ Tenant(s) or any of the Occupant(s) of legal age constitutes notice to the Tenan
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">COMPLIANCE WITH LAW: </text-chunk>
 <text-chunk font="times" font-size="12">The Tenant(s) agrees that during the term of the Agreement, to
 promptly comply with any present and future laws, ordinances, orders, rules, regulations, and
@@ -412,7 +412,7 @@ against the Tenant(s), the Landlord, or both.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">DEFAULT: </text-chunk>
 <text-chunk font="times" font-size="12">If the Tenant(s) fails to comply with any of the financial or material provisions of
 this Agreement, or of any present rules and regulations or any that may be hereafter prescribed
@@ -428,7 +428,7 @@ equity and may immediately terminate this Agreement.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">
 The Tenant(s) will be in default if: (a) Tenant(s) does not pay rent or other amounts that are
 owed in accordance with respective State laws; (b) Tenant(s), their guests, or the Occupant(s)
@@ -443,7 +443,7 @@ Occupant(s) while on the Premises and/or; (g) as otherwise allowed by law
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">MULTIPLE TENANT(S) OR OCCUPANT(S): </text-chunk>
 <text-chunk font="times" font-size="12">Each individual that is considered a Tenant(s) is jointly and individually liable for all of this Agreement's obligations, including but
 not limited to rent monies. If any Tenant(s), guest, or Occupant(s) violates this Agreement, the
@@ -454,7 +454,7 @@ the agent of the Premise for the service of process.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">DISPUTES: </text-chunk>
 <text-chunk font="times" font-size="12">If a dispute arises during or after the term of this Agreement between the
 Landlord and Tenant(s), they shall agree to hold negotiations amongst themselves, in “good
@@ -463,7 +463,7 @@ faith”, before any litigation.
 </paragraph>
 
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">SEVERABILITY: </text-chunk>
 <text-chunk font="times" font-size="12">If any provision of this Agreement or the application thereof shall, for any
 reason and to any extent, be invalid or unenforceable, neither the remainder of this Agreement
@@ -472,7 +472,7 @@ thereby, but instead shall be enforced to the maximum extent permitted by law.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">SURRENDER OF PREMISES: </text-chunk>
 <text-chunk font="times" font-size="12">The Tenant(s) has surrendered the Premises when (a) the moveout date has passed and no one is living in the Premise within the Landlord’s reasonable
 judgment; or (b) Access to the Premise have been turned in to Landlord – whichever comes
@@ -482,7 +482,7 @@ tear thereof, and damages by the elements excepted.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">RETALIATION: </text-chunk>
 <text-chunk font="times" font-size="12">The Landlord is prohibited from making any type of retaliatory acts against
 the Tenant(s) including but not limited to restricting access to the Premises, decreasing or
@@ -491,7 +491,7 @@ that could be considered unjustified.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">WAIVER: </text-chunk>
 <text-chunk font="times" font-size="12">A Waiver by the Landlord for a breach of any covenant or duty by the Tenant(s),
 under this Agreement is not a waiver for a breach of any other covenant or duty by the
@@ -501,7 +501,7 @@ formal amendment to this Agreement and executed by the Tenant(s) and Landlord.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">EQUAL HOUSING: </text-chunk>
 <text-chunk font="times" font-size="12">If the Tenant(s) possess(es) any mental or physical impairment, the
 Landlord shall provide reasonable modifications to the Premises unless the modifications
@@ -511,7 +511,7 @@ seek the most appropriate route for providing the modifications to the Premises.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">HAZARDOUS MATERIALS: </text-chunk>
 <text-chunk font="times" font-size="12">The Tenant(s) agrees to not possess any type of personal
 property that could be considered a fire hazard such as a substance having flammable or explosive characteristics on the Premises. Items that are prohibited to be brought into the
@@ -521,13 +521,13 @@ other related content in the form of a liquid, solid, or gas.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">WATERBEDS: </text-chunk>
 <text-chunk font="times" font-size="12">The Tenant(s) is not permitted to furnish the Premises with waterbeds.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">INDEMNIFICATION: </text-chunk>
 <text-chunk font="times" font-size="12">The Landlord shall not be liable for any damage or injury to the
 Tenant(s), or any other person, or to any property, occurring on the Premises, or any part
@@ -537,7 +537,7 @@ recommended that renter's insurance be purchased at the Tenant(s)'s expense.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="20 0 0 0">
+<paragraph margin="20 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">COVENANTS: </text-chunk>
 <text-chunk font="times" font-size="12">The covenants and conditions herein contained shall apply to and bind the
 heirs, legal representatives, and assigns of the parties hereto, and all covenants are to be
@@ -545,37 +545,37 @@ construed as conditions of this Agreement
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">NOTICES: </text-chunk>
 <text-chunk font="times" font-size="12">Any notice to be sent by the Landlord or the Tenant(s) to each other shall use the
 following mailing addresses:
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">Landlord's/Agent's Mailing Address</text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">
 {{.CompanyName}}, ATTN. John Landlord
 {{.CompanyAddress}}
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">
 Tenant(s)'s Mailing Address
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">
 Alex Tenant and Joanna Tenant
 1 Main Street, Apt 4, Small Town, Alabama, 20992</text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">AGENT/MANAGER: </text-chunk>
 <text-chunk font="times" font-size="12">The Landlord authorizes the following to act on their behalf in regards
 to the Premises for any repair, maintenance, or compliant other than a breach of this
@@ -585,7 +585,7 @@ Number (888) 222-3333 and can be E-Mailed at email@email.com.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">PREMISES DEEMED UNINHABITABLE: </text-chunk>
 <text-chunk font="times" font-size="12">If the Property is deemed uninhabitable due to
 damage beyond reasonable repair the Tenant(s) will be able to terminate this Agreement by
@@ -596,7 +596,7 @@ proved by the Landlord.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">SERVICEMEMBERS CIVIL RELIEF ACT: </text-chunk>
 <text-chunk font="times" font-size="12">In the event the Tenant(s) is or hereafter
 becomes, a member of the United States Armed Forces on extended active duty and hereafter
@@ -615,21 +615,21 @@ damages to the Premises
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">LEAD PAINT: </text-chunk>
 <text-chunk font="times" font-size="12">The Premises was not constructed before 1978 and therefore does not contain
 leadbased paint.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">GOVERNING LAW: </text-chunk>
 <text-chunk font="times" font-size="12">This Agreement is to be governed under the laws located in the State of
 North Carolina
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">ADDITIONAL TERMS AND CONDITIONS: </text-chunk>
 <text-chunk font="times" font-size="12">In addition to the above stated terms and
 conditions of this Agreement, the Landlord and Tenant agree to the following: Additional
@@ -637,7 +637,7 @@ Terms are to be specified: Term 1, Term 2, Term 3
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">ENTIRE AGREEMENT: </text-chunk>
 <text-chunk font="times" font-size="12">This Agreement contains all the terms agreed to by the parties
 relating to its subject matter including any attachments or addendums. This Agreement replaces
@@ -649,7 +649,7 @@ The parties have agreed and executed this agreement on December 09 2020.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="420 0 10 0">
+<paragraph margin="420 0 10 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">
 LANDLORD(S) SIGNATURE
 </text-chunk>
@@ -660,7 +660,7 @@ LANDLORD(S) SIGNATURE
 <text-chunk font="times" font-size="12">John Landlord as President of Best Landlord Company</text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 20 0">
+<paragraph margin="18 0 20 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">
 TENANT(S) SIGNATURE
 </text-chunk>
@@ -672,7 +672,7 @@ TENANT(S) SIGNATURE
 {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
 
-<paragraph margin="0 0 0 0" text-align = "center">
+<paragraph margin="420 0 10 0" text-align = "center">
    <text-chunk font="times-bold" font-size="21.5">Security Deposit Receipt</text-chunk>
 </paragraph>
 
@@ -710,7 +710,7 @@ Pet Fee(s):</text-chunk>
 <text-chunk font="times" font-size="12"> $300.00 for all the Pet(s)</text-chunk>
 </paragraph>
 
-<paragraph text-align = "center">
+<paragraph margin="420 0 10 0" text-align="center">
    <text-chunk font="times-bold" font-size="18.5">Move-in Checklist</text-chunk>
 </paragraph>
 
