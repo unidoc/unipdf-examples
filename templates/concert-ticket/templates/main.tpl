@@ -4,7 +4,7 @@
             <text-chunk font="helvetica-bold" font-size="{{.FontSize}}">Epic Rock Concert</text-chunk>
         </paragraph>
         <paragraph text-align="left" margin="5 5 0 0">
-            <text-chunk font="helvetica" font-size="{{.SubFontSize}}">25.05.2021  7:30PM</text-chunk> 
+            <text-chunk font-size="{{.SubFontSize}}">{{.Time}}</text-chunk> 
         </paragraph>
         <line fit-mode="fill-width" position="relative" thickness= "2.0" margin="5 0 0 0"></line>
     </division>
@@ -25,7 +25,7 @@
     <table-cell>
         <division>
             <division margin="0 0 0 15">
-            {{template "header" dict "FontSize" 19 "SubFontSize" 11}}
+            {{template "header" dict "FontSize" 19 "SubFontSize" 11 "Time" (formatTime .EventTime "02.01.2006 03:04PM")}}
             </division>
                 <table columns="2" column-widths="0.3 0.7">
                 <table-cell>

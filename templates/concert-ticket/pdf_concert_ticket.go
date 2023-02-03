@@ -12,6 +12,8 @@ import (
 	"io"
 	"log"
 	"os"
+	"text/template"
+	"time"
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
@@ -29,6 +31,7 @@ type Field struct {
 
 // Ticket holds all data related to a ticket.
 type Ticket struct {
+	EventTime         string   `json:"event_time"`
 	TicketNumber      string   `json:"ticket_number"`
 	Detail            []Field  `json:"ticket_detail"`
 	RulesOfAttendance []string `json:"rules_of_attendance"`
@@ -67,6 +70,12 @@ func main() {
 	tplOpts := &creator.TemplateOptions{
 		ImageMap: map[string]*model.Image{
 			"qr-code": qrCode,
+		},
+		HelperFuncMap: template.FuncMap{
+			"formatTime": func(val, format string) string {
+				t, _ := time.Parse("2006-01-02T15:04:05Z", val)
+				return t.Format(format)
+			},
 		},
 	}
 
