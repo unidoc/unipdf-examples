@@ -73,6 +73,19 @@ func main() {
 				t, _ := time.Parse("2006-01-02T00:00:00", val)
 				return t.Format(format)
 			},
+			"listNames": func(tenants []string) string {
+				nameList := ""
+				for i, t := range tenants {
+					if i < (len(tenants) - 2) {
+						nameList = nameList + t + ", "
+					} else if i == (len(tenants) - 2) {
+						nameList = nameList + t + " and "
+					} else {
+						nameList = nameList + t
+					}
+				}
+				return nameList
+			},
 		},
 	}
 
@@ -94,8 +107,7 @@ func main() {
 		}
 		// Draw template.
 		data := map[string]interface{}{
-			"Date":       time.Now(),
-			"Statement":  rentalAgreement,
+			"Agreement":  rentalAgreement,
 			"PageNum":    pageNum,
 			"TotalPages": totalPages,
 		}

@@ -59,7 +59,7 @@
 </paragraph>
 
 <paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">2 individuals known as Alex Tenant and Joanna Tenant, hereinafter known as the “Tenant(s)”, agree to the following:</text-chunk>
+<text-chunk font="times" font-size="12">{{len .Tenants}} individuals known as {{listNames .Tenants}}, hereinafter known as the “Tenant(s)”, agree to the following:</text-chunk>
 </paragraph>
 
 <paragraph margin="18 0 0 0" line-height="1.1">
@@ -464,22 +464,22 @@ tear thereof, and damages by the elements excepted.
 </paragraph>
 
 <paragraph margin="18 0 0 0" line-height="1.1">
-   <text-chunk font="times-bold" font-size="12">RETALIATION: </text-chunk>
-   <text-chunk font="times" font-size="12">The Landlord is prohibited from making any type of retaliatory acts against
-      the Tenant(s) including but not limited to restricting access to the Premises, decreasing or
-      cancelling services or utilities, failure to repair appliances or fixtures, or any other type of act
-      that could be considered unjustified.
-   </text-chunk>
+<text-chunk font="times-bold" font-size="12">RETALIATION: </text-chunk>
+<text-chunk font="times" font-size="12">The Landlord is prohibited from making any type of retaliatory acts against
+the Tenant(s) including but not limited to restricting access to the Premises, decreasing or
+cancelling services or utilities, failure to repair appliances or fixtures, or any other type of act
+that could be considered unjustified.
+</text-chunk>
 </paragraph>
 
 <paragraph margin="18 0 0 0" line-height="1.1">
-   <text-chunk font="times-bold" font-size="12">WAIVER: </text-chunk>
-   <text-chunk font="times" font-size="12">A Waiver by the Landlord for a breach of any covenant or duty by the Tenant(s),
-      under this Agreement is not a waiver for a breach of any other covenant or duty by the
-      Tenant(s), or of any subsequent breach of the same covenant or duty. No provision of this
-      Agreement shall be considered waived unless such a waiver shall be expressed in writing as a
-      formal amendment to this Agreement and executed by the Tenant(s) and Landlord.
-   </text-chunk>
+<text-chunk font="times-bold" font-size="12">WAIVER: </text-chunk>
+<text-chunk font="times" font-size="12">A Waiver by the Landlord for a breach of any covenant or duty by the Tenant(s),
+under this Agreement is not a waiver for a breach of any other covenant or duty by the
+Tenant(s), or of any subsequent breach of the same covenant or duty. No provision of this
+Agreement shall be considered waived unless such a waiver shall be expressed in writing as a
+formal amendment to this Agreement and executed by the Tenant(s) and Landlord.
+</text-chunk>
 </paragraph>
 
 <paragraph margin="18 0 0 0" line-height="1.1">
