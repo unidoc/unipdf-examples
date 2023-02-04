@@ -10,10 +10,10 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"html/template"
 	"io"
 	"log"
 	"os"
+	"text/template"
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
