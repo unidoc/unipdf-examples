@@ -129,7 +129,6 @@ func main() {
 					}
 					return w
 				}
-
 				r := number % 10
 				if r == 0 {
 					w = NumberToWord[number]
