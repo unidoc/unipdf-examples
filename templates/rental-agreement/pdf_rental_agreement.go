@@ -13,26 +13,38 @@ import (
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type RentalAgreement struct {
-	Date                  string   `json:"date"`
-	CompanyName           string   `json:"company_name"`
-	CompanyAddress        string   `json:"company_address"`
-	Tenants               []string `json:"tenants"`
-	ApartmentAddress      string   `json:"apartment_address"`
-	UnitSize              int64    `json:"unit_size"`
-	BeginningDate         string   `json:"beginning_date"`
-	EndingDate            string   `json:"ending_date"`
-	MonthlyInstallment    string   `json:"monthly_installment"`
-	InsufficientFundFee   string   `json:"ins_fee_amount"`
-	LatePaymentFee        string   `json:"late_fee_amount"`
-	SecurityDeposit       string   `json:"sec_deposit_amount"`
-	PurchaseDepositAmount string   `json:"purchase_deposit_amount"`
-	PurchaseAmount        string   `json:"purchase_amount"`
-	PetFee                string   `json:"pet_fee_amount"`
-	TerminationFee        string   `json:"termination_fee"`
-	MoveInCheckList       struct {
+	Date                           string   `json:"date"`
+	CompanyName                    string   `json:"company_name"`
+	CompanyAddress                 string   `json:"company_address"`
+	Tenants                        []string `json:"tenants"`
+	ApartmentAddress               string   `json:"apartment_address"`
+	UnitSize                       int64    `json:"unit_size"`
+	BeginningDate                  string   `json:"beginning_date"`
+	EndingDate                     string   `json:"ending_date"`
+	MonthlyInstallment             string   `json:"monthly_installment"`
+	MinimumAbandonmentDays         int      `json:"minimum_abandonment_days"`
+	InsufficientFundFee            string   `json:"ins_fee_amount"`
+	LatePaymentFee                 string   `json:"late_fee_amount"`
+	SecurityDeposit                string   `json:"sec_deposit_amount"`
+	SecurityDepositReturnTime      int      `json:"security_deposit_return_time"`
+	PurchaseDepositAmount          string   `json:"purchase_deposit_amount"`
+	PurchaseAmount                 string   `json:"purchase_amount"`
+	ParkingSpacesDesc              string   `json:"parking_spaces_description"`
+	PetFee                         string   `json:"pet_fee_amount"`
+	TerminationFee                 string   `json:"termination_fee"`
+	TerminationNoticePeriod        int      `json:"early_termination_notice_period"`
+	NumberOfBedrooms               int      `json:"number_of_bedrooms"`
+	NumberOfBathRooms              float64  `json:"number_of_bathrooms"`
+	NumberOfAllowedPets            int      `json:"number_of_allowed_pets"`
+	NumberOfParkingSpaces          int      `json:"number_of_parking_spaces"`
+	CancellationNotificationPeriod int      `json:"cancellation_notification_period"`
+	ContinuationNotificationPeriod int      `json:"continuation_notification_period"`
+	MoveInCheckList                struct {
 		LivingRoom  []string `json:"living_room"`
 		DinningRoom []string `json:"dinning_room"`
 		Kitchen     []string `json:"kitchen"`
@@ -85,6 +97,33 @@ func main() {
 					}
 				}
 				return nameList
+			},
+			"computeMargin": func(text string) float64 {
+				// An arbitrary margin calculation to position the lines.
+				// Basically the number of the characters multiplied by 5 happens to position the line right next to the text.
+				// TODO maybe calculating the width of the text based on the font would make this accurate.
+				return float64(len(text)+10) * 5
+			},
+			"numberToWord": func(number int, capitalize bool) string {
+				w := ""
+				if number < 20 {
+					w = NumberToWord[number]
+					if capitalize {
+						w = cases.Title(language.English).String(w)
+					}
+					return w
+				}
+
+				r := number % 10
+				if r == 0 {
+					w = NumberToWord[number]
+				} else {
+					w = NumberToWord[number-r] + " " + NumberToWord[r]
+				}
+				if capitalize {
+					w = cases.Title(language.English).String(w)
+				}
+				return w
 			},
 		},
 	}
@@ -160,4 +199,34 @@ func readRentalAgreement(jsonFile string) (*RentalAgreement, error) {
 	}
 
 	return rentalAgreement, nil
+}
+
+var NumberToWord = map[int]string{
+	1:  "one",
+	2:  "two",
+	3:  "three",
+	4:  "four",
+	5:  "five",
+	6:  "six",
+	7:  "seven",
+	8:  "eight",
+	9:  "nine",
+	10: "ten",
+	11: "eleven",
+	12: "twelve",
+	13: "thirteen",
+	14: "fourteen",
+	15: "fifteen",
+	16: "sixteen",
+	17: "seventeen",
+	18: "eighteen",
+	19: "nineteen",
+	20: "twenty",
+	30: "thirty",
+	40: "forty",
+	50: "fifty",
+	60: "sixty",
+	70: "seventy",
+	80: "eighty",
+	90: "ninety",
 }

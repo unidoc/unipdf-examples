@@ -6,6 +6,9 @@
         "Alex Tenant",
         "Joanna Tenant"
     ],
+    "early_termination_notice_period": 60,
+    "cancellation_notification_period": 30,
+    "continuation_notification_period": 60,
     "apartment_address": "1 Main Street, Apt 4, Small Town, Alabama, 20992",
     "unit_size": 2,
     "beginning_date": "2020-12-03T00:00:00",
@@ -18,10 +21,13 @@
     "purchase_deposit_amount": "4,500.00",
     "pet_fee_amount": "300.00",
     "termination_fee": "1,000.00",
+    "number_of_bedrooms": 2,
+    "number_of_bathrooms": 2.5,
     "security_deposit_return_time": 14,
+    "minimum_abandonment_days": 7,
     "number_of_parking_spaces": 2,
-    "early_termination": 60,
     "number_of_allowed_pets": 2,
+    "parking_spaces_description": "1 outdoor parking space and 1 indoor garage parking space",
     "move_in_check_list": {
         "living_room": [
             "Floors",

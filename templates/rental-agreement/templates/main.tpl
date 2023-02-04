@@ -1,10 +1,11 @@
 {{define "checklist" }}
+{{$margin := computeMargin .}}
 <table-cell>
    <division margin="5 0 5 0">
    <paragraph>
       <text-chunk>{{.}} Condition </text-chunk>
    </paragraph>
-   <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 90"></line>
+   <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 {{$margin}}"></line>
    </division>
 </table-cell>
 <table-cell >
@@ -15,15 +16,6 @@
       <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 80"></line>
    </division>
 </table-cell>
-{{end}}
-
-{{define "simple-paragraph"}}
-{{$head_text := .Head}}
-{{$text := .Content}}
-<paragraph margin="20 0 0 0">
-<text-chunk font="times-bold" font-size="12">{{$head_text}}</text-chunk>
-<text-chunk font="times" font-size="12">{{$text}}</text-chunk>
-</paragraph>
 {{end}}
 
 {{ define "form-sig"}}
@@ -39,12 +31,10 @@
 {{ define "simple-form"}}
    {{$margin := .Margin}}
    {{$text := .Text}}
-   <division>
       <paragraph>
          <text-chunk font= "times" font-size="11">{{$text}} </text-chunk>
       </paragraph>
       <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="{{$margin}}"></line>
-   </division>
 {{end}}
 <paragraph margin="0 0 10 0" text-align="center" line-height="1.1">
    <text-chunk font="times-bold" font-size="20"> LEASE WITH OPTION TO PURCHASE </text-chunk>
@@ -65,12 +55,12 @@
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">OCCUPANT(S): </text-chunk>
 <text-chunk font="times" font-size="12">The Premises is to be occupied strictly as a residential dwelling with the
-following Two (2) Occupants to reside on the Premises in addition to the Tenant(s) mentioned above: Alex Jr Tenant and Jill Tenant, hereinafter known as the “Occupant(s)”.</text-chunk>
+following {{numberToWord (len .Tenants) true}} ({{len .Tenants}}) Occupants to reside on the Premises in addition to the Tenant(s) mentioned above: {{listNames .Tenants}}, hereinafter known as the “Occupant(s)”.</text-chunk>
 </paragraph>
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">OFFER TO RENT: </text-chunk>
-<text-chunk font="times" font-size="12">The Landlord hereby rents to the Tenant(s), subject to the following terms and conditions of this Agreement, an apartment with the address of {{.ApartmentAddress}} consisting of 2.5 bathroom(s) and 2 bedroom(s) hereinafter known as the “Premises”. The Landlord may also use the address for notices sent to the Tenant(s).</text-chunk>
+<text-chunk font="times" font-size="12">The Landlord hereby rents to the Tenant(s), subject to the following terms and conditions of this Agreement, an apartment with the address of {{.ApartmentAddress}} consisting of {{.NumberOfBathRooms}} bathroom(s) and {{.NumberOfBedrooms}} bedroom(s) hereinafter known as the “Premises”. The Landlord may also use the address for notices sent to the Tenant(s).</text-chunk>
 </paragraph>
 
 <paragraph margin="18 0 0 0" line-height="1.1">
@@ -99,16 +89,16 @@ professional service(s), or for any commercial use unless otherwise stated in th
 Microwave, Outdoor Grill, Oven(s), Refrigerator, Stove(s), Washer (for Laundry), and any
 other unnamed appliances existing on the Premises. Any damage to the Landlord's appliances
 shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.</text-chunk>
- </paragraph>
+</paragraph>
  
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">LEASE TERM: </text-chunk>
 <text-chunk font="times" font-size="12"> This Agreement shall be a fixed-period arrangement beginning on {{formatTime .BeginningDate "December 9 2006"}} and ending on {{formatTime .EndingDate "December 9 2006"}} with the Tenant(s) having the option to continue to 
 occupy the Premises under the same terms and conditions of this Agreement under a 
 Month-to-Month arrangement (Tenancy at Will) with either the Landlord or Tenant having the 
-option to cancel the tenancy with at least thirty (30) days notice or the minimum time-period set 
+option to cancel the tenancy with at least {{numberToWord .CancellationNotificationPeriod false}}thirty ({{.CancellationNotificationPeriod}}) days notice or the minimum time-period set 
 by the State, whichever is shorter. For the Tenant to continue under Month-to-Month tenancy at 
-the expiration of the Lease Term, the Landlord must be notified within sixty (60) days before 
+the expiration of the Lease Term, the Landlord must be notified within {{numberToWord .ContinuationNotificationPeriod false}} ({{.ContinuationNotificationPeriod}}) days before 
 the end of the Lease Term. Hereinafter known as the “Lease Term”.</text-chunk>
 </paragraph>
 
@@ -160,7 +150,7 @@ is due.
 <text-chunk font="times" font-size="12">A Security Deposit in the amount of ${{.SecurityDeposit}} (US Dollars) shall be
 required by the Tenant(s) at the execution of this Agreement to the Landlord for the faithful
 performance of all the terms and conditions. The Security Deposit is to be returned to the
-Tenant(s) within 14 days after this Agreement has terminated, less any damage charges and
+Tenant(s) within {{.SecurityDepositReturnTime}} days after this Agreement has terminated, less any damage charges and
 without interest. This Security Deposit shall not be credited towards rent unless the Landlord
 gives their written consent.
 </text-chunk>
@@ -238,7 +228,7 @@ sub-let shall not be deemed to be consent to any subsequent subletting.
 <paragraph margin="20 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">ABANDONMENT:</text-chunk>
 <text-chunk font="times" font-size="12">If the Tenant(s) vacates or abandons the property for a time-period that is
-the minimum set by State law or seven (7) days, whichever is less, the Landlord shall have the
+the minimum set by State law or {{numberToWord .MinimumAbandonmentDays false}} ({{.MinimumAbandonmentDays}}) days, whichever is less, the Landlord shall have the
 right to terminate this Agreement immediately and remove all belongings including any
 personal property off of the Premises. If the Tenant(s) vacates or abandons the property, the
 Landlord shall immediately have the right to terminate this Agreement.
@@ -255,14 +245,14 @@ any subsequent assignment.
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">PARKING:</text-chunk>
-<text-chunk font="times" font-size="12">The Landlord shall provide the Tenant(s) 2 Parking Spaces.
+<text-chunk font="times" font-size="12">The Landlord shall provide the Tenant(s) {{.NumberOfParkingSpaces}} Parking Spaces.
 </text-chunk>
 </paragraph>
 
 
 <paragraph margin="20 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">The Landlord shall not charge a fee for the 2 Parking Spaces. The Parking Space(s) can be
-described as: 1 outdoor parking space and 1 indoor garage parking space provided
+<text-chunk font="times" font-size="12">The Landlord shall not charge a fee for the {{.NumberOfParkingSpaces}}} Parking Spaces. The Parking Space(s) can be
+described as: {{.ParkingSpacesDesc}}} provided
 </text-chunk>
 </paragraph>
 
@@ -326,9 +316,9 @@ following conditions:
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">
-The Tenant(s) must provide at least 60 days' notice and pay an early termination fee of
+The Tenant(s) must provide at least {{.TerminationNoticePeriod}} days' notice and pay an early termination fee of
 ${{.TerminationFee}} (US Dollars) which does not include the rent due for the notice period. During the
-notice period of 60 days the rent shall be paid in accordance with this Agreement.
+notice period of {{.TerminationNoticePeriod}} days the rent shall be paid in accordance with this Agreement.
 </text-chunk>
 </paragraph>
 
@@ -342,7 +332,7 @@ PETS:
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">
-Two (2) pets on the Premises consisting of Birds, Cats, Dogs, Fish, Hamsters, Rabbits, with no
+{{numberToWord .NumberOfAllowedPets true}} ({{.NumberOfAllowedPets}}) pets on the Premises consisting of Birds, Cats, Dogs, Fish, Hamsters, Rabbits, with no
 other types of Pet(s) being allowed on the Premises or common areas, hereinafter known as the
 “Pet(s)”. The Tenant(s) shall be required to pay a pet fee in the amount of ${{.PetFee}} for all the
 Pet(s) which is refundable at the end of the Lease Term only if there is no damage to the
@@ -635,8 +625,9 @@ The parties have agreed and executed this agreement on December 09 2020.
 LANDLORD(S) SIGNATURE
 </text-chunk>
 </paragraph>
-
+<division margin="0 60 0 0">
 {{template "form-sig" dict "Margin" "0 0 0 110" "Text" "Landlord’s Signature"}}
+</division>
 <paragraph margin = "5 0 0 0">
 <text-chunk font="times" font-size="12">John Landlord as President of Best Landlord Company</text-chunk>
 </paragraph>
@@ -646,10 +637,10 @@ LANDLORD(S) SIGNATURE
 TENANT(S) SIGNATURE
 </text-chunk>
 </paragraph>
-
+<division margin="0 60 0 0">
 {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
-
-<division margin="18 0 20 0">
+</division>
+<division margin="18 60 20 0">
 {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
 
@@ -696,7 +687,7 @@ Pet Fee(s):</text-chunk>
 <text-chunk font="times" font-size="11">
 Property Address: {{.ApartmentAddress}}
 Unit Size: {{.UnitSize}} bedroom(s)
-Move-in Inspection Date: __________________________ Move-out Inspection Date: ___________________                                 
+Move-in Inspection Date: ___________________ Move-out Inspection Date: _________________                                 
 </text-chunk>
 </paragraph>
 
