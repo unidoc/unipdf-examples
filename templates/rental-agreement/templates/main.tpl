@@ -19,22 +19,18 @@
 {{end}}
 
 {{ define "form-sig"}}
-   {{$margin := .Margin}}
-   {{$text := .Text}}
    <division>
       <paragraph>
-         <text-chunk font= "times-bold" font-size="11">{{$text}}: </text-chunk>
+         <text-chunk font= "times-bold" font-size="11">{{.Text}}: </text-chunk>
       </paragraph>
-      <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="{{$margin}}"></line>
+      <line fit-mode="fill-width" position="relative" thickness= "0.2" margin="{{.Margin}}"></line>
    </division>
 {{end}}
 {{ define "simple-form"}}
-   {{$margin := .Margin}}
-   {{$text := .Text}}
       <paragraph>
-         <text-chunk font= "times" font-size="11">{{$text}} </text-chunk>
+         <text-chunk font= "times" font-size="11">{{.Text}} </text-chunk>
       </paragraph>
-      <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="{{$margin}}"></line>
+      <line fit-mode="fill-width" position="relative" thickness= "0.2" margin="{{.Margin}}"></line>
 {{end}}
 <paragraph margin="0 0 10 0" text-align="center" line-height="1.1">
    <text-chunk font="times-bold" font-size="20"> LEASE WITH OPTION TO PURCHASE </text-chunk>
@@ -49,13 +45,13 @@
 </paragraph>
 
 <paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">{{len .Tenants}} individuals known as {{listNames .Tenants}}, hereinafter known as the “Tenant(s)”, agree to the following:</text-chunk>
+<text-chunk font="times" font-size="12">{{len .Tenants}} individuals known as {{listItems .Tenants true}}, hereinafter known as the “Tenant(s)”, agree to the following:</text-chunk>
 </paragraph>
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">OCCUPANT(S): </text-chunk>
 <text-chunk font="times" font-size="12">The Premises is to be occupied strictly as a residential dwelling with the
-following {{numberToWord (len .Tenants) true}} ({{len .Tenants}}) Occupants to reside on the Premises in addition to the Tenant(s) mentioned above: {{listNames .Tenants}}, hereinafter known as the “Occupant(s)”.</text-chunk>
+following {{numberToWord (len .Tenants) true}} ({{len .Tenants}}) Occupants to reside on the Premises in addition to the Tenant(s) mentioned above: {{listItems .Tenants true}}, hereinafter known as the “Occupant(s)”.</text-chunk>
 </paragraph>
 
 <paragraph margin="18 0 0 0" line-height="1.1">
@@ -76,7 +72,7 @@ professional service(s), or for any commercial use unless otherwise stated in th
 </paragraph>
 
 <paragraph margin="20 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">Bedroom Set(s), Dining Room Set(s), Living Room Set(s) and all other furnishings to be provided by the Tenant(s). Any damage to the Landlord's furnishings shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.</text-chunk>
+<text-chunk font="times" font-size="12">{{listItems .FurnishingItems false}} and all other furnishings to be provided by the Tenant(s). Any damage to the Landlord's furnishings shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.</text-chunk>
 </paragraph>
 
 <paragraph margin="20 0 0 0" line-height="1.1">
@@ -85,8 +81,7 @@ professional service(s), or for any commercial use unless otherwise stated in th
 </paragraph>
 
 <paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">Air Conditioner(s), Dishwasher, Dryer (for Laundry), Fan(s), Hot Water Heater, HVAC,
-Microwave, Outdoor Grill, Oven(s), Refrigerator, Stove(s), Washer (for Laundry), and any
+<text-chunk font="times" font-size="12">{{listItems .ProvidedAPPliances false}} and any
 other unnamed appliances existing on the Premises. Any damage to the Landlord's appliances
 shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.</text-chunk>
 </paragraph>
@@ -250,8 +245,8 @@ any subsequent assignment.
 </paragraph>
 
 
-<paragraph margin="20 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">The Landlord shall not charge a fee for the {{.NumberOfParkingSpaces}}} Parking Spaces. The Parking Space(s) can be
+<paragraph margin="18 0 0 0" line-height="1.1">
+<text-chunk font="times" font-size="12">The Landlord shall not charge a fee for the {{.NumberOfParkingSpaces}} Parking Spaces. The Parking Space(s) can be
 described as: {{.ParkingSpacesDesc}}} provided
 </text-chunk>
 </paragraph>
@@ -267,7 +262,7 @@ purchasers, mortgagees, or lessees upon reasonable notice.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="20 0 0 0" line-height="1.1">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">SALE OF PROPERTY:</text-chunk>
 <text-chunk font="times" font-size="12">If the Premises is sold, the Tenant(s) is to be notified of the new
 Owner, and if there is a new Manager, their contact details for repairs and maintenance shall be
@@ -529,7 +524,7 @@ following mailing addresses:
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">
-{{.CompanyName}}, ATTN. John Landlord
+{{.CompanyName}}, ATTN. {{.LandLord}}
 {{.CompanyAddress}}
 </text-chunk>
 </paragraph>
@@ -542,17 +537,16 @@ Tenant(s)'s Mailing Address
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">
-Alex Tenant and Joanna Tenant
-1 Main Street, Apt 4, Small Town, Alabama, 20992</text-chunk>
+{{listItems .Tenants true}}
+{{.TenantsMailingAddress}}</text-chunk>
 </paragraph>
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">AGENT/MANAGER: </text-chunk>
 <text-chunk font="times" font-size="12">The Landlord authorizes the following to act on their behalf in regards
 to the Premises for any repair, maintenance, or compliant other than a breach of this
-Agreement: The The management company known as Best Management Company of 5 Maple
-Ave, Suite 12A, Best City, Alabama, 29277 that can be contacted at the following Phone
-Number (888) 222-3333 and can be E-Mailed at email@email.com.
+Agreement: The The management company known as {{.ManagementCompany}} of {{.ManagementCompanyAddress}} that can be contacted at the following Phone
+Number {{.ManagementPhoneNumber}} and can be E-Mailed at {{.ManagementCompanyEmail}}.
 </text-chunk>
 </paragraph>
 
@@ -574,7 +568,7 @@ becomes, a member of the United States Armed Forces on extended active duty and 
 the Tenant(s) receives permanent change of station (PCS) orders to depart from the area where
 the Premises are located, or is relieved from active duty, retires or separates from the military,
 is ordered into military housing, or receives deployment orders, then in any of these events, the
-Tenant may terminate this lease upon giving thirty (30) days written notice to the Landlord.
+Tenant may terminate this lease upon giving {{numberToWord .LeaseTerminationOfServiceMembers false}} ({{.LeaseTerminationOfServiceMembers}}) days written notice to the Landlord.
 The Tenant shall also provide to the Landlord a copy of the official orders or a letter signed by
 the Tenant’s commanding officer, reflecting the change which warrants termination under this
 clause. The Tenant will pay prorated rent for any days which he/she occupies the dwelling past
@@ -588,7 +582,7 @@ damages to the Premises
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">LEAD PAINT: </text-chunk>
-<text-chunk font="times" font-size="12">The Premises was not constructed before 1978 and therefore does not contain
+<text-chunk font="times" font-size="12">The Premises was not constructed before {{.ConstructedBefore}} and therefore does not contain
 leadbased paint.
 </text-chunk>
 </paragraph>
@@ -596,7 +590,7 @@ leadbased paint.
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">GOVERNING LAW: </text-chunk>
 <text-chunk font="times" font-size="12">This Agreement is to be governed under the laws located in the State of
-North Carolina
+{{.StateName}}
 </text-chunk>
 </paragraph>
 
@@ -616,7 +610,7 @@ all previous discussions, understandings, and oral agreements. The Landlord and 
 agree to the terms and conditions and shall be bound until the end of the Lease Term.
 </text-chunk>
 <text-chunk font="times" font-size="12" margin="20 0 0 0">
-The parties have agreed and executed this agreement on December 09 2020.
+The parties have agreed and executed this agreement on {{formatTime .Date "December 9 2006"}}.
 </text-chunk>
 </paragraph>
 
@@ -629,7 +623,7 @@ LANDLORD(S) SIGNATURE
 {{template "form-sig" dict "Margin" "0 0 0 110" "Text" "Landlord’s Signature"}}
 </division>
 <paragraph margin = "5 0 0 0">
-<text-chunk font="times" font-size="12">John Landlord as President of Best Landlord Company</text-chunk>
+<text-chunk font="times" font-size="12">{{.LandLord }} as President of {{.LandLord}}</text-chunk>
 </paragraph>
 
 <paragraph margin="18 0 20 0" line-height="1.1">
@@ -659,12 +653,16 @@ the City of __________________________________________ , State of ______________
 The Security Deposit in the amount of $ _____________________ (US Dollars) has been deposited in
 ___________________ [Bank Name] with the Account Number of _________________ for the full
 performance of the Lease executed on the _____ day of _______________ , 20 ___.
-Sincerely,                                    .
+Sincerely,
 </text-chunk>
-<text-chunk font="times-bold" font-size="12"> Landlord’s Signature _________________________</text-chunk>
 </paragraph>
+</division>
+<division margin="20 0 30 0">
+{{template "form-sig" dict "Margin" "0 200 0 110" "Text" "Landlord’s Signature"}}
+</division>
 
-<paragraph margin="480 0 30 0" text-align = "center">
+<division margin="480 0 30 0">
+<paragraph text-align = "center">
    <text-chunk font="times" font-size="12">AMOUNT ($) DUE AT SIGNING</text-chunk>
 </paragraph>
 </division>
