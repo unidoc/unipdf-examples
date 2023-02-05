@@ -18,44 +18,56 @@ import (
 )
 
 type RentalAgreement struct {
-	Date                             string   `json:"date"`
-	CompanyName                      string   `json:"company_name"`
-	CompanyAddress                   string   `json:"company_address"`
-	FurnishingItems                  []string `json:"furnishing_items"`
-	ProvidedAPPliances               []string `json:"provided_appliances"`
-	Tenants                          []string `json:"tenants"`
-	ApartmentAddress                 string   `json:"apartment_address"`
-	UnitSize                         int64    `json:"unit_size"`
-	BeginningDate                    string   `json:"beginning_date"`
-	EndingDate                       string   `json:"ending_date"`
-	MonthlyInstallment               string   `json:"monthly_installment"`
-	MinimumAbandonmentDays           int      `json:"minimum_abandonment_days"`
-	ManagementCompany                string   `json:"management_company"`
-	ManagementCompanyAddress         string   `json:"management_company_address"`
-	ManagementPhoneNumber            string   `json:"management_company_phone"`
-	ManagementCompanyEmail           string   `json:"management_company_email"`
-	InsufficientFundFee              string   `json:"ins_fee_amount"`
-	LatePaymentFee                   string   `json:"late_fee_amount"`
-	LandLord                         string   `json:"landlord"`
-	SecurityDeposit                  string   `json:"sec_deposit_amount"`
-	SecurityDepositReturnTime        int      `json:"security_deposit_return_time"`
-	StateName                        string   `json:"state_name"`
-	PurchaseDepositAmount            string   `json:"purchase_deposit_amount"`
-	PurchaseAmount                   string   `json:"purchase_amount"`
-	ParkingSpacesDesc                string   `json:"parking_spaces_description"`
-	PetFee                           string   `json:"pet_fee_amount"`
-	TerminationFee                   string   `json:"termination_fee"`
-	TerminationNoticePeriod          int      `json:"early_termination_notice_period"`
-	TenantsMailingAddress            string   `json:"tenant_mailing_address"`
-	NumberOfBedrooms                 int      `json:"number_of_bedrooms"`
-	NumberOfBathRooms                float64  `json:"number_of_bathrooms"`
-	NumberOfAllowedPets              int      `json:"number_of_allowed_pets"`
-	NumberOfParkingSpaces            int      `json:"number_of_parking_spaces"`
-	LeaseTerminationOfServiceMembers int      `json:"lease_termination_for_service_members"`
-	CancellationNotificationPeriod   int      `json:"cancellation_notification_period"`
-	ContinuationNotificationPeriod   int      `json:"continuation_notification_period"`
-	ConstructedBefore                int      `json:"constructed_before"`
-	MoveInCheckList                  struct {
+	Date                             string `json:"date"`
+	BeginningDate                    string `json:"beginning_date"`
+	EndingDate                       string `json:"ending_date"`
+	MonthlyInstallment               string `json:"monthly_installment"`
+	MinimumAbandonmentDays           int    `json:"minimum_abandonment_days"`
+	InsufficientFundFee              string `json:"ins_fee_amount"`
+	LatePaymentFee                   string `json:"late_fee_amount"`
+	SecurityDeposit                  string `json:"sec_deposit_amount"`
+	SecurityDepositReturnTime        int    `json:"security_deposit_return_time"`
+	PurchaseDepositAmount            string `json:"purchase_deposit_amount"`
+	PurchaseAmount                   string `json:"purchase_amount"`
+	PetFee                           string `json:"pet_fee_amount"`
+	TerminationFee                   string `json:"termination_fee"`
+	TerminationNoticePeriod          int    `json:"early_termination_notice_period"`
+	TenantsMailingAddress            string `json:"tenant_mailing_address"`
+	NumberOfAllowedPets              int    `json:"number_of_allowed_pets"`
+	NumberOfParkingSpaces            int    `json:"number_of_parking_spaces"`
+	LeaseTerminationOfServiceMembers int    `json:"lease_termination_for_service_members"`
+	CancellationNotificationPeriod   int    `json:"cancellation_notification_period"`
+	ContinuationNotificationPeriod   int    `json:"continuation_notification_period"`
+	Company                          struct {
+		Name     string `json:"name"`
+		Address  string `json:"address"`
+		Location string `json:"location"`
+		LandLord string `json:"landlord"`
+	} `json:"company"`
+	Manager struct {
+		Company string `json:"company"`
+		Address string `json:"address"`
+		Phone   string `json:"phone"`
+		Email   string `json:"email"`
+	} `json:"manager"`
+	Apartment struct {
+		Bedrooms           int      `json:"number_of_bedrooms"`
+		Bathrooms          float64  `json:"number_of_bathrooms"`
+		UnitSize           int      `json:"unit_size"`
+		Address            string   `json:"address"`
+		FurnishingItems    []string `json:"furnishing_items"`
+		ProvidedAPPliances []string `json:"provided_appliances"`
+		Utilities          []string `json:"utility_services"`
+		AllowedPets        []string `json:"allowed_pets_list"`
+		ConstructedBefore  int      `json:"constructed_before"`
+		ParkingSpaces      int      `json:"number_of_parking_spaces"`
+		ParkingSpaceDesc   string   `json:"parking_spaces_description"`
+	} `json:"apartment"`
+	Tenant struct {
+		Names          []string `json:"names"`
+		MailingAddress string   `json:"mailing_address"`
+	} `json:"tenant"`
+	MoveInCheckList struct {
 		LivingRoom  []string `json:"living_room"`
 		DinningRoom []string `json:"dinning_room"`
 		Kitchen     []string `json:"kitchen"`
@@ -76,7 +88,7 @@ func init() {
 
 func main() {
 	c := creator.New()
-	c.SetPageMargins(90, 60, 90, 120)
+	c.SetPageMargins(90, 60, 90, 135)
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
 	if err != nil {
@@ -87,6 +99,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// Create template options.
 	tplOpts := &creator.TemplateOptions{
 		FontMap: map[string]*model.PdfFont{
 			"arial-bold": arialBold,
@@ -115,15 +128,15 @@ func main() {
 			},
 			"computeMargin": func(text string) float64 {
 				// An arbitrary margin calculation to position the lines.
-				// Basically the number of the characters multiplied by 5 happens to position the line right next to the text.
-				// TODO may be calculating the width of the text based on the font would make this accurate.
+				// Basically the number of the characters multiplied by 5 happens to position the line approximately right next to the text.
+				// TODO may be calculating the width of the text from the font object would make this accurate.
 				return float64(len(text)+10) * 5
 			},
-			// converts number to their respective name words.
+			// converts numbers to their respective names.
 			"numberToWord": func(number int, capitalize bool) string {
 				w := ""
 				if number < 20 {
-					w = NumberToWord[number]
+					w = numberToWord[number]
 					if capitalize {
 						w = cases.Title(language.English).String(w)
 					}
@@ -131,9 +144,9 @@ func main() {
 				}
 				r := number % 10
 				if r == 0 {
-					w = NumberToWord[number]
+					w = numberToWord[number]
 				} else {
-					w = NumberToWord[number-r] + " " + NumberToWord[r]
+					w = numberToWord[number-r] + " " + numberToWord[r]
 				}
 				if capitalize {
 					w = cases.Title(language.English).String(w)
@@ -148,7 +161,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Draw the main template.
+	// Draw main template.
 	if err := c.DrawTemplate(mainTpl, rentalAgreement, tplOpts); err != nil {
 		log.Fatal(err)
 	}
@@ -216,8 +229,8 @@ func readRentalAgreement(jsonFile string) (*RentalAgreement, error) {
 	return rentalAgreement, nil
 }
 
-// NumberToWord is a dictionary that maps numeric representation to their respective names in english.
-var NumberToWord = map[int]string{
+// numberToWord is a dictionary that maps numbers to their respective names in english.
+var numberToWord = map[int]string{
 	1:  "one",
 	2:  "two",
 	3:  "three",
