@@ -12,10 +12,6 @@
         "phone": "(888) 222-3333",
         "email": "email@email.com"
     },
-    "tenants": [
-        "Alex Tenant",
-        "Joanna Tenant"
-    ],
     "apartment": {
         "number_of_bedrooms": 2,
         "number_of_bathrooms": 2.5,
