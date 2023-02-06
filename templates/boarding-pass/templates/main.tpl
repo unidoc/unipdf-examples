@@ -24,7 +24,7 @@
     {{template "table-cell-paragraph" (extendDict $props "Rowspan" 3 "Margin" "0 20" "Align" "right" "Font" "helvetica" "FontSize" 10 "LineHeight" 1.5 "Text" (printf "ETK:\n%s\nReg No:%s" .Etk .RegNumber )) }}
 
     <table-cell indent="0" rowspan="3" background-color="#ffffff">
-        <image src="qr-code-1" fit-mode="fill-width" margin="00"></image>
+        <image src="qr-code-1" fit-mode="fill-width"></image>
     </table-cell>
 
     {{template "table-cell-paragraph" (extendDict $props "Rowspan" 1 "Margin" "0" "Align" "left" "Font" "helvetica-bold" "FontSize" 14 "LineHeight" 1.0 "Text" "Boarding pass") }}
@@ -58,7 +58,7 @@
     <table-cell border-width-bottom="1" indent="0" background-color="#ffffff">
         <table columns="2" column-widths="0.1 0.9">
             <table-cell indent="0" vertical-align="middle">
-                <image src="path('templates/res/seat_icon.png')" fit-mode="fill-width" margin="0"></image>
+                <image src="path('templates/res/seat_icon.png')" fit-mode="fill-width"></image>
             </table-cell>
 
             {{template "table-cell-paragraph" (extendDict $props "Margin" "0" "BorderBottomSize" 0 "TextColor" "#ff0000" "Text" .Seat ) }}
@@ -83,7 +83,7 @@
 
 {{template "boarding-pass-form" . }}
 
-<table columns="2" column-widths="0.5 0.5">
+<table columns="2">
     {{template "table-cell-paragraph" (extendDict $props "Colspan" 2 "BorderBottomSize" 2 "Margin" "10 0 0 0" "Font" "helvetica-bold" "FontSize" 10 "TextColor" "#000000" "Text" "What's next?" )}}
 
     <table-cell indent="0">
