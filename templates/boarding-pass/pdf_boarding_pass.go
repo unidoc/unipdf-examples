@@ -45,7 +45,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Read boarding pass data json.
+	// Read boarding pass JSON data.
 	pass, err := readBoardingPassData("boarding_pass.json")
 	if err != nil {
 		log.Fatal(err)
