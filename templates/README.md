@@ -13,6 +13,6 @@ modified without the need to rebuild the application.
 - [Sample Security Report](security-report): showcases the usage of creator templates by creating a sample security report.
 - [Sample Airplane Ticket](airplane-ticket): showcases the usage of creator templates by creating a sample airplane ticket.
 - [Sample Bank Account Statement](bank-account-statement): showcases the usage of creator templates by creating a sample bank account statement.
+- [Sample Boarding Pass Document](boarding-pass): showcases the usage of creator templates by creating a sample boarding pass document.
 - [Sample Trade Confirmation Document](trade-confirmation): showcases the usage of creator templates by creating a sample trade confirmation document.
-
 - [Sample Receipt Document](receipt): showcases the usage of creator templates by creating a receipt document.
