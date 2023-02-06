@@ -51,21 +51,25 @@ func init() {
 func main() {
 	c := creator.New()
 	c.SetPageMargins(20, 20, 20, 20)
+
 	// Create qrCode.
 	qrCode, err := createQRCode("https://github.com/unidoc/unipdf-examples/tree/master/templates/concert-ticket/", 500, 500)
 	if err != nil {
 		panic(err)
 	}
+
 	// Read ticket data.
 	ticket, err := readTemplateData("./concert-ticket.json")
 	if err != nil {
 		panic(err)
 	}
+
 	// Read template file.
 	tpl, err := readTemplate("./templates/main.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// Draw main content template.
 	tplOpts := &creator.TemplateOptions{
 		ImageMap: map[string]*model.Image{
