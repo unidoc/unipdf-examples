@@ -89,7 +89,7 @@ func init() {
 
 func main() {
 	c := creator.New()
-	c.SetPageMargins(90, 60, 90, 135)
+	c.SetPageMargins(90, 60, 95, 135)
 
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
@@ -129,7 +129,7 @@ func main() {
 				}
 				return nameList
 			},
-			"computeMargin": func(text, stdFontName string) float64 {
+			"getWidth": func(text, stdFontName string) float64 {
 
 				// Margin calculation to position the lines.
 				stdFont := model.StdFontName(stdFontName)
@@ -198,7 +198,7 @@ func main() {
 			"PageNum":    pageNum,
 			"TotalPages": totalPages,
 		}
-		if err := block.DrawTemplate(c, tpl, data, nil); err != nil {
+		if err := block.DrawTemplate(c, tpl, data, tplOpts); err != nil {
 			log.Fatal(err)
 		}
 	}

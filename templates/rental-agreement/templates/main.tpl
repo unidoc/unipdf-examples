@@ -1,15 +1,15 @@
 {{define "checklist" }}
-{{$margin := computeMargin .}}
+{{$margin := getWidth (printf "%s%s" . " Condition ") "Times-Roman"}}
 <table-cell>
-   <division margin="5 0 5 0">
+   <division margin="5 0">
    <paragraph>
-      <text-chunk>{{.}} Condition </text-chunk>
+      <text-chunk font = "times">{{.}} Condition </text-chunk>
    </paragraph>
    <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 {{$margin}}"></line>
    </division>
 </table-cell>
 <table-cell >
-   <division margin="5 0 5 0">
+   <division margin="5 0">
       <paragraph>
          <text-chunk>Specific Damage </text-chunk>
       </paragraph>
@@ -36,7 +36,7 @@
    <text-chunk font="times-bold" font-size="20"> LEASE WITH OPTION TO PURCHASE </text-chunk>
 </paragraph>
 
-<paragraph margin="23 0 0 0" line-height="1.1">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">This agreement, dated {{formatTime .Date "December 9 2006"}}, by and between a business entity known as {{.Company.Name}} of {{.Company.Address}}, hereinafter known as the “Landlord”.</text-chunk>
 </paragraph>
 
@@ -196,17 +196,16 @@ Premises. Duplicate copies of the access provided may only be authorized under t
 </text-chunk>
 </paragraph>
 
-<paragraph margin="20 0 0 0" line-height="1.1">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">MOVE-IN INSPECTION: </text-chunk>
 <text-chunk font="times" font-size="12">Before, at the time of the Tenant(s) accepting possession, or
 shortly thereafter, the Landlord and Tenant(s) shall perform an inspection documenting the
 present condition of all appliances, fixtures, furniture, and any existing damage within the Premises.
-
 </text-chunk>
 </paragraph>
 
 
-<paragraph margin="18 0 0 0" line-height="1.1">
+<paragraph margin="20 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">SUBLETTING: </text-chunk>
 <text-chunk font="times" font-size="12">The Tenant(s) shall not have the right to sub-let the Premises or any part
 thereof without the prior written consent of the Landlord. If consent is granted by the Landlord,
@@ -219,7 +218,7 @@ sub-let shall not be deemed to be consent to any subsequent subletting.
 </paragraph>
 
 
-<paragraph margin="20 0 0 0" line-height="1.1">
+<paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">ABANDONMENT: </text-chunk>
 <text-chunk font="times" font-size="12">If the Tenant(s) vacates or abandons the property for a time-period that is
 the minimum set by State law or {{numberToWord .MinimumAbandonmentDays false}} ({{.MinimumAbandonmentDays}}) days, whichever is less, the Landlord shall have the
@@ -344,8 +343,6 @@ noise ordinances.
 <text-chunk font="times" font-size="12">There shall be no other persons living on the Premises other than the Tenant(s) and
 any Occupant(s). Guests of the Tenant(s) are allowed for periods not lasting for more than
 forty-eight hours unless otherwise approved by the Landlord.
-
-
 </text-chunk>
 </paragraph>
 
@@ -604,12 +601,12 @@ The parties have agreed and executed this agreement on {{formatTime .Date "Decem
 </text-chunk>
 </paragraph>
 
-<paragraph margin="420 0 10 0" line-height="1.1">
+<paragraph margin="300 0 10 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">
 LANDLORD(S) SIGNATURE
 </text-chunk>
 </paragraph>
-<division margin="0 60 0 0">
+<division margin="60 60 0 0">
 {{template "form-sig" dict "Margin" "0 0 0 110" "Text" "Landlord’s Signature"}}
 </division>
 <paragraph margin = "5 0 0 0">
@@ -621,10 +618,10 @@ LANDLORD(S) SIGNATURE
 TENANT(S) SIGNATURE
 </text-chunk>
 </paragraph>
-<division margin="0 60 0 0">
+<division margin="30 60 0 0">
 {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
-<division margin="18 60 20 0">
+<division margin="30 60 20 0">
 {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
 
@@ -657,7 +654,7 @@ Sincerely,
 </paragraph>
 </division>
 
-<paragraph margin="30 0 30 0" text-align = "left" line-height="2.3">
+<paragraph margin="30 0" text-align = "left" line-height="2.3">
 <text-chunk font="times-bold" font-size="12">Security Deposit: </text-chunk> 
 <text-chunk font="times" font-size="12">${{.SecurityDeposit}}</text-chunk>
    <text-chunk font="times-bold" font-size="12">
@@ -679,9 +676,8 @@ Move-in Inspection Date: ___________________ Move-out Inspection Date: _________
 </text-chunk>
 </paragraph>
 
-<paragraph margin="15 0 0 0">
-<text-chunk font="times" font-size="11" >
-Write the condition of the space along with any specific damage or repairs needed. Be sure to write
+<paragraph margin="10 0 0 0">
+<text-chunk font="times" font-size="11">Write the condition of the space along with any specific damage or repairs needed. Be sure to write
 any repair needed such as paint chipping, wall damage, or any lessened area that could be considered
 maintenance needed at the end of the lease, and therefore, be deducted at the end of the Lease Term.
 </text-chunk>
@@ -694,7 +690,6 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
 {{$move_in_checklist := .MoveInCheckList}}
 <table columns="2" margin="20 0 0 0">
 {{range $move_in_checklist.LivingRoom}}
-   
    {{template "checklist" .}}
 {{end}}
 </table>
@@ -703,7 +698,6 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
 </paragraph>
 <table columns="2" margin="20 0 0 0">
 {{range $move_in_checklist.DinningRoom}}
-   
    {{template "checklist" .}}
 {{end}}
 </table>
@@ -712,7 +706,6 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
 </paragraph>
 <table columns="2" margin="20 0 0 0">
 {{range $move_in_checklist.Kitchen}}
-   
    {{template "checklist" .}}
 {{end}}
 </table>
@@ -721,7 +714,6 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
 </paragraph>
 <table columns="2" margin="20 0 0 0">
 {{range $move_in_checklist.Bathroom}}
-   
    {{template "checklist" .}}
 {{end}}
 </table>
@@ -733,3 +725,22 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
    {{template "checklist" .}}
 {{end}}
 </table>
+
+<paragraph margin = "18 0 0 0">
+<text-chunk font="times" font-size="12">I, a Tenant on this Lease, have sufficiently inspected the Premises and confirm above-stated 
+information. (only 1 Tenant required)</text-chunk>
+</paragraph>
+
+<division margin="18 60 0 0">
+{{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
+</division>
+
+<paragraph margin = "18 0 0 0">
+<text-chunk font="times" font-size="12">
+I, the Landlord on this Lease, have sufficiently inspected the Premises and confirm 
+above-statedinformation.</text-chunk>
+</paragraph>
+
+<division margin="18 60 0 0">
+{{template "form-sig" dict "Margin" "0 0 0 110" "Text" "Landlord’s Signature"}}
+</division>
