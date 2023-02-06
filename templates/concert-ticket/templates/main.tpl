@@ -112,7 +112,7 @@
             <paragraph margin="5 0 0 0" line-height="1.3">
                 <text-chunk font-size="9">Concert Hall is located three blocks west of the park and three blocks north the library. </text-chunk>
                 <text-chunk font-size="9">Free parking is available nearby, which fills up close to showtime, and on the streets around. </text-chunk>
-                <text-chunk font-size="9">Bike racks are located outside the main entrance tothe Hall. </text-chunk>
+                <text-chunk font-size="9">Bike racks are located outside the main entrance to the Hall. </text-chunk>
             </paragraph>
             <paragraph margin="10 0 0 0">
                 <text-chunk font="helvetica-bold" font-size="12">Learn More At </text-chunk>
