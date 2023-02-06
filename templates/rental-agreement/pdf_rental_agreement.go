@@ -148,7 +148,7 @@ func main() {
 				return textWith / 100
 			},
 
-			// converts numbers to their respective names.
+			// Converts numbers to their respective names.
 			"numberToWord": func(number int, capitalize bool) string {
 				w := ""
 				if number < 20 {
