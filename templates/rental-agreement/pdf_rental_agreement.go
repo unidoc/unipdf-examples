@@ -17,6 +17,7 @@ import (
 	"golang.org/x/text/language"
 )
 
+// RentalAgreement represents rental agreement data.
 type RentalAgreement struct {
 	Date                             string `json:"date"`
 	BeginningDate                    string `json:"beginning_date"`
@@ -89,6 +90,7 @@ func init() {
 func main() {
 	c := creator.New()
 	c.SetPageMargins(90, 60, 90, 135)
+
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
 	if err != nil {
@@ -99,6 +101,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// Create template options.
 	tplOpts := &creator.TemplateOptions{
 		FontMap: map[string]*model.PdfFont{
@@ -126,12 +129,25 @@ func main() {
 				}
 				return nameList
 			},
-			"computeMargin": func(text string) float64 {
-				// An arbitrary margin calculation to position the lines.
-				// Basically the number of the characters multiplied by 5 happens to position the line approximately right next to the text.
-				// TODO may be calculating the width of the text from the font object would make this accurate.
-				return float64(len(text)+10) * 5
+			"computeMargin": func(text, stdFontName string) float64 {
+
+				// Margin calculation to position the lines.
+				stdFont := model.StdFontName(stdFontName)
+				font, err := model.NewStandard14Font(stdFont)
+				if err != nil {
+					log.Fatal(err)
+				}
+				textWith := 0.0
+				for _, r := range text {
+					metrics, bool := font.GetRuneMetrics(r)
+					if !bool {
+						log.Fatal("failed to get width")
+					}
+					textWith += metrics.Wx
+				}
+				return textWith / 100
 			},
+
 			// converts numbers to their respective names.
 			"numberToWord": func(number int, capitalize bool) string {
 				w := ""
@@ -161,17 +177,21 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// Draw main template.
 	if err := c.DrawTemplate(mainTpl, rentalAgreement, tplOpts); err != nil {
 		log.Fatal(err)
 	}
+
 	// Draw header and footer.
 	drawHeader := func(tplPath string, block *creator.Block, pageNum, totalPages int) {
+
 		// Read template.
 		tpl, err := readTemplate(tplPath)
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		// Draw template.
 		data := map[string]interface{}{
 			"Agreement":  rentalAgreement,
@@ -189,14 +209,14 @@ func main() {
 	c.DrawFooter(func(block *creator.Block, args creator.FooterFunctionArgs) {
 		drawHeader("templates/footer.tpl", block, args.PageNum, args.TotalPages)
 	})
+
 	// Write output file.
 	if err := c.WriteToFile("unipdf-rental-agreement.pdf"); err != nil {
 		log.Fatal(err)
 	}
 }
 
-// readTemplate reads the template at the specified file path and returns it
-// as an io.Reader.
+// readTemplate reads the template at the specified file path and returns it as an io.Reader.
 func readTemplate(tplFile string) (io.Reader, error) {
 	file, err := os.Open(tplFile)
 	if err != nil {
