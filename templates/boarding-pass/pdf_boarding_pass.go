@@ -57,7 +57,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Draw main content teplate.
+	// Draw main content template.
 	tplOpts := &creator.TemplateOptions{
 		ImageMap: map[string]*model.Image{
 			"qr-code-1": qrCode,
@@ -111,7 +111,7 @@ func readTemplate(tplFile string) (io.Reader, error) {
 }
 
 // createQRCode creates a new QR code image encoding the provided text, having
-// the specified with and height.
+// the specified width and height.
 func createQRCode(text string, width, height int) (*model.Image, error) {
 	qrCode, err := qr.Encode(text, qr.M, qr.Auto)
 	if err != nil {
