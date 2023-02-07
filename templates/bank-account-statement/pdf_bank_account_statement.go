@@ -50,7 +50,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Draw main content teplate.
+	// Draw main content template.
 	tplOpts := &creator.TemplateOptions{
 		HelperFuncMap: template.FuncMap{
 			"formatTime": func(val, format string) string {
