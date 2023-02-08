@@ -17,6 +17,7 @@
         "number_of_bathrooms": 2.5,
         "unit_size": 2,
         "address": "1 Main Street, Apt 4, Small Town, Alabama, 20992",
+        "number_of_allowed_pets": 2,
         "furnishing_items": [
             "Bedroom Set(s)",
             "Dining RoomSet(s)",
@@ -78,7 +79,6 @@
     "security_deposit_return_time": 14,
     "minimum_abandonment_days": 7,
     "number_of_parking_spaces": 2,
-    "number_of_allowed_pets": 2,
     "move_in_check_list": {
         "living_room": [
             "Floors",

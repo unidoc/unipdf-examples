@@ -39,9 +39,6 @@ type RentalAgreement struct {
 	PetFee                           string `json:"pet_fee_amount"`
 	TerminationFee                   string `json:"termination_fee"`
 	TerminationNoticePeriod          int    `json:"early_termination_notice_period"`
-	TenantsMailingAddress            string `json:"tenant_mailing_address"`
-	NumberOfAllowedPets              int    `json:"number_of_allowed_pets"`
-	NumberOfParkingSpaces            int    `json:"number_of_parking_spaces"`
 	LeaseTerminationOfServiceMembers int    `json:"lease_termination_for_service_members"`
 	CancellationNotificationPeriod   int    `json:"cancellation_notification_period"`
 	ContinuationNotificationPeriod   int    `json:"continuation_notification_period"`
@@ -58,17 +55,18 @@ type RentalAgreement struct {
 		Email   string `json:"email"`
 	} `json:"manager"`
 	Apartment struct {
-		Bedrooms           int      `json:"number_of_bedrooms"`
-		Bathrooms          float64  `json:"number_of_bathrooms"`
-		UnitSize           int      `json:"unit_size"`
-		Address            string   `json:"address"`
-		FurnishingItems    []string `json:"furnishing_items"`
-		ProvidedAPPliances []string `json:"provided_appliances"`
-		Utilities          []string `json:"utility_services"`
-		AllowedPets        []string `json:"allowed_pets_list"`
-		ConstructedBefore  int      `json:"constructed_before"`
-		ParkingSpaces      int      `json:"number_of_parking_spaces"`
-		ParkingSpaceDesc   string   `json:"parking_spaces_description"`
+		Bedrooms            int      `json:"number_of_bedrooms"`
+		Bathrooms           float64  `json:"number_of_bathrooms"`
+		UnitSize            int      `json:"unit_size"`
+		Address             string   `json:"address"`
+		FurnishingItems     []string `json:"furnishing_items"`
+		ProvidedAPPliances  []string `json:"provided_appliances"`
+		Utilities           []string `json:"utility_services"`
+		AllowedPets         []string `json:"allowed_pets_list"`
+		NumberOfAllowedPets int      `json:"number_of_allowed_pets"`
+		ConstructedBefore   int      `json:"constructed_before"`
+		ParkingSpaces       int      `json:"number_of_parking_spaces"`
+		ParkingSpaceDesc    string   `json:"parking_spaces_description"`
 	} `json:"apartment"`
 	Tenant struct {
 		Names          []string `json:"names"`
@@ -137,7 +135,7 @@ func main() {
 			},
 			"getWidth": func(text, stdFontName string) float64 {
 
-				// Margin calculation to position the lines.
+				// Width calculation for a given text based on the font used.
 				stdFont := model.StdFontName(stdFontName)
 				font, err := model.NewStandard14Font(stdFont)
 				if err != nil {

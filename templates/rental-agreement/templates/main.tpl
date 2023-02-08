@@ -320,7 +320,7 @@ notice period of {{.TerminationNoticePeriod}} days the rent shall be paid in acc
 
 <paragraph margin="5 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">
-{{numberToWord .NumberOfAllowedPets  true}}({{.NumberOfAllowedPets}}) pets on the Premises consisting of {{listItems .Apartment.AllowedPets true}}, with 
+{{numberToWord .Apartment.NumberOfAllowedPets  true}}({{.Apartment.NumberOfAllowedPets}}) pets on the Premises consisting of {{listItems .Apartment.AllowedPets true}}, with 
 no other types of Pet(s) being allowed on the Premises or common areas, hereinafter known as 
 the “Pet(s)”. The Tenant(s) shall be required to pay a pet fee in the amount of ${{.PetFee}} for all the Pet(s) which is refundable at the end of the Lease Term only if there is no damage to the
 Premises that is caused by the Pet(s). The Tenant(s) is responsible for all damage that any pet
