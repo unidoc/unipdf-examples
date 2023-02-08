@@ -46,7 +46,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Draw main content teplate.
+	// Draw main content template.
 	chartMap := map[string]render.ChartRenderable{}
 	tplOpts := &creator.TemplateOptions{
 		HelperFuncMap: template.FuncMap{

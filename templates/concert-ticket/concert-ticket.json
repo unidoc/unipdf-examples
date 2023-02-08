@@ -1,0 +1,44 @@
+{
+    "ticket_number": "000385724",
+    "event_time": "2021-05-25T19:30:00.00Z",
+    "ticket_detail": [
+        {
+            "field_name": "Admission",
+            "field_value": "General admission"
+        },
+        {
+            "field_name": "Ticket type",
+            "field_value": "Adult"
+        },
+        {
+            "field_name": "Price",
+            "field_value": "$32"
+        },
+        {
+            "field_name": "Name",
+            "field_value": "Jane R. Doe"
+        },
+        {
+            "field_name": "Address",
+            "field_value": "107 Pickens Way"
+        }
+    ],
+    "rules_of_attendance": [
+        "1. Do not stand up in front of people who are sitting down",
+        "2. Do not take up too much space in a pit/GA section",
+        "3. DO NOT force your way to the front of the stage",
+        "4. Let people pass through if they are trying to exit",
+        "5. Make friends with those around you",
+        "6. Let shorter people stand in front of you",
+        "7. Sharing is caring!",
+        "8. Do not interrupt those sitting near you with a drink run every other song",
+        "9. Do not talk loudly during the concert",
+        "10. Rock out and have fun!"
+    ],
+    "rules_of_purchase": [
+        "- No refunds or exchanges.",
+        "- Unused tickets may be converted to a tax - deductible donation.",
+        "- All photography, video and audio recording is prohibited.",
+        "- Cameras and tape or video recorders are not allowed in the theater due to copyright law."
+    ]
+}
