@@ -1,0 +1,21 @@
+{
+    "etk": "1234567890/1",
+    "reg_num": "12345",
+    "passenger_name": "Jane Doe",
+    "from": {
+        "city": "Jakarta",
+        "code": "CGK"
+    },
+    "destination": {
+        "city": "New York",
+        "code": "JFK"
+    },
+    "flight_number": "S7 168",
+    "gate": "G21",
+    "class": "Econom (T)",
+    "seat": "12D",
+    "date": "16 June",
+    "boarding_time": "06:35",
+    "departure_time": "07:05",
+    "arrival_time": "07:30"
+}

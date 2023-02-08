@@ -1,8 +1,8 @@
 /*
  * This example showcases the usage of creator templates by creating a sample
- * airplane ticket.
+ * boarding pass document.
  *
- * Run as: go run pdf_airplane_ticket.go
+ * Run as: go run pdf_boarding_pass.go
  */
 
 package main
@@ -14,7 +14,6 @@ import (
 	"log"
 	"os"
 	"text/template"
-	"time"
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
@@ -38,7 +37,7 @@ func init() {
 
 func main() {
 	c := creator.New()
-	c.SetPageMargins(50, 50, 25, 25)
+	c.SetPageMargins(30, 30, 20, 20)
 
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
@@ -46,14 +45,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Read ticket.
-	ticket, err := readTicket("ticket.json")
+	// Read boarding pass JSON data.
+	pass, err := readBoardingPassData("boarding_pass.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Create QR code image.
-	qrCode, err := createQRCode("https://github.com/unidoc/unipdf-examples/tree/master/templates/airplane-ticket", 500, 500)
+	qrCode, err := createQRCode("https://github.com/unidoc/unipdf-examples/tree/master/templates/boarding-pass", 100, 100)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -64,10 +63,6 @@ func main() {
 			"qr-code-1": qrCode,
 		},
 		HelperFuncMap: template.FuncMap{
-			"formatTime": func(val, format string) string {
-				t, _ := time.Parse("2006-01-02T15:04:05", val)
-				return t.Format(format)
-			},
 			"extendDict": func(m map[string]interface{}, params ...interface{}) (map[string]interface{}, error) {
 				lenParams := len(params)
 				if lenParams%2 != 0 {
@@ -88,17 +83,12 @@ func main() {
 		},
 	}
 
-	data := map[string]interface{}{
-		"company": "UniPDF Airlines",
-		"ticket":  ticket,
-	}
-
-	if err := c.DrawTemplate(mainTpl, data, tplOpts); err != nil {
+	if err := c.DrawTemplate(mainTpl, pass, tplOpts); err != nil {
 		log.Fatal(err)
 	}
 
 	// Write output file.
-	if err := c.WriteToFile("unipdf-airplain-ticket.pdf"); err != nil {
+	if err := c.WriteToFile("unipdf-boarding-pass.pdf"); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -120,55 +110,6 @@ func readTemplate(tplFile string) (io.Reader, error) {
 	return buf, nil
 }
 
-// Ticket represents a sample plane ticket.
-type Ticket struct {
-	Status    string `json:"status"`
-	Passenger string `json:"passenger"`
-	Document  string `json:"document"`
-	Number    string `json:"number"`
-	Order     string `json:"order"`
-	Issued    string `json:"issued"`
-	Routes    []struct {
-		Flight           string `json:"flight"`
-		FlightCompany    string `json:"flightCompany"`
-		FlightPlaner     string `json:"flightPlaner"`
-		Departure        string `json:"departure"`
-		DepartureAirport string `json:"departureAirport"`
-		Arrival          string `json:"arrival"`
-		ArrivalAirport   string `json:"arrivalAirport"`
-		Class            string `json:"class"`
-		ClassAdd         string `json:"classAdd"`
-		Baggage          string `json:"baggage"`
-		BaggageAdd       string `json:"baggageAdd"`
-		CheckIn          string `json:"checkIn"`
-		CheckInAirport   string `json:"checkInAirport"`
-	} `json:"routes"`
-	Fares []struct {
-		Name   string  `json:"name"`
-		Charge float64 `json:"charge"`
-	} `json:"fares"`
-	PhoneNumbers []struct {
-		Name  string `json:"name"`
-		Value string `json:"value"`
-	} `json:"phoneNumbers"`
-}
-
-// readTicket reads the data for a plane ticket from a specified JSON file.
-func readTicket(jsonFile string) (*Ticket, error) {
-	file, err := os.Open(jsonFile)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	ticket := &Ticket{}
-	if err := json.NewDecoder(file).Decode(ticket); err != nil {
-		return nil, err
-	}
-
-	return ticket, nil
-}
-
 // createQRCode creates a new QR code image encoding the provided text, having
 // the specified width and height.
 func createQRCode(text string, width, height int) (*model.Image, error) {
@@ -188,4 +129,43 @@ func createQRCode(text string, width, height int) (*model.Image, error) {
 	}
 
 	return img, nil
+}
+
+// readBoardingPassData reads the boarding pass data from a specified JSON file.
+func readBoardingPassData(jsonFile string) (*Pass, error) {
+	file, err := os.Open(jsonFile)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	pass := &Pass{}
+	if err := json.NewDecoder(file).Decode(pass); err != nil {
+		return nil, err
+	}
+
+	return pass, nil
+}
+
+// Pass holds the boarding pass data.
+type Pass struct {
+	Etk           string   `json:"etk"`
+	RegNumber     string   `json:"reg_num"`
+	Name          string   `json:"passenger_name"`
+	From          *Airport `json:"from"`
+	Destination   *Airport `json:"destination"`
+	FlightNumber  string   `json:"flight_number"`
+	Gate          string   `json:"gate"`
+	Class         string   `json:"class"`
+	Seat          string   `json:"seat"`
+	Date          string   `json:"date"`
+	BoardingTime  string   `json:"boarding_time"`
+	DepartureTime string   `json:"departure_time"`
+	ArrivalTime   string   `json:"arrival_time"`
+}
+
+// Airport holds the airport information data.
+type Airport struct {
+	City string `json:"city"`
+	Code string `json:"code"`
 }
