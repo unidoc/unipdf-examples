@@ -17,5 +17,4 @@ modified without the need to rebuild the application.
 - [Sample Trade Confirmation Document](trade-confirmation): showcases the usage of creator templates by creating a sample trade confirmation document.
 - [Sample Receipt Document](receipt): showcases the usage of creator templates by creating a receipt document.
 - [Sample Concert Ticket](concert-ticket): showcases the usage of creator templates by creating a sample concert ticket.
-- [Sample Rental Agreement](rental-agreement): showcases the usage of creator templates by creating a sample
-rental agreement.
+- [Sample Rental Agreement](rental-agreement): showcases the usage of creator templates by creating a sample rental agreement.

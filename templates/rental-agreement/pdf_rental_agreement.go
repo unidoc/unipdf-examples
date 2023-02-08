@@ -1,3 +1,9 @@
+/*
+ * This example showcases the usage of creator templates by creating
+ * a sample rental agreement.
+ *
+ * Run as: go run pdf_rental_agreement.go
+ */
 package main
 
 import (
