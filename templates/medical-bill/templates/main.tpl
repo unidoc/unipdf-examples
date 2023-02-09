@@ -127,7 +127,7 @@
     </table-cell>
 
     <table-cell rowspan="2">
-        <table columns="4" column-widths="0.25 0.25 0.25 0.25">
+        <table columns="4">
             {{template "table-cell-paragraph" (extendDict $props "BorderBottomSize" 1 "Margin" "0 0 10 0" "Font" "helvetica-bold" "FontSize" 9 "Text" "Visa")}}
             {{template "table-cell-paragraph" (extendDict $props "Text" "MasterCard")}}
             {{template "table-cell-paragraph" (extendDict $props "Text" "Discover")}}
@@ -182,35 +182,35 @@
 {{template "simple-paragraph" dict "Margin" "0 0 10 0" "LineHeight" 1.0 "Font" "helvetica" "FontSize" 12 "TextColor" "#000000" "Text" "Financial Assistance applications may be obtained/completed/submitted as follows:"}}
 
 <list indent="5">
-    <list-marker font="helvetica" font-size="12" color="#000000">• </list-marker>
+    <list-marker font-size="12">• </list-marker>
     <list-item>
         <paragraph>
-            <text-chunk font="helvetica" font-size="12" color="#000000">Obtain an application at The Sample Medical Center's Patient Financial Services Department located at Main Street 123</text-chunk>
+            <text-chunk font-size="12">Obtain an application at The Sample Medical Center's Patient Financial Services Department located at Main Street 123</text-chunk>
         </paragraph>
     </list-item>
     <list-item>
         <paragraph>
-            <text-chunk font="helvetica" font-size="12" color="#000000">Request to have an application by mail at: 123 Main Street, Anywhere, NY 12345 - 6789.</text-chunk>
+            <text-chunk font-size="12">Request to have an application by mail at: 123 Main Street, Anywhere, NY 12345 - 6789.</text-chunk>
         </paragraph>
     </list-item>
     <list-item>
         <paragraph>
-            <text-chunk font="helvetica" font-size="12" color="#000000">Request to have an application mailed to you by calling 123 - 456 - 7890. Our hours of operation are: Monday-Friday, 8:30a.m.-4:30p.m.</text-chunk>
+            <text-chunk font-size="12">Request to have an application mailed to you by calling 123 - 456 - 7890. Our hours of operation are: Monday-Friday, 8:30a.m.-4:30p.m.</text-chunk>
         </paragraph>
     </list-item>
     <list-item>
         <paragraph>
-            <text-chunk font="helvetica" font-size="12" color="#000000">Download an application through the Sample Medical Center's website:
+            <text-chunk font-size="12">Download an application through the Sample Medical Center's website:
 </text-chunk>
-            <text-chunk font="helvetica" font-size="12" link="url('https://www.ourwebsite.com/PatientFinancialServices.aspx')">https://www.ourwebsite.com/PatientFinancialServices.aspx</text-chunk>
+            <text-chunk font-size="12" link="url('https://www.ourwebsite.com/PatientFinancialServices.aspx')">https://www.ourwebsite.com/PatientFinancialServices.aspx</text-chunk>
         </paragraph>
     </list-item>
 </list>
 
-<paragraph line-height="1.0">
-    <text-chunk font="helvetica" font-size="12" color="#000000">Patient Financial Service Counselors are available Monday through Friday, 8:30 a.m. to 4:30 pm via telephone (123) 456-7890 to address questions related to the Financial Assistance Program.
+<paragraph>
+    <text-chunk font-size="12">Patient Financial Service Counselors are available Monday through Friday, 8:30 a.m. to 4:30 pm via telephone (123) 456-7890 to address questions related to the Financial Assistance Program.
 Please feel free to email us at:</text-chunk>
-    <text-chunk font="helvetica" font-size="12" link="url('mailto:businessoffice@ourwebsite.com')">businessoffice@ourwebsite.com.</text-chunk>
+    <text-chunk font-size="12" link="url('mailto:businessoffice@ourwebsite.com')">businessoffice@ourwebsite.com.</text-chunk>
 </paragraph>
 
 {{template "simple-paragraph" dict "Margin" "15 0 5 0" "LineHeight" 1.0 "Font" "helvetica-bold" "FontSize" 14 "TextColor" "#000000" "Text" "Section 1557 — Notice of Nondiscrimination"}}
@@ -219,7 +219,7 @@ Please feel free to email us at:</text-chunk>
 
 {{template "simple-paragraph" dict "Margin" "15 0 0 0" "LineHeight" 1.0 "Font" "helvetica" "FontSize" 10 "TextColor" "#000000" "Text" "If any of this following has changed since your last statement, please indicate..."}}
 
-<table columns="2" column-widths="0.5 0.5" margin="0">
+<table columns="2">
     <table-cell>
         <table columns="3" column-widths="0.5 0.25 0.25">
             {{template "table-cell-paragraph" (extendDict $props "Colspan" 3 "BorderBottomSize" 5 "Margin" "0 0 0 0" "Font" "helvetica-bold" "FontSize" 9 "Text" "About you:")}}

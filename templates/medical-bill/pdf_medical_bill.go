@@ -1,3 +1,10 @@
+/*
+ * This example showcases the usage of creator templates by creating a sample
+ * medical bill.
+ *
+ * Run as: go run pdf_medical_bill.go
+ */
+
 package main
 
 import (
@@ -36,13 +43,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Read medical bill data json.
+	// Read medical bill JSON data.
 	bill, err := readBillData("medical_bill.json")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Draw main content teplate.
+	// Draw main content template.
 	tplOpts := &creator.TemplateOptions{
 		HelperFuncMap: template.FuncMap{
 			"formatTime": func(val, format string) string {
