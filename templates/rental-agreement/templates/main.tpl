@@ -32,6 +32,17 @@
       </paragraph>
       <line fit-mode="fill-width" position="relative" thickness= "0.2" margin="{{.Margin}}"></line>
 {{end}}
+{{define "paragraph-with-header"}}
+<paragraph margin="18 0 0 0" line-height="1.1">
+<text-chunk font="times-bold" font-size="12">{{.Header}}: </text-chunk>
+<text-chunk font="times" font-size="12">{{.Text}} </text-chunk>
+</paragraph>
+{{end}}
+{{define "simple-paragraph"}}
+<paragraph margin="18 0 0 0" line-height="1.1">
+<text-chunk font="times" font-size="12">{{.Text}}</text-chunk>
+</paragraph>
+{{end}}
 <paragraph margin="0 0 10 0" text-align="center" line-height="1.1">
    <text-chunk font="times-bold" font-size="20"> LEASE WITH OPTION TO PURCHASE </text-chunk>
 </paragraph>
@@ -59,26 +70,17 @@ following {{numberToWord (len .Tenant.Names) true}} ({{len .Tenant.Names}}) Occu
 <text-chunk font="times" font-size="12">The Landlord hereby rents to the Tenant(s), subject to the following terms and conditions of this Agreement, an apartment with the address of {{.Apartment.Address}} consisting of {{.Apartment.Bathrooms}} bathroom(s) and {{.Apartment.Bedrooms}} bedroom(s) hereinafter known as the “Premises”. The Landlord may also use the address for notices sent to the Tenant(s).</text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">PURPOSE: </text-chunk>
-<text-chunk font="times" font-size="12">The Tenant(s) and any Occupant(s) may only use the Premises as a residential
-dwelling. It may not be used for storage, manufacturing of any type of food or product,
-professional service(s), or for any commercial use unless otherwise stated in this Agreement.</text-chunk>
-</paragraph>
+{{template "paragraph-with-header" dict "Header" "PURPOSE" "Text" `The Tenant(s) and any Occupant(s) may only use the Premises as a residential 
+dwelling. It may not be used for storage, manufacturing of any type of food or product, 
+professional service(s), or for any commercial use unless otherwise stated in this Agreement.`}}
+
+{{template "paragraph-with-header" dict "Header" "FURNISHINGS" "Text" "The Premises is furnished with the following:"}}
 
 <paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">FURNISHINGS: </text-chunk>
-<text-chunk font="times" font-size="12">The Premises is furnished with the following:</text-chunk>
-</paragraph>
-
-<paragraph margin="20 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">{{listItems .Apartment.FurnishingItems false}} and all other furnishings to be provided by the Tenant(s). Any damage to the Landlord's furnishings shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.</text-chunk>
 </paragraph>
 
-<paragraph margin="20 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">APPLIANCES: </text-chunk>
-<text-chunk font="times" font-size="12">The Landlord shall provide the following appliances:</text-chunk>
-</paragraph>
+{{template "paragraph-with-header" dict "Header" "APPLIANCES" "Text" "The Landlord shall provide the following appliances:"}}
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">{{listItems .Apartment.ProvidedAPPliances false}} and any
@@ -123,21 +125,9 @@ is due.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">FIRST (1ST) MONTH'S RENT:</text-chunk>
-<text-chunk font="times" font-size="12">First (1st) month's rent shall be due by the Tenant(s) upon the execution of this Agreement.</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">PRE-PAYMENT:</text-chunk>
-<text-chunk font="times" font-size="12">The Landlord shall not require any pre-payment of rent by the Tenant(s).</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">PROBATION PERIOD:</text-chunk>
-<text-chunk font="times" font-size="12">The Tenant(s) will not move into the Premises before the start of the Lease Term.
-</text-chunk>
-</paragraph>
+{{template "paragraph-with-header" dict "Header" "FIRST (1ST) MONTH'S RENT" "Text" "First (1st) month's rent shall be due by the Tenant(s) upon the execution of this Agreement."}}
+{{template "paragraph-with-header" dict "Header" "PRE-PAYMENT" "Text" "The Landlord shall not require any pre-payment of rent by the Tenant(s)."}}
+{{template "paragraph-with-header" dict "Header" "PROBATION PERIOD" "Text" "he Tenant(s) will not move into the Premises before the start of the Lease Term."}}
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">SECURITY DEPOSIT: </text-chunk>
@@ -150,14 +140,14 @@ gives their written consent.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">POSSESSION: </text-chunk>
-<text-chunk font="times" font-size="12">Tenant(s) has examined the condition of the Premises and by taking possession acknowledges that they have accepted the Premises in good order and in its current 
-condition except as herein otherwise stated. Failure of the Landlord to deliver possession of the Premises at the start of the Lease Term to the Tenant(s) shall terminate this Agreement at the option of the Tenant(s). Furthermore, under such failure to deliver possession by the Landlord, and if the Tenant(s) cancels this Agreement, the Security Deposit (if any) shall be returned to the Tenant(s) along with any other pre-paid rent, fees, including if the Tenant(s) 
-paid a fee during the application process before the execution of this Agreement.
-</text-chunk>
-</paragraph>
-
+{{template "paragraph-with-header" dict "Header" "POSSESSION" "Text" `Tenant(s) has examined the condition of the Premises and by taking 
+possession acknowledges that they have accepted the Premises in good order and in its current 
+condition except as herein otherwise stated. Failure of the Landlord to deliver possession of the 
+Premises at the start of the Lease Term to the Tenant(s) shall terminate this Agreement at the 
+option of the Tenant(s). Furthermore, under such failure to deliver possession by the Landlord, 
+and if the Tenant(s) cancels this Agreement, the Security Deposit (if any) shall be returned to 
+the Tenant(s) along with any other pre-paid rent, fees, including if the Tenant(s) paid a fee 
+during the application process before the execution of this Agreement.`}}
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">OPTION TO PURCHASE.</text-chunk>
@@ -169,54 +159,37 @@ Agreement to be negotiated, in “good faith”, between the Landlord and Tenant
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">If the Landlord and Tenant(s) cannot produce a signed Purchase and Sale Agreement within a
+{{template "simple-paragraph" dict "Text" `If the Landlord and Tenant(s) cannot produce a signed Purchase and Sale Agreement within a
 reasonable time period then the deposit shall be refunded to the Tenant(s) and this Lease
-Agreement shall continue under its terms and conditions.
-</text-chunk>
-</paragraph>
+Agreement shall continue under its terms and conditions.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">If the option to purchase is exercised by the Tenant(s) all Rent that is paid to the Landlord shall remain separate from any and all deposits, consideration, or payments, made to the Landlord in regards to the purchase of the Premises.
-</text-chunk>
-</paragraph>
+{{template "simple-paragraph" dict "Text" `If the option to purchase is exercised by the Tenant(s) all Rent that is paid to the Landlord shall 
+remain separate from any and all deposits, consideration, or payments, made to the Landlord in 
+regards to the purchase of the Premises.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">RECORDING. </text-chunk>
-<text-chunk font="times" font-size="12">The Tenant(s) shall be withheld from recording this Option to Purchase unless the Tenant(s) has the written consent from the Landlord.
-</text-chunk>
-</paragraph>
+{{template "paragraph-with-header" dict "Header" "RECORDING" "Text" `The Tenant(s) shall be withheld from recording this Option to Purchase unless 
+the Tenant(s) has the written consent from the Landlord.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">ACCESS: </text-chunk>
-<text-chunk font="times" font-size="12">Upon the beginning of the Proration Period or the start of the Lease Term,
+{{template "paragraph-with-header" dict "Header" "ACCESS" "Text" `Upon the beginning of the Proration Period or the start of the Lease Term, 
 whichever is earlier, the Landlord agrees to give access to the Tenant(s) in the form of keys,
-fobs, cards, or any type of keyless security entry as needed to enter the common areas and the
-Premises. Duplicate copies of the access provided may only be authorized under the consent of the Landlord and, if any replacements are needed, the Landlord may provide them for a fee. At the end of this Agreement all access provided to the Tenant(s) shall be returned to the Landlord or a fee will be charged to the Tenant(s) or the fee will be subtracted from the Security Deposit.
-</text-chunk>
-</paragraph>
+fobs, cards, or any type of keyless security entry as needed to enter the common areas and the 
+Premises. Duplicate copies of the access provided may only be authorized under the consent of 
+the Landlord and, if any replacements are needed, the Landlord may provide them for a fee. At 
+the end of this Agreement all access provided to the Tenant(s) shall be returned to the Landlord 
+or a fee will be charged to the Tenant(s) or the fee will be subtracted from the Security Deposit.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">MOVE-IN INSPECTION: </text-chunk>
-<text-chunk font="times" font-size="12">Before, at the time of the Tenant(s) accepting possession, or
+{{template "paragraph-with-header" dict "Header" "MOVE-IN INSPECTION" "Text" `Before, at the time of the Tenant(s) accepting possession, or
 shortly thereafter, the Landlord and Tenant(s) shall perform an inspection documenting the
 present condition of all appliances, fixtures, furniture, and any existing damage within the Premises.
-</text-chunk>
-</paragraph>
+`}}
 
-
-<paragraph margin="20 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">SUBLETTING: </text-chunk>
-<text-chunk font="times" font-size="12">The Tenant(s) shall not have the right to sub-let the Premises or any part
+{{template "paragraph-with-header" dict "Header" "SUBLETTING" "Text" `The Tenant(s) shall not have the right to sub-let the Premises or any part
 thereof without the prior written consent of the Landlord. If consent is granted by the Landlord,
 the Tenant(s) will be responsible for all actions and liabilities of the Sublessee including but not
 limited to: damage to the Premises, non-payment of rent, and any eviction process (In the event
 of an eviction the Tenant(s) shall be responsible for all court filing fee(s), representation, and
 any other fee(s) associated with removing the Sublessee). The consent by the Landlord to one
-sub-let shall not be deemed to be consent to any subsequent subletting.
-</text-chunk>
-</paragraph>
-
+sub-let shall not be deemed to be consent to any subsequent subletting.`}}
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">ABANDONMENT: </text-chunk>
@@ -228,64 +201,33 @@ Landlord shall immediately have the right to terminate this Agreement.
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">ASSIGNMENT: </text-chunk>
-<text-chunk font="times" font-size="12">Tenant(s) shall not assign this Lease without the prior written consent of the
+{{template "paragraph-with-header" dict "Header" "ASSIGNMENT" "Text" `Tenant(s) shall not assign this Lease without the prior written consent of the
 Landlord. The consent by the Landlord to one assignment shall not be deemed to be consent to
-any subsequent assignment.
-</text-chunk>
-</paragraph>
+any subsequent assignment.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">PARKING: </text-chunk>
-<text-chunk font="times" font-size="12">The Landlord shall provide the Tenant(s) {{.Apartment.ParkingSpaces}} Parking Spaces.
-</text-chunk>
-</paragraph>
+{{template "paragraph-with-header" dict "Header" "PARKING" "Text" (printf "The Landlord shall provide the Tenant(s) %d Parking Spaces." .Apartment.ParkingSpaces)}}
 
+{{template "simple-paragraph" dict "Text" (printf `The Landlord shall not charge a fee for the %d Parking Spaces. The Parking Space(s) can be
+described as: %s provided` .Apartment.ParkingSpaces .Apartment.ParkingSpaceDesc)}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">The Landlord shall not charge a fee for the {{.Apartment.ParkingSpaces}} Parking Spaces. The Parking Space(s) can be
-described as: {{.Apartment.ParkingSpaceDesc}} provided
-</text-chunk>
-</paragraph>
-
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">RIGHT OF ENTRY: </text-chunk>
-<text-chunk font="times" font-size="12">The Landlord shall have the right to enter the Premises during normal
+{{template "paragraph-with-header" dict "Header" "RIGHT OF ENTRY" "Text" `The Landlord shall have the right to enter the Premises during normal
 working hours by providing notice in accordance with the minimum State requirement in order
 for inspection, make necessary repairs, alterations or improvements, to supply services as
 agreed or for any reasonable purpose. The Landlord may exhibit the Premises to prospective
-purchasers, mortgagees, or lessees upon reasonable notice.
-</text-chunk>
-</paragraph>
+purchasers, mortgagees, or lessees upon reasonable notice.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">SALE OF PROPERTY: </text-chunk>
-<text-chunk font="times" font-size="12">If the Premises is sold, the Tenant(s) is to be notified of the new
+{{template "paragraph-with-header" dict "Header" "SALE OF PROPERTY" "Text" `If the Premises is sold, the Tenant(s) is to be notified of the new
 Owner, and if there is a new Manager, their contact details for repairs and maintenance shall be
 forwarded. If the Premises is conveyed to another party, the new owner shall not have the right
 to terminate this Agreement and it shall continue under the terms and conditions agreed upon
-by the Landlord and Tenant(s).
-</text-chunk>
-</paragraph>
+by the Landlord and Tenant(s).`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">UTILITIES: </text-chunk>
-<text-chunk font="times" font-size="12">The Landlord agrees to pay for the following utilities and services:
-</text-chunk>
-</paragraph>
+{{template "paragraph-with-header" dict "Header" "UTILITIES" "Text" "The Landlord agrees to pay for the following utilities and services:"}}
 
-<paragraph margin="10 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">
-{{listItems .Apartment.Utilities false}} and the Landlord shall also provide Some
-great services with all other utilities and services to be the responsibility of the Tenant(s).
-</text-chunk>
-</paragraph>
+{{template "simple-paragraph" dict "Text" (printf `%s and the Landlord shall also provide Some
+great services with all other utilities and services to be the responsibility of the Tenant(s).` (listItems .Apartment.Utilities false))}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">MAINTENANCE, REPAIRS, OR ALTERATIONS: </text-chunk>
-<text-chunk font="times" font-size="12"> The Tenant(s) shall, at their own
+{{template "paragraph-with-header" dict "Header" "MAINTENANCE, REPAIRS, OR ALTERATIONS" "Text" `The Tenant(s) shall, at their own
 expense and at all times, maintain the Premises in a clean and sanitary manner, and shall
 surrender the same at termination hereof, in as good condition as received, normal wear and
 tear excepted. The Tenant(s) may not make any alterations to the leased Premises without the
@@ -296,9 +238,7 @@ units if one or all shall fail to operate. The Landlord will place fresh batteri
 battery-operated smoke detectors when the Tenant(s) moves into the Premises. After the initial
 placement of the fresh batteries, it is the responsibility of the Tenant(s) to replace batteries
 when needed. A monthly “cursory” inspection may be required for all fire extinguishers to
-make sure they are fully charged.
-</text-chunk>
-</paragraph>
+make sure they are fully charged.`}}
 
 <paragraph margin="20 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">EARLY TERMINATION: </text-chunk>
@@ -312,62 +252,35 @@ notice period of {{.TerminationNoticePeriod}} days the rent shall be paid in acc
 </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12"> PETS: </text-chunk>
-<text-chunk font="times" font-size="12">The Tenant(s) shall be allowed to have:
-</text-chunk>
-</paragraph>
-
-<paragraph margin="5 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">
-{{numberToWord .Apartment.NumberOfAllowedPets  true}}({{.Apartment.NumberOfAllowedPets}}) pets on the Premises consisting of {{listItems .Apartment.AllowedPets true}}, with 
+{{template "paragraph-with-header" dict "Header" "PETS" "Text" "The Tenant(s) shall be allowed to have:"}}
+{{template "simple-paragraph" dict "Text" (printf `%s(%d) pets on the Premises consisting of %s, with 
 no other types of Pet(s) being allowed on the Premises or common areas, hereinafter known as 
-the “Pet(s)”. The Tenant(s) shall be required to pay a pet fee in the amount of ${{.PetFee}} for all the Pet(s) which is refundable at the end of the Lease Term only if there is no damage to the
+the “Pet(s)”. The Tenant(s) shall be required to pay a pet fee in the amount of $%s for all the Pet(s) which is refundable at the end of the Lease Term only if there is no damage to the
 Premises that is caused by the Pet(s). The Tenant(s) is responsible for all damage that any pet
 causes, regardless of ownership of said pet and agrees to restore the property to its original
-condition at their expense. There shall be no limit on the weight of the pet. pounds (Lb.).
-</text-chunk>
-</paragraph>
+condition at their expense. There shall be no limit on the weight of the pet. pounds (Lb.).` (numberToWord .Apartment.NumberOfAllowedPets  true) (.Apartment.NumberOfAllowedPets) (listItems .Apartment.AllowedPets true) (.PetFee))}}
 
-<paragraph margin="20 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">NOISE/WASTE: </text-chunk>
-<text-chunk font="times" font-size="12">The Tenant(s) agrees not to commit waste on the Premises, maintain, or
+{{template "paragraph-with-header" dict "Header" "NOISE/WASTE" "Text" `The Tenant(s) agrees not to commit waste on the Premises, maintain, or
 permit to be maintained, a nuisance thereon, or use, or permit the Premises to be used, in an
 unlawful manner. The Tenant(s) further agrees to abide by any and all local, county, and State
-noise ordinances.
-</text-chunk>
-</paragraph>
+noise ordinances.`}}
 
-<paragraph margin="20 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">GUESTS: </text-chunk>
-<text-chunk font="times" font-size="12">There shall be no other persons living on the Premises other than the Tenant(s) and
+{{template "paragraph-with-header" dict "Header" "GUESTS" "Text" `There shall be no other persons living on the Premises other than the Tenant(s) and
 any Occupant(s). Guests of the Tenant(s) are allowed for periods not lasting for more than
 forty-eight hours unless otherwise approved by the Landlord.
-</text-chunk>
-</paragraph>
+`}}
 
+{{template "paragraph-with-header" dict "Header" "SMOKING POLICY" "Text" `Smoking on the Premises is prohibited on the entire property, including
+individual units, common areas, every building and adjoining properties.`}}
 
-<paragraph margin="20 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">SMOKING POLICY: </text-chunk>
-<text-chunk font="times" font-size="12">Smoking on the Premises is prohibited on the entire property, including
-individual units, common areas, every building and adjoining properties.
-</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">COMPLIANCE WITH LAW: </text-chunk>
-<text-chunk font="times" font-size="12">The Tenant(s) agrees that during the term of the Agreement, to
+{{template "paragraph-with-header" dict "Header" "COMPLIANCE WITH LAW" "Text" `he Tenant(s) agrees that during the term of the Agreement, to
 promptly comply with any present and future laws, ordinances, orders, rules, regulations, and
 requirements of the Federal, State, County, City, and Municipal government or any of their
 departments, bureaus, boards, commissions and officials thereof with respect to the Premises,
 or the use or occupancy thereof, whether said compliance shall be ordered or directed to or
-against the Tenant(s), the Landlord, or both.
-</text-chunk>
-</paragraph>
+against the Tenant(s), the Landlord, or both.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">DEFAULT: </text-chunk>
-<text-chunk font="times" font-size="12">If the Tenant(s) fails to comply with any of the financial or material provisions of
+{{template "paragraph-with-header" dict "Header" "DEFAULT" "Text" `If the Tenant(s) fails to comply with any of the financial or material provisions of
 this Agreement, or of any present rules and regulations or any that may be hereafter prescribed
 by the Landlord, or materially fails to comply with any duties imposed on the Tenant(s) by
 statute or State laws, within the time period after delivery of written notice by the Landlord
@@ -377,13 +290,9 @@ to pay rent when due and the default continues for the time-period specified in 
 notice thereafter, the Landlord may, at their option, declare the entire balance (compiling all
 months applicable to this Agreement) of rent payable hereunder to be immediately due and
 payable and may exercise any and all rights and remedies available to the Landlord at law or in
-equity and may immediately terminate this Agreement.
-</text-chunk>
-</paragraph>
+equity and may immediately terminate this Agreement.`}}
 
-<paragraph margin="10 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">
-The Tenant(s) will be in default if: (a) Tenant(s) does not pay rent or other amounts that are
+{{template "simple-paragraph" dict "Text" `The Tenant(s) will be in default if: (a) Tenant(s) does not pay rent or other amounts that are
 owed in accordance with respective State laws; (b) Tenant(s), their guests, or the Occupant(s)
 violate this Agreement, rules, or fire, safety, health, or criminal laws, regardless of whether
 arrest or conviction occurs; (c) Tenant(s) abandons the Premises; (d) Tenant(s) gives incorrect
@@ -392,118 +301,62 @@ convicted, or given deferred adjudication for a criminal offense involving actua
 physical harm to a person, or involving possession, manufacture, or delivery of a controlled
 substance, marijuana, or drug paraphernalia under state statute; (f) any illegal drugs or
 paraphernalia are found in the Premises or on the person of the Tenant(s), guests, or
-Occupant(s) while on the Premises and/or; (g) as otherwise allowed by law
-</text-chunk>
-</paragraph>
+Occupant(s) while on the Premises and/or; (g) as otherwise allowed by law`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">MULTIPLE TENANT(S) OR OCCUPANT(S): </text-chunk>
-<text-chunk font="times" font-size="12">Each individual that is considered a Tenant(s) is jointly and individually liable for all of this Agreement's obligations, including but
+{{template "paragraph-with-header" dict "Header" "MULTIPLE TENANT(S) OR OCCUPANT(S)" "Text" `Each individual that is considered a Tenant(s) is jointly and individually liable for all of this Agreement's obligations, including but
 not limited to rent monies. If any Tenant(s), guest, or Occupant(s) violates this Agreement, the
 Tenant(s) is considered to have violated this Agreement. Landlord’s requests and notices to the
 Tenant(s) or any of the Occupant(s) of legal age constitutes notice to the Tenant(s). Notices and requests from the Tenant(s) or any one of the Occupant(s) (including repair requests and entry
 permissions) constitutes notice from the Tenant(s). In eviction suits, the Tenant(s) is considered
-the agent of the Premise for the service of process.
-</text-chunk>
-</paragraph>
+the agent of the Premise for the service of process.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">DISPUTES: </text-chunk>
-<text-chunk font="times" font-size="12">If a dispute arises during or after the term of this Agreement between the
+{{template "paragraph-with-header" dict "Header" "DISPUTES" "Text" `If a dispute arises during or after the term of this Agreement between the
 Landlord and Tenant(s), they shall agree to hold negotiations amongst themselves, in “good
-faith”, before any litigation.
-</text-chunk>
-</paragraph>
-
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">SEVERABILITY: </text-chunk>
-<text-chunk font="times" font-size="12">If any provision of this Agreement or the application thereof shall, for any
+faith”, before any litigation.`}}
+{{template "paragraph-with-header" dict "Header" "SEVERABILITY" "Text" `If any provision of this Agreement or the application thereof shall, for any
 reason and to any extent, be invalid or unenforceable, neither the remainder of this Agreement
 nor the application of the provision to other persons, entities or circumstances shall be affected
-thereby, but instead shall be enforced to the maximum extent permitted by law.
-</text-chunk>
-</paragraph>
+thereby, but instead shall be enforced to the maximum extent permitted by law.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">SURRENDER OF PREMISES: </text-chunk>
-<text-chunk font="times" font-size="12">The Tenant(s) has surrendered the Premises when (a) the moveout date has passed and no one is living in the Premise within the Landlord’s reasonable
+{{template "paragraph-with-header" dict "Header" "SURRENDER OF PREMISES" "Text" `The Tenant(s) has surrendered the Premises when (a) the moveout date has passed and no one is living in the Premise within the Landlord’s reasonable
 judgment; or (b) Access to the Premise have been turned in to Landlord – whichever comes
 first. Upon the expiration of the term hereof, the Tenant(s) shall surrender the Premise in better
 or equal condition as it were at the commencement of this Agreement, reasonable use, wear and
-tear thereof, and damages by the elements excepted.
-</text-chunk>
-</paragraph>
+tear thereof, and damages by the elements excepted.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">RETALIATION: </text-chunk>
-<text-chunk font="times" font-size="12">The Landlord is prohibited from making any type of retaliatory acts against
+{{template "paragraph-with-header" dict "Header" "RETALIATION" "Text" `The Landlord is prohibited from making any type of retaliatory acts against
 the Tenant(s) including but not limited to restricting access to the Premises, decreasing or
 cancelling services or utilities, failure to repair appliances or fixtures, or any other type of act
-that could be considered unjustified.
-</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">WAIVER: </text-chunk>
-<text-chunk font="times" font-size="12">A Waiver by the Landlord for a breach of any covenant or duty by the Tenant(s),
+that could be considered unjustified.`}}
+{{template "paragraph-with-header" dict "Header" "WAIVER" "Text" `A Waiver by the Landlord for a breach of any covenant or duty by the Tenant(s),
 under this Agreement is not a waiver for a breach of any other covenant or duty by the
 Tenant(s), or of any subsequent breach of the same covenant or duty. No provision of this
 Agreement shall be considered waived unless such a waiver shall be expressed in writing as a
-formal amendment to this Agreement and executed by the Tenant(s) and Landlord.
-</text-chunk>
-</paragraph>
+formal amendment to this Agreement and executed by the Tenant(s) and Landlord.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">EQUAL HOUSING: </text-chunk>
-<text-chunk font="times" font-size="12">If the Tenant(s) possess(es) any mental or physical impairment, the
+{{template "paragraph-with-header" dict "Header" "EQUAL HOUSING" "Text" `If the Tenant(s) possess(es) any mental or physical impairment, the
 Landlord shall provide reasonable modifications to the Premises unless the modifications
 would be too difficult or expensive for the Landlord to provide. Any impairment of the
 Tenant(s) is/are encouraged to be provided and presented to the Landlord in writing in order to
-seek the most appropriate route for providing the modifications to the Premises.
-</text-chunk>
-</paragraph>
+seek the most appropriate route for providing the modifications to the Premises.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">HAZARDOUS MATERIALS: </text-chunk>
+{{template "paragraph-with-header" dict "Header" "HAZARDOUS MATERIALS" "Text" `HAZARDOUS MATERIALS: </text-chunk>
 <text-chunk font="times" font-size="12">The Tenant(s) agrees to not possess any type of personal
 property that could be considered a fire hazard such as a substance having flammable or explosive characteristics on the Premises. Items that are prohibited to be brought into the
 Premises, other than for everyday cooking or the need of an appliance, includes but is not
 limited to gas (compressed), gasoline, fuel, propane, kerosene, motor oil, fireworks, or any
-other related content in the form of a liquid, solid, or gas.
-</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">WATERBEDS: </text-chunk>
-<text-chunk font="times" font-size="12">The Tenant(s) is not permitted to furnish the Premises with waterbeds.
-</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">INDEMNIFICATION: </text-chunk>
-<text-chunk font="times" font-size="12">The Landlord shall not be liable for any damage or injury to the
+other related content in the form of a liquid, solid, or gas.`}}
+{{template "paragraph-with-header" dict "Header" "WATERBEDS" "Text" "The Tenant(s) is not permitted to furnish the Premises with waterbeds."}}
+{{template "paragraph-with-header" dict "Header" "INDEMNIFICATION" "Text" `The Landlord shall not be liable for any damage or injury to the
 Tenant(s), or any other person, or to any property, occurring on the Premises, or any part
 thereof, or in common areas thereof, and the Tenant(s) agrees to hold the Landlord harmless
 from any claims or damages unless caused solely by the Landlord's negligence. It is
-recommended that renter's insurance be purchased at the Tenant(s)'s expense.
-</text-chunk>
-</paragraph>
-
-<paragraph margin="20 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">COVENANTS: </text-chunk>
-<text-chunk font="times" font-size="12">The covenants and conditions herein contained shall apply to and bind the
+recommended that renter's insurance be purchased at the Tenant(s)'s expense.`}}
+{{template "paragraph-with-header" dict "Header" "COVENANTS" "Text" `The covenants and conditions herein contained shall apply to and bind the
 heirs, legal representatives, and assigns of the parties hereto, and all covenants are to be
-construed as conditions of this Agreement.
-</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">NOTICES: </text-chunk>
-<text-chunk font="times" font-size="12">Any notice to be sent by the Landlord or the Tenant(s) to each other shall use the
-following mailing addresses:
-</text-chunk>
-</paragraph>
+construed as conditions of this Agreement.`}}
+{{template "paragraph-with-header" dict "Header" "NOTICES" "Text" `Any notice to be sent by the Landlord or the Tenant(s) to each other shall use the
+following mailing addresses:`}}
 
 <paragraph margin="18 0 0 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">Landlord's/Agent's Mailing Address</text-chunk>
@@ -533,8 +386,8 @@ Tenant(s)'s Mailing Address
 <text-chunk font="times" font-size="12">The Landlord authorizes the following to act on their behalf in regards
 to the Premises for any repair, maintenance, or compliant other than a breach of this
 Agreement: The The management company known as {{.Manager.Company}} of {{.Manager.Address}} that can be contacted at the following Phone
-Number {{.Manager.Phone}} and can be E-Mailed at {{.Manager.Email}}.
-</text-chunk>
+Number {{.Manager.Phone}} and can be E-Mailed at </text-chunk>
+<text-chunk font="times" font-size="12">{{.Manager.Email}}.</text-chunk>
 </paragraph>
 
 <paragraph margin="40 0 0 0" line-height="1.1">
@@ -547,59 +400,29 @@ restoring the Premises back to a livable condition in addition to any other loss
 proved by the Landlord.
 </text-chunk>
 </paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">SERVICEMEMBERS CIVIL RELIEF ACT: </text-chunk>
-<text-chunk font="times" font-size="12">In the event the Tenant(s) is or hereafter
+{{template "paragraph-with-header" dict "Header" "SERVICEMEMBERS CIVIL RELIEF ACT" "Text" (printf `In the event the Tenant(s) is or hereafter
 becomes, a member of the United States Armed Forces on extended active duty and hereafter
 the Tenant(s) receives permanent change of station (PCS) orders to depart from the area where
 the Premises are located, or is relieved from active duty, retires or separates from the military,
 is ordered into military housing, or receives deployment orders, then in any of these events, the
-Tenant may terminate this lease upon giving {{numberToWord .LeaseTerminationOfServiceMembers false}} ({{.LeaseTerminationOfServiceMembers}}) days written notice to the Landlord.
+Tenant may terminate this lease upon giving %s (%d) days written notice to the Landlord.
 The Tenant shall also provide to the Landlord a copy of the official orders or a letter signed by
 the Tenant’s commanding officer, reflecting the change which warrants termination under this
-clause. The Tenant will pay prorated rent for any days which he/she occupies the dwelling past
-the beginning of the rental period.
-</text-chunk>
-<text-chunk font="times" font-size="12" margin="20 0 0 0">
-The damage/security deposit will be promptly returned to Tenant, provided there are no
-damages to the Premises
-</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">LEAD PAINT: </text-chunk>
-<text-chunk font="times" font-size="12">The Premises was not constructed before {{.Apartment.ConstructedBefore}} and therefore does not contain
-leadbased paint.
-</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">GOVERNING LAW: </text-chunk>
-<text-chunk font="times" font-size="12">This Agreement is to be governed under the laws located in the State of
-{{.Company.Location}}
-</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">ADDITIONAL TERMS AND CONDITIONS: </text-chunk>
-<text-chunk font="times" font-size="12">In addition to the above stated terms and
+clause. The Tenant will pay prorated rent for any days which he/she occupies the dwelling past the beginning of the rental period.` (numberToWord .LeaseTerminationOfServiceMembers false) (.LeaseTerminationOfServiceMembers))}}
+{{template "simple-paragraph" dict "Text" "The damage/security deposit will be promptly returned to Tenant, provided there are no damages to the Premises"}}
+{{template "paragraph-with-header" dict "Header" "LEAD PAINT" "Text" (printf `The Premises was not constructed before %s and therefore does not contain
+leadbased paint.` .Apartment.ConstructedBefore)}}
+{{template "paragraph-with-header" dict "Header" "GOVERNING LAW" "Text" (printf `This Agreement is to be governed under the laws located in the State of
+%s` .Company.Location)}}
+{{template "paragraph-with-header" dict "Header" "ADDITIONAL TERMS AND CONDITIONS" "Text" `In addition to the above stated terms and
 conditions of this Agreement, the Landlord and Tenant agree to the following: Additional
-Terms are to be specified: Term 1, Term 2, Term 3
-</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">ENTIRE AGREEMENT: </text-chunk>
-<text-chunk font="times" font-size="12">This Agreement contains all the terms agreed to by the parties
+Terms are to be specified: Term 1, Term 2, Term 3`}}
+{{template "paragraph-with-header" dict "Header" "ENTIRE AGREEMENT" "Text" (printf `This Agreement contains all the terms agreed to by the parties
 relating to its subject matter including any attachments or addendums. This Agreement replaces
 all previous discussions, understandings, and oral agreements. The Landlord and Tenant(s)
 agree to the terms and conditions and shall be bound until the end of the Lease Term.
-</text-chunk>
-<text-chunk font="times" font-size="12" margin="20 0 0 0">
-The parties have agreed and executed this agreement on {{formatTime .Date "December 9 2006"}}.
-</text-chunk>
-</paragraph>
+
+The parties have agreed and executed this agreement on %s` (formatTime .Date "December 9 2006"))}}
 
 <paragraph margin="300 0 10 0" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">
