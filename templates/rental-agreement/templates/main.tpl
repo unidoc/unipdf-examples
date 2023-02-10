@@ -33,14 +33,27 @@
       <line fit-mode="fill-width" position="relative" thickness= "0.2" margin="{{.Margin}}"></line>
 {{end}}
 {{define "paragraph-with-header"}}
-<paragraph margin="18 0 0 0" line-height="1.1">
+{{$margin := "18 0 0 0"}}
+{{if .Margin}}
+{{$margin:= .Margin}}
+{{end}}
+<paragraph margin= "{{$margin}}" line-height="1.1">
 <text-chunk font="times-bold" font-size="12">{{.Header}}: </text-chunk>
 <text-chunk font="times" font-size="12">{{.Text}} </text-chunk>
 </paragraph>
 {{end}}
 {{define "simple-paragraph"}}
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">{{.Text}}</text-chunk>
+
+{{$margin := "18 0 0 0"}}
+{{if .Margin}}
+{{$margin = .Margin}}
+{{end}}
+{{$font := "times"}}
+{{if .Font}}
+{{$font = .Font}}
+{{end}}
+<paragraph margin="{{$margin}}" line-height="1.1">
+<text-chunk font="{{$font}}" font-size="12">{{.Text}}</text-chunk>
 </paragraph>
 {{end}}
 <paragraph margin="0 0 10 0" text-align="center" line-height="1.1">
@@ -51,24 +64,18 @@
 <text-chunk font="times" font-size="12">This agreement, dated {{formatTime .Date "December 9 2006"}}, by and between a business entity known as {{.Company.Name}} of {{.Company.Address}}, hereinafter known as the “Landlord”.</text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0">
+<paragraph margin="16 0 0 0">
 <text-chunk font="times-bold" font-size="12">AND</text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">{{len .Tenant.Names}} individuals known as {{listItems .Tenant.Names true}}, hereinafter known as the “Tenant(s)”, agree to the following:</text-chunk>
-</paragraph>
+{{template "simple-paragraph" dict "Text" (printf "%d individuals known as %s, hereinafter known as the “Tenant(s)”, agree to the following:" (len .Tenant.Names) (listItems .Tenant.Names true))}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">OCCUPANT(S): </text-chunk>
-<text-chunk font="times" font-size="12">The Premises is to be occupied strictly as a residential dwelling with the
-following {{numberToWord (len .Tenant.Names) true}} ({{len .Tenant.Names}}) Occupants to reside on the Premises in addition to the Tenant(s) mentioned above: {{listItems .Tenant.Names true}}, hereinafter known as the “Occupant(s)”.</text-chunk>
-</paragraph>
+{{template "paragraph-with-header" dict "Header" "OCCUPANT(S)" "Text" (printf `The Premises is to be occupied strictly as a residential dwelling with the
+following %s (%d) Occupants to reside on the Premises in addition to the Tenant(s) mentioned above: %s, hereinafter known as the “Occupant(s)”.` (numberToWord (len .Tenant.Names) true) (len .Tenant.Names) (listItems .Tenant.Names true))}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">OFFER TO RENT: </text-chunk>
-<text-chunk font="times" font-size="12">The Landlord hereby rents to the Tenant(s), subject to the following terms and conditions of this Agreement, an apartment with the address of {{.Apartment.Address}} consisting of {{.Apartment.Bathrooms}} bathroom(s) and {{.Apartment.Bedrooms}} bedroom(s) hereinafter known as the “Premises”. The Landlord may also use the address for notices sent to the Tenant(s).</text-chunk>
-</paragraph>
+{{template "paragraph-with-header" dict "Header" "OFFER TO RENT" "Text" (printf `The Landlord hereby rents to the Tenant(s), subject to the following terms 
+and conditions of this Agreement, an apartment with the address of %s consisting of %.1f bathroom(s) and %d bedroom(s) hereinafter known as 
+the “Premises”. The Landlord may also use the address for notices sent to the Tenant(s).` .Apartment.Address .Apartment.Bathrooms .Apartment.Bedrooms)}}
 
 {{template "paragraph-with-header" dict "Header" "PURPOSE" "Text" `The Tenant(s) and any Occupant(s) may only use the Premises as a residential 
 dwelling. It may not be used for storage, manufacturing of any type of food or product, 
@@ -82,7 +89,7 @@ professional service(s), or for any commercial use unless otherwise stated in th
 
 {{template "paragraph-with-header" dict "Header" "APPLIANCES" "Text" "The Landlord shall provide the following appliances:"}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
+<paragraph margin="14 0 0 0" line-height="1.1">
 <text-chunk font="times" font-size="12">{{listItems .Apartment.ProvidedAPPliances false}} and any
 other unnamed appliances existing on the Premises. Any damage to the Landlord's appliances
 shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.</text-chunk>
@@ -149,15 +156,12 @@ and if the Tenant(s) cancels this Agreement, the Security Deposit (if any) shall
 the Tenant(s) along with any other pre-paid rent, fees, including if the Tenant(s) paid a fee 
 during the application process before the execution of this Agreement.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">OPTION TO PURCHASE.</text-chunk>
-<text-chunk font="times" font-size="12"> The Tenant(s) shall have the right to purchase the Premises
-described herein for ${{.PurchaseAmount}} at any time during the course of the Lease Term, along with
+
+{{template "paragraph-with-header" dict "Header" "OPTION TO PURCHASE" "Text" (printf `he Tenant(s) shall have the right to purchase the Premises
+described herein for $%s at any time during the course of the Lease Term, along with
 any renewal periods or extensions, by providing written notice to the Landlord along with a
-deposit of ${{.PurchaseDepositAmount}} that is subject to the terms and conditions of a Purchase and Sale
-Agreement to be negotiated, in “good faith”, between the Landlord and Tenant(s).
-</text-chunk>
-</paragraph>
+deposit of $%s that is subject to the terms and conditions of a Purchase and Sale
+Agreement to be negotiated, in “good faith”, between the Landlord and Tenant(s).` .PurchaseAmount .PurchaseDepositAmount)}}
 
 {{template "simple-paragraph" dict "Text" `If the Landlord and Tenant(s) cannot produce a signed Purchase and Sale Agreement within a
 reasonable time period then the deposit shall be refunded to the Tenant(s) and this Lease
@@ -191,15 +195,11 @@ of an eviction the Tenant(s) shall be responsible for all court filing fee(s), r
 any other fee(s) associated with removing the Sublessee). The consent by the Landlord to one
 sub-let shall not be deemed to be consent to any subsequent subletting.`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">ABANDONMENT: </text-chunk>
-<text-chunk font="times" font-size="12">If the Tenant(s) vacates or abandons the property for a time-period that is
-the minimum set by State law or {{numberToWord .MinimumAbandonmentDays false}} ({{.MinimumAbandonmentDays}}) days, whichever is less, the Landlord shall have the
+{{template "paragraph-with-header" dict "Header" "ABANDONMENT" "Text" (printf `If the Tenant(s) vacates or abandons the property for a time-period that is
+the minimum set by State law or %s (%d) days, whichever is less, the Landlord shall have the
 right to terminate this Agreement immediately and remove all belongings including any
 personal property off of the Premises. If the Tenant(s) vacates or abandons the property, the
-Landlord shall immediately have the right to terminate this Agreement.
-</text-chunk>
-</paragraph>
+Landlord shall immediately have the right to terminate this Agreement.` (numberToWord .MinimumAbandonmentDays false) (.MinimumAbandonmentDays))}}
 
 {{template "paragraph-with-header" dict "Header" "ASSIGNMENT" "Text" `Tenant(s) shall not assign this Lease without the prior written consent of the
 Landlord. The consent by the Landlord to one assignment shall not be deemed to be consent to
@@ -240,17 +240,12 @@ placement of the fresh batteries, it is the responsibility of the Tenant(s) to r
 when needed. A monthly “cursory” inspection may be required for all fire extinguishers to
 make sure they are fully charged.`}}
 
-<paragraph margin="20 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">EARLY TERMINATION: </text-chunk>
-<text-chunk font="times" font-size="12"> The Tenant(s) may be allowed to cancel this Agreement under the
-following conditions:
-</text-chunk>
-<text-chunk font="times" font-size="12" margin="10 0 0 0">
-The Tenant(s) must provide at least {{.TerminationNoticePeriod}} days' notice and pay an early termination fee of
-${{.TerminationFee}} (US Dollars) which does not include the rent due for the notice period. During the
-notice period of {{.TerminationNoticePeriod}} days the rent shall be paid in accordance with this Agreement.
-</text-chunk>
-</paragraph>
+{{template "paragraph-with-header" dict "Margin" "20 0 0 0" "Header" "EARLY TERMINATION" "Text" `The Tenant(s) may be allowed to cancel this Agreement under the
+following conditions:`}}
+
+{{template "simple-paragraph" dict "Margin" "10 0 0 0" "Text" (printf `The Tenant(s) must provide at least %d days' notice and pay an early termination fee of
+$%s (US Dollars) which does not include the rent due for the notice period. During the
+notice period of %d days the rent shall be paid in accordance with this Agreement.` .TerminationNoticePeriod .TerminationFee .TerminationNoticePeriod)}}
 
 {{template "paragraph-with-header" dict "Header" "PETS" "Text" "The Tenant(s) shall be allowed to have:"}}
 {{template "simple-paragraph" dict "Text" (printf `%s(%d) pets on the Premises consisting of %s, with 
@@ -358,48 +353,27 @@ construed as conditions of this Agreement.`}}
 {{template "paragraph-with-header" dict "Header" "NOTICES" "Text" `Any notice to be sent by the Landlord or the Tenant(s) to each other shall use the
 following mailing addresses:`}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">Landlord's/Agent's Mailing Address</text-chunk>
-</paragraph>
+{{template "simple-paragraph" dict "Font" "times-bold" "Text" "Landlord's/Agent's Mailing Address"}}
+{{template "simple-paragraph" dict "Text" (printf `%s, ATTN. %s
+%s` .Company.Name .Company.LandLord .Company.Address)}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">
-{{.Company.Name}}, ATTN. {{.Company.LandLord}}
-{{.Company.Address}}
-</text-chunk>
-</paragraph>
+{{template "simple-paragraph" dict "Font" "times-bold" "Text" "Tenant(s)'s Mailing Address"}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">
-Tenant(s)'s Mailing Address
-</text-chunk>
-</paragraph>
+{{template "simple-paragraph" dict "Text" (printf `%s
+%s` (listItems .Tenant.Names true) (.Tenant.MailingAddress))}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">
-{{listItems .Tenant.Names true}}
-{{.Tenant.MailingAddress}}</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 40 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">AGENT/MANAGER: </text-chunk>
-<text-chunk font="times" font-size="12">The Landlord authorizes the following to act on their behalf in regards
+{{template "paragraph-with-header" dict "Header" "AGENT/MANAGER" "Text" (printf `The Landlord authorizes the following to act on their behalf in regards
 to the Premises for any repair, maintenance, or compliant other than a breach of this
-Agreement: The The management company known as {{.Manager.Company}} of {{.Manager.Address}} that can be contacted at the following Phone
-Number {{.Manager.Phone}} and can be E-Mailed at </text-chunk>
-<text-chunk font="times" font-size="12">{{.Manager.Email}}.</text-chunk>
-</paragraph>
+Agreement: The The management company known as %s of %s that can be contacted at the following Phone
+Number %s and can be E-Mailed at %s.` .Manager.Company .Manager.Address .Manager.Phone .Manager.Email)}}
 
-<paragraph margin="40 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">PREMISES DEEMED UNINHABITABLE: </text-chunk>
-<text-chunk font="times" font-size="12">If the Property is deemed uninhabitable due to
+{{template "paragraph-with-header" dict "Margin" "40 0 0 0" "Header" "PREMISES DEEMED UNINHABITABLE" "Text" `If the Property is deemed uninhabitable due to
 damage beyond reasonable repair the Tenant(s) will be able to terminate this Agreement by
 written notice to the Landlord. If said damage was due to the negligence of the Tenant(s), the
 Tenant(s) shall be liable to the Landlord for all repairs and for the loss of income due to
 restoring the Premises back to a livable condition in addition to any other losses that can be
-proved by the Landlord.
-</text-chunk>
-</paragraph>
+proved by the Landlord.`}}
+
 {{template "paragraph-with-header" dict "Header" "SERVICEMEMBERS CIVIL RELIEF ACT" "Text" (printf `In the event the Tenant(s) is or hereafter
 becomes, a member of the United States Armed Forces on extended active duty and hereafter
 the Tenant(s) receives permanent change of station (PCS) orders to depart from the area where
@@ -417,30 +391,18 @@ leadbased paint.` .Apartment.ConstructedBefore)}}
 {{template "paragraph-with-header" dict "Header" "ADDITIONAL TERMS AND CONDITIONS" "Text" `In addition to the above stated terms and
 conditions of this Agreement, the Landlord and Tenant agree to the following: Additional
 Terms are to be specified: Term 1, Term 2, Term 3`}}
-{{template "paragraph-with-header" dict "Header" "ENTIRE AGREEMENT" "Text" (printf `This Agreement contains all the terms agreed to by the parties
+{{template "paragraph-with-header" dict "Margin" "18 0 20 0" "Header" "ENTIRE AGREEMENT" "Text" (printf `This Agreement contains all the terms agreed to by the parties
 relating to its subject matter including any attachments or addendums. This Agreement replaces
 all previous discussions, understandings, and oral agreements. The Landlord and Tenant(s)
 agree to the terms and conditions and shall be bound until the end of the Lease Term.
-
 The parties have agreed and executed this agreement on %s` (formatTime .Date "December 9 2006"))}}
 
-<paragraph margin="300 0 10 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">
-LANDLORD(S) SIGNATURE
-</text-chunk>
-</paragraph>
+{{template "simple-paragraph" dict "Margin" "300 0 10 0" "Font" "times-bold" "Text" "LANDLORD(S) SIGNATURE"}}
 <division margin="60 60 0 0">
 {{template "form-sig" dict "Margin" "0 0 0 110" "Text" "Landlord’s Signature"}}
 </division>
-<paragraph margin = "5 0 0 0">
-<text-chunk font="times" font-size="12">{{.Company.LandLord}} as President of {{.Company.Name}}</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 20 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">
-TENANT(S) SIGNATURE
-</text-chunk>
-</paragraph>
+{{template "simple-paragraph" dict "Margin" "5 0 0 0" "Text" (printf `%s as President of %s` .Company.LandLord .Company.Name)}}
+{{template "simple-paragraph" dict "Margin" "18 0 20 0" "Font" "times-bold" "Text" "TENANT(S) SIGNATURE"}}
 <division margin="30 60 0 0">
 {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
