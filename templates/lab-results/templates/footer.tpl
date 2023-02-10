@@ -10,25 +10,25 @@
 
         <table-cell align="right">
             <paragraph>
-                <text-chunk font="helvetica" font-size="12">Date Issued: {{ .Date }}</text-chunk>
+                <text-chunk font-size="12">Date Issued: {{ .Date }}</text-chunk>
             </paragraph>
         </table-cell>
 
         <table-cell align="right">
             <paragraph>
-                <text-chunk font="helvetica" font-size="12">Page {{ .PageNum }} of {{ .TotalPages }}</text-chunk>
+                <text-chunk font-size="12">Page {{ .PageNum }} of {{ .TotalPages }}</text-chunk>
             </paragraph>
         </table-cell>
 
         <table-cell colspan="2">
             <paragraph>
-                <text-chunk font="helvetica" font-size="12">This document contains private and confidential health information protected by state and federal law. If you have received this document in error, please call 800-111-1212</text-chunk>
+                <text-chunk font-size="12">This document contains private and confidential health information protected by state and federal law. If you have received this document in error, please call 800-111-1212</text-chunk>
             </paragraph>
         </table-cell>
         
         <table-cell align="right" indent="0">
             <paragraph text-align="right" margin="0 10">
-                <text-chunk font="helvetica" font-size="12">© 1995-2020 Sample Corporation of America® Holdings All Rights Reserved - Enterprise Report Version: 1.00</text-chunk>
+                <text-chunk font-size="12">© 1995-2020 Sample Corporation of America® Holdings All Rights Reserved - Enterprise Report Version: 1.00</text-chunk>
             </paragraph>
         </table-cell>
     </table>

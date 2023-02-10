@@ -14,6 +14,19 @@
     </table-cell>
 {{end}}
 
+{{define "result-field"}}
+    <table-cell border-width-left="1">
+        <paragraph margin="0 10">
+            <text-chunk color="#1B7A98" font="helvetica-bold">{{ .Title }}</text-chunk>
+        </paragraph>
+    </table-cell>
+    <table-cell>
+        <paragraph margin="0 10 0 0">
+            <text-chunk>{{ .Value }}</text-chunk>
+        </paragraph>
+    </table-cell>
+{{end}}
+
 {{range $idx, $result := .Results}}
     <table columns="6" column-widths="0.15 0.15 0.17 0.13 0.13 0.17">
         <table-cell border-width-left="1" colspan="2">
@@ -34,137 +47,18 @@
             </paragraph>
         </table-cell>
 
-        <table-cell border-width-left="1">
-            <paragraph margin="0 10">
-                <text-chunk font="helvetica-bold" color="#1B7A98">DOB(y/m/d):</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell>
-            <paragraph margin="0 10 0 0">
-                <text-chunk>{{ $.Patient.Birthdate }}</text-chunk>
-            </paragraph>
-        </table-cell>
-
-        <table-cell border-width-left="1">
-            <paragraph margin="0 10">
-                <text-chunk font="helvetica-bold" color="#1B7A98">Date Collected:</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell>
-            <paragraph margin="0 10 0 0">
-                <text-chunk>{{ $.Specimen.Collected }}</text-chunk>
-            </paragraph>
-        </table-cell>
-
-        <table-cell border-width-left="1">
-            <paragraph margin="0 10">
-                <text-chunk font="helvetica-bold" color="#1B7A98">Ordering:</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell>
-            <paragraph margin="0 10 0 0">
-                <text-chunk>{{ $.Physician.Ordering }}</text-chunk>
-            </paragraph>
-        </table-cell>
-
-        <table-cell border-width-left="1">
-            <paragraph margin="0 10">
-                <text-chunk font="helvetica-bold" color="#1B7A98">Age:</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell>
-            <paragraph margin="0 10 0 0">
-                <text-chunk>{{ $.Patient.Age }}</text-chunk>
-            </paragraph>
-        </table-cell>
-
-        <table-cell border-width-left="1">
-            <paragraph margin="0 10">
-                <text-chunk font="helvetica-bold" color="#1B7A98">Date received:</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell>
-            <paragraph margin="0 10 0 0">
-                <text-chunk>{{ $.Specimen.Received }}</text-chunk>
-            </paragraph>
-        </table-cell>
-
-        <table-cell border-width-left="1">
-            <paragraph margin="0 10">
-                <text-chunk font="helvetica-bold" color="#1B7A98">Referring:</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell>
-            <paragraph margin="0 10 0 0">
-                <text-chunk>{{ $.Physician.Referring }}</text-chunk>
-            </paragraph>
-        </table-cell>
-
-        <table-cell border-width-left="1">
-            <paragraph margin="0 10">
-                <text-chunk font="helvetica-bold" color="#1B7A98">Gender:</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell>
-            <paragraph margin="0 10 0 0">
-                <text-chunk>{{ $.Patient.Gender }}</text-chunk>
-            </paragraph>
-        </table-cell>
-
-        <table-cell border-width-left="1">
-            <paragraph margin="0 10">
-                <text-chunk font="helvetica-bold" color="#1B7A98">Date entered:</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell>
-            <paragraph margin="0 10 0 0">
-                <text-chunk>{{ $.Specimen.Entered }}</text-chunk>
-            </paragraph>
-        </table-cell>
-
-        <table-cell border-width-left="1">
-            <paragraph margin="0 10">
-                <text-chunk font="helvetica-bold" color="#1B7A98">ID:</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell>
-            <paragraph margin="0 10 0 0">
-                <text-chunk>{{ $.Physician.Id }}</text-chunk>
-            </paragraph>
-        </table-cell>
-
-        <table-cell border-width-left="1">
-            <paragraph margin="0 10">
-                <text-chunk font="helvetica-bold" color="#1B7A98">Patient ID:</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell>
-            <paragraph margin="0 10 0 0">
-                <text-chunk>{{ $.Patient.Id }}</text-chunk>
-            </paragraph>
-        </table-cell>
-
-        <table-cell border-width-left="1">
-            <paragraph margin="0 10">
-                <text-chunk font="helvetica-bold" color="#1B7A98">Date reported:</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell>
-            <paragraph margin="0 10 0 0">
-                <text-chunk>{{ $.Specimen.Reported }}</text-chunk>
-            </paragraph>
-        </table-cell>
-
-        <table-cell border-width-left="1">
-            <paragraph margin="0 10">
-                <text-chunk font="helvetica-bold" color="#1B7A98">NPI:</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell>
-            <paragraph margin="0 10 0 0">
-                <text-chunk>{{ $.Physician.Npi }}</text-chunk>
-            </paragraph>
-        </table-cell>
+        {{template "result-field" (dict "Title" "DOB(y/m/d):" "Value" $.Patient.Birthdate ) }}
+        {{template "result-field" (dict "Title" "Date Collected:" "Value" $.Specimen.Collected ) }}
+        {{template "result-field" (dict "Title" "Ordering:" "Value" $.Physician.Ordering ) }}
+        {{template "result-field" (dict "Title" "Age:" "Value" $.Patient.Age ) }}
+        {{template "result-field" (dict "Title" "Date received:" "Value" $.Specimen.Received ) }}
+        {{template "result-field" (dict "Title" "Referring:" "Value" $.Physician.Referring ) }}
+        {{template "result-field" (dict "Title" "Gender:" "Value" $.Patient.Gender ) }}
+        {{template "result-field" (dict "Title" "Date entered:" "Value" $.Specimen.Entered ) }}
+        {{template "result-field" (dict "Title" "ID:" "Value" $.Physician.Id ) }}
+        {{template "result-field" (dict "Title" "Patient ID:" "Value" $.Patient.Id ) }}
+        {{template "result-field" (dict "Title" "Date reported:" "Value" $.Specimen.Reported ) }}
+        {{template "result-field" (dict "Title" "NPI:" "Value" $.Physician.Npi ) }}
     </table>
 
     <line position="relative" fit-mode="fill-width" thickness="1" color="#1B7A98" margin="10 0"></line>
