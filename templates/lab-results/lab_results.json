@@ -3,6 +3,7 @@
     "control_id": "0987654",
     "account_number": "90000999",
     "phone": "(123) 456-7890",
+    "support_phone": "800-111-1212",
     "rte": "00",
     "patient": {
         "birthdate": "1965/12/01",

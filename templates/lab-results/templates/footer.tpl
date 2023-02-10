@@ -22,7 +22,7 @@
 
         <table-cell colspan="2">
             <paragraph>
-                <text-chunk font-size="12">This document contains private and confidential health information protected by state and federal law. If you have received this document in error, please call 800-111-1212</text-chunk>
+                <text-chunk font-size="12">This document contains private and confidential health information protected by state and federal law. If you have received this document in error, please call {{ .SupportPhone }}</text-chunk>
             </paragraph>
         </table-cell>
         

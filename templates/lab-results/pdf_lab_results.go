@@ -92,14 +92,15 @@ func main() {
 
 		// Draw template.
 		data := map[string]interface{}{
-			"Date":       "02/03/2023 0945",
-			"SpecimenID": labResults.SpecimenID,
-			"ControlID":  labResults.ControlID,
-			"AcctNum":    labResults.AcctNum,
-			"Phone":      labResults.Phone,
-			"Rte":        labResults.Rte,
-			"PageNum":    pageNum,
-			"TotalPages": totalPages,
+			"Date":         "02/03/2023 0945",
+			"SpecimenID":   labResults.SpecimenID,
+			"ControlID":    labResults.ControlID,
+			"AcctNum":      labResults.AcctNum,
+			"Phone":        labResults.Phone,
+			"Rte":          labResults.Rte,
+			"SupportPhone": labResults.SupportPhone,
+			"PageNum":      pageNum,
+			"TotalPages":   totalPages,
 		}
 
 		if err := block.DrawTemplate(c, tpl, data, tplOpts); err != nil {
@@ -155,15 +156,16 @@ func readResultData(jsonFile string) (*LabResults, error) {
 
 // LabResults hold lab results data.
 type LabResults struct {
-	SpecimenID string        `json:"specimen_id"`
-	ControlID  string        `json:"control_id"`
-	AcctNum    string        `json:"account_number"`
-	Phone      string        `json:"phone"`
-	Rte        string        `json:"rte"`
-	Patient    Patient       `json:"patient"`
-	Specimen   Specimen      `json:"specimen"`
-	Physician  Physician     `json:"physician"`
-	Results    []*TestResult `json:"tests"`
+	SpecimenID   string        `json:"specimen_id"`
+	ControlID    string        `json:"control_id"`
+	AcctNum      string        `json:"account_number"`
+	Phone        string        `json:"phone"`
+	SupportPhone string        `json:"support_phone"`
+	Rte          string        `json:"rte"`
+	Patient      Patient       `json:"patient"`
+	Specimen     Specimen      `json:"specimen"`
+	Physician    Physician     `json:"physician"`
+	Results      []*TestResult `json:"tests"`
 }
 
 // Patien holds patient related data.
