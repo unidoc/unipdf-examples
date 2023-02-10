@@ -1,4 +1,4 @@
-{{define "checklist" }}
+{{define "checklist-row" }}
 {{$margin := getWidth (printf "%s%s" . " Condition ") "Times-Roman"}}
 <table-cell>
    <division margin="5 0">
@@ -8,7 +8,7 @@
    <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 {{$margin}}"></line>
    </division>
 </table-cell>
-<table-cell >
+<table-cell>
    <division margin="5 0">
       <paragraph>
          <text-chunk>Specific Damage </text-chunk>
@@ -16,6 +16,14 @@
       <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 80"></line>
    </division>
 </table-cell>
+{{end}}
+
+{{define "check-list-table"}}
+<table columns="2" margin="20 0 0 0">
+{{range .Items}}
+   {{template "checklist-row" .}}
+{{end}}
+</table>
 {{end}}
 
 {{ define "form-sig"}}
@@ -44,29 +52,32 @@
 {{end}}
 {{define "simple-paragraph"}}
 
+{{$fontSize := 12}}
 {{$margin := "18 0 0 0"}}
+{{$font := "times"}}
+
+{{if .FontSize}}
+{{$fontSize = .FontSize}}
+{{end}}
+
 {{if .Margin}}
 {{$margin = .Margin}}
 {{end}}
-{{$font := "times"}}
+
 {{if .Font}}
 {{$font = .Font}}
 {{end}}
 <paragraph margin="{{$margin}}" line-height="1.1">
-<text-chunk font="{{$font}}" font-size="12">{{.Text}}</text-chunk>
+<text-chunk font="{{$font}}" font-size="{{$fontSize}}">{{.Text}}</text-chunk>
 </paragraph>
 {{end}}
 <paragraph margin="0 0 10 0" text-align="center" line-height="1.1">
    <text-chunk font="times-bold" font-size="20"> LEASE WITH OPTION TO PURCHASE </text-chunk>
 </paragraph>
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">This agreement, dated {{formatTime .Date "December 9 2006"}}, by and between a business entity known as {{.Company.Name}} of {{.Company.Address}}, hereinafter known as the “Landlord”.</text-chunk>
-</paragraph>
+{{template "simple-paragraph" dict "Text" (printf `This agreement, dated %s, by and between a business entity known as %s of %s, hereinafter known as the “Landlord”.` (formatTime .Date "December 9 2006") .Company.Name .Company.Address)}}
 
-<paragraph margin="16 0 0 0">
-<text-chunk font="times-bold" font-size="12">AND</text-chunk>
-</paragraph>
+{{template "simple-paragraph" dict "Margin" "16 0 0 0" "Font" "times-bold" "Text" "AND"}}
 
 {{template "simple-paragraph" dict "Text" (printf "%d individuals known as %s, hereinafter known as the “Tenant(s)”, agree to the following:" (len .Tenant.Names) (listItems .Tenant.Names true))}}
 
@@ -83,69 +94,48 @@ professional service(s), or for any commercial use unless otherwise stated in th
 
 {{template "paragraph-with-header" dict "Header" "FURNISHINGS" "Text" "The Premises is furnished with the following:"}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">{{listItems .Apartment.FurnishingItems false}} and all other furnishings to be provided by the Tenant(s). Any damage to the Landlord's furnishings shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.</text-chunk>
-</paragraph>
+
+{{template "simple-paragraph" dict "Text" (printf `%s and all other furnishings to be 
+provided by the Tenant(s). Any damage to the Landlord's furnishings shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.` (listItems .Apartment.FurnishingItems false))}}
 
 {{template "paragraph-with-header" dict "Header" "APPLIANCES" "Text" "The Landlord shall provide the following appliances:"}}
 
-<paragraph margin="14 0 0 0" line-height="1.1">
-<text-chunk font="times" font-size="12">{{listItems .Apartment.ProvidedAPPliances false}} and any
+{{template "simple-paragraph" dict "Margin" "10 0 0 0" "Text" (printf `%s and any
 other unnamed appliances existing on the Premises. Any damage to the Landlord's appliances
-shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.</text-chunk>
-</paragraph>
- 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">LEASE TERM: </text-chunk>
-<text-chunk font="times" font-size="12"> This Agreement shall be a fixed-period arrangement beginning on {{formatTime .BeginningDate "December 9 2006"}} and ending on {{formatTime .EndingDate "December 9 2006"}} with the Tenant(s) having the option to continue to 
+shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.` (listItems .Apartment.ProvidedAPPliances false))}}
+
+{{template "paragraph-with-header" dict "Header" "LEASE TERM" "Text" (printf `This Agreement shall be a fixed-period arrangement beginning on %s and ending on %s with the Tenant(s) having the option to continue to 
 occupy the Premises under the same terms and conditions of this Agreement under a 
 Month-to-Month arrangement (Tenancy at Will) with either the Landlord or Tenant having the 
-option to cancel the tenancy with at least {{numberToWord .CancellationNotificationPeriod false}}({{.CancellationNotificationPeriod}}) days notice or the minimum time-period set 
-by the State, whichever is shorter. For the Tenant to continue under Month-to-Month tenancy at the expiration of the Lease Term, the Landlord must be notified within {{numberToWord .ContinuationNotificationPeriod false}} ({{.ContinuationNotificationPeriod}}) days before 
-the end of the Lease Term. Hereinafter known as the “Lease Term”.</text-chunk>
-</paragraph>
+option to cancel the tenancy with at least %s(%d) days notice or the minimum time-period set 
+by the State, whichever is shorter. For the Tenant to continue under Month-to-Month tenancy at the expiration of the Lease Term, the Landlord must be notified within %s (%d) days before 
+the end of the Lease Term. Hereinafter known as the “Lease Term”.` (formatTime .BeginningDate "December 9 2006") (formatTime .EndingDate "December 9 2006") (numberToWord .CancellationNotificationPeriod false) .CancellationNotificationPeriod (numberToWord .ContinuationNotificationPeriod false) .ContinuationNotificationPeriod)}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">RENT: </text-chunk>
-<text-chunk font="times" font-size="12">Tenant(s) shall pay the Landlord in equal monthly installments of ${{.MonthlyInstallment}} (US
+{{template "paragraph-with-header" dict "Header" "RENT" "Text" (printf `Tenant(s) shall pay the Landlord in equal monthly installments of $%s (US
 Dollars) hereinafter known as the “Rent”. The Rent will be due on the First (1st) of every
 month and be paid through an electronic payment known as Automated Clearing House or 
 “ACH”. Details of the Tenant's banking information and authorization shall be attached to this 
-Lease Agreement.</text-chunk>
-</paragraph>
-
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">NON-SUFFICIENT FUNDS (NSF CHECKS): </text-chunk>
-<text-chunk font="times" font-size="12">If the Tenant(s) attempts to pay the rent with 
+Lease Agreement.` .MonthlyInstallment)}}
+{{template "paragraph-with-header" dict "Header" "NON-SUFFICIENT FUNDS (NSF CHECKS)" "Text" (printf `If the Tenant(s) attempts to pay the rent with 
 a check that is not honored or an electronic transaction (ACH) due to insufficient funds (NSF) 
-there shall be a fee of ${{.InsufficientFundFee}} (US Dollars).</text-chunk>
-</paragraph>
+there shall be a fee of $%s (US Dollars).` .InsufficientFundFee)}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">LATE FEE: </text-chunk>
-<text-chunk font="times" font-size="12">If rent is not paid on the due date, there shall be a late fee assessed by the
-Landlord in the amount of: 
-</text-chunk>
-<text-chunk margin="18 0 0 0" font="times" font-size="12">
-${{.LatePaymentFee}} (US Dollars) per occurrence for each month payment that is late after the 3rd Day rent
-is due.
-</text-chunk>
-</paragraph>
+{{template "paragraph-with-header" dict "Header" "LATE FEE" "Text" `If rent is not paid on the due date, there shall be a late fee assessed by the
+Landlord in the amount of: `}}
+
+{{template "simple-paragraph" dict "Text" (printf `$%s (US Dollars) per occurrence for each month payment that is late after the 3rd Day rent
+is due.` .LatePaymentFee)}}
 
 {{template "paragraph-with-header" dict "Header" "FIRST (1ST) MONTH'S RENT" "Text" "First (1st) month's rent shall be due by the Tenant(s) upon the execution of this Agreement."}}
 {{template "paragraph-with-header" dict "Header" "PRE-PAYMENT" "Text" "The Landlord shall not require any pre-payment of rent by the Tenant(s)."}}
 {{template "paragraph-with-header" dict "Header" "PROBATION PERIOD" "Text" "he Tenant(s) will not move into the Premises before the start of the Lease Term."}}
 
-<paragraph margin="18 0 0 0" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">SECURITY DEPOSIT: </text-chunk>
-<text-chunk font="times" font-size="12">A Security Deposit in the amount of ${{.SecurityDeposit}} (US Dollars) shall be
+{{template "paragraph-with-header" dict "Header" "SECURITY DEPOSIT" "Text" (printf `A Security Deposit in the amount of $%s (US Dollars) shall be
 required by the Tenant(s) at the execution of this Agreement to the Landlord for the faithful
 performance of all the terms and conditions. The Security Deposit is to be returned to the
-Tenant(s) within {{.SecurityDepositReturnTime}} days after this Agreement has terminated, less any damage charges and
+Tenant(s) within %d days after this Agreement has terminated, less any damage charges and
 without interest. This Security Deposit shall not be credited towards rent unless the Landlord
-gives their written consent.
-</text-chunk>
-</paragraph>
+gives their written consent.` .SecurityDeposit .SecurityDepositReturnTime)}}
 
 {{template "paragraph-with-header" dict "Header" "POSSESSION" "Text" `Tenant(s) has examined the condition of the Premises and by taking 
 possession acknowledges that they have accepted the Premises in good order and in its current 
@@ -157,7 +147,7 @@ the Tenant(s) along with any other pre-paid rent, fees, including if the Tenant(
 during the application process before the execution of this Agreement.`}}
 
 
-{{template "paragraph-with-header" dict "Header" "OPTION TO PURCHASE" "Text" (printf `he Tenant(s) shall have the right to purchase the Premises
+{{template "paragraph-with-header" dict "Header" "OPTION TO PURCHASE" "Text" (printf `The Tenant(s) shall have the right to purchase the Premises
 described herein for $%s at any time during the course of the Lease Term, along with
 any renewal periods or extensions, by providing written notice to the Landlord along with a
 deposit of $%s that is subject to the terms and conditions of a Purchase and Sale
@@ -395,18 +385,19 @@ Terms are to be specified: Term 1, Term 2, Term 3`}}
 relating to its subject matter including any attachments or addendums. This Agreement replaces
 all previous discussions, understandings, and oral agreements. The Landlord and Tenant(s)
 agree to the terms and conditions and shall be bound until the end of the Lease Term.
+
 The parties have agreed and executed this agreement on %s` (formatTime .Date "December 9 2006"))}}
 
-{{template "simple-paragraph" dict "Margin" "300 0 10 0" "Font" "times-bold" "Text" "LANDLORD(S) SIGNATURE"}}
-<division margin="60 60 0 0">
+{{template "simple-paragraph" dict "Margin" "500 0 10 0" "Font" "times-bold" "Text" "LANDLORD(S) SIGNATURE"}}
+<division margin="20 60 0 0">
 {{template "form-sig" dict "Margin" "0 0 0 110" "Text" "Landlord’s Signature"}}
 </division>
 {{template "simple-paragraph" dict "Margin" "5 0 0 0" "Text" (printf `%s as President of %s` .Company.LandLord .Company.Name)}}
 {{template "simple-paragraph" dict "Margin" "18 0 20 0" "Font" "times-bold" "Text" "TENANT(S) SIGNATURE"}}
-<division margin="30 60 0 0">
+<division margin="20 60 0 0">
 {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
-<division margin="30 60 20 0">
+<division margin="20 60 20 0">
 {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
 
@@ -442,7 +433,7 @@ Sincerely,
 <paragraph margin="30 0" text-align = "left" line-height="2.3">
 <text-chunk font="times-bold" font-size="12">Security Deposit: </text-chunk> 
 <text-chunk font="times" font-size="12">${{.SecurityDeposit}}</text-chunk>
-   <text-chunk font="times-bold" font-size="12">
+<text-chunk font="times-bold" font-size="12">
 First (1st) Month's Rent: </text-chunk><text-chunk font="times" font-size="12"> ${{.SecurityDeposit}}</text-chunk>
 <text-chunk font="times-bold" font-size="12">
 Pet Fee(s):</text-chunk> 
@@ -461,70 +452,29 @@ Move-in Inspection Date: ___________________ Move-out Inspection Date: _________
 </text-chunk>
 </paragraph>
 
-<paragraph margin="10 0 0 0">
-<text-chunk font="times" font-size="11">Write the condition of the space along with any specific damage or repairs needed. Be sure to write
+{{template "simple-paragraph" dict "FontSize" 11 "Margin" "10 0 0 0" "Text" `Write the condition of the space along with any specific damage or repairs needed. Be sure to write
 any repair needed such as paint chipping, wall damage, or any lessened area that could be considered
-maintenance needed at the end of the lease, and therefore, be deducted at the end of the Lease Term.
-</text-chunk>
-</paragraph>
+maintenance needed at the end of the lease, and therefore, be deducted at the end of the Lease Term.`}}
 
-<paragraph margin="15 0 0 0">
-<text-chunk font="times-bold" font-size="18.5">Living Room</text-chunk>
-</paragraph>
+{{template "simple-paragraph" dict "FontSize" 18.5 "Margin" "15 0 0 0" "Font" "times-bold" "Text" "Living Room"}}
+{{template "check-list-table" dict "Items" .MoveInCheckList.LivingRoom}}
+{{template "simple-paragraph" dict "FontSize" 18.5 "Margin" "10 0 0 0" "Font" "times-bold" "Text" "Dining Room"}}
+{{template "check-list-table" dict "Items" .MoveInCheckList.DinningRoom}}
+{{template "simple-paragraph" dict "FontSize" 18.5 "Margin" "10 0 0 0" "Font" "times-bold" "Text" "Kitchen Area"}}
+{{template "check-list-table" dict "Items" .MoveInCheckList.Kitchen}}
+{{template "simple-paragraph" dict "FontSize" 18.5 "Margin" "10 0 0 0" "Font" "times-bold" "Text" "Bedroom(s)"}}
+{{template "check-list-table" dict "Items" .MoveInCheckList.Bathroom}}
+{{template "simple-paragraph" dict "FontSize" 18.5 "Margin" "10 0 0 0" "Font" "times-bold" "Text" "Other"}}
+{{template "check-list-table" dict "Items" .MoveInCheckList.Other}}
 
-{{$move_in_checklist := .MoveInCheckList}}
-<table columns="2" margin="20 0 0 0">
-{{range $move_in_checklist.LivingRoom}}
-   {{template "checklist" .}}
-{{end}}
-</table>
-<paragraph margin="15 0 0 0">
-<text-chunk font="times-bold" font-size="18.5">Dining Room</text-chunk>
-</paragraph>
-<table columns="2" margin="20 0 0 0">
-{{range $move_in_checklist.DinningRoom}}
-   {{template "checklist" .}}
-{{end}}
-</table>
-<paragraph margin="15 0 0 0">
-<text-chunk font="times-bold" font-size="18.5">Kitchen Area</text-chunk>
-</paragraph>
-<table columns="2" margin="20 0 0 0">
-{{range $move_in_checklist.Kitchen}}
-   {{template "checklist" .}}
-{{end}}
-</table>
-<paragraph margin="15 0 0 0">
-<text-chunk font="times-bold" font-size="18.5">Bedroom(s)</text-chunk>
-</paragraph>
-<table columns="2" margin="20 0 0 0">
-{{range $move_in_checklist.Bathroom}}
-   {{template "checklist" .}}
-{{end}}
-</table>
-<paragraph margin="15 0 0 0">
-<text-chunk font="times-bold" font-size="18.5">Other</text-chunk>
-</paragraph>
-<table columns="2" margin="20 0 0 0">
-{{range $move_in_checklist.Other}}
-   {{template "checklist" .}}
-{{end}}
-</table>
-
-<paragraph margin = "18 0 0 0">
-<text-chunk font="times" font-size="12">I, a Tenant on this Lease, have sufficiently inspected the Premises and confirm above-stated 
-information. (only 1 Tenant required)</text-chunk>
-</paragraph>
-
+{{template "simple-paragraph" dict "Text" `I, a Tenant on this Lease, have sufficiently inspected the Premises and confirm above-stated 
+information. (only 1 Tenant required)`}}
 <division margin="18 60 0 0">
 {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
 
-<paragraph margin = "18 0 0 0">
-<text-chunk font="times" font-size="12">
-I, the Landlord on this Lease, have sufficiently inspected the Premises and confirm 
-above-statedinformation.</text-chunk>
-</paragraph>
+{{template "simple-paragraph" dict "Text" `I, the Landlord on this Lease, have sufficiently inspected the Premises and confirm 
+above-statedinformation`}}
 
 <division margin="18 60 0 0">
 {{template "form-sig" dict "Margin" "0 0 0 110" "Text" "Landlord’s Signature"}}
