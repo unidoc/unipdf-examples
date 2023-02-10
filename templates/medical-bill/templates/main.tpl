@@ -209,7 +209,7 @@
 
 <paragraph>
     <text-chunk font-size="12">Patient Financial Service Counselors are available Monday through Friday, 8:30 a.m. to 4:30 pm via telephone (123) 456-7890 to address questions related to the Financial Assistance Program.
-Please feel free to email us at:</text-chunk>
+Please feel free to email us at: </text-chunk>
     <text-chunk font-size="12" link="url('mailto:businessoffice@ourwebsite.com')">businessoffice@ourwebsite.com.</text-chunk>
 </paragraph>
 
@@ -217,7 +217,7 @@ Please feel free to email us at:</text-chunk>
 {{template "simple-paragraph" dict "Margin" "0 0 10 0" "LineHeight" 1.0 "Font" "helvetica" "FontSize" 12 "TextColor" "#000000" "Text" "The Sample Medical Center complies with applicable Federal civil right laws and does not discriminate on the basis of race, color, national origin, age, disability, or sex."}}
 
 
-{{template "simple-paragraph" dict "Margin" "15 0 0 0" "LineHeight" 1.0 "Font" "helvetica" "FontSize" 10 "TextColor" "#000000" "Text" "If any of this following has changed since your last statement, please indicate..."}}
+{{template "simple-paragraph" dict "Margin" "10 0 5 0" "LineHeight" 1.0 "Font" "helvetica" "FontSize" 10 "TextColor" "#000000" "Text" "If any of this following has changed since your last statement, please indicate..."}}
 
 <table columns="2">
     <table-cell>
