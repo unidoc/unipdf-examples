@@ -1,3 +1,10 @@
+/*
+ * This example showcases the usage of creator templates by creating a sample
+ * lab result document.
+ *
+ * Run as: go run pdf_lab_results.go
+ */
+
 package main
 
 import (
@@ -35,7 +42,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Read lab result data json.
+	// Read lab result JSON data.
 	data, err := readResultData("lab_results.json")
 	if err != nil {
 		log.Fatal(err)
@@ -71,16 +78,11 @@ func main() {
 		},
 	}
 
-	// data := map[string]interface{}{
-	// 	"firmName":    "UniDoc Financial Firm",
-	// 	"firmAddress": "123 Main Street\nPortland, ME 12345\n(123) 456-789",
-	// }
-
 	if err := c.DrawTemplate(mainTpl, data, tplOpts); err != nil {
 		log.Fatal(err)
 	}
 
-	// Draw header.
+	// Draw header and footer.
 	drawHeader := func(tplPath string, block *creator.Block, labResults *LabResults, pageNum, totalPages int) {
 		// Read template.
 		tpl, err := readTemplate(tplPath)
@@ -151,6 +153,7 @@ func readResultData(jsonFile string) (*LabResults, error) {
 	return result, nil
 }
 
+// LabResults hold lab results data.
 type LabResults struct {
 	SpecimenID string        `json:"specimen_id"`
 	ControlID  string        `json:"control_id"`
@@ -163,6 +166,7 @@ type LabResults struct {
 	Results    []*TestResult `json:"tests"`
 }
 
+// Patien holds patient related data.
 type Patient struct {
 	Birthdate string `json:"birthdate"`
 	Age       string `json:"age"`
@@ -170,6 +174,7 @@ type Patient struct {
 	Id        string `json:"id"`
 }
 
+// Specimen holds test specimen data.
 type Specimen struct {
 	Collected string `json:"collected"`
 	Received  string `json:"received"`
@@ -177,6 +182,7 @@ type Specimen struct {
 	Reported  string `json:"reported"`
 }
 
+// Physician holds physician data.
 type Physician struct {
 	Ordering  string `json:"ordering"`
 	Referring string `json:"referring"`
@@ -184,22 +190,24 @@ type Physician struct {
 	Npi       string `json:"npi"`
 }
 
+// Level represents test results info level.
 type Level string
 
+// Acceptable level values.
 const (
 	Green  Level = "green"
 	Yellow       = "yellow"
 	Red          = "red"
 )
 
-var (
-	levelColor = map[Level]string{
-		Green:  "#407505",
-		Yellow: "#F5A623",
-		Red:    "#FF0000",
-	}
-)
+// Map of result level and text color.
+var levelColor = map[Level]string{
+	Green:  "#407505",
+	Yellow: "#F5A623",
+	Red:    "#FF0000",
+}
 
+// TestResult represents each test result.
 type TestResult struct {
 	Info        string   `json:"info"`
 	Level       Level    `json:"level"`
