@@ -34,12 +34,14 @@
       <line fit-mode="fill-width" position="relative" thickness= "0.2" margin="{{.Margin}}"></line>
    </division>
 {{end}}
+
 {{ define "simple-form"}}
       <paragraph>
          <text-chunk font= "times" font-size="11">{{.Text}} </text-chunk>
       </paragraph>
       <line fit-mode="fill-width" position="relative" thickness= "0.2" margin="{{.Margin}}"></line>
 {{end}}
+
 {{define "paragraph-with-header"}}
 {{$margin := "18 0 0 0"}}
 {{if .Margin}}
@@ -50,20 +52,17 @@
 <text-chunk font="times" font-size="12">{{.Text}} </text-chunk>
 </paragraph>
 {{end}}
-{{define "simple-paragraph"}}
 
+{{define "simple-paragraph"}}
 {{$fontSize := 12}}
 {{$margin := "18 0 0 0"}}
 {{$font := "times"}}
-
 {{if .FontSize}}
 {{$fontSize = .FontSize}}
 {{end}}
-
 {{if .Margin}}
 {{$margin = .Margin}}
 {{end}}
-
 {{if .Font}}
 {{$font = .Font}}
 {{end}}
@@ -71,6 +70,7 @@
 <text-chunk font="{{$font}}" font-size="{{$fontSize}}">{{.Text}}</text-chunk>
 </paragraph>
 {{end}}
+
 <paragraph margin="0 0 10 0" text-align="center" line-height="1.1">
    <text-chunk font="times-bold" font-size="20"> LEASE WITH OPTION TO PURCHASE </text-chunk>
 </paragraph>
@@ -94,7 +94,6 @@ professional service(s), or for any commercial use unless otherwise stated in th
 
 {{template "paragraph-with-header" dict "Header" "FURNISHINGS" "Text" "The Premises is furnished with the following:"}}
 
-
 {{template "simple-paragraph" dict "Text" (printf `%s and all other furnishings to be 
 provided by the Tenant(s). Any damage to the Landlord's furnishings shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.` (listItems .Apartment.FurnishingItems false))}}
 
@@ -116,6 +115,7 @@ Dollars) hereinafter known as the “Rent”. The Rent will be due on the First 
 month and be paid through an electronic payment known as Automated Clearing House or 
 “ACH”. Details of the Tenant's banking information and authorization shall be attached to this 
 Lease Agreement.` .MonthlyInstallment)}}
+
 {{template "paragraph-with-header" dict "Header" "NON-SUFFICIENT FUNDS (NSF CHECKS)" "Text" (printf `If the Tenant(s) attempts to pay the rent with 
 a check that is not honored or an electronic transaction (ACH) due to insufficient funds (NSF) 
 there shall be a fee of $%s (US Dollars).` .InsufficientFundFee)}}
@@ -238,6 +238,7 @@ $%s (US Dollars) which does not include the rent due for the notice period. Duri
 notice period of %d days the rent shall be paid in accordance with this Agreement.` .TerminationNoticePeriod .TerminationFee .TerminationNoticePeriod)}}
 
 {{template "paragraph-with-header" dict "Header" "PETS" "Text" "The Tenant(s) shall be allowed to have:"}}
+
 {{template "simple-paragraph" dict "Text" (printf `%s(%d) pets on the Premises consisting of %s, with 
 no other types of Pet(s) being allowed on the Premises or common areas, hereinafter known as 
 the “Pet(s)”. The Tenant(s) shall be required to pay a pet fee in the amount of $%s for all the Pet(s) which is refundable at the end of the Lease Term only if there is no damage to the
@@ -313,6 +314,7 @@ tear thereof, and damages by the elements excepted.`}}
 the Tenant(s) including but not limited to restricting access to the Premises, decreasing or
 cancelling services or utilities, failure to repair appliances or fixtures, or any other type of act
 that could be considered unjustified.`}}
+
 {{template "paragraph-with-header" dict "Header" "WAIVER" "Text" `A Waiver by the Landlord for a breach of any covenant or duty by the Tenant(s),
 under this Agreement is not a waiver for a breach of any other covenant or duty by the
 Tenant(s), or of any subsequent breach of the same covenant or duty. No provision of this
@@ -331,15 +333,19 @@ property that could be considered a fire hazard such as a substance having flamm
 Premises, other than for everyday cooking or the need of an appliance, includes but is not
 limited to gas (compressed), gasoline, fuel, propane, kerosene, motor oil, fireworks, or any
 other related content in the form of a liquid, solid, or gas.`}}
+
 {{template "paragraph-with-header" dict "Header" "WATERBEDS" "Text" "The Tenant(s) is not permitted to furnish the Premises with waterbeds."}}
+
 {{template "paragraph-with-header" dict "Header" "INDEMNIFICATION" "Text" `The Landlord shall not be liable for any damage or injury to the
 Tenant(s), or any other person, or to any property, occurring on the Premises, or any part
 thereof, or in common areas thereof, and the Tenant(s) agrees to hold the Landlord harmless
 from any claims or damages unless caused solely by the Landlord's negligence. It is
 recommended that renter's insurance be purchased at the Tenant(s)'s expense.`}}
+
 {{template "paragraph-with-header" dict "Header" "COVENANTS" "Text" `The covenants and conditions herein contained shall apply to and bind the
 heirs, legal representatives, and assigns of the parties hereto, and all covenants are to be
 construed as conditions of this Agreement.`}}
+
 {{template "paragraph-with-header" dict "Header" "NOTICES" "Text" `Any notice to be sent by the Landlord or the Tenant(s) to each other shall use the
 following mailing addresses:`}}
 
@@ -348,7 +354,6 @@ following mailing addresses:`}}
 %s` .Company.Name .Company.LandLord .Company.Address)}}
 
 {{template "simple-paragraph" dict "Font" "times-bold" "Text" "Tenant(s)'s Mailing Address"}}
-
 {{template "simple-paragraph" dict "Text" (printf `%s
 %s` (listItems .Tenant.Names true) (.Tenant.MailingAddress))}}
 
@@ -357,7 +362,7 @@ to the Premises for any repair, maintenance, or compliant other than a breach of
 Agreement: The The management company known as %s of %s that can be contacted at the following Phone
 Number %s and can be E-Mailed at %s.` .Manager.Company .Manager.Address .Manager.Phone .Manager.Email)}}
 
-{{template "paragraph-with-header" dict "Margin" "40 0 0 0" "Header" "PREMISES DEEMED UNINHABITABLE" "Text" `If the Property is deemed uninhabitable due to
+{{template "paragraph-with-header" dict "Header" "PREMISES DEEMED UNINHABITABLE" "Text" `If the Property is deemed uninhabitable due to
 damage beyond reasonable repair the Tenant(s) will be able to terminate this Agreement by
 written notice to the Landlord. If said damage was due to the negligence of the Tenant(s), the
 Tenant(s) shall be liable to the Landlord for all repairs and for the loss of income due to
@@ -373,14 +378,19 @@ Tenant may terminate this lease upon giving %s (%d) days written notice to the L
 The Tenant shall also provide to the Landlord a copy of the official orders or a letter signed by
 the Tenant’s commanding officer, reflecting the change which warrants termination under this
 clause. The Tenant will pay prorated rent for any days which he/she occupies the dwelling past the beginning of the rental period.` (numberToWord .LeaseTerminationOfServiceMembers false) (.LeaseTerminationOfServiceMembers))}}
+
 {{template "simple-paragraph" dict "Text" "The damage/security deposit will be promptly returned to Tenant, provided there are no damages to the Premises"}}
+
 {{template "paragraph-with-header" dict "Header" "LEAD PAINT" "Text" (printf `The Premises was not constructed before %s and therefore does not contain
 leadbased paint.` .Apartment.ConstructedBefore)}}
+
 {{template "paragraph-with-header" dict "Header" "GOVERNING LAW" "Text" (printf `This Agreement is to be governed under the laws located in the State of
 %s` .Company.Location)}}
+
 {{template "paragraph-with-header" dict "Header" "ADDITIONAL TERMS AND CONDITIONS" "Text" `In addition to the above stated terms and
 conditions of this Agreement, the Landlord and Tenant agree to the following: Additional
 Terms are to be specified: Term 1, Term 2, Term 3`}}
+
 {{template "paragraph-with-header" dict "Margin" "18 0 20 0" "Header" "ENTIRE AGREEMENT" "Text" (printf `This Agreement contains all the terms agreed to by the parties
 relating to its subject matter including any attachments or addendums. This Agreement replaces
 all previous discussions, understandings, and oral agreements. The Landlord and Tenant(s)
@@ -388,7 +398,9 @@ agree to the terms and conditions and shall be bound until the end of the Lease 
 
 The parties have agreed and executed this agreement on %s` (formatTime .Date "December 9 2006"))}}
 
-{{template "simple-paragraph" dict "Margin" "500 0 10 0" "Font" "times-bold" "Text" "LANDLORD(S) SIGNATURE"}}
+{{/* render on a new page */}}
+<page-break></page-break>
+{{template "simple-paragraph" dict "Margin" "18 0 10 0" "Font" "times-bold" "Text" "LANDLORD(S) SIGNATURE"}}
 <division margin="20 60 0 0">
 {{template "form-sig" dict "Margin" "0 0 0 110" "Text" "Landlord’s Signature"}}
 </division>
@@ -401,7 +413,8 @@ The parties have agreed and executed this agreement on %s` (formatTime .Date "De
 {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
 
-<paragraph margin="420 0 10 0" text-align = "center">
+<page-break></page-break>
+<paragraph margin="18 0 10 0" text-align = "center">
    <text-chunk font="times-bold" font-size="21.5">Security Deposit Receipt</text-chunk>
 </paragraph>
 
@@ -423,14 +436,14 @@ Sincerely,
 <division margin="20 0 30 0">
 {{template "form-sig" dict "Margin" "0 200 0 110" "Text" "Landlord’s Signature"}}
 </division>
-
-<division margin="480 0 30 0">
+<page-break></page-break>
+<division margin="50 0 30 0">
 <paragraph text-align = "center">
    <text-chunk font="times" font-size="12">AMOUNT ($) DUE AT SIGNING</text-chunk>
 </paragraph>
 </division>
 
-<paragraph margin="30 0" text-align = "left" line-height="2.3">
+<paragraph margin="18 0" text-align = "left" line-height="2.3">
 <text-chunk font="times-bold" font-size="12">Security Deposit: </text-chunk> 
 <text-chunk font="times" font-size="12">${{.SecurityDeposit}}</text-chunk>
 <text-chunk font="times-bold" font-size="12">
@@ -439,8 +452,8 @@ First (1st) Month's Rent: </text-chunk><text-chunk font="times" font-size="12"> 
 Pet Fee(s):</text-chunk> 
 <text-chunk font="times" font-size="12"> ${{.PetFee}} for all the Pet(s)</text-chunk>
 </paragraph>
-
-<paragraph margin="420 0 10 0" text-align="center">
+<page-break></page-break>
+<paragraph text-align="center">
    <text-chunk font="times-bold" font-size="18.5">Move-in Checklist</text-chunk>
 </paragraph>
 
@@ -452,7 +465,8 @@ Move-in Inspection Date: ___________________ Move-out Inspection Date: _________
 </text-chunk>
 </paragraph>
 
-{{template "simple-paragraph" dict "FontSize" 11 "Margin" "10 0 0 0" "Text" `Write the condition of the space along with any specific damage or repairs needed. Be sure to write
+{{template "simple-paragraph" dict "Margin" "0" "FontSize" 11 "Text" `
+Write the condition of the space along with any specific damage or repairs needed. Be sure to write
 any repair needed such as paint chipping, wall damage, or any lessened area that could be considered
 maintenance needed at the end of the lease, and therefore, be deducted at the end of the Lease Term.`}}
 
