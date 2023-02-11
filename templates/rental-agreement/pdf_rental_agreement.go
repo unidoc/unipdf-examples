@@ -253,7 +253,7 @@ func readRentalAgreement(jsonFile string) (*RentalAgreement, error) {
 	return rentalAgreement, nil
 }
 
-// numberToWord is a dictionary that maps numbers to their respective names in english.
+// numberToWord represents a map of numbers to their respective names in english.
 var numberToWord = map[int]string{
 	1:  "one",
 	2:  "two",
