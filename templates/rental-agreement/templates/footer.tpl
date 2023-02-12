@@ -24,7 +24,7 @@
             <table-cell vertical-align="bottom">
                 {{if gt 10 .PageNum}}
                 <paragraph margin="0 0 8 0">
-                    <text-chunk outline-color= "faf9e4" font="arial-bold" color="#0000FF" font-size="9" underline="true" underline-thickness="0.5" underline-color="#0000FF">http://www.bestlandlords.com/billing</text-chunk>
+                    <text-chunk outline-color="faf9e4" font="arial-bold" font-size="9" underline="true" underline-thickness="0.5" link="url('http://www.bestlandlords.com/billing')">http://www.bestlandlords.com/billing</text-chunk>
                 </paragraph>
                 {{end}}
             </table-cell>
