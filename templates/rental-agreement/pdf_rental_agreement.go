@@ -198,9 +198,8 @@ func main() {
 
 		// Draw template.
 		data := map[string]interface{}{
-			"Agreement":  rentalAgreement,
-			"PageNum":    pageNum,
-			"TotalPages": totalPages,
+			"Agreement": rentalAgreement,
+			"PageNum":   pageNum,
 		}
 		if err := block.DrawTemplate(c, tpl, data, tplOpts); err != nil {
 			log.Fatal(err)
