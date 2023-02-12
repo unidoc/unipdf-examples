@@ -14,7 +14,6 @@ import (
 	"log"
 	"os"
 	"text/template"
-	"time"
 
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
@@ -52,10 +51,6 @@ func main() {
 	// Draw main content template.
 	tplOpts := &creator.TemplateOptions{
 		HelperFuncMap: template.FuncMap{
-			"formatTime": func(val, format string) string {
-				t, _ := time.Parse("2006-01-02T15:04:05", val)
-				return t.Format(format)
-			},
 			"extendDict": func(m map[string]interface{}, params ...interface{}) (map[string]interface{}, error) {
 				lenParams := len(params)
 				if lenParams%2 != 0 {

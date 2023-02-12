@@ -29,7 +29,7 @@
     {{template "table-cell-paragraph" (extendDict $props "Align" "center" "Text" "To Contact Us Call: 123 - 456 - 7890\n\nPhone representatives are available:\n8am to 8pm Monday - Thursday\nand 8am to 4:30pm Friday") }}
     
     <table-cell>
-        <table columns="2" column-widths="0.5 0.5">
+        <table columns="2">
             {{template "table-cell-paragraph" (extendDict $props "Margin" "0" "Align" "left" "Text" "Guarantor Number:") }}
             {{template "table-cell-paragraph" (extendDict $props "Align" "right" "TextAlgin" "right" "Text" .bill.Guarantor.Number) }}
             {{template "table-cell-paragraph" (extendDict $props "Margin" "-2 0 0 0" "Align" "left" "Text" "Guarantor Name:") }}
@@ -82,7 +82,7 @@
     {{end}}
 </table>
 
-<table columns="2" column-width="0.5 0.5">
+<table columns="2">
     {{template "table-cell-paragraph" (extendDict $props "BackgroundColor" "#ffffff" "BorderBottomSize" 0 "Align" "left" "TextAlign" "left" "Font" "helvetica" "TextColor" "#000000"
         "Text" "MESSAGES:\nWe have filed the medical claims with your insurance.They have indicated the balance is your responsibility. To pay your DIN online, please visit www.ourwebsite.com.\n\nIf you have questions regarding your bill, or for payment arrangements, please call 123 - 456 - 78 or send an email inquiry to aboutmybill@ourwebsite.com"
     )}}
@@ -101,7 +101,7 @@
     </table-cell>
 </table>
 
-<table columns="2" column-widths="0.5 0.5" margin="15 0 0 0">
+<table columns="2" margin="15 0 0 0">
     {{template "table-cell-paragraph" (extendDict $props "Colspan" 2 "Align" "center" "TextAlign" "center" "Font" "helvetica-bold" "FontSize" 12 "Text" "Please retain statement for your records" ) }}
 
     <table-cell colspan="2">
