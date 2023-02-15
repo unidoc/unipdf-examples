@@ -1,0 +1,40 @@
+{
+    "guarantor": {
+        "number": "2nnnnn",
+        "name": "Sample Guarantor",
+        "address1": "123 MAIN STREET",
+        "address2": "ANYWHERE, NY 12345 - 6789"
+    },
+    "statement_date": "01/02/2023",
+    "due_date": "Upon Receipt",
+    "services": [
+        {
+            "items": [
+                {
+                    "date": "01/02/2023 to 01/02/2023",
+                    "desc": "Visit #123 Sample Patient"
+                },
+                {
+                    "desc": "Pharmacy",
+                    "charges": "60.53"
+                },
+                {
+                    "desc": "Treatment or Observation Room",
+                    "charges": "588.00"
+                },
+                {
+                    "desc": "Insurance Payment",
+                    "payment": "-598.53"
+                },
+                {
+                    "desc": "Total Hospital Charges",
+                    "charges": "638.53"
+                }
+            ],
+            "total_payments": "-598.53",
+            "total_adjustments": "0.0",
+            "patient_due": "40.00"
+        }
+    ],
+    "total": "$40.00"
+}
