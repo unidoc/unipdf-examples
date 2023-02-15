@@ -1,15 +1,15 @@
 {{define "test-result-header"}}
     <table-cell background-color="#1B7A98" align="center" vertical-align="middle">
         <paragraph text-align="center">
-            <text-chunk font-size="10" color="#ffffff">{{ .Text }}</text-chunk>
+            <text-chunk color="#ffffff">{{ .Text }}</text-chunk>
         </paragraph>
     </table-cell>
 {{end}}
 
 {{define "test-result-row"}}
-    <table-cell align="center" vertical-align="top" border-width-bottom="1" border-color="#1B7A98">
+    <table-cell align="center" border-width-bottom="1" border-color="#1B7A98">
         <paragraph text-align="center" line-height="1.1">
-            <text-chunk font-size="10">{{ .Text }}</text-chunk>
+            <text-chunk>{{ .Text }}</text-chunk>
         </paragraph>
     </table-cell>
 {{end}}
@@ -132,7 +132,7 @@
         </table-cell>
         <table-cell border-width-bottom="1" border-width-top="1">
             <paragraph>
-                <text-chunk>Dir: Michael Tannenbaum, MD</text-chunk>
+                <text-chunk>Dir: John Doe, MD</text-chunk>
             </paragraph>
         </table-cell>
     </table>

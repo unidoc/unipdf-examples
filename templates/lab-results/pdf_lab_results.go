@@ -1,6 +1,6 @@
 /*
  * This example showcases the usage of creator templates by creating a sample
- * lab result document.
+ * lab results document.
  *
  * Run as: go run pdf_lab_results.go
  */
@@ -42,7 +42,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Read lab result JSON data.
+	// Read lab results JSON data.
 	data, err := readResultData("lab_results.json")
 	if err != nil {
 		log.Fatal(err)
@@ -168,7 +168,7 @@ type LabResults struct {
 	Results      []*TestResult `json:"tests"`
 }
 
-// Patien holds patient related data.
+// Patient holds patient related data.
 type Patient struct {
 	Birthdate string `json:"birthdate"`
 	Age       string `json:"age"`

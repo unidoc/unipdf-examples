@@ -1,6 +1,6 @@
 {{define "info-field"}}
     <table-cell>
-        <paragraph margin="0">
+        <paragraph>
             <text-chunk color="#1B7A98" font-size="12">{{ .Title }}</text-chunk>
         </paragraph>
     </table-cell>
@@ -12,7 +12,7 @@
 {{end}}
 
 <division margin="10">
-    <table columns="2" column-width="0.5 0.5">
+    <table columns="2">
         <table-cell border-width-bottom="2" border-color="#000000">
             <image src="path('templates/res/logo.png')" margin="0 0 5 5"></image>
         </table-cell>

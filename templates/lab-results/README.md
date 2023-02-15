@@ -1,9 +1,9 @@
-Sample lab result document
+Sample lab results document
 ==========================
 
 This example showcases the usage of creator templates by creating a sample
-lab result document.
+lab results document.
 
 <p>
-    <img src="templates/res/screenshot.png" alt="sample-lab-result-preview" width="100%" />
+    <img src="templates/res/screenshot.png" alt="sample-lab-results-preview" width="100%" />
 </p>
