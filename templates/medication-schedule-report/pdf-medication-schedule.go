@@ -27,8 +27,11 @@ import (
 
 func main() {
 	c := creator.New()
-	c.SetPageMargins(90, 60, 95, 135)
-	c.SetPageSize(creator.PageSizeA5)
+	c.SetPageMargins(90, 60, 95, 300)
+	// pageSize 279.4 x 215.9
+	size := creator.PageSize{279.4 * creator.PPMM, 215.9 * creator.PPMM}
+	// c.SetPageSize(creator.PageSizeA4)
+	c.SetPageSize(size)
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
 	if err != nil {
@@ -39,6 +42,21 @@ func main() {
 	if err := c.DrawTemplate(mainTpl, nil, nil); err != nil {
 		log.Fatal(err)
 	}
+
+	c.DrawFooter(func(block *creator.Block, args creator.FooterFunctionArgs) {
+		// Read template.
+		tpl, err := readTemplate("templates/footer.tpl")
+		if err != nil {
+			log.Fatal(err)
+		}
+		// Draw template.
+		data := map[string]interface{}{
+			"PageNum": args.PageNum,
+		}
+		if err := block.DrawTemplate(c, tpl, data, nil); err != nil {
+			log.Fatal(err)
+		}
+	})
 
 	// Write to output file.
 	if err := c.WriteToFile("unipdf-medication-schedule.pdf"); err != nil {
