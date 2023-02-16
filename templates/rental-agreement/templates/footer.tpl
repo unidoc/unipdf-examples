@@ -8,7 +8,6 @@
         <table columns="1" margin = "0 0 0 30">
             <table-cell vertical-align="bottom">
                 {{if gt 10 .PageNum}}
-                {{$width := getWidth "Initials " "Times-Roman"}}
                 <division>
                     <paragraph>
                         <text-chunk font="times" font-size="9">Initials</text-chunk>
