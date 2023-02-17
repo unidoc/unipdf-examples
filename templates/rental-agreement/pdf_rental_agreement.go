@@ -134,7 +134,6 @@ func main() {
 				return nameList
 			},
 			"getWidth": func(text, stdFontName string) float64 {
-
 				// Width calculation for a given text based on the font used.
 				stdFont := model.StdFontName(stdFontName)
 				font, err := model.NewStandard14Font(stdFont)
@@ -189,7 +188,6 @@ func main() {
 
 	// Draw header and footer.
 	drawHeader := func(tplPath string, block *creator.Block, pageNum, totalPages int) {
-
 		// Read template.
 		tpl, err := readTemplate(tplPath)
 		if err != nil {

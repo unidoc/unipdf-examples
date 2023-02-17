@@ -1,13 +1,13 @@
 {
     "date": "2020-12-09T00:00:00",
     "company": {
-        "name": "Best Landlord Company",
+        "name": "UniDOC Land Company",
         "address": "2 Maple Ln, Suite A, Best Town, Alabama, 29227",
         "location": "North Carolina",
         "landlord": "John Landlord"
     },
     "manager": {
-        "company": "Best Management Company",
+        "company": "UniDOC Management Company",
         "address": "2 Maple Ln, Suite A, Best Town, Alabama, 29227",
         "phone": "(888) 222-3333",
         "email": "email@email.com"

@@ -8,5 +8,3 @@ rental agreement.
     <img src="templates/res/pages.png" alt="sample-rental-agreement-preview" width="100%"/>
 </p>
 
-
-

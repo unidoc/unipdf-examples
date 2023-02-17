@@ -2,10 +2,10 @@
 {{$margin := getWidth (printf "%s%s" . " Condition ") "Times-Roman"}}
 <table-cell>
    <division margin="5 0">
-   <paragraph>
-      <text-chunk font = "times">{{.}} Condition </text-chunk>
-   </paragraph>
-   <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 {{$margin}}"></line>
+      <paragraph>
+         <text-chunk font = "times">{{.}} Condition </text-chunk>
+      </paragraph>
+      <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 {{$margin}}"></line>
    </division>
 </table-cell>
 <table-cell>
@@ -48,8 +48,8 @@
 {{$margin:= .Margin}}
 {{end}}
 <paragraph margin= "{{$margin}}" line-height="1.1">
-<text-chunk font="times-bold" font-size="12">{{.Header}}: </text-chunk>
-<text-chunk font="times" font-size="12">{{.Text}} </text-chunk>
+   <text-chunk font="times-bold" font-size="12">{{.Header}}: </text-chunk>
+   <text-chunk font="times" font-size="12">{{.Text}} </text-chunk>
 </paragraph>
 {{end}}
 
@@ -402,15 +402,15 @@ The parties have agreed and executed this agreement on %s` (formatTime .Date "De
 <page-break></page-break>
 {{template "simple-paragraph" dict "Margin" "18 0 10 0" "Font" "times-bold" "Text" "LANDLORD(S) SIGNATURE"}}
 <division margin="20 60 0 0">
-{{template "form-sig" dict "Margin" "0 0 0 110" "Text" "Landlord’s Signature"}}
+   {{template "form-sig" dict "Margin" "0 0 0 110" "Text" "Landlord’s Signature"}}
 </division>
 {{template "simple-paragraph" dict "Margin" "5 0 0 0" "Text" (printf `%s as President of %s` .Company.LandLord .Company.Name)}}
 {{template "simple-paragraph" dict "Margin" "18 0 20 0" "Font" "times-bold" "Text" "TENANT(S) SIGNATURE"}}
 <division margin="20 60 0 0">
-{{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
+   {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
 <division margin="20 60 20 0">
-{{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
+   {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
 
 <page-break></page-break>
@@ -419,50 +419,42 @@ The parties have agreed and executed this agreement on %s` (formatTime .Date "De
 </paragraph>
 
 <division margin="10 0 0 0">
-<paragraph line-height="2.5">
-<text-chunk>
-Date:__________________________________________  
-Dear ___________________________________________[Tenant(s)],
-The Landlord shall hold the Security Deposit in a separate account at a bank
-located at __________________________________________[Street Address] in
-the City of __________________________________________ , State of ___________________
-The Security Deposit in the amount of $ _____________________ (US Dollars) has been deposited in
-___________________ [Bank Name] with the Account Number of _________________ for the full
-performance of the Lease executed on the _____ day of _______________ , 20 ___.
-Sincerely,
-</text-chunk>
-</paragraph>
+   <paragraph line-height="2.5">
+      <text-chunk font="times">Date:__________________________________________{{printf "\n"}}</text-chunk>
+      <text-chunk font="times">Dear ___________________________________________[Tenant(s)],{{printf "\n"}}</text-chunk>
+      <text-chunk font="times">The Landlord shall hold the Security Deposit in a separate account at a bank{{printf "\n"}}</text-chunk>
+      <text-chunk font="times">located at __________________________________________[Street Address] in{{printf "\n"}}</text-chunk>
+      <text-chunk font="times">the City of __________________________________________ , State of ___________________{{printf "\n"}}</text-chunk>
+      <text-chunk font="times">The Security Deposit in the amount of $ _____________________ (US Dollars) has been deposited in{{printf "\n"}}</text-chunk>
+      <text-chunk font="times">___________________ [Bank Name] with the Account Number of _________________ for the full{{printf "\n"}}</text-chunk>
+      <text-chunk font="times">performance of the Lease executed on the _____ day of _______________ , 20 ___.{{printf "\n"}}</text-chunk>
+      <text-chunk font="times">Sincerely,{{printf "\n"}}</text-chunk>
+   </paragraph>
 </division>
 <division margin="20 0 30 0">
-{{template "form-sig" dict "Margin" "0 200 0 110" "Text" "Landlord’s Signature"}}
+   {{template "form-sig" dict "Margin" "0 200 0 110" "Text" "Landlord’s Signature"}}
 </division>
 <page-break></page-break>
 <division margin="50 0 30 0">
-<paragraph text-align = "center">
-   <text-chunk font="times" font-size="12">AMOUNT ($) DUE AT SIGNING</text-chunk>
-</paragraph>
+   <paragraph text-align = "center">
+      <text-chunk font="times" font-size="12">AMOUNT ($) DUE AT SIGNING</text-chunk>
+   </paragraph>
 </division>
-
-<paragraph margin="18 0" text-align = "left" line-height="2.3">
-<text-chunk font="times-bold" font-size="12">Security Deposit: </text-chunk> 
-<text-chunk font="times" font-size="12">${{.SecurityDeposit}}</text-chunk>
-<text-chunk font="times-bold" font-size="12">
-First (1st) Month's Rent: </text-chunk><text-chunk font="times" font-size="12"> ${{.SecurityDeposit}}</text-chunk>
-<text-chunk font="times-bold" font-size="12">
-Pet Fee(s):</text-chunk> 
-<text-chunk font="times" font-size="12"> ${{.PetFee}} for all the Pet(s)</text-chunk>
+<paragraph margin="18 0" line-height="2.3">
+   <text-chunk font="times-bold" font-size="12">Security Deposit: </text-chunk> 
+   <text-chunk font="times" font-size="12">${{.SecurityDeposit}}{{printf "\n"}}</text-chunk>
+   <text-chunk font="times-bold" font-size="12">First (1st) Month's Rent: </text-chunk>
+   <text-chunk font="times" font-size="12">${{.SecurityDeposit}}{{printf "\n"}}</text-chunk>
+   <text-chunk font="times-bold" font-size="12">Pet Fee(s): </text-chunk> 
+   <text-chunk font="times" font-size="12"> ${{.PetFee}} for all the Pet(s)</text-chunk>
 </paragraph>
 <page-break></page-break>
 <paragraph text-align="center">
    <text-chunk font="times-bold" font-size="18.5">Move-in Checklist</text-chunk>
 </paragraph>
-
 <paragraph>
-<text-chunk font="times" font-size="11">
-Property Address: {{.Apartment.Address}}
-Unit Size: {{.Apartment.UnitSize}} bedroom(s)
-Move-in Inspection Date: ___________________ Move-out Inspection Date: _________________                                 
-</text-chunk>
+   <text-chunk font="times" font-size="11">Property Address: {{.Apartment.Address}}{{printf "\n"}}Unit Size: {{.Apartment.UnitSize}} bedroom(s){{printf "\n"}}</text-chunk>
+   <text-chunk font="times" font-size="11">Move-in Inspection Date: ___________________ Move-out Inspection Date: _________________</text-chunk>                             
 </paragraph>
 
 {{template "simple-paragraph" dict "Margin" "0" "FontSize" 11 "Text" `
@@ -484,12 +476,12 @@ maintenance needed at the end of the lease, and therefore, be deducted at the en
 {{template "simple-paragraph" dict "Text" `I, a Tenant on this Lease, have sufficiently inspected the Premises and confirm above-stated 
 information. (only 1 Tenant required)`}}
 <division margin="18 60 0 0">
-{{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
+   {{template "form-sig" dict "Margin" "0 0 0 100" "Text" "Tenant’s Signature"}}
 </division>
 
 {{template "simple-paragraph" dict "Text" `I, the Landlord on this Lease, have sufficiently inspected the Premises and confirm 
 above-statedinformation`}}
 
 <division margin="18 60 0 0">
-{{template "form-sig" dict "Margin" "0 0 0 110" "Text" "Landlord’s Signature"}}
+   {{template "form-sig" dict "Margin" "0 0 0 110" "Text" "Landlord’s Signature"}}
 </division>
