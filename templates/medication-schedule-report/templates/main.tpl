@@ -8,3 +8,18 @@
         </paragraph>
     </table-cell>
 </table>
+
+<table columns="1">
+<table-cell border-width-left="0.5" border-width-bottom="0.5">
+<division>
+<paragraph>
+<text-chunk>K00</text-chunk>
+<text-chunk>PLEASE NOTE: </text-chunk>
+<text-chunk>completed calendars MUST be returned to SHC as part of the patient's Medical Record </text-chunk>
+<text-chunk>Information:	0-123-456-789</text-chunk>
+<text-chunk>Emergency:	0-123-456-789</text-chunk>
+<text-chunk>Website:	www.samplehealthcare.com</text-chunk>
+</paragraph>
+</division>
+</table-cell> 
+</table>

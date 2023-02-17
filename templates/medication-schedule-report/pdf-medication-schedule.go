@@ -43,7 +43,7 @@ type MedicalData struct {
 
 func main() {
 	c := creator.New()
-	c.SetPageMargins(90, 60, 95, 300)
+	c.SetPageMargins(12, 11, 6, 12)
 	size := creator.PageSize{279.4 * creator.PPMM, 215.9 * creator.PPMM}
 	c.SetPageSize(size)
 	// Read main content template.
