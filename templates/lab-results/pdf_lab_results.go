@@ -17,7 +17,6 @@ import (
 
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/creator"
 )
 
@@ -51,23 +50,6 @@ func main() {
 	// Draw main content template.
 	tplOpts := &creator.TemplateOptions{
 		HelperFuncMap: template.FuncMap{
-			"extendDict": func(m map[string]interface{}, params ...interface{}) (map[string]interface{}, error) {
-				lenParams := len(params)
-				if lenParams%2 != 0 {
-					return nil, core.ErrRangeError
-				}
-
-				for i := 0; i < lenParams; i += 2 {
-					key, ok := params[i].(string)
-					if !ok {
-						return nil, core.ErrTypeError
-					}
-
-					m[key] = params[i+1]
-				}
-
-				return m, nil
-			},
 			"infoColor": func(level Level) string {
 				if color, ok := levelColor[level]; ok {
 					return color
