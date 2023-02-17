@@ -8,6 +8,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"log"
 	"os"
@@ -25,12 +26,23 @@ import (
 // 	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 // }
 
+type MedicalData struct {
+	Patient struct {
+		Name                 string `json:"name"`
+		SocialSecurityNumber string `json:"social_security_number"`
+		Dob                  string `json:"dob"`
+	} `json:"patient"`
+	StartDate       string `json:"start_date"`
+	EndDate         string `json:"end_date"`
+	EmergencyLine   string `json:"emergency_line"`
+	InformationLine string `json:"information_line"`
+	Website         string `json:"website"`
+}
+
 func main() {
 	c := creator.New()
 	c.SetPageMargins(90, 60, 95, 300)
-	// pageSize 279.4 x 215.9
 	size := creator.PageSize{279.4 * creator.PPMM, 215.9 * creator.PPMM}
-	// c.SetPageSize(creator.PageSizeA4)
 	c.SetPageSize(size)
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
@@ -78,4 +90,20 @@ func readTemplate(tplFile string) (io.Reader, error) {
 	}
 
 	return buf, nil
+}
+
+// readReceipt reads the receipt json file and decodes it to `Receipt` object.
+func readData(jsonFile string) (*MedicalData, error) {
+	file, err := os.Open(jsonFile)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var data MedicalData
+	err = json.NewDecoder(file).Decode(&data)
+	if err != nil {
+		return nil, err
+	}
+	return &data, nil
 }
