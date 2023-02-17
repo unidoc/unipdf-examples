@@ -1,0 +1,72 @@
+{
+    "specimen_id": "245-988-9013-0",
+    "control_id": "0987654",
+    "account_number": "90000999",
+    "phone": "(123) 456-7890",
+    "support_phone": "800-111-1212",
+    "rte": "00",
+    "patient": {
+        "birthdate": "1965/12/01",
+        "age": "55",
+        "gender": "M",
+        "id": "12345"
+    },
+    "specimen": {
+        "collected": "09/01/2020",
+        "received": "09/01/2020",
+        "entered": "09/01/2020",
+        "reported": "09/01/2020"
+    },
+    "physician": {
+        "ordering": "",
+        "referring": "",
+        "id": "",
+        "npi": ""
+    },
+    "tests": [
+        {
+            "info": "NOT DETECTED",
+            "level": "green",
+            "test": "SARS-CoV-2, NAA",
+            "result": "Not Detected",
+            "flag": "",
+            "units": "",
+            "ref_interval": "Not Detected",
+            "lab": "01",
+            "description": [
+                "Detection of IgG antibodies may indicate exposure to SARS-CoV-2 (COVID 19). It usually takes at least 10 days after symptom onset for IgG to reach detectable labels. An IgG positive result may suggest an immune response to a primary infection with SARS-CoV-2, but the relationship between IgG positivity and immunity to SARS-CoV-2 has not yet been firmly established. Antibody tests have not been shown to definitively diagnose or exclude SARS-CoV-2 infection. Diagnosis of COVID-19 is made by detection of SARS-CoV-2 RNA by molecular testing methods, consistent with a patient's clinical findings.",
+                "Negative results do not rule out SARS-CoV-2 infection particularly in those who have been in contact with the virus. Follow-up testing with a molecular diagnostic should be considered to rule out infection in these individuals. Results from antibody testing should not be used as the sole basis to diagnose or exclude SARS-CoV-2 infection or to inform infection status."
+            ]
+        },
+        {
+            "info": "INSUFFICIENT",
+            "level": "yellow",
+            "test": "Vitamin D, 25-Hydroxy",
+            "result": "25.0",
+            "flag": "Insufficient",
+            "units": "ng/mL",
+            "ref_interval": "30.0 - 100.0",
+            "lab": "01",
+            "description": [
+                "The serum concentration of calcifediol, also called 25-hydroxyvitamin D (abbreviated 25(OH)D), is typically used to determine vitamin D status. Most vitamin D is converted to 25(OH)D in the serum, giving an accurate picture of vitamin D status. The level of serum 1,25(OH)D is not usually used to determine vitamin D status because it often is regulated by other hormones in the body such as parathyroid hormone. The levels of 1,25(OH)D can remain normal even when a person may be vitamin D deficient. Serum level of 25(OH)D is the laboratory test ordered to indicate whether or not a person has vitamin D deficiency or insufficiency. It is also considered reasonable to treat at-risk persons with vitamin D supplementation without checking the level of 25(OH)D in the serum, as vitamin D toxicity has only been rarely reported to occur.",
+                "Levels of 25(OH)D that are consistently above 200 nanograms per milliliter (ng/mL) (or 500 nanomoles per liter, nmol/L) are thought to be potentially toxic, although data from humans are sparse. Vitamin D toxicity usually results from taking supplements in excess. Hypercalcemia is often the cause of symptoms, and levels of 25(OH)D above 150 ng/mL (375 nmol/L) are usually found, although in some cases 25(OH)D levels may appear to be normal. Periodic measurement of serum calcium in individuals receiving large doses of vitamin D is recommended.",
+                "Vitamin D deficiency has been defined by the Institute of Medicine and an Endocrine Society practice guideline as a level of serum 25-OH vitamin D less than 20 ng/mL. The Endocrine Society went on to further define vitamin D insufficiency as a level between 21 and 29 ng/mL."
+            ]
+        },
+        {
+            "info": "HIGH",
+            "level": "red",
+            "test": "C-Reactive Protein, Cardiac",
+            "result": "9.78",
+            "flag": "High",
+            "units": "mg/L",
+            "ref_interval": "0.00 - 5.00",
+            "lab": "01",
+            "description": [
+                "C-Reactive Protein (CRP) is one of the first widely-available tests that offers a tangible marker of inflammation. The High-Sensitivity Creactive Protein (hsCRP) test measures very low amounts of CRP in the blood providing much more precise and accurate readings. When CRP is high, that is a definite indication of an inflammatory process present throughout the body. (Note: In some cases inflammation is present, yet CRP is not elevated.) CRP levels are considered elevated when greater than .5 mg/L.",
+                "When inflammation persists, that is almost always a feature of subclinical disease—a process smoldering below the surface that is not yet detectable, but in which tissue damage is occurring. High CRP levels are common in pre-diabetes and diabetes, reflecting insulin resistance and metabolic syndrome—all conditions associated with a high risk of cardiovascular disease.",
+                "Elevated CRP levels can also indicate a long-term infection. It is also an important marker of cardiovascular risk. As a predictive biomarker, hsCRP reflects the effectiveness and efficiency of immune defenses, which are responsible for neutralizing any sign of infection, repairing daily wear and tear, and identifying and eliminating cancerous cells."
+            ]
+        }
+    ]
+}
