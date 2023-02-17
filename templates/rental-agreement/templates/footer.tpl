@@ -23,7 +23,7 @@
             <table-cell vertical-align="bottom">
                 {{if gt 10 .PageNum}}
                 <paragraph margin="0 0 5 0">
-                    <text-chunk font="arial-bold" font-size="9" underline="true" underline-thickness="0.5" link="url('http://www.bestlandlords.com/billing')">http://www.bestlandlords.com/billing</text-chunk>
+                    <text-chunk font="arial-bold" font-size="9" underline="true" underline-thickness="0.5" link="url('https://unidoc.io')">https://unidoc.io</text-chunk>
                 </paragraph>
                 {{end}}
             </table-cell>
