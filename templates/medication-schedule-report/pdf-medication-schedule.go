@@ -16,19 +16,21 @@ import (
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/ean"
+	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-// func init() {
-// 	// Make sure to load your metered License API key prior to using the library.
-// 	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io.
-// 	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
-// }
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io.
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+}
 
 type MedicalData struct {
 	Patient struct {
@@ -45,14 +47,19 @@ type MedicalData struct {
 
 func main() {
 	c := creator.New()
-	c.SetPageMargins(12, 11, 6, 112)
 	size := creator.PageSize{279.4 * creator.PPMM, 215.9 * creator.PPMM}
 	c.SetPageSize(size)
+	c.SetPageMargins(20, 20, 44, 44)
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
 	if err != nil {
 		log.Fatal(err)
 	}
+	barCode, err := makeBarcode("0123456789012", 50, 72)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_ = barCode
 	arialBold, err := model.NewPdfFontFromTTFFile("./templates/res/arialbd.ttf")
 	if err != nil {
 		log.Fatal(err)
@@ -63,6 +70,9 @@ func main() {
 	}
 	// Create template options.
 	tplOpts := &creator.TemplateOptions{
+		ImageMap: map[string]*model.Image{
+			"barCode": barCode,
+		},
 		FontMap: map[string]*model.PdfFont{
 			"arial-bold": arialBold,
 			"arial":      arial,
@@ -102,14 +112,13 @@ func main() {
 func makeBarcode(codeStr string, width float64, oversampling int) (*model.Image, error) {
 	bcode, err := ean.Encode(codeStr)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
-	// Prepare the code image.
 	pixelWidth := oversampling * int(math.Ceil(width))
 	bcodeImg, err := barcode.Scale(bcode, pixelWidth, pixelWidth)
 	if err != nil {
-		return nil, err
+		log.Fatal(err)
 	}
 
 	image, err := model.ImageHandling.NewImageFromGoImage(bcodeImg)

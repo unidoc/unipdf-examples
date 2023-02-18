@@ -8,5 +8,35 @@
     "end_date": "02-28-2021",
     "information_line": "0-123-456-789",
     "emergency_line": "0-123-456-789",
-    "website": "www.samplehealthcare.com"
+    "website": "www.samplehealthcare.com",
+    "drugs": [
+        {
+            "name": "Zerit",
+            "description": "(Stavudine), 15mg Capsule(s) 4 tablets/day for 4 week(s)"
+        },
+        {
+            "name": "Valcyte",
+            "description": "(Valgancyclovir Hidrocloride), 450 mg Tablet(s) 2 tablets/day for 2 week(s)"
+        },
+        {
+            "name": "Prednisone",
+            "description": "4 tablets/day for 4 week(s)"
+        },
+        {
+            "name": "Aspirin",
+            "description": "375 mg film coated Tablet(s) 4 tablets/day for 1 week"
+        },
+        {
+            "name": "Salbutamol",
+            "description": "Aerosol, spray 90 mg Inhalation 6 times/day for 2 week(s)"
+        },
+        {
+            "name": "Vitamin D3",
+            "description": "(Cholecalciferol), 1.25 mg Capsule(s) 3 capsules/day for 2 week(s)"
+        },
+        {
+            "name": "Ibuprofen",
+            "description": "1 tablet/day for 3 week(s)"
+        }
+    ]
 }
