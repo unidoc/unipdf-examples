@@ -12,31 +12,82 @@
     "drugs": [
         {
             "name": "Zerit",
-            "description": "(Stavudine), 15mg Capsule(s) 4 tablets/day for 4 week(s)"
+            "description": "(Stavudine), 15mg Capsule(s) 4 tablets/day for 4 week(s)",
+            "times_taken": [
+                "8 AM",
+                "12 PM",
+                "5 PM",
+                "9 PM"
+            ]
         },
         {
             "name": "Valcyte",
-            "description": "(Valgancyclovir Hidrocloride), 450 mg Tablet(s) 2 tablets/day for 2 week(s)"
+            "description": "(Valgancyclovir Hidrocloride), 450 mg Tablet(s) 2 tablets/day for 2 week(s)",
+            "times_taken": [
+                "Noon",
+                "Bedtime"
+            ]
         },
         {
             "name": "Prednisone",
-            "description": "4 tablets/day for 4 week(s)"
+            "description": "4 tablets/day for 4 week(s)",
+            "times_taken": [
+                "10 AM"
+            ]
         },
         {
             "name": "Aspirin",
-            "description": "375 mg film coated Tablet(s) 4 tablets/day for 1 week"
+            "description": "375 mg film coated Tablet(s) 4 tablets/day for 1 week",
+            "times_taken": [
+                "8 AM",
+                "12 PM",
+                "4 PM",
+                "8 PM"
+            ]
         },
         {
             "name": "Salbutamol",
-            "description": "Aerosol, spray 90 mg Inhalation 6 times/day for 2 week(s)"
+            "description": "Aerosol, spray 90 mg Inhalation 6 times/day for 2 week(s)",
+            "times_taken": [
+                "8 AM",
+                "12 PM",
+                "3 PM",
+                "4 PM",
+                "6 PM",
+                "8 PM"
+            ]
         },
         {
             "name": "Vitamin D3",
-            "description": "(Cholecalciferol), 1.25 mg Capsule(s) 3 capsules/day for 2 week(s)"
+            "description": "(Cholecalciferol), 1.25 mg Capsule(s) 3 capsules/day for 2 week(s)",
+            "times_taken": [
+                "Morning",
+                "Afternoon",
+                "Evening"
+            ]
         },
         {
             "name": "Ibuprofen",
-            "description": "1 tablet/day for 3 week(s)"
+            "description": "1 tablet/day for 3 week(s)",
+            "times_taken": [
+                "6 PM"
+            ]
         }
+    ],
+    "list_day": [
+        "Su",
+        "Mo",
+        "Tu",
+        "We",
+        "Th",
+        "Fr",
+        "Sa",
+        "Su",
+        "Mo",
+        "Tu",
+        "We",
+        "Th",
+        "Fr",
+        "Sa"
     ]
 }
