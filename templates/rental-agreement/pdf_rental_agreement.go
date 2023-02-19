@@ -140,15 +140,15 @@ func main() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				textWith := 0.0
+				textWidth := 0.0
 				for _, r := range text {
 					metrics, bool := font.GetRuneMetrics(r)
 					if !bool {
 						log.Fatal("failed to get width")
 					}
-					textWith += metrics.Wx
+					textWidth += metrics.Wx
 				}
-				return textWith / 100
+				return textWidth / 100
 			},
 
 			// Converts numbers to their respective names.
