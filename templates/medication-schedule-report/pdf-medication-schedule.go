@@ -9,26 +9,30 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"math"
 	"os"
+	"text/template"
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/ean"
+	"github.com/unidoc/unipdf/v3/common"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
-// func init() {
-// 	// Make sure to load your metered License API key prior to using the library.
-// 	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io.
-// 	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
-// }
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io.
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+}
 
 type MedicalData struct {
 	Patient struct {
@@ -41,6 +45,13 @@ type MedicalData struct {
 	EmergencyLine   string `json:"emergency_line"`
 	InformationLine string `json:"information_line"`
 	Website         string `json:"website"`
+	Drugs           []struct {
+		Name          string   `json:"name"`
+		Description   string   `json:"description"`
+		TimesOfTheDay []string `json:"times_taken"`
+		DaysTaken     []string `json:"days"`
+	} `json:"drugs"`
+	ListOfDays []string `json:"list_of_days"`
 }
 
 func main() {
@@ -74,6 +85,21 @@ func main() {
 		FontMap: map[string]*model.PdfFont{
 			"arial-bold": arialBold,
 			"arial":      arial,
+		},
+		HelperFuncMap: template.FuncMap{
+			"getColumnWidths": func(colNums int, colWidth float64) string {
+				var widths string
+				width := colWidth / float64(colNums)
+				for i := 0; i < colNums; i++ {
+					s := fmt.Sprintf("%.4f", width)
+					if i == colNums-1 {
+						widths += s
+					} else {
+						widths += (s + " ")
+					}
+				}
+				return widths
+			},
 		},
 	}
 	// Read data from json.
