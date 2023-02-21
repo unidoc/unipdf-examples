@@ -24,7 +24,7 @@
         </table-cell>
 
         <table-cell rowspan="5" border-width-bottom="2.5" border-width-left="1">
-            <table columns="2" column-widths="0.8 0.2">
+            <table columns="2" column-widths="0.7 0.3">
                 <table-cell>
                     <table columns="2">
                         <table-cell colspan="2" margin="5 0 0 0">
@@ -70,8 +70,10 @@
                         </table-cell>
                     </table>
                 </table-cell>
-                <table-cell vertical-align="middle">
+                <table-cell vertical-align="bottom">
+                    <division margin="0 20 0 0">
                     <image src="path('templates/res/bar-code.png')" width="30" height="120"></image>
+                    </division>
                 </table-cell>
             </table>
         </table-cell>
@@ -331,9 +333,34 @@
     {{end}}
 {{end}}
 
-<table columns="16" margin ="20 0 0 0" column-widths = "0.25 0.08 {{getColumnWidths (len .ListOfDays) 0.67}}">
+<table columns="16" margin="20 0 0 0" column-widths="0.25 0.08 {{getColumnWidths (len .ListOfDays) 0.67}}">
     {{template "table-header" dict "Days" .ListOfDays}}
     {{range $idx, $v := .Drugs}}
         {{template "drug-schedule" .}}
     {{end}}
 </table>
+
+<table columns="3" margin="0 0 0 200" column-widths="0.6 0.2 0.2">
+    <table-cell>
+        <paragraph margin="10 0 0 0">
+            <text-chunk>Mark each box with a checkmark after you have taken a dose of medicine. If you skipped a dose, please consult your physician or pharmacist. Do not take medicine on the days and times not clearly indicated on this schedule.</text-chunk>
+        </paragraph>
+    </table-cell>
+    <table-cell>
+        <division margin="10 0 0 0">
+        <ellipse position="relative" width="10" height="10" border-color="#000000" fill-color="#ffffff" border-width="0.4"></ellipse>
+        <paragraph >
+            <text-chunk>Take a medication</text-chunk>
+        </paragraph>
+        </division>
+    </table-cell>
+    <table-cell>
+        <division margin="10 0 0 0">
+        <ellipse position="relative" width="10" height="10" border-color="#cfcfcb" fill-color="#cfcfcb" border-width="0.4"></ellipse>
+        <paragraph>
+        <text-chunk>Skip this day</text-chunk>
+        </paragraph>
+        </division>
+    </table-cell>
+</table>
+
