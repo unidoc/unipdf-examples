@@ -135,7 +135,7 @@
         </table-cell>
         {{/** ----------------------------------------- **/}}
            <table-cell colspan="5">
-            <table columns="4" column-widths="0.27 0.40 0.30 0.03">
+            <table columns="4" column-widths="0.20 0.35 0.42 0.03">
                 <table-cell>
                     <paragraph>
                         <text-chunk font-size="8" font="arial">Date (mm/dd/yyyy)</text-chunk>
