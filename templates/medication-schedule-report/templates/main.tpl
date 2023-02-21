@@ -1,6 +1,6 @@
-    <table columns="6" indent="0" column-widths= "0.15 0.25 0.2 0.1 0.03 0.27">
+    <table columns="7" indent="0" column-widths= "0.15 0.25 0.2 0.1 0.03 0.2 0.07">
         <table-cell rowspan="4">
-            <image src="path('templates/res/logo.png')" width="95.5" height="51.5" ></image>
+            <image src="path('templates/res/logo.png')" width="95.5" height="41.5" ></image>
         </table-cell>
         <table-cell>
             <paragraph>
@@ -22,10 +22,7 @@
                 <text-chunk font-size="8" font="arial"></text-chunk>
             </paragraph>
         </table-cell>
-
         <table-cell rowspan="5" border-width-bottom="2.5" border-width-left="1">
-            <table columns="2" column-widths="0.7 0.3">
-                <table-cell>
                     <table columns="2">
                         <table-cell colspan="2" margin="5 0 0 0">
                             <paragraph>
@@ -69,28 +66,25 @@
                             </paragraph>
                         </table-cell>
                     </table>
-                </table-cell>
-                <table-cell vertical-align="bottom">
-                    <division margin="0 20 0 0">
-                    <image src="path('templates/res/bar-code.png')" width="30" height="120"></image>
-                    </division>
-                </table-cell>
-            </table>
+        </table-cell>
+        <table-cell rowspan="5"  border-width-bottom="2.5" vertical-align="middle">
+            <image src="path('templates/res/bar-code.png')" width="30" height="150"></image>
         </table-cell>
 
-        <table-cell border-width-bottom="0.5" vertical-align="bottom">
+        {{/** ----------------------------------------- **/}}
+        <table-cell vertical-align="bottom" border-width-bottom="0.5">
             <paragraph>
-                <text-chunk font-size="12" font="arial">John Smith</text-chunk>
+                <text-chunk font-size="12" font="arial-bold">{{.Patient.Name}}</text-chunk>
+            </paragraph>
+        </table-cell>
+        <table-cell vertical-align="bottom" border-width-bottom="0.5">
+            <paragraph>
+                <text-chunk font-size="12" font="arial-bold">{{.Patient.SocialSecurityNumber}}</text-chunk>
             </paragraph>
         </table-cell>
         <table-cell border-width-bottom="0.5" vertical-align="bottom">
             <paragraph>
-                <text-chunk font-size="12" font="arial">123-45-6789</text-chunk>
-            </paragraph>
-        </table-cell>
-        <table-cell border-width-bottom="0.5" vertical-align="bottom">
-            <paragraph>
-                <text-chunk font-size="12" font="arial">03/22/1985</text-chunk>
+                <text-chunk font-size="12" font="arial-bold">{{.Patient.Dob}}</text-chunk>
             </paragraph>
         </table-cell>
         <table-cell>
@@ -98,7 +92,6 @@
                 <text-chunk font-size="8" font="arial"></text-chunk>
             </paragraph>
         </table-cell>
-
         <table-cell>
             <paragraph>
                 <text-chunk font-size="8" font="arial">Two Week Period From:</text-chunk>
@@ -119,15 +112,15 @@
                 <text-chunk font-size="8" font="arial"></text-chunk>
             </paragraph>
         </table-cell>
-
+        {{/** ----------------------------------------- **/}}
         <table-cell border-width-bottom="0.5" vertical-align="bottom">
             <paragraph>
-                <text-chunk font-size="12" font="arial">02/14/2021</text-chunk>
+                <text-chunk font-size="12" font="arial-bold">02/14/2021</text-chunk>
             </paragraph>
         </table-cell>
         <table-cell border-width-bottom="0.5" vertical-align="bottom">
             <paragraph>
-                <text-chunk font-size="12" font="arial">02/28/2021</text-chunk>
+                <text-chunk font-size="12" font="arial-bold">02/28/2021</text-chunk>
             </paragraph>
         </table-cell>
         <table-cell>
@@ -137,23 +130,24 @@
         </table-cell>
         <table-cell>
             <paragraph>
-                <text-chunk font-size="8" font="arial"></text-chunk>
+                <text-chunk></text-chunk>
             </paragraph>
         </table-cell>
-        <table-cell colspan="5">
+        {{/** ----------------------------------------- **/}}
+           <table-cell colspan="5">
             <table columns="4" column-widths="0.27 0.40 0.30 0.03">
                 <table-cell>
-                    <paragraph margin="0 0 10 0">
+                    <paragraph>
                         <text-chunk font-size="8" font="arial">Date (mm/dd/yyyy)</text-chunk>
                     </paragraph>
                 </table-cell>
                 <table-cell>
-                    <paragraph margin="0 0 10 0">
+                    <paragraph>
                     <text-chunk font-size="8" font="arial">Prepared by (Signature/Printed Name)</text-chunk>
                     </paragraph>
                 </table-cell>
                 <table-cell>
-                    <paragraph margin="0 0 10 0">
+                    <paragraph>
                         <text-chunk font-size="8" font="arial">Verified by PhC (Signature/Printed Name)</text-chunk>
                     </paragraph>
                 </table-cell>
@@ -184,17 +178,17 @@
                 </table-cell>
 
                 <table-cell>
-                    <paragraph margin="0 0 10 0">
+                    <paragraph>
                         <text-chunk font-size="8" font="arial">Date (mm/dd/yyyy)</text-chunk>
                     </paragraph>
                 </table-cell>
                 <table-cell>
-                    <paragraph margin="0 0 10 0">
+                    <paragraph>
                     <text-chunk font-size="8" font="arial">Verified by RN (Signature/Printed Name)**</text-chunk>
                     </paragraph>
                 </table-cell>
                 <table-cell>
-                    <paragraph margin="0 0 10 0">
+                    <paragraph>
                         <text-chunk font-size="8" font="arial">Counselled by (Signature/Printed Name)</text-chunk>
                     </paragraph>
                 </table-cell>
@@ -226,12 +220,12 @@
                 </table-cell>
 
                 <table-cell>
-                    <paragraph margin="0 0 10 0">
+                    <paragraph>
                         <text-chunk font-size="8" font="arial" >Date (mm/dd/yyyy)</text-chunk>
                     </paragraph>
                 </table-cell>
                 <table-cell>
-                    <paragraph margin="0 0 10 0">
+                    <paragraph>
                         <text-chunk font-size="8" font="arial">Parent/Legal Guardian (Signature/Printed Name)</text-chunk>
                     </paragraph>
                 </table-cell>
