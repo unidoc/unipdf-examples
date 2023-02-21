@@ -140,7 +140,6 @@
                 <text-chunk font-size="8" font="arial"></text-chunk>
             </paragraph>
         </table-cell>
-
         <table-cell colspan="5">
             <table columns="4" column-widths="0.27 0.40 0.30 0.03">
                 <table-cell>
@@ -158,14 +157,11 @@
                         <text-chunk font-size="8" font="arial">Verified by PhC (Signature/Printed Name)</text-chunk>
                     </paragraph>
                 </table-cell>
-
                 <table-cell>
                     <paragraph>
                         <text-chunk font-size="8" font="arial"></text-chunk>
                     </paragraph>
                 </table-cell>
-
-
                 <table-cell border-width-bottom="0.5">
                     <paragraph>
                         <text-chunk font-size="8" font="arial"></text-chunk>
@@ -340,26 +336,34 @@
     {{end}}
 </table>
 
-<table columns="3" margin="0 0 0 200" column-widths="0.6 0.2 0.2">
+<table columns="5" margin="0 0 0 200" column-widths="0.6 0.05 0.15 0.05 0.15">
     <table-cell>
         <paragraph margin="10 0 0 0">
             <text-chunk>Mark each box with a checkmark after you have taken a dose of medicine. If you skipped a dose, please consult your physician or pharmacist. Do not take medicine on the days and times not clearly indicated on this schedule.</text-chunk>
         </paragraph>
     </table-cell>
     <table-cell>
-        <division margin="10 0 0 0">
-        <ellipse position="relative" width="10" height="10" border-color="#000000" fill-color="#ffffff" border-width="0.4"></ellipse>
-        <paragraph >
-            <text-chunk>Take a medication</text-chunk>
-        </paragraph>
+        <division margin="18 0 0 0">
+            <ellipse position="relative" width="10" height="10" border-color="#000000" fill-color="#ffffff" border-width="0.4"></ellipse>
         </division>
     </table-cell>
     <table-cell>
         <division margin="10 0 0 0">
-        <ellipse position="relative" width="10" height="10" border-color="#cfcfcb" fill-color="#cfcfcb" border-width="0.4"></ellipse>
-        <paragraph>
-        <text-chunk>Skip this day</text-chunk>
-        </paragraph>
+            <paragraph>
+                <text-chunk>Take a medication</text-chunk>
+            </paragraph>
+        </division>
+    </table-cell>
+    <table-cell>
+        <division margin="18 0 0 0">
+            <ellipse position="relative" width="10" height="10" border-color="#cfcfcb" fill-color="#cfcfcb" border-width="0.4">Text</ellipse>
+        </division>
+    </table-cell>
+    <table-cell>
+        <division margin="18 0 0 0">
+            <paragraph>
+                <text-chunk>Skip this day</text-chunk>
+            </paragraph>
         </division>
     </table-cell>
 </table>
