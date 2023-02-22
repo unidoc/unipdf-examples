@@ -1,0 +1,812 @@
+{
+    "version": "1.02",
+    "release": "March 2021",
+    "checklist": [
+        {
+            "title": "PRE FLIGHT FLOWS",
+            "items": [
+                {
+                    "check": "Download Charts @ NOTAMS"
+                },
+                {
+                    "check": "Check weather & forecasts"
+                },
+                {
+                    "check": "Load PAX, CARGO & FUEL"
+                }
+            ]
+        },
+        {
+            "title": "PRE START CHECKLIST",
+            "items": [
+                {
+                    "check": "PARKING BRAKE",
+                    "value": "SET"
+                },
+                {
+                    "check": "CHOCKS",
+                    "value": "REMOVED"
+                },
+                {
+                    "check": "GPU",
+                    "value": "CONNECTED"
+                },
+                {
+                    "check": "THROTTLE",
+                    "value": "THRUST LEVERS IDLE"
+                },
+                {
+                    "check": "ENGINE MASTERS",
+                    "value": "OFF"
+                },
+                {
+                    "check": "BATTERIES",
+                    "value": "ON"
+                },
+                {
+                    "check": "GENERATOR SWITCHES",
+                    "value": ""
+                },
+                {
+                    "check": "EXT POWER",
+                    "value": "ON"
+                },
+                {
+                    "check": "ADIRS",
+                    "value": "SET TO NAV"
+                },
+                {
+                    "check": "PANEL DISPLAYS",
+                    "value": "BRIGHTNESS SET"
+                },
+                {
+                    "check": "NAV LIGHTS",
+                    "value": "ON if required"
+                },
+                {
+                    "check": "PANEL LIGHTS",
+                    "value": "SET"
+                },
+                {
+                    "check": "LANDING GEAR LEVER",
+                    "value": "CHECK DOWN"
+                },
+                {
+                    "check": "FLAPS",
+                    "value": "UP"
+                },
+                {
+                    "check": "SPOILER",
+                    "value": "RETRACTED"
+                },
+                {
+                    "check": "FUEL QUANTITY",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "FASTEN SEAT BELTS",
+                    "value": "ON"
+                },
+                {
+                    "check": "NO SMOKING SIGNS",
+                    "value": "ON"
+                },
+                {
+                    "action": "Check Weather (ATIS, Flight Services)"
+                },
+                {
+                    "check": "DE-ICE",
+                    "value": "TEST / CHECK"
+                },
+                {
+                    "action": "Request Clearance"
+                },
+                {
+                    "check": "TRANSPONDER",
+                    "value": "SET, STANDBY"
+                },
+                {
+                    "check": "BEACON LIGHTS",
+                    "value": "ON"
+                },
+                {
+                    "check": "EMERGENCY LIGHTS",
+                    "value": "ARM"
+                },
+                {
+                    "check": "FMC",
+                    "value": "SETUP, CHECK"
+                },
+                {
+                    "check": "DEPARTURE BRIEFING",
+                    "value": "COMPLETE"
+                },
+                {
+                    "check": "DOORS",
+                    "value": "CLOSED (CHECK DOOR PAGE)"
+                }
+            ]
+        },
+        {
+            "title": "STARTUP CHECKLIST",
+            "items": [
+                {
+                    "check": "APU",
+                    "value": "START"
+                },
+                {
+                    "check": "APU BLEED",
+                    "value": "RUN (WHEN AVAILABLE)"
+                },
+                {
+                    "check": "APU GEN",
+                    "value": "ON / CHECK VOLTS"
+                },
+                {
+                    "action": "Request Pushback - Initiate Pushback"
+                },
+                {
+                    "check": "THRUST LEVERS",
+                    "value": "IDLE"
+                },
+                {
+                    "check": "ENGINE AREA",
+                    "value": "CLEAR"
+                },
+                {
+                    "check": "FUEL PUMP SWITCHES",
+                    "value": "ON"
+                },
+                {
+                    "check": "MODE SELECTOR",
+                    "value": "IGN / START"
+                },
+                {
+                    "check": "LEFT ENGINE",
+                    "value": "(ENG 1)"
+                },
+                {
+                    "check": "ENGINE MASTER 1",
+                    "value": "START"
+                },
+                {
+                    "check": "AT N2 > 20% FUEL FLOW",
+                    "value": "CHECK ON"
+                },
+                {
+                    "check": "N1 INCREASING AS N2 INCR.",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "OIL PRESSURE",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "GENERATOR SWITCH",
+                    "value": "ON"
+                },
+                {
+                    "check": "REPEAT FOR RIGHT ENGINE",
+                    "value": "(ENG2)"
+                },
+                {
+                    "check": "FUEL FLOW",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "HYDRAULIC PUMP SWITCHES",
+                    "value": "ON"
+                },
+                {
+                    "check": "APU",
+                    "value": "OFF"
+                },
+                {
+                    "check": "MODE SELECTOR",
+                    "value": "NORM"
+                }
+            ]
+        },
+        {
+            "title": "BEFORE TAXI CHECKLIST",
+            "items": [
+                {
+                    "check": "PROBE/WINDOW HEAT",
+                    "value": "AUTO"
+                },
+                {
+                    "check": "HDG INDICATOR / ALTIMITERS",
+                    "value": "SET"
+                },
+                {
+                    "check": "STBY INSTRUMENTS",
+                    "value": "SET"
+                },
+                {
+                    "check": "RADIOS AND AVIONICS",
+                    "value": "SET FOR DEPARTURE"
+                },
+                {
+                    "check": "AUTOPILOT",
+                    "value": "SET, don't activate"
+                },
+                {
+                    "check": "F/D",
+                    "value": "ON"
+                },
+                {
+                    "check": "AUTOBRAKE",
+                    "value": "MAX"
+                },
+                {
+                    "check": "ELEVATOR TRIM",
+                    "value": "SET FOR TAKE-OFF"
+                },
+                {
+                    "check": "FLIGHT CONTROLS",
+                    "value": "FREE AND CORRECT"
+                },
+                {
+                    "action": "Request Taxi Clearance"
+                }
+            ]
+        },
+        {
+            "title": "TAXI CHECKLIST",
+            "items": [
+                {
+                    "check": "TAXI LIGHTS",
+                    "value": "ON"
+                },
+                {
+                    "check": "PARKING BRAKE",
+                    "value": "RELEASE"
+                },
+                {
+                    "check": "TAXI to assigned runway",
+                    "value": "SPEED Max. 20 knots"
+                },
+                {
+                    "check": "BRKS/GYRO/TURN COORDINATOR",
+                    "value": "CHECK during taxi"
+                },
+                {
+                    "check": "T/O CONFIG",
+                    "value": "DEPRESS / CHECK"
+                },
+                {
+                    "check": "T/O MEMO",
+                    "value": "GREEN"
+                }
+            ]
+        },
+        {
+            "title": "BEFORE TAKE-OFF CHECKLIST",
+            "items": [
+                {
+                    "check": "PARKING BRAKE",
+                    "value": "SET"
+                },
+                {
+                    "check": "FLIGHT INSTRUMENTS",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "ENGINE INSTRUMENTS",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "TAKE-OFF DATA",
+                    "value": "(V1, VR, V2) CHECK"
+                },
+                {
+                    "check": "NAV EQUIPMENT",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "LANDING LIGHTS",
+                    "value": "ON"
+                },
+                {
+                    "check": "STROBE LIGHT",
+                    "value": "ON"
+                },
+                {
+                    "check": "PITOT HEAT",
+                    "value": "AUTO"
+                },
+                {
+                    "check": "DE-ICE",
+                    "value": "AS REQUIRED"
+                },
+                {
+                    "check": "TRANSPONDER",
+                    "value": "TA/RA"
+                },
+                {
+                    "action": "Request Takeoff Clearance"
+                }
+            ]
+        },
+        {
+            "title": "TAKE-OFF CHECKLIST",
+            "items": [
+                {
+                    "action": "Smoothly increase thrust to 40% N1 let spool up"
+                },
+                {
+                    "check": "TAKEOFF THRUST",
+                    "value": "FULL OR TO/GA"
+                },
+                {
+                    "check": "BRAKES",
+                    "value": "RELEASE"
+                },
+                {
+                    "check": "AT 100 KTS",
+                    "value": "SPEED CROSSCHECK"
+                },
+                {
+                    "check": "AT V1",
+                    "value": "COMMITED / GO (Decision)"
+                },
+                {
+                    "check": "AT Vr",
+                    "value": "ROTATE"
+                },
+                {
+                    "check": "PITCH",
+                    "value": "slowly to 10deg, increase to 15 deg"
+                },
+                {
+                    "check": "POSITIVE RATE OF CLIMB",
+                    "value": "GEAR UP"
+                },
+                {
+                    "check": "PASSING F SPEED (PFD)",
+                    "value": "FLAPS 0"
+                },
+                {
+                    "check": "SPOILERS",
+                    "value": "DISARM"
+                },
+                {
+                    "check": "LANDING LIGHTS",
+                    "value": "AS REQUIRED"
+                }
+            ]
+        },
+        {
+            "title": "CLIMB-OUT CHECKLIST",
+            "items": [
+                {
+                    "check": "THRUST LEVERS",
+                    "value": "CLB DETENT"
+                },
+                {
+                    "check": "AP1",
+                    "value": "ENGAGE (when suitable)"
+                },
+                {
+                    "check": "TAXI LIGHTS",
+                    "value": "OFF"
+                },
+                {
+                    "action": "At TA (Transition-Altitude)"
+                },
+                {
+                    "check": "ALTIMETER",
+                    "value": "PULL TO SET STD (22.92 / 1013)"
+                },
+                {
+                    "check": "BELOW 10'000FT",
+                    "value": "MAX 250 KIAS"
+                },
+                {
+                    "check": "ATC",
+                    "value": "AS REQUIRED"
+                },
+                {
+                    "action": "Passing 10'000 ft"
+                },
+                {
+                    "check": "LANDING LIGHTS",
+                    "value": "OFF"
+                },
+                {
+                    "action": "Above 10'000 ft"
+                },
+                {
+                    "check": "FASTEN SEAT BELTS",
+                    "value": "OFF"
+                }
+            ]
+        },
+        {
+            "title": "CRUISE CHECKLIST",
+            "items": [
+                {
+                    "action": "Accelerate to Cruise Speed"
+                },
+                {
+                    "check": "ENGINE & INSTRUMENTS",
+                    "value": "MONITOR"
+                },
+                {
+                    "check": "FUEL QUANTITY",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "RADIOS",
+                    "value": "TUNED & SET"
+                },
+                {
+                    "check": "AUTOPILOT",
+                    "value": "CHECK & SET"
+                },
+                {
+                    "check": "LIGHTS",
+                    "value": "AS REQUIRED"
+                },
+                {
+                    "check": "ATIS / AIRPORT INFORMATION",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "ALTIMETER",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "RADIOS",
+                    "value": "SET"
+                },
+                {
+                    "check": "DE-ICE",
+                    "value": "AS REQUIRED"
+                },
+                {
+                    "check": "TOD",
+                    "value": "SET TCAS TO BELOW"
+                },
+                {
+                    "check": "DESCENT SPEED",
+                    "value": "NORMAL"
+                },
+                {
+                    "check": "FL240",
+                    "value": "0.76 MACH"
+                },
+                {
+                    "check": "FL180",
+                    "value": "0.67 MACH"
+                },
+                {
+                    "action": "At TA (Transition-Altitude)"
+                },
+                {
+                    "check": "ALTIMETER",
+                    "value": "RESET TO LOCAL"
+                },
+                {
+                    "check": "FL120",
+                    "value": "280 KIAS"
+                },
+                {
+                    "action": "Below 10'000 ft"
+                },
+                {
+                    "check": "SPEED",
+                    "value": "250 KIAS"
+                },
+                {
+                    "check": "LANDING LIGHTS",
+                    "value": "ON"
+                },
+                {
+                    "check": "LS",
+                    "value": "ON"
+                },
+                {
+                    "check": "FUEL QUANTITIES & BALANCE",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "FLAPS / LANDING GEAR",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "FUEL QUANTITIES & BALANCE",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "FLAPS / LANDING GEAR",
+                    "value": "CHECK UP"
+                },
+                {
+                    "action": "Check Weather (ATIS, Flight Services)"
+                }
+            ]
+        },
+        {
+            "title": "APPROACH CHECKLIST",
+            "items": [
+                {
+                    "check": "FASTEN SEAT BELTS",
+                    "value": "ON"
+                },
+                {
+                    "check": "RADIOS",
+                    "value": "ON"
+                },
+                {
+                    "check": "SPEED",
+                    "value": "ESTABLISH 210 KIAS"
+                },
+                {
+                    "check": "LANDING LIGHTS",
+                    "value": "CHECK ON"
+                },
+                {
+                    "check": "TAXI LIGHTS",
+                    "value": "ON"
+                },
+                {
+                    "check": "GND SPOILERS",
+                    "value": "ARM"
+                },
+                {
+                    "check": "AUTO BRAKE",
+                    "value": "SET"
+                },
+                {
+                    "check": "FLAPS",
+                    "value": "FLAPS 1"
+                },
+                {
+                    "check": "SPEED",
+                    "value": "MANAGED"
+                },
+                {
+                    "check": "AT 6 DME",
+                    "value": "FLAPS 2"
+                },
+                {
+                    "check": "SPEED",
+                    "value": "ESTABLISH 180 KIAS"
+                },
+                {
+                    "check": "LANDING GEAR",
+                    "value": "DOWN"
+                },
+                {
+                    "check": "LANDING GEAR 3 GREEN",
+                    "value": "FLAPS 3"
+                },
+                {
+                    "check": "FLAPS",
+                    "value": "FULL"
+                },
+                {
+                    "action": "Final Glideslope Descent :"
+                },
+                {
+                    "check": "SPEED",
+                    "value": "ESTABLISH 145 KIAS"
+                },
+                {
+                    "check": "PARKING BRAKE",
+                    "value": "VERIFY OFF"
+                },
+                {
+                    "check": "DE-ICE",
+                    "value": "AS REQUIRED"
+                }
+            ]
+        },
+        {
+            "title": "LANDING CHECKLIST",
+            "items": [
+                {
+                    "check": "LANDING GEAR",
+                    "value": "CHECK DOWN"
+                },
+                {
+                    "check": "AUTOPILOT",
+                    "value": "AS REQUIRED"
+                },
+                {
+                    "check": "GO-AROUND ALTITUDE",
+                    "value": "SET IN FCU"
+                },
+                {
+                    "check": "AUTO-THRUST",
+                    "value": "AS REQUIRED"
+                },
+                {
+                    "check": "LANDING MEMO",
+                    "value": "NO BLUE"
+                },
+                {
+                    "check": "LANDING SPEED",
+                    "value": "MANAGED"
+                },
+                {
+                    "check": "AFTER TOUCH DOWN",
+                    "value": "REVERSE THRUST"
+                },
+                {
+                    "check": "SPOILERS",
+                    "value": "VERIFY EXTENDED"
+                },
+                {
+                    "check": "BRAKES",
+                    "value": "AS REQUIRED"
+                },
+                {
+                    "check": "AT 60 KIAS",
+                    "value": "CANCEL REVERSE THRUST"
+                }
+            ]
+        },
+        {
+            "title": "AFTER LANDING CHECKLIST",
+            "items": [
+                {
+                    "check": "SPOILERS",
+                    "value": "DISARMED"
+                },
+                {
+                    "check": "FLAPS",
+                    "value": "RETRACT"
+                },
+                {
+                    "check": "END MODE SELECTOR",
+                    "value": "NORM"
+                },
+                {
+                    "check": "LANDING LIGHTS",
+                    "value": "OFF"
+                },
+                {
+                    "check": "STROBE LIGHTS",
+                    "value": "OFF"
+                },
+                {
+                    "check": "ANTI ICE",
+                    "value": "AS REQUIRED"
+                },
+                {
+                    "check": "APU",
+                    "value": "START"
+                },
+                {
+                    "check": "BRAKE TEMP",
+                    "value": "CHECK"
+                },
+                {
+                    "check": "TRANSPONDER",
+                    "value": "OFF"
+                },
+                {
+                    "action": "Taxi to Assigned Gate/Parking (Speed Max 20 knots)"
+                },
+                {
+                    "check": "APU",
+                    "value": "START / CHECK RUN"
+                },
+                {
+                    "check": "APU",
+                    "value": "GET ON / CHECK VOLTS"
+                },
+                {
+                    "check": "ELEVATOR TRIM",
+                    "value": "TAKEOFF SETTING"
+                },
+                {
+                    "action": "Taxi to Assigned Gate/Parking (Speed Max 20 knots)"
+                },
+                {
+                    "check": "TAXI LIGHTS",
+                    "value": "OFF"
+                }
+            ]
+        },
+        {
+            "title": "PARKING / SHUTDOWN CHECKLIST",
+            "items": [
+                {
+                    "check": "PARKING BRAKES",
+                    "value": "SET"
+                },
+                {
+                    "check": "THRUST LEVERS",
+                    "value": "IDLE"
+                },
+                {
+                    "check": "GROUND CONTACT",
+                    "value": "ESTABLISH"
+                },
+                {
+                    "check": "GROUND OPERATIONS",
+                    "value": "AS REQUIRED (FMC2)"
+                },
+                {
+                    "check": "ELECTRICAL POWER",
+                    "value": "ESTABLISH"
+                },
+                {
+                    "check": "ENGINE MASTER 1 & 2",
+                    "value": "OFF"
+                },
+                {
+                    "check": "PARKING BRAKES",
+                    "value": "SET"
+                },
+                {
+                    "check": "NAV LIGHTS",
+                    "value": "OFF"
+                },
+                {
+                    "check": "EXTERIOR LIGHTS",
+                    "value": "AS REQUIRED"
+                },
+                {
+                    "check": "ANTI ICE",
+                    "value": "OFF"
+                },
+                {
+                    "check": "PASSENGER SIGNS",
+                    "value": "OFF"
+                },
+                {
+                    "check": "DOORS",
+                    "value": "OPEN"
+                },
+                {
+                    "check": "FLIGHT DIRECTOR",
+                    "value": "OFF"
+                },
+                {
+                    "check": "APU BLEED",
+                    "value": "AS REQUIRED"
+                },
+                {
+                    "check": "FUEL PUMPS",
+                    "value": "ALL OFF"
+                },
+                {
+                    "check": "BEACON",
+                    "value": "OFF"
+                },
+                {
+                    "check": "ECAM STS",
+                    "value": "DEPRESS"
+                },
+                {
+                    "check": "PANEL LIGHTS",
+                    "value": "OFF"
+                },
+                {
+                    "check": "ADIRS",
+                    "value": "OFF"
+                },
+                {
+                    "check": "AVIONICS",
+                    "value": "OFF"
+                },
+                {
+                    "check": "NO SMOKING",
+                    "value": "OFF"
+                },
+                {
+                    "check": "APU",
+                    "value": "AS REQUIRED"
+                },
+                {
+                    "check": "BATTERIES",
+                    "value": "AS REQUIRED"
+                }
+            ]
+        }
+    ]
+}
