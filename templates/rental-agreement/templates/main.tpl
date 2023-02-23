@@ -1,32 +1,32 @@
-{{define "checklist-row" }}
-{{$margin := getWidth (printf "%s%s" . " Condition ") "Times-Roman"}}
-<table-cell>
-   <division margin="5 0">
-      <paragraph>
-         <text-chunk font = "times">{{.}} Condition </text-chunk>
-      </paragraph>
-      <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 {{$margin}}"></line>
-   </division>
-</table-cell>
-<table-cell>
-   <division margin="5 0">
-      <paragraph>
-         <text-chunk>Specific Damage </text-chunk>
-      </paragraph>
-      <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 80"></line>
-   </division>
-</table-cell>
+{{define "checklist-row"}}
+   {{$margin := getWidth (printf "%s%s" . " Condition ") "Times-Roman"}}
+   <table-cell>
+      <division margin="5 0">
+         <paragraph>
+            <text-chunk font = "times">{{.}} Condition </text-chunk>
+         </paragraph>
+         <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 {{$margin}}"></line>
+      </division>
+   </table-cell>
+   <table-cell>
+      <division margin="5 0">
+         <paragraph>
+            <text-chunk>Specific Damage </text-chunk>
+         </paragraph>
+         <line fit-mode="fill-width" position="relative" thickness= "0.5" margin="0 0 0 80"></line>
+      </division>
+   </table-cell>
 {{end}}
 
 {{define "check-list-table"}}
-<table columns="2" margin="20 0 0 0">
-{{range .Items}}
-   {{template "checklist-row" .}}
-{{end}}
-</table>
+   <table columns="2" margin="20 0 0 0">
+      {{range .Items}}
+         {{template "checklist-row" .}}
+      {{end}}
+   </table>
 {{end}}
 
-{{ define "form-sig"}}
+{{define "form-sig"}}
    <division>
       <paragraph>
          <text-chunk font= "times-bold" font-size="11">{{.Text}}: </text-chunk>
@@ -35,7 +35,7 @@
    </division>
 {{end}}
 
-{{ define "simple-form"}}
+{{define "simple-form"}}
       <paragraph>
          <text-chunk font= "times" font-size="11">{{.Text}} </text-chunk>
       </paragraph>
@@ -43,32 +43,32 @@
 {{end}}
 
 {{define "paragraph-with-header"}}
-{{$margin := "18 0 0 0"}}
-{{if .Margin}}
-{{$margin:= .Margin}}
-{{end}}
-<paragraph margin= "{{$margin}}" line-height="1.1">
-   <text-chunk font="times-bold" font-size="12">{{.Header}}: </text-chunk>
-   <text-chunk font="times" font-size="12">{{.Text}} </text-chunk>
-</paragraph>
+   {{$margin := "18 0 0 0"}}
+   {{if .Margin}}
+      {{$margin:= .Margin}}
+   {{end}}
+   <paragraph margin= "{{$margin}}" line-height="1.1">
+      <text-chunk font="times-bold" font-size="12">{{.Header}}: </text-chunk>
+      <text-chunk font="times" font-size="12">{{.Text}} </text-chunk>
+   </paragraph>
 {{end}}
 
 {{define "simple-paragraph"}}
-{{$fontSize := 12}}
-{{$margin := "18 0 0 0"}}
-{{$font := "times"}}
-{{if .FontSize}}
-{{$fontSize = .FontSize}}
-{{end}}
-{{if .Margin}}
-{{$margin = .Margin}}
-{{end}}
-{{if .Font}}
-{{$font = .Font}}
-{{end}}
-<paragraph margin="{{$margin}}" line-height="1.1">
-<text-chunk font="{{$font}}" font-size="{{$fontSize}}">{{.Text}}</text-chunk>
-</paragraph>
+   {{$fontSize := 12}}
+   {{$margin := "18 0 0 0"}}
+   {{$font := "times"}}
+   {{if .FontSize}}
+      {{$fontSize = .FontSize}}
+   {{end}}
+   {{if .Margin}}
+      {{$margin = .Margin}}
+   {{end}}
+   {{if .Font}}
+      {{$font = .Font}}
+   {{end}}
+   <paragraph margin="{{$margin}}" line-height="1.1">
+      <text-chunk font="{{$font}}" font-size="{{$fontSize}}">{{.Text}}</text-chunk>
+   </paragraph>
 {{end}}
 
 <paragraph margin="0 0 10 0" text-align="center" line-height="1.1">
@@ -101,7 +101,7 @@ provided by the Tenant(s). Any damage to the Landlord's furnishings shall be the
 
 {{template "simple-paragraph" dict "Margin" "10 0 0 0" "Text" (printf `%s and any
 other unnamed appliances existing on the Premises. Any damage to the Landlord's appliances
-shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.` (listItems .Apartment.ProvidedAPPliances false))}}
+shall be the liability of the Tenant(s), reasonable wear-and-tear excepted, to be billed directly or less the Security Deposit.` (listItems .Apartment.ProvidedAppliances false))}}
 
 {{template "paragraph-with-header" dict "Header" "LEASE TERM" "Text" (printf `This Agreement shall be a fixed-period arrangement beginning on %s and ending on %s with the Tenant(s) having the option to continue to 
 occupy the Premises under the same terms and conditions of this Agreement under a 

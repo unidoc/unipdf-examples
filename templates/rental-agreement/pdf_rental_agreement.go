@@ -60,7 +60,7 @@ type RentalAgreement struct {
 		UnitSize            int      `json:"unit_size"`
 		Address             string   `json:"address"`
 		FurnishingItems     []string `json:"furnishing_items"`
-		ProvidedAPPliances  []string `json:"provided_appliances"`
+		ProvidedAppliances  []string `json:"provided_appliances"`
 		Utilities           []string `json:"utility_services"`
 		AllowedPets         []string `json:"allowed_pets_list"`
 		NumberOfAllowedPets int      `json:"number_of_allowed_pets"`
