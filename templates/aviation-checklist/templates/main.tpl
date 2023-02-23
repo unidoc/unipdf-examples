@@ -30,9 +30,9 @@
         {{$borderBottomWidth = 1}}
     {{end}}
 
-    <table-cell border-width-left="1" border-width-right="1" border-width-bottom="{{ $borderBottomWidth }}" align="{{ $align }}">
+    <table-cell border-width-left="1" border-width-right="1" border-width-bottom="{{$borderBottomWidth}}" align="{{$align}}">
         <paragraph>
-            <text-chunk font="{{ $font }}">{{ $text }}</text-chunk>
+            <text-chunk font="{{$font}}">{{$text}}</text-chunk>
         </paragraph>
     </table-cell>
 {{end}}
@@ -53,7 +53,7 @@
                     {{$margin := "0 5 0 0"}}
 
                     {{/* Close current cell */}}
-                        </division>
+                    </division>
                     </table-cell>
 
                     {{if eq $column 0}}}
@@ -62,7 +62,6 @@
                     {{else}}
                         {{/* Close current table and move to new table in new page */}}
                         </table>
-
                         <table columns="2">
 
                         {{$column = 0}}
@@ -70,7 +69,7 @@
 
                     {{/* Start new cell */}}
                     <table-cell>
-                        <division margin="{{ $margin }}">
+                    <division margin="{{$margin}}">
                 {{end}}
 
                 {{template "check-table" . }}

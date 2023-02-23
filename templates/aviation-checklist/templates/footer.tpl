@@ -8,7 +8,8 @@
 
         <table-cell border-width-top="2">
             <paragraph>
-                <text-chunk>Copyright © 2021 unidoc.io</text-chunk>
+                <text-chunk>Copyright © 2021 </text-chunk>
+                <text-chunk color="#000000" link="url('https://unidoc.io')">unidoc.io</text-chunk>
             </paragraph>
         </table-cell>
 
