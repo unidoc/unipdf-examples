@@ -50,22 +50,22 @@ func main() {
 	}
 
 	// Draw main content template.
+	stdFont := model.StdFontName(model.HelveticaName)
+	stdFontBold := model.StdFontName(model.HelveticaBoldName)
+
+	font, err := model.NewStandard14Font(stdFont)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fontBold, err := model.NewStandard14Font(stdFontBold)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	tplOpts := &creator.TemplateOptions{
 		HelperFuncMap: template.FuncMap{
 			"calcTableHeight": func(check *Checks) float64 {
-				stdFont := model.StdFontName(model.HelveticaName)
-				stdFontBold := model.StdFontName(model.HelveticaBoldName)
-
-				font, err := model.NewStandard14Font(stdFont)
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				fontBold, err := model.NewStandard14Font(stdFontBold)
-				if err != nil {
-					log.Fatal(err)
-				}
-
 				titleSp := c.NewStyledParagraph()
 				chunk := titleSp.SetText(check.Title)
 				chunk.Style.Font = font
@@ -108,6 +108,10 @@ func main() {
 		},
 	}
 
+	if err := c.DrawTemplate(mainTpl, checks, tplOpts); err != nil {
+		log.Fatal(err)
+	}
+
 	// Draw header and footer.
 	drawHeader := func(tplPath string, block *creator.Block, version, releaseDate string, pageNum, totalPages int) {
 		// Read template.
@@ -135,10 +139,6 @@ func main() {
 	c.DrawFooter(func(block *creator.Block, args creator.FooterFunctionArgs) {
 		drawHeader("templates/footer.tpl", block, checks.Version, checks.ReleaseDate, args.PageNum, args.TotalPages)
 	})
-
-	if err := c.DrawTemplate(mainTpl, checks, tplOpts); err != nil {
-		log.Fatal(err)
-	}
 
 	// Write output file.
 	if err := c.WriteToFile("unipdf-aviation-checklist.pdf"); err != nil {
