@@ -52,7 +52,7 @@
 
 <table columns="7" indent="0" column-widths= "0.15 0.25 0.2 0.1 0.03 0.2 0.07">
     <table-cell rowspan="4">
-        <image src="path('templates/res/logo.png')" width="95.5" height="41.5" ></image>
+        <image src="path('templates/res/logo.png')" width="95.5" height="51.5" ></image>
     </table-cell>
     <table-cell>
         <paragraph>
@@ -120,23 +120,23 @@
                 </table>
     </table-cell>
     <table-cell rowspan="5"  border-width-bottom="2.5" vertical-align="middle">
-        <image src="path('templates/res/bar-code.png')" width="30" height="150"></image>
+    <image src="path('templates/res/bar-code.png')" width="30" height="120"></image>
     </table-cell>
 
     {{/** ----------------------------------------- **/}}
     <table-cell vertical-align="bottom" border-width-bottom="0.5">
         <paragraph>
-            <text-chunk font-size="12" font="arial-bold">{{.Patient.Name}}</text-chunk>
+            <text-chunk font-size="12" font="arial">{{.Patient.Name}}</text-chunk>
         </paragraph>
     </table-cell>
     <table-cell vertical-align="bottom" border-width-bottom="0.5">
         <paragraph>
-            <text-chunk font-size="12" font="arial-bold">{{.Patient.SocialSecurityNumber}}</text-chunk>
+            <text-chunk font-size="12" font="arial">{{.Patient.SocialSecurityNumber}}</text-chunk>
         </paragraph>
     </table-cell>
     <table-cell border-width-bottom="0.5" vertical-align="bottom">
         <paragraph>
-            <text-chunk font-size="12" font="arial-bold">{{.Patient.Dob}}</text-chunk>
+            <text-chunk font-size="12" font="arial">{{.Patient.Dob}}</text-chunk>
         </paragraph>
     </table-cell>
     <table-cell>
@@ -167,20 +167,15 @@
     {{/** ----------------------------------------- **/}}
     <table-cell border-width-bottom="0.5" vertical-align="bottom">
         <paragraph>
-            <text-chunk font-size="12" font="arial-bold">02/14/2021</text-chunk>
+            <text-chunk font-size="12" font="arial">{{.StartDate}}</text-chunk>
         </paragraph>
     </table-cell>
     <table-cell border-width-bottom="0.5" vertical-align="bottom">
         <paragraph>
-            <text-chunk font-size="12" font="arial-bold">02/28/2021</text-chunk>
+            <text-chunk font-size="12" font="arial">{{.EndDate}}</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell>
-        <paragraph>
-            <text-chunk></text-chunk>
-        </paragraph>
-    </table-cell>
-    <table-cell>
+    <table-cell colspan="2">
         <paragraph>
             <text-chunk></text-chunk>
         </paragraph>
