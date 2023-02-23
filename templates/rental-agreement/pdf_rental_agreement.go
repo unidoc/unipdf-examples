@@ -175,7 +175,7 @@ func main() {
 		},
 	}
 
-	// Read data from json.
+	// Read data from JSON file.
 	rentalAgreement, err := readRentalAgreement("rental_data.json")
 	if err != nil {
 		log.Fatal(err)
@@ -233,7 +233,7 @@ func readTemplate(tplFile string) (io.Reader, error) {
 	return buf, nil
 }
 
-// readRentalAgreement reads the data for an rental agreement document from the
+// readRentalAgreement reads the data for a rental agreement document from the
 // specified JSON file.
 func readRentalAgreement(jsonFile string) (*RentalAgreement, error) {
 	file, err := os.Open(jsonFile)
