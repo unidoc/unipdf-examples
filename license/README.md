@@ -18,4 +18,4 @@ Anyone can get a free metered API key by signing up on http://cloud.unidoc.io/
 ## Examples
 
 - [unipdf_license_loading_metered.go](unipdf_license_loading_metered.go) Demonstrates how to load the Metered API license key and how to print out relevant information.
-- [unipdf_license_info.go](unipdf_license_info.go) Demonstrates how to print out information about the license after loading an offline license key.
+- [unipdf_offline_license_info.go](unipdf_offline_license_info.go) Demonstrates how to print out information about the license after loading an offline license key.
