@@ -50,15 +50,12 @@ func main() {
 	}
 
 	// Draw main content template.
-	stdFont := model.StdFontName(model.HelveticaName)
-	stdFontBold := model.StdFontName(model.HelveticaBoldName)
-
-	font, err := model.NewStandard14Font(stdFont)
+	font, err := model.NewStandard14Font(model.HelveticaName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fontBold, err := model.NewStandard14Font(stdFontBold)
+	fontBold, err := model.NewStandard14Font(model.HelveticaBoldName)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -71,7 +68,6 @@ func main() {
 				chunk.Style.Font = font
 
 				height := titleSp.Height()
-
 				for _, v := range check.Items {
 					var chunk *creator.TextChunk
 					itemSp := c.NewStyledParagraph()
@@ -207,25 +203,27 @@ func (c *CheckItem) DisplayText() string {
 
 	// Max line width.
 	maxWidth := 258.0
+	// Font size use for rendering checklist items.
+	fontSize := 10.0
 
-	stdFont := model.StdFontName(model.HelveticaName)
-	font, err := model.NewStandard14Font(stdFont)
+	font, err := model.NewStandard14Font(model.HelveticaName)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	textWidth := 0.0
 	for _, r := range *c.Check + *c.Value {
-		textWidth += getRuneWidth(font, r)
+		textWidth += getRuneWidth(font, r) * fontSize
 	}
 
 	if textWidth < maxWidth {
 		availWidth := maxWidth - textWidth
 		separator := '.'
-		sepWidth := getRuneWidth(font, separator)
+		sepWidth := getRuneWidth(font, separator) * fontSize
 		sepCount := int(availWidth / sepWidth)
 
-		// Space to narrow for dot separator, use space
+		// When the distance between check label and it's value is too narrow
+		// to use dots as separator, replace dots with spaces.
 		if sepCount <= 5 {
 			separator = ' '
 			sepWidth := getRuneWidth(font, separator)
@@ -245,5 +243,6 @@ func getRuneWidth(font *model.PdfFont, r rune) float64 {
 	if !bool {
 		log.Fatal("failed to get width")
 	}
-	return metrics.Wx / 100
+
+	return metrics.Wx / 1000
 }
