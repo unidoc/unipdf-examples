@@ -20,3 +20,4 @@ modified without the need to rebuild the application.
 - [Sample Concert Ticket](concert-ticket): showcases the usage of creator templates by creating a sample concert ticket.
 - [Sample Lab Results](lab-results): showcases the usage of creator templates by creating a sample lab results document.
 - [Sample Medical Bill Document](medical-bill): showcases the usage of creator templates by creating a sample medical bill document.
+- [Sample Rental Agreement](rental-agreement): showcases the usage of creator templates by creating a sample rental agreement.
