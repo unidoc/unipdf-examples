@@ -19,19 +19,19 @@
 {{end}}
 
 {{define "drug-schedule"}}   
-    <table-cell  border-width-left="0.5" border-width-top="0.5" border-width-bottom="0.5" vertical-align="top" rowspan="{{len .TimesOfTheDay}}">
+    <table-cell  border-width-left="0.5" border-width-bottom="0.5" vertical-align="top" rowspan="{{len .TimesOfTheDay}}">
         <division>
             <paragraph margin="10 0 0 0">
                 <text-chunk font="arial-bold" font-size="11">{{.Name}}</text-chunk>
             </paragraph>
-            <paragraph margin="5 0 5 0">
-                <text-chunk font="arial" font-size="9"> {{.Description}}</text-chunk>
+            <paragraph margin="5 5 5 0">
+                <text-chunk font="arial" font-size="9">{{.Description}}</text-chunk>
             </paragraph>
         </division>
     </table-cell>
     {{$daysTaken := .DaysTaken}}
     {{range .TimesOfTheDay}}
-        <table-cell  border-width-right="0.5" border-width-top="0.5" border-width-bottom="0.5" vertical-align="bottom" align="left" indent="0">
+        <table-cell  border-width-right="0.5" border-width-bottom="0.5" vertical-align="bottom" align="left" indent="0">
             <paragraph margin="0 0 10 0">
                 <text-chunk font="arial" font-size="9">{{.}}</text-chunk>
             </paragraph>
@@ -72,12 +72,13 @@
         </paragraph>
     </table-cell>
 {{end}}
+
 {{define "info-row"}}
     {{if .Colspan}}
         <table-cell colspan="2" margin="{{.Margin}}">
             <paragraph>
                 {{if .MultiLine}}
-                     <text-chunk font-size="8" font="{{.Font1}}">{{.Heading}}</text-chunk>
+                <text-chunk font-size="8" font="{{.Font1}}">{{.Heading}}</text-chunk>
                 {{end}}
                 <text-chunk font-size="8" font="{{.Font}}">{{.Col1}}</text-chunk>
             </paragraph>
@@ -113,8 +114,10 @@
         </paragraph>
     </table-cell>
 {{end}}
+
 {{define "foot-note"}}
 {{end}}
+
 <table columns="5" indent="0" column-widths="0.15 0.55 0.03 0.2 0.07">
     <table-cell vertical-align="top">
         <image src="path('templates/res/logo.png')" width="105.5" height="61.5" ></image>
@@ -136,9 +139,9 @@
         <table columns="2">
             {{template "info-row" dict "Col1" "K00" "Font" "arial-bold" "Margin" "5 0 0 0" "Colspan" 2}}
             {{template "info-row" dict "Heading" "PLEASE NOTE: " "Col1" "completed calendars MUST be returned to SHC as part of the patient's Medical Record" "Font" "arial" "Font1" "arial-bold" "Margin" "5 0 0 0" "Colspan" 2 "MultiLine" true}}
-            {{template "info-row" dict "Col1" "Information:" "Col2" "0-123-456-789" "Font" "arial" "Margin" "5 0 0 0"}}
-            {{template "info-row" dict "Col1" "Emergency:" "Col2" "0-123-456-789" "Font" "arial-bold" "Margin" "0 0 0 0"}}
-            {{template "info-row" dict "Col1" "Website:" "Col2" "www.samplehealthcare.com" "Font" "arial" "Margin" "5 0 0 0"}}
+            {{template "info-row" dict "Col1" "Information:" "Col2" .InformationLine "Font" "arial" "Margin" "5 0 0 0"}}
+            {{template "info-row" dict "Col1" "Emergency:" "Col2" .EmergencyLine "Font" "arial-bold" "Margin" "0 0 0 0"}}
+            {{template "info-row" dict "Col1" "Website:" "Col2" .Website "Font" "arial" "Margin" "5 0 0 0"}}
         </table>
     </table-cell>
     <table-cell rowspan="4" border-width-bottom="2.5" vertical-align="middle">
@@ -158,7 +161,7 @@
     </table-cell>
 </table>
 
-<division margin="10 0 0 0">
+<division margin="5 0 0 0">
     <paragraph>
         <text-chunk>*  Best Possible Medication History</text-chunk>
     </paragraph>
@@ -167,7 +170,7 @@
     </paragraph>
 </division>
 
-<table columns="16" margin="10 0 0 0" column-widths="0.25 0.08 {{getColumnWidths (len .ListOfDays) 0.67}}">
+<table columns="16" margin="10 0 0 0" column-widths="0.25 0.08 {{getColumnWidths (len .ListOfDays) 0.67}}" enable-page-wrap="true" enable-row-wrap="true">
     {{template "table-header" dict "Days" .ListOfDays}}
         {{range $idx, $v := .Drugs}}
             {{template "drug-schedule" .}}

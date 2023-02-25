@@ -19,7 +19,7 @@
                 "5 PM",
                 "9 PM"
             ],
-            "days": [
+            "days_taken": [
                 "T",
                 "F",
                 "T",
@@ -43,7 +43,7 @@
                 "Noon",
                 "Bedtime"
             ],
-            "days": [
+            "days_taken": [
                 "F",
                 "T",
                 "F",
@@ -66,7 +66,7 @@
             "times_taken": [
                 "10 AM"
             ],
-            "days": [
+            "days_taken": [
                 "F",
                 "T",
                 "T",
@@ -92,7 +92,7 @@
                 "4 PM",
                 "8 PM"
             ],
-            "days": [
+            "days_taken": [
                 "F",
                 "F",
                 "F",
@@ -113,14 +113,14 @@
             "name": "Salbutamol",
             "description": "Aerosol, spray 90 mg Inhalation 6 times/day for 2 week(s)",
             "times_taken": [
-                "8 AM",
+                "10 AM",
                 "12 PM",
-                "3 PM",
+                "2 PM",
                 "4 PM",
                 "6 PM",
                 "8 PM"
             ],
-            "days": [
+            "days_taken": [
                 "F",
                 "T",
                 "F",
@@ -145,7 +145,7 @@
                 "Afternoon",
                 "Evening"
             ],
-            "days": [
+            "days_taken": [
                 "F",
                 "F",
                 "F",
@@ -168,7 +168,7 @@
             "times_taken": [
                 "6 PM"
             ],
-            "days": [
+            "days_taken": [
                 "F",
                 "F",
                 "T",
@@ -201,5 +201,8 @@
         "Th",
         "Fr",
         "Sa"
-    ]
+    ],
+    "form_number":"6626 04/04",
+    "permanent_record_number":"P1234.5",
+    "medication_record_number":"M67890"
 }

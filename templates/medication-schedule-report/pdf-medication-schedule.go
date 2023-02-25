@@ -31,6 +31,7 @@ func init() {
 	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 }
 
+// MedicalData represents data related to patient medical information and drug administration schedules.
 type MedicalData struct {
 	Patient struct {
 		Name                 string `json:"name"`
@@ -46,9 +47,12 @@ type MedicalData struct {
 		Name          string   `json:"name"`
 		Description   string   `json:"description"`
 		TimesOfTheDay []string `json:"times_taken"`
-		DaysTaken     []string `json:"days"`
+		DaysTaken     []string `json:"days_taken"`
 	} `json:"drugs"`
-	ListOfDays []string `json:"list_of_days"`
+	ListOfDays            []string `json:"list_of_days"`
+	FormNumber            string   `json:"form_number"`
+	PermanentRecordNumber string   `json:"permanent_record_number"`
+	MedicationRecord      string   `json:"medication_record_number"`
 }
 
 func main() {
@@ -56,6 +60,7 @@ func main() {
 	size := creator.PageSize{279.4 * creator.PPMM, 215.9 * creator.PPMM}
 	c.SetPageSize(size)
 	c.SetPageMargins(20, 20, 35, 35)
+
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
 	if err != nil {
@@ -69,6 +74,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// Create template options.
 	tplOpts := &creator.TemplateOptions{
 		FontMap: map[string]*model.PdfFont{
@@ -76,12 +82,13 @@ func main() {
 			"arial":      arial,
 		},
 		HelperFuncMap: template.FuncMap{
-			"getColumnWidths": func(colNums int, colWidth float64) string {
+			"getColumnWidths": func(NumOfCols int, colWidth float64) string {
+				// Calculate column widths given the number of columns and the total width.
 				var widths string
-				width := colWidth / float64(colNums)
-				for i := 0; i < colNums; i++ {
+				width := colWidth / float64(NumOfCols)
+				for i := 0; i < NumOfCols; i++ {
 					s := fmt.Sprintf("%.4f", width)
-					if i == colNums-1 {
+					if i == NumOfCols-1 {
 						widths += s
 					} else {
 						widths += (s + " ")
@@ -91,11 +98,13 @@ func main() {
 			},
 		},
 	}
+
 	// Read data from JSON.
 	medicationData, err := readData("data.json")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// Draw content template.
 	if err := c.DrawTemplate(mainTpl, medicationData, tplOpts); err != nil {
 		log.Fatal(err)
@@ -107,9 +116,13 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
 		// Draw template.
 		data := map[string]interface{}{
-			"PageNum": args.PageNum,
+			"PageNum":               args.PageNum,
+			"FormNumber":            medicationData.FormNumber,
+			"PermanentRecordNumber": medicationData.PermanentRecordNumber,
+			"MedicationRecord":      medicationData.MedicationRecord,
 		}
 		if err := block.DrawTemplate(c, tpl, data, nil); err != nil {
 			log.Fatal(err)
