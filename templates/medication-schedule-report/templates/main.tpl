@@ -1,20 +1,20 @@
 {{define "table-header"}}
     <table-cell  border-width-bottom="1.5" vertical-align="bottom">
         <paragraph margin="0 0 10 0">
-            <text-chunk font="arial-bold" font-size="11">Drug &amp; Usage</text-chunk>
+            <text-chunk font="arial-bold">Drug &amp; Usage</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell  border-width-bottom="1.5" vertical-align="bottom">
+    <table-cell  border-width-bottom="1.5" vertical-align="bottom" align="left" indent="0">
         <paragraph margin="0 0 10 0">
-            <text-chunk font="arial-bold" font-size="11">Time</text-chunk>
+            <text-chunk font="arial-bold">Time</text-chunk>
         </paragraph>
     </table-cell>
     {{range .Days}}
-    <table-cell border-width-bottom="1.5" vertical-align="bottom">
-        <paragraph margin="0 0 10 0">
-        <text-chunk font="arial-bold" font-size="11">{{.}}</text-chunk>
-        </paragraph>
-    </table-cell>
+        <table-cell border-width-bottom="1.5" vertical-align="bottom">
+            <paragraph margin="0 0 10 0">
+                <text-chunk font="arial-bold">{{.}}</text-chunk>
+            </paragraph>
+        </table-cell>
     {{end}}
 {{end}}
 
@@ -31,7 +31,7 @@
     </table-cell>
     {{$daysTaken := .DaysTaken}}
     {{range .TimesOfTheDay}}
-        <table-cell  border-width-right="0.5" border-width-top="0.5" border-width-bottom="0.5" vertical-align="bottom">
+        <table-cell  border-width-right="0.5" border-width-top="0.5" border-width-bottom="0.5" vertical-align="bottom" align="left" indent="0">
             <paragraph margin="0 0 10 0">
                 <text-chunk font="arial" font-size="9">{{.}}</text-chunk>
             </paragraph>
@@ -114,7 +114,6 @@
     </table-cell>
 {{end}}
 {{define "foot-note"}}
-
 {{end}}
 <table columns="5" indent="0" column-widths="0.15 0.55 0.03 0.2 0.07">
     <table-cell vertical-align="top">
@@ -175,31 +174,31 @@
         {{end}}
 </table>
 
-<table columns="5" margin="0 0 0 200" column-widths="0.6 0.1 0.1 0.1 0.1" indent="0">
+<table columns="5" margin="0 0 0 200" column-widths="0.6 0.05 0.15 0.05 0.15" indent="0">
     <table-cell>
         <paragraph margin="10 0 0 0">
             <text-chunk>Mark each box with a checkmark after you have taken a dose of medicine. If you skipped a dose, please consult your physician or pharmacist. Do not take medicine on the days and times not clearly indicated on this schedule.</text-chunk>
         </paragraph>
     </table-cell>
     <table-cell align="right">
-        <division margin="18 0 0 0">
+        <division margin="15 0 0 0">
             <image src="path('templates/res/checkmark.png')"></image>
         </division>
     </table-cell>
     <table-cell>
-        <division margin="18 0 0 0">
+        <division margin="10 0 0 0">
             <paragraph>
                 <text-chunk>Take a medication</text-chunk>
             </paragraph>
         </division>
     </table-cell>
     <table-cell>
-        <division margin="18 0 0 0">
+        <division margin="15 0 0 0">
             <image src="path('templates/res/checkmark-empty.png')"></image>
         </division>
     </table-cell>
     <table-cell align="right">
-        <division margin="18 0 0 0">
+        <division margin="15 0 0 0">
             <paragraph>
                 <text-chunk>Skip this day</text-chunk>
             </paragraph>

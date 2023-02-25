@@ -12,12 +12,9 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math"
 	"os"
 	"text/template"
 
-	"github.com/boombuler/barcode"
-	"github.com/boombuler/barcode/ean"
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
@@ -64,11 +61,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	barCode, err := makeBarcode("0123456789012", 50, 72)
-	if err != nil {
-		log.Fatal(err)
-	}
-	_ = barCode
 	arialBold, err := model.NewPdfFontFromTTFFile("./templates/res/arialbd.ttf")
 	if err != nil {
 		log.Fatal(err)
@@ -79,9 +71,6 @@ func main() {
 	}
 	// Create template options.
 	tplOpts := &creator.TemplateOptions{
-		ImageMap: map[string]*model.Image{
-			"barCode": barCode,
-		},
 		FontMap: map[string]*model.PdfFont{
 			"arial-bold": arialBold,
 			"arial":      arial,
@@ -102,7 +91,7 @@ func main() {
 			},
 		},
 	}
-	// Read data from json.
+	// Read data from JSON.
 	medicationData, err := readData("data.json")
 	if err != nil {
 		log.Fatal(err)
@@ -133,24 +122,7 @@ func main() {
 	}
 }
 
-func makeBarcode(codeStr string, width float64, oversampling int) (*model.Image, error) {
-	bcode, err := ean.Encode(codeStr)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	pixelWidth := oversampling * int(math.Ceil(width))
-	bcodeImg, err := barcode.Scale(bcode, pixelWidth, pixelWidth)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	image, err := model.ImageHandling.NewImageFromGoImage(bcodeImg)
-
-	return image, err
-}
-
-// readTemplate reads the template at the specified file path and returns it as an io.Reader.
+// readTemplate reads the template at the specified file path and returns an io.Reader.
 func readTemplate(tplFile string) (io.Reader, error) {
 	file, err := os.Open(tplFile)
 	if err != nil {
@@ -162,11 +134,10 @@ func readTemplate(tplFile string) (io.Reader, error) {
 	if _, err = io.Copy(buf, file); err != nil {
 		return nil, err
 	}
-
 	return buf, nil
 }
 
-// readReceipt reads the receipt json file and decodes it to `Receipt` object.
+// readData reads data from the json file and decodes it to `MedicalData` object.
 func readData(jsonFile string) (*MedicalData, error) {
 	file, err := os.Open(jsonFile)
 	if err != nil {
