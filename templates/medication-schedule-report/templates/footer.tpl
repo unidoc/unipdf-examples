@@ -6,9 +6,9 @@
             </paragraph>
         </division>
     </table-cell>
-    <table-cell>
+    <table-cell align = "right">
         <table columns="1">
-            <table-cell>
+            <table-cell align = "right">
                 <paragraph>
                     <text-chunk font="times" font-size="9">Hem/Onc   Form#6626 04/04    Permanent   Record P1234.5    Medication Record M67890</text-chunk>
                 </paragraph>

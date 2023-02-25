@@ -1,16 +1,16 @@
 {{define "table-header"}}
-    <table-cell  border-width-bottom="2.0" vertical-align="bottom">
+    <table-cell  border-width-bottom="1.5" vertical-align="bottom">
         <paragraph margin="0 0 10 0">
             <text-chunk font="arial-bold" font-size="11">Drug &amp; Usage</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell  border-width-bottom="2.0" vertical-align="bottom">
+    <table-cell  border-width-bottom="1.5" vertical-align="bottom">
         <paragraph margin="0 0 10 0">
             <text-chunk font="arial-bold" font-size="11">Time</text-chunk>
         </paragraph>
     </table-cell>
     {{range .Days}}
-    <table-cell border-width-bottom="2.0" vertical-align="bottom">
+    <table-cell border-width-bottom="1.5" vertical-align="bottom">
         <paragraph margin="0 0 10 0">
         <text-chunk font="arial-bold" font-size="11">{{.}}</text-chunk>
         </paragraph>
@@ -50,265 +50,116 @@
     {{end}}
 {{end}}
 
-<table columns="7" indent="0" column-widths= "0.15 0.25 0.2 0.1 0.03 0.2 0.07">
-    <table-cell rowspan="4">
-        <image src="path('templates/res/logo.png')" width="95.5" height="51.5" ></image>
-    </table-cell>
-    <table-cell>
+{{define "sign-row"}}
+    <table-cell border-width-bottom="{{.BorderWidth}}">
         <paragraph>
-            <text-chunk font-size="8" font="arial">Medication Reconcilliation/BPMH* for:</text-chunk>
+            <text-chunk font-size="8" font="arial">{{.Col1}}</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell>
+    <table-cell border-width-bottom="{{.BorderWidth}}">
         <paragraph>
-            <text-chunk font-size="8" font="arial">Social Security Number</text-chunk>
+            <text-chunk font-size="8" font="arial">{{.Col2}}</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell>
+    <table-cell border-width-bottom="{{.BorderWidth}}">
         <paragraph>
-            <text-chunk font-size="8" font="arial">DOB</text-chunk>
+            <text-chunk font-size="8" font="arial">{{.Col3}}</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell>
+    <table-cell>     
         <paragraph>
             <text-chunk font-size="8" font="arial"></text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell rowspan="5" border-width-bottom="2.5" border-width-left="1">
-                <table columns="2">
-                    <table-cell colspan="2" margin="5 0 0 0">
-                        <paragraph>
-                            <text-chunk font-size="8" font="arial-bold">K00</text-chunk>
-                        </paragraph>
-                    </table-cell>
-                    <table-cell colspan="3">
-                        <paragraph>
-                            <text-chunk font-size="8" font="arial-bold">PLEASE NOTE: </text-chunk>
-                            <text-chunk font-size="8" font="arial">completed calendars MUST be returned to SHC as part of the patient's Medical Record</text-chunk>
-                        </paragraph>
-                    </table-cell>
-                    <table-cell>
-                        <paragraph margin="15 0 0 0">
-                            <text-chunk font-size="8" font="arial">Information:</text-chunk>
-                        </paragraph>
-                    </table-cell>
-                    <table-cell>
-                        <paragraph margin="15 0 0 0">
-                            <text-chunk font-size="8" font="arial">0-123-456-789</text-chunk>
-                        </paragraph>
-                    </table-cell>
-                    <table-cell>
-                        <paragraph>
-                            <text-chunk font-size="8" font="arial">Emergenc:</text-chunk>
-                        </paragraph>
-                    </table-cell>
-                    <table-cell>
-                        <paragraph>
-                            <text-chunk font-size="8" font="arial">0-123-456-789</text-chunk>
-                        </paragraph>
-                    </table-cell>
-                    <table-cell>
-                        <paragraph>
-                            <text-chunk font-size="8" font="arial">Website:</text-chunk>
-                        </paragraph>
-                    </table-cell>
-                    <table-cell>
-                        <paragraph>
-                            <text-chunk font-size="8" font="arial">www.samplehealthcare.com</text-chunk>
-                        </paragraph>
-                    </table-cell>
-                </table>
-    </table-cell>
-    <table-cell rowspan="5"  border-width-bottom="2.5" vertical-align="middle">
-    <image src="path('templates/res/bar-code.png')" width="30" height="120"></image>
-    </table-cell>
+{{end}}
+{{define "info-row"}}
+    {{if .Colspan}}
+        <table-cell colspan="2" margin="{{.Margin}}">
+            <paragraph>
+                {{if .MultiLine}}
+                     <text-chunk font-size="8" font="{{.Font1}}">{{.Heading}}</text-chunk>
+                {{end}}
+                <text-chunk font-size="8" font="{{.Font}}">{{.Col1}}</text-chunk>
+            </paragraph>
+        </table-cell>
+    {{ else }}
+        <table-cell>
+            <paragraph margin="{{.Margin}}">
+                <text-chunk font-size="8" font="{{.Font}}">{{.Col1}}</text-chunk>
+            </paragraph>
+        </table-cell>
+        <table-cell>
+            <paragraph margin="{{.Margin}}">
+                <text-chunk font-size="8" font="{{.Font}}">{{.Col2}}</text-chunk>
+            </paragraph>
+        </table-cell>
+    {{end}}
+{{end}}
 
-    {{/** ----------------------------------------- **/}}
-    <table-cell vertical-align="bottom" border-width-bottom="0.5">
+{{define "patient-row"}}
+    <table-cell vertical-align="{{.Valign}}" border-width-bottom="{{.BorderWidth}}">
         <paragraph>
-            <text-chunk font-size="12" font="arial">{{.Patient.Name}}</text-chunk>
+            <text-chunk font="arial" font-size="{{.FontSize}}">{{.Col1}}</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell vertical-align="bottom" border-width-bottom="0.5">
+    <table-cell vertical-align="{{.Valign}}" border-width-bottom="{{.BorderWidth}}">
         <paragraph>
-            <text-chunk font-size="12" font="arial">{{.Patient.SocialSecurityNumber}}</text-chunk>
+            <text-chunk font="arial" font-size="{{.FontSize}}">{{.Col2}}</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell border-width-bottom="0.5" vertical-align="bottom">
+    <table-cell vertical-align="{{.Valign}}" border-width-bottom="{{.BorderWidth}}">
         <paragraph>
-            <text-chunk font-size="12" font="arial">{{.Patient.Dob}}</text-chunk>
+            <text-chunk font="arial" font-size="{{.FontSize}}">{{.Col3}}</text-chunk>
         </paragraph>
+    </table-cell>
+{{end}}
+{{define "foot-note"}}
+
+{{end}}
+<table columns="5" indent="0" column-widths="0.15 0.55 0.03 0.2 0.07">
+    <table-cell vertical-align="top">
+        <image src="path('templates/res/logo.png')" width="105.5" height="61.5" ></image>
+    </table-cell>
+    <table-cell>
+        <table columns="3" column-widths="0.5 0.3 0.2">
+            {{template "patient-row" dict "Col1" "Medication Reconcilliation/BPMH* for:" "Col2" "Social Security Number" "Col3" "DOB" "Valign" "middle" "BorderWidth" "0" "FontSize" "8"}}
+            {{template "patient-row" dict "Col1" .Patient.Name "Col2" .Patient.SocialSecurityNumber "Col3" .Patient.Dob "Valign" "bottom" "BorderWidth" "0.5" "FontSize" "11"}}
+            {{template "patient-row" dict "Col1" "Two Week Period From:" "Col2" "To:" "Col3" "" "Valign" "middle" "BorderWidth" "0" "FontSize" "8"}}
+            {{template "patient-row" dict "Col1" .StartDate "Col2" .EndDate "Col3" "" "Valign" "bottom" "BorderWidth" "0.5" "FontSize" "11"}}
+        </table>
     </table-cell>
     <table-cell>
         <paragraph>
             <text-chunk font-size="8" font="arial"></text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell>
-        <paragraph>
-            <text-chunk font-size="8" font="arial">Two Week Period From:</text-chunk>
-        </paragraph>
+    <table-cell rowspan="4" border-width-bottom="2.5" border-width-left="1">
+        <table columns="2">
+            {{template "info-row" dict "Col1" "K00" "Font" "arial-bold" "Margin" "5 0 0 0" "Colspan" 2}}
+            {{template "info-row" dict "Heading" "PLEASE NOTE: " "Col1" "completed calendars MUST be returned to SHC as part of the patient's Medical Record" "Font" "arial" "Font1" "arial-bold" "Margin" "5 0 0 0" "Colspan" 2 "MultiLine" true}}
+            {{template "info-row" dict "Col1" "Information:" "Col2" "0-123-456-789" "Font" "arial" "Margin" "5 0 0 0"}}
+            {{template "info-row" dict "Col1" "Emergency:" "Col2" "0-123-456-789" "Font" "arial-bold" "Margin" "0 0 0 0"}}
+            {{template "info-row" dict "Col1" "Website:" "Col2" "www.samplehealthcare.com" "Font" "arial" "Margin" "5 0 0 0"}}
+        </table>
     </table-cell>
-    <table-cell>
-        <paragraph>
-            <text-chunk font-size="8" font="arial">To:</text-chunk>
-        </paragraph>
+    <table-cell rowspan="4" border-width-bottom="2.5" vertical-align="middle">
+        <division>
+            <image src="path('templates/res/bar-code.png')" width="25" height="120"></image>
+        </division>
     </table-cell>
-    <table-cell>
-        <paragraph>
-            <text-chunk></text-chunk>
-        </paragraph>
-    </table-cell>
-    <table-cell>
-        <paragraph>
-            <text-chunk font-size="8" font="arial"></text-chunk>
-        </paragraph>
-    </table-cell>
-    {{/** ----------------------------------------- **/}}
-    <table-cell border-width-bottom="0.5" vertical-align="bottom">
-        <paragraph>
-            <text-chunk font-size="12" font="arial">{{.StartDate}}</text-chunk>
-        </paragraph>
-    </table-cell>
-    <table-cell border-width-bottom="0.5" vertical-align="bottom">
-        <paragraph>
-            <text-chunk font-size="12" font="arial">{{.EndDate}}</text-chunk>
-        </paragraph>
-    </table-cell>
-    <table-cell colspan="2">
-        <paragraph>
-            <text-chunk></text-chunk>
-        </paragraph>
-    </table-cell>
-    {{/** ----------------------------------------- **/}}
-    <table-cell colspan="5">
+    <table-cell colspan="3" rowspan="3" vertical-align="bottom">
         <table columns="4" column-widths="0.20 0.35 0.42 0.03">
-            <table-cell>
-                <paragraph>
-                    <text-chunk font-size="8" font="arial">Date (mm/dd/yyyy)</text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell>
-                <paragraph>
-                <text-chunk font-size="8" font="arial">Prepared by (Signature/Printed Name)</text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell>
-                <paragraph>
-                    <text-chunk font-size="8" font="arial">Verified by PhC (Signature/Printed Name)</text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell>
-                <paragraph>
-                    <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell border-width-bottom="0.5">
-                <paragraph>
-                    <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell border-width-bottom="0.5">
-                <paragraph>
-                <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell border-width-bottom="0.5">
-                <paragraph>
-                    <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-                <table-cell>
-                <paragraph>
-                    <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-
-            <table-cell>
-                <paragraph>
-                    <text-chunk font-size="8" font="arial">Date (mm/dd/yyyy)</text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell>
-                <paragraph>
-                <text-chunk font-size="8" font="arial">Verified by RN (Signature/Printed Name)**</text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell>
-                <paragraph>
-                    <text-chunk font-size="8" font="arial">Counselled by (Signature/Printed Name)</text-chunk>
-                </paragraph>
-            </table-cell>
-                <table-cell>
-                <paragraph>
-                    <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-
-            <table-cell border-width-bottom="0.5">
-                <paragraph>
-                    <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell border-width-bottom="0.5">
-                <paragraph>
-                <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell border-width-bottom="0.5">
-                <paragraph>
-                    <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-                <table-cell>
-                <paragraph>
-                    <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-
-            <table-cell>
-                <paragraph>
-                    <text-chunk font-size="8" font="arial" >Date (mm/dd/yyyy)</text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell>
-                <paragraph>
-                    <text-chunk font-size="8" font="arial">Parent/Legal Guardian (Signature/Printed Name)</text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell>
-            </table-cell>
-            <table-cell>
-                <paragraph>
-                    <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-
-            <table-cell border-width-bottom="0.5">
-                <paragraph>
-                    <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell border-width-bottom="0.5">
-                <paragraph>
-                <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell border-width-bottom="0.5">
-                <paragraph>
-                    <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
-            <table-cell>
-                <paragraph>
-                    <text-chunk font-size="8" font="arial"></text-chunk>
-                </paragraph>
-            </table-cell>
+            {{template "sign-row" dict "Col1" "Date (mm/dd/yyyy)" "Col2" "Prepared by (Signature/Printed Name)" "Col3" "Verified by PhC (Signature/Printed Name)" "BorderWidth" "0"}}
+            {{template "sign-row" dict "Col1" "" "Col2" "" "Col3" "" "BorderWidth" "0.5"}}
+            {{template "sign-row" dict "Col1" "Date (mm/dd/yyyy)" "Col2" "Verified by RN (Signature/Printed Name)**" "Col3" "Counselled by (Signature/Printed Name)" "BorderWidth" "0"}}
+            {{template "sign-row" dict "Col1" "" "Col2" "" "Col3" "" "BorderWidth" "0.5"}}
+            {{template "sign-row" dict "Col1" "Date (mm/dd/yyyy)" "Col2" "Parent/Legal Guardian (Signature/Printed Name)" "Col3" "" "BorderWidth" "0"}}
+            {{template "sign-row" dict "Col1" "" "Col2" "" "Col3" "" "BorderWidth" "0.5"}}
         </table>
     </table-cell>
 </table>
 
-<division margin="20 0 0 0">
+<division margin="10 0 0 0">
     <paragraph>
         <text-chunk>*  Best Possible Medication History</text-chunk>
     </paragraph>
@@ -317,26 +168,26 @@
     </paragraph>
 </division>
 
-<table columns="16" margin="20 0 0 0" column-widths="0.25 0.08 {{getColumnWidths (len .ListOfDays) 0.67}}">
+<table columns="16" margin="10 0 0 0" column-widths="0.25 0.08 {{getColumnWidths (len .ListOfDays) 0.67}}">
     {{template "table-header" dict "Days" .ListOfDays}}
         {{range $idx, $v := .Drugs}}
             {{template "drug-schedule" .}}
         {{end}}
 </table>
 
-<table columns="5" margin="0 0 0 200" column-widths="0.6 0.05 0.15 0.05 0.15">
+<table columns="5" margin="0 0 0 200" column-widths="0.6 0.1 0.1 0.1 0.1" indent="0">
     <table-cell>
         <paragraph margin="10 0 0 0">
             <text-chunk>Mark each box with a checkmark after you have taken a dose of medicine. If you skipped a dose, please consult your physician or pharmacist. Do not take medicine on the days and times not clearly indicated on this schedule.</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell>
+    <table-cell align="right">
         <division margin="18 0 0 0">
-            <ellipse position="relative" width="10" height="10" border-color="#000000" fill-color="#ffffff" border-width="0.4"></ellipse>
+            <image src="path('templates/res/checkmark.png')"></image>
         </division>
     </table-cell>
     <table-cell>
-        <division margin="10 0 0 0">
+        <division margin="18 0 0 0">
             <paragraph>
                 <text-chunk>Take a medication</text-chunk>
             </paragraph>
@@ -344,10 +195,10 @@
     </table-cell>
     <table-cell>
         <division margin="18 0 0 0">
-            <ellipse position="relative" width="10" height="10" border-color="#cfcfcb" fill-color="#cfcfcb" border-width="0.4">Text</ellipse>
+            <image src="path('templates/res/checkmark-empty.png')"></image>
         </division>
     </table-cell>
-    <table-cell>
+    <table-cell align="right">
         <division margin="18 0 0 0">
             <paragraph>
                 <text-chunk>Skip this day</text-chunk>
