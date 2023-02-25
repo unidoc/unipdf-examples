@@ -21,3 +21,4 @@ modified without the need to rebuild the application.
 - [Sample Lab Results](lab-results): showcases the usage of creator templates by creating a sample lab results document.
 - [Sample Medical Bill Document](medical-bill): showcases the usage of creator templates by creating a sample medical bill document.
 - [Sample Rental Agreement](rental-agreement): showcases the usage of creator templates by creating a sample rental agreement.
+- [Sample Medication Schedule](medication-schedule-report): showcases the usage of creator templates by creating a sample medication schedule
