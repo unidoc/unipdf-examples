@@ -1,5 +1,5 @@
 /*
- * This example showcases the usage of creator templates by creating a sample medication schedule report.
+ * This example showcases the usage of creator templates by creating a sample medication schedule document.
  *
  * Run as: go run pdf-medication-schedule.go
  */
