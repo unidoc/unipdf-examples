@@ -1,0 +1,158 @@
+{
+    "date": "2020-12-09T00:00:00",
+    "company": {
+        "name": "UniDOC Land Company",
+        "address": "2 Maple Ln, Suite A, Best Town, Alabama, 29227",
+        "location": "North Carolina",
+        "landlord": "John Landlord"
+    },
+    "manager": {
+        "company": "UniDOC Management Company",
+        "address": "2 Maple Ln, Suite A, Best Town, Alabama, 29227",
+        "phone": "(888) 222-3333",
+        "email": "email@email.com"
+    },
+    "apartment": {
+        "number_of_bedrooms": 2,
+        "number_of_bathrooms": 2.5,
+        "unit_size": 2,
+        "address": "1 Main Street, Apt 4, Small Town, Alabama, 20992",
+        "number_of_allowed_pets": 2,
+        "furnishing_items": [
+            "Bedroom Set(s)",
+            "Dining RoomSet(s)",
+            "LivingRoomSet(s)"
+        ],
+        "number_of_parking_spaces": 2,
+        "parking_spaces_description": "1 outdoor parking space and 1 indoor garage parking space",
+        "provided_appliances": [
+            "Air Conditioner(s)",
+            "Dish washer",
+            "Dryer(forLaundry)",
+            "Fan(s)",
+            "Hot Water Heater",
+            "HVAC",
+            "Microwave",
+            "Outdoor Grill",
+            "Oven(s)",
+            "Refrigerator",
+            "Stove(s)",
+            "Washer (for Laundry)"
+        ],
+        "utility_services": [
+            "Lawn Care",
+            "Snow Removal",
+            "Trash Removal",
+            "Water"
+        ],
+        "allowed_pets_list": [
+            "Birds",
+            "Cats",
+            "Dogs",
+            "Fish",
+            "Hamsters",
+            "Rabbits"
+        ],
+        "constructed_before": 1978
+    },
+    "tenant": {
+        "names": [
+            "Alex Tenant",
+            "Joanna Tenant"
+        ],
+        "mailing_address": "1 Main Street, Apt 4 Small Town Alabama 20992"
+    },
+    "early_termination_notice_period": 60,
+    "cancellation_notification_period": 30,
+    "continuation_notification_period": 60,
+    "lease_termination_for_service_members": 30,
+    "beginning_date": "2020-12-03T00:00:00",
+    "ending_date": "2033-11-29T00:00:00",
+    "monthly_installment": "1,873.00",
+    "ins_fee_amount": "45.00",
+    "late_fee_amount": "50.00",
+    "sec_deposit_amount": "1,873.00",
+    "purchase_amount": "450,000.00",
+    "purchase_deposit_amount": "4,500.00",
+    "pet_fee_amount": "300.00",
+    "termination_fee": "1,000.00",
+    "security_deposit_return_time": 14,
+    "minimum_abandonment_days": 7,
+    "number_of_parking_spaces": 2,
+    "move_in_check_list": {
+        "living_room": [
+            "Floors",
+            "Walls",
+            "Ceiling",
+            "Windows",
+            "Lighting",
+            "Electrical",
+            "Other",
+            "Other"
+        ],
+        "dinning_room": [
+            "Floors",
+            "Walls",
+            "Ceiling",
+            "Windows",
+            "Lighting",
+            "Electrical",
+            "Other",
+            "Other"
+        ],
+        "kitchen": [
+            "Stove",
+            "Refrigerator",
+            "Sink",
+            "Floors",
+            "Walls",
+            "Ceiling",
+            "Windows",
+            "Lighting",
+            "Electrical",
+            "Cabinets",
+            "Closets",
+            "Exhaust Fan",
+            "Fire Alarms",
+            "Other",
+            "Other"
+        ],
+        "bedroom": [
+            "Doors",
+            "Closets",
+            "Floors",
+            "Walls",
+            "Ceiling",
+            "Windows",
+            "Lighting",
+            "Electrical Outlets",
+            "Other",
+            "Other"
+        ],
+        "bathroom": [
+            "Sink",
+            "Shower",
+            "Curtain",
+            "Towel Rack",
+            "Toilet",
+            "Doors",
+            "Floors",
+            "Walls",
+            "Ceiling",
+            "Windows",
+            "Lighting",
+            "Electrical",
+            "Other",
+            "Other"
+        ],
+        "other": [
+            "Heating",
+            "AC Unit",
+            "Hot Water",
+            "Smoke Alarm",
+            "Door Bell",
+            "Other",
+            "Other"
+        ]
+    }
+}

@@ -12,9 +12,12 @@ modified without the need to rebuild the application.
 
 - [Sample Security Report](security-report): showcases the usage of creator templates by creating a sample security report.
 - [Sample Airplane Ticket](airplane-ticket): showcases the usage of creator templates by creating a sample airplane ticket.
+- [Sample Aviation Checklist](aviation-checklist): showcases the usage of creator templates by creating a sample aviation checklist.
 - [Sample Bank Account Statement](bank-account-statement): showcases the usage of creator templates by creating a sample bank account statement.
 - [Sample Boarding Pass Document](boarding-pass): showcases the usage of creator templates by creating a sample boarding pass document.
 - [Sample Trade Confirmation Document](trade-confirmation): showcases the usage of creator templates by creating a sample trade confirmation document.
 - [Sample Receipt Document](receipt): showcases the usage of creator templates by creating a receipt document.
 - [Sample Concert Ticket](concert-ticket): showcases the usage of creator templates by creating a sample concert ticket.
+- [Sample Lab Results](lab-results): showcases the usage of creator templates by creating a sample lab results document.
 - [Sample Medical Bill Document](medical-bill): showcases the usage of creator templates by creating a sample medical bill document.
+- [Sample Rental Agreement](rental-agreement): showcases the usage of creator templates by creating a sample rental agreement.
