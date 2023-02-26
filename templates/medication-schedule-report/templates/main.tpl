@@ -19,7 +19,7 @@
 {{end}}
 
 {{define "drug-schedule"}}   
-    <table-cell  border-width-left="0.5" border-width-bottom="0.5" vertical-align="top" rowspan="{{len .TimesOfTheDay}}">
+    <table-cell border-width-left="0.5" border-width-bottom="0.5" vertical-align="top" rowspan="{{len .TimesOfTheDay}}">
         <division>
             <paragraph margin="10 0 0 0">
                 <text-chunk font="arial-bold" font-size="11">{{.Name}}</text-chunk>
@@ -31,7 +31,7 @@
     </table-cell>
     {{$daysTaken := .DaysTaken}}
     {{range .TimesOfTheDay}}
-        <table-cell  border-width-right="0.5" border-width-bottom="0.5" vertical-align="bottom" align="left" indent="0">
+        <table-cell border-width-right="0.5" border-width-bottom="0.5" vertical-align="bottom" align="left" indent="0">
             <paragraph margin="0 0 10 0">
                 <text-chunk font="arial" font-size="9">{{.}}</text-chunk>
             </paragraph>
@@ -41,7 +41,7 @@
             {{if eq . "T"}}
                 {{$bg ="#cfcfcb"}}
             {{end}}
-            <table-cell  border-width="0.5" vertical-align="bottom" background-color="{{$bg}}">
+            <table-cell border-width="0.5" vertical-align="bottom" background-color="{{$bg}}">
                 <paragraph margin="0 0 10 0">
                     <text-chunk font="arial" font-size="9"></text-chunk>
                 </paragraph>
@@ -51,17 +51,17 @@
 {{end}}
 
 {{define "sign-row"}}
-    <table-cell border-width-bottom="{{.BorderWidth}}">
+    <table-cell border-width-bottom="{{.BorderWidth}}" indent="0">
         <paragraph>
-            <text-chunk font-size="8" font="arial">{{.Col1}}</text-chunk>
+            <text-chunk font-size="8" font="arial" indent="0">{{.Col1}}</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell border-width-bottom="{{.BorderWidth}}">
+    <table-cell border-width-bottom="{{.BorderWidth}}" indent="0">
         <paragraph>
-            <text-chunk font-size="8" font="arial">{{.Col2}}</text-chunk>
+            <text-chunk font-size="8" font="arial" indent="0">{{.Col2}}</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell border-width-bottom="{{.BorderWidth}}">
+    <table-cell border-width-bottom="{{.BorderWidth}}" indent="0">
         <paragraph>
             <text-chunk font-size="8" font="arial">{{.Col3}}</text-chunk>
         </paragraph>
@@ -75,7 +75,7 @@
 
 {{define "info-row"}}
     {{if .Colspan}}
-        <table-cell colspan="2" margin="{{.Margin}}">
+        <table-cell colspan="2" margin="{{.Margin}}" indent="0">
             <paragraph>
                 {{if .MultiLine}}
                 <text-chunk font-size="8" font="{{.Font1}}">{{.Heading}}</text-chunk>
@@ -84,12 +84,12 @@
             </paragraph>
         </table-cell>
     {{ else }}
-        <table-cell>
+        <table-cell indent="0">
             <paragraph margin="{{.Margin}}">
                 <text-chunk font-size="8" font="{{.Font}}">{{.Col1}}</text-chunk>
             </paragraph>
         </table-cell>
-        <table-cell>
+        <table-cell indent="0">
             <paragraph margin="{{.Margin}}">
                 <text-chunk font-size="8" font="{{.Font}}">{{.Col2}}</text-chunk>
             </paragraph>
@@ -98,17 +98,17 @@
 {{end}}
 
 {{define "patient-row"}}
-    <table-cell vertical-align="{{.Valign}}" border-width-bottom="{{.BorderWidth}}">
+    <table-cell vertical-align="{{.Valign}}" border-width-bottom="{{.BorderWidth}}" indent="0">
         <paragraph>
             <text-chunk font="arial" font-size="{{.FontSize}}">{{.Col1}}</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell vertical-align="{{.Valign}}" border-width-bottom="{{.BorderWidth}}">
+    <table-cell vertical-align="{{.Valign}}" border-width-bottom="{{.BorderWidth}}" indent="0">
         <paragraph>
             <text-chunk font="arial" font-size="{{.FontSize}}">{{.Col2}}</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell vertical-align="{{.Valign}}" border-width-bottom="{{.BorderWidth}}">
+    <table-cell vertical-align="{{.Valign}}" border-width-bottom="{{.BorderWidth}}" indent="0">
         <paragraph>
             <text-chunk font="arial" font-size="{{.FontSize}}">{{.Col3}}</text-chunk>
         </paragraph>
@@ -163,10 +163,10 @@
 
 <division margin="5 0 0 0">
     <paragraph>
-        <text-chunk>*  Best Possible Medication History</text-chunk>
+        <text-chunk font-size="8">*  Best Possible Medication History</text-chunk>
     </paragraph>
     <paragraph>
-        <text-chunk>** Verification of steroids medication that are part of the patients therapy treatment</text-chunk>
+        <text-chunk font-size="8">** Verification of steroids medication that are part of the patients therapy treatment</text-chunk>
     </paragraph>
 </division>
 
