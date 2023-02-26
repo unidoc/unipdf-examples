@@ -38,7 +38,7 @@
         </table-cell>
         {{range $daysTaken}}
             {{$bg:="#fffffe"}}
-            {{if eq . "T"}}
+            {{if eq . "F"}}
                 {{$bg ="#cfcfcb"}}
             {{end}}
             <table-cell border-width="0.5" vertical-align="bottom" background-color="{{$bg}}">

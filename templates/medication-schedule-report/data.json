@@ -20,6 +20,30 @@
                 "9 PM"
             ],
             "days_taken": [
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T"
+            ]
+        },
+        {
+            "name": "Valcyte",
+            "description": "(Valgancyclovir Hidrocloride), 450 mg Tablet(s) 2 tablets/day for 2 week(s)",
+            "times_taken": [
+                "Noon",
+                "Bedtime"
+            ],
+            "days_taken": [
                 "T",
                 "F",
                 "T",
@@ -37,50 +61,26 @@
             ]
         },
         {
-            "name": "Valcyte",
-            "description": "(Valgancyclovir Hidrocloride), 450 mg Tablet(s) 2 tablets/day for 2 week(s)",
-            "times_taken": [
-                "Noon",
-                "Bedtime"
-            ],
-            "days_taken": [
-                "F",
-                "T",
-                "F",
-                "T",
-                "F",
-                "T",
-                "F",
-                "T",
-                "F",
-                "T",
-                "F",
-                "T",
-                "F",
-                "T"
-            ]
-        },
-        {
             "name": "Prednisone",
             "description": "4 tablets/day for 4 week(s)",
             "times_taken": [
                 "10 AM"
             ],
             "days_taken": [
-                "F",
-                "T",
                 "T",
                 "F",
-                "T",
-                "T",
                 "F",
                 "T",
-                "T",
+                "F",
                 "F",
                 "T",
+                "F",
+                "F",
                 "T",
                 "F",
-                "T"
+                "F",
+                "T",
+                "F"
             ]
         },
         {
@@ -93,20 +93,20 @@
                 "8 PM"
             ],
             "days_taken": [
-                "F",
-                "F",
-                "F",
-                "F",
-                "F",
-                "F",
-                "F",
                 "T",
                 "T",
                 "T",
                 "T",
                 "T",
                 "T",
-                "T"
+                "T",
+                "F",
+                "F",
+                "F",
+                "F",
+                "F",
+                "F",
+                "F"
             ]
         },
         {
@@ -121,7 +121,6 @@
                 "8 PM"
             ],
             "days_taken": [
-                "F",
                 "T",
                 "F",
                 "T",
@@ -134,7 +133,8 @@
                 "F",
                 "T",
                 "F",
-                "T"
+                "T",
+                "F"
             ]
         },
         {
@@ -146,20 +146,20 @@
                 "Evening"
             ],
             "days_taken": [
-                "F",
-                "F",
-                "F",
-                "F",
-                "F",
-                "F",
-                "F",
-                "F",
-                "F",
-                "F",
-                "F",
-                "F",
-                "F",
-                "F"
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T"
             ]
         },
         {
@@ -169,20 +169,20 @@
                 "6 PM"
             ],
             "days_taken": [
-                "F",
-                "F",
+                "T",
                 "T",
                 "F",
-                "F",
+                "T",
                 "T",
                 "F",
-                "F",
+                "T",
                 "T",
                 "F",
-                "F",
+                "T",
                 "T",
                 "F",
-                "F"
+                "T",
+                "T"
             ]
         }
     ],
