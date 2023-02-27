@@ -8,6 +8,7 @@ package main
 
 import (
 	"bytes"
+	"html/template"
 	"io"
 	"log"
 	"os"
@@ -32,7 +33,7 @@ func main() {
 	c := creator.New()
 	size := creator.PageSize{842, 595}
 	c.SetPageSize(size)
-	c.SetPageMargins(10, 10, 35, 35)
+	c.SetPageMargins(10, 10, 65, 55)
 
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
@@ -59,7 +60,13 @@ func main() {
 			"exo-bold":    exoBold,
 			"exo-italic":  exoItalic,
 			"exo-regular": exoRegular,
-		}}
+		},
+		HelperFuncMap: template.FuncMap{
+			"isEven": func(num int) bool {
+				return num%2 == 0
+			},
+		},
+	}
 
 	if err = c.DrawTemplate(mainTpl, tplOpts, nil); err != nil {
 		log.Fatal(err)
@@ -77,7 +84,30 @@ func main() {
 			log.Fatal(err)
 		}
 	})
+	draw := func(tplPath string, block *creator.Block, pageNum int) {
+		// Read template.
+		tpl, err := readTemplate(tplPath)
+		if err != nil {
+			log.Fatal(err)
+		}
 
+		// Draw template.
+		data := map[string]interface{}{
+			"PageNum":     pageNum,
+			"DateOfPrint": "12/28/2020",
+			"DateRange":   "06/10/2018 - 06/09/2019",
+		}
+		if err := block.DrawTemplate(c, tpl, data, tplOpts); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	c.DrawHeader(func(block *creator.Block, args creator.HeaderFunctionArgs) {
+		draw("templates/header.tpl", block, args.PageNum)
+	})
+	c.DrawFooter(func(block *creator.Block, args creator.FooterFunctionArgs) {
+		draw("templates/footer.tpl", block, args.PageNum)
+	})
 	// Write output file.
 	if err := c.WriteToFile("unipdf-log-book.pdf"); err != nil {
 		log.Fatal(err)
