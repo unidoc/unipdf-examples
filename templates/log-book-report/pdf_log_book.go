@@ -8,10 +8,12 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"html/template"
 	"io"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
@@ -27,6 +29,21 @@ func init() {
 		panic(err)
 	}
 	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+}
+
+type Item struct {
+	Source        string `json:"Source"`
+	Manufacturer  string `json:"Manufacturer"`
+	Model         string `json:"Model"`
+	VIN           string `json"VIN"`
+	Received      string `json:"Received"`
+	Sent          string `json:"Sent"`
+	Buyer_Name    string `json:"Buyer_Name"`
+	Buyer_Address string `json:"Buyer_Address"`
+	Buyer_State   string `json:"Buyer_State"`
+	Buyer_Zip     string `json:"Buyer_Zip"`
+	Discarded     string `json:"Discarded"`
+	DiscardReason string `json:"DiscardReason"`
 }
 
 func main() {
@@ -55,6 +72,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Read data from JSON.
+	items, err := readData("contents/operations_log.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	tplOpts := &creator.TemplateOptions{
 		FontMap: map[string]*model.PdfFont{
 			"exo-bold":    exoBold,
@@ -65,10 +88,13 @@ func main() {
 			"isEven": func(num int) bool {
 				return num%2 == 0
 			},
+			"getSlice": func(s string) []string {
+				return strings.Split(s, ",")
+			},
 		},
 	}
 
-	if err = c.DrawTemplate(mainTpl, tplOpts, nil); err != nil {
+	if err = c.DrawTemplate(mainTpl, items, tplOpts); err != nil {
 		log.Fatal(err)
 	}
 	// Draw front page.
@@ -128,4 +154,20 @@ func readTemplate(tplFile string) (io.Reader, error) {
 		return nil, err
 	}
 	return buf, nil
+}
+
+// readData reads data from the json file and decodes it to `MedicalData` object.
+func readData(jsonFile string) ([]*Item, error) {
+	file, err := os.Open(jsonFile)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var data []*Item
+	err = json.NewDecoder(file).Decode(&data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
