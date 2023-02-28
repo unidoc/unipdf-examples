@@ -91,6 +91,15 @@ func main() {
 			"getSlice": func(s string) []string {
 				return strings.Split(s, ",")
 			},
+			"htmlescaper": func(value string) string {
+				return template.HTMLEscaper(value)
+			},
+			"getNext": func(index int) Item {
+				return items[index]
+			},
+			"getOddPageContent": func(start, end int) []Item {
+				return items[start:end]
+			},
 		},
 	}
 
@@ -157,14 +166,14 @@ func readTemplate(tplFile string) (io.Reader, error) {
 }
 
 // readData reads data from the json file and decodes it to `MedicalData` object.
-func readData(jsonFile string) ([]*Item, error) {
+func readData(jsonFile string) ([]Item, error) {
 	file, err := os.Open(jsonFile)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	var data []*Item
+	var data []Item
 	err = json.NewDecoder(file).Decode(&data)
 	if err != nil {
 		return nil, err

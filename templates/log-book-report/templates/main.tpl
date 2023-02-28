@@ -39,10 +39,48 @@
         </table-cell>
     {{end}}
 {{end}}
+
+{{define "recieved-row"}}
+    <table-cell border-width-bottom="0.5" border-width-top="0.5">
+        <paragraph>
+            <text-chunk font="exo-regular" font-size="11">{{.Num}}</text-chunk>
+        </paragraph>
+    </table-cell>
+    <table-cell border-width-bottom="0.5" border-width-top="0.5">
+        <paragraph>
+            <text-chunk font="exo-regular" font-size="11">{{.Item.Manufacturer | htmlescaper}}</text-chunk>
+        </paragraph>
+    </table-cell>
+    <table-cell border-width-bottom="0.5" border-width-top="0.5">
+        <paragraph>
+            <text-chunk font="exo-regular" font-size="11">{{.Item.Model | htmlescaper}}</text-chunk>
+        </paragraph>
+    </table-cell>
+    <table-cell border-width-bottom="0.5" border-width-top="0.5">
+        <paragraph>
+            <text-chunk font="exo-regular" font-size="11">{{.Item.VIN | htmlescaper}}</text-chunk>
+        </paragraph>
+    </table-cell>
+    <table-cell border-width-bottom="0.5" border-width-top="0.5">
+        <paragraph>
+            <text-chunk font="exo-regular" font-size="11">{{.Item.Received | htmlescaper}}</text-chunk>
+        </paragraph>
+    </table-cell>
+    <table-cell border-width-bottom="0.5" border-width-top="0.5">
+        <paragraph>
+            <text-chunk font="exo-regular" font-size="11">{{.Item.Source | htmlescaper}}</text-chunk>
+        </paragraph>
+    </table-cell>
+{{end}}
 <table columns="6" column-widths = "0.05 0.19 0.19 0.19 0.19 0.19">
     {{template "received-header"}}
+    {{range $i, $item := .}}
+        {{template "recieved-row" dict "Item" $item "Num" $i}}
+    {{end}}
 </table>
 <page-break></page-break>
 <table columns="4" column-widths = "0.1 0.3 0.3 0.3">
     {{template "sent-header"}}
 </table>
+
+
