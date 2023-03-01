@@ -115,9 +115,6 @@
     </table-cell>
 {{end}}
 
-{{define "foot-note"}}
-{{end}}
-
 <table columns="5" indent="0" column-widths="0.15 0.55 0.03 0.2 0.07">
     <table-cell vertical-align="top">
         <image src="path('templates/res/logo.png')" width="105.5" height="61.5" ></image>

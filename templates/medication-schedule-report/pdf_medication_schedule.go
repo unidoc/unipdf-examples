@@ -99,7 +99,7 @@ func main() {
 		},
 	}
 
-	// Read data from JSON.
+	// Read data from JSON file.
 	medicationData, err := readData("data.json")
 	if err != nil {
 		log.Fatal(err)
