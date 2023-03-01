@@ -41,9 +41,10 @@
 {{end}}
 
 {{define "recieved-row"}}
+    {{$i := add 3 .Num}}
     <table-cell border-width-bottom="0.5" border-width-top="0.5">
         <paragraph>
-            <text-chunk font="exo-regular" font-size="11">{{.Num}}</text-chunk>
+            <text-chunk font="exo-regular" font-size="11">{{$i}}</text-chunk>
         </paragraph>
     </table-cell>
     <table-cell border-width-bottom="0.5" border-width-top="0.5">
