@@ -51,7 +51,6 @@ func main() {
 	size := creator.PageSize{842, 595}
 	c.SetPageSize(size)
 	c.SetPageMargins(10, 10, 65, 55)
-
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
 	if err != nil {
