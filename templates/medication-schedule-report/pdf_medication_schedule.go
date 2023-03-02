@@ -1,7 +1,7 @@
 /*
  * This example showcases the usage of creator templates by creating a sample medication schedule document.
  *
- * Run as: go run pdf-medication-schedule.go
+ * Run as: go run pdf_medication_schedule.go
  */
 
 package main
