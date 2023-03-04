@@ -51,6 +51,7 @@ func main() {
 	size := creator.PageSize{842, 595}
 	c.SetPageSize(size)
 	c.SetPageMargins(10, 10, 65, 55)
+	rowsPerPage := 25
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
 	if err != nil {
@@ -90,6 +91,9 @@ func main() {
 			"add": func(num1, num2 int) int {
 				return num1 + num2
 			},
+			"mod": func(num int) bool {
+				return num%rowsPerPage == 0
+			},
 			"getSlice": func(s string) []string {
 				return strings.Split(s, ",")
 			},
@@ -99,7 +103,8 @@ func main() {
 			"getNext": func(index int) Item {
 				return items[index]
 			},
-			"getOddPageContent": func(start, end int) []Item {
+			"getNexData": func(start int) []Item {
+				end := start + rowsPerPage
 				return items[start:end]
 			},
 		},
@@ -117,7 +122,7 @@ func main() {
 		}
 
 		// Draw front page template.
-		if err := c.DrawTemplate(frontPageTpl, nil, tplOpts); err != nil {
+		if err := c.DrawTemplate(frontPageTpl, c, tplOpts); err != nil {
 			log.Fatal(err)
 		}
 	})
@@ -149,7 +154,6 @@ func main() {
 	if err := c.WriteToFile("unipdf-log-book.pdf"); err != nil {
 		log.Fatal(err)
 	}
-
 }
 
 // readTemplate reads the template at the specified file path and returns an io.Reader.
