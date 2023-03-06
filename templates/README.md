@@ -11,7 +11,8 @@ modified without the need to rebuild the application.
 ## Documentation
 
 Full documentation can be found in the [documentation](documentation) directory.
-The documentation is written entirely using templates so it can also serve as an example.
+The documentation is written entirely using templates so the source code can also serve as a
+starting point for creating technical documents/tutorials.
 
 Documentation PDF file: [unipdf-templates-documentation.pdf](documentation/unipdf-templates-documentation.pdf).
 
