@@ -4,7 +4,7 @@
             <text-chunk font="arial-bold">Drug &amp; Usage</text-chunk>
         </paragraph>
     </table-cell>
-    <table-cell  border-width-bottom="1.5" vertical-align="bottom" align="left" indent="0">
+    <table-cell  border-width-bottom="1.5" vertical-align="bottom" indent="0">
         <paragraph margin="0 0 10 0">
             <text-chunk font="arial-bold">Time</text-chunk>
         </paragraph>
@@ -19,7 +19,7 @@
 {{end}}
 
 {{define "drug-schedule"}}   
-    <table-cell border-width-left="0.5" border-width-bottom="0.5" vertical-align="top" rowspan="{{len .TimesOfTheDay}}">
+    <table-cell border-width-left="0.5" border-width-bottom="0.5" rowspan="{{len .TimesOfTheDay}}">
         <division>
             <paragraph margin="10 0 0 0">
                 <text-chunk font="arial-bold" font-size="11">{{.Name}}</text-chunk>
@@ -31,7 +31,7 @@
     </table-cell>
     {{$daysTaken := .DaysTaken}}
     {{range .TimesOfTheDay}}
-        <table-cell border-width-right="0.5" border-width-bottom="0.5" vertical-align="bottom" align="left" indent="0">
+        <table-cell border-width-right="0.5" border-width-bottom="0.5" vertical-align="bottom" indent="0">
             <paragraph margin="0 0 10 0">
                 <text-chunk font="arial" font-size="9">{{.}}</text-chunk>
             </paragraph>
@@ -116,7 +116,7 @@
 {{end}}
 
 <table columns="5" indent="0" column-widths="0.15 0.55 0.03 0.2 0.07">
-    <table-cell vertical-align="top">
+    <table-cell>
         <image src="path('templates/res/logo.png')" width="105.5" height="61.5" ></image>
     </table-cell>
     <table-cell>

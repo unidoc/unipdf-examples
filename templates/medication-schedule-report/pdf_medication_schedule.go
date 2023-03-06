@@ -82,13 +82,13 @@ func main() {
 			"arial":      arial,
 		},
 		HelperFuncMap: template.FuncMap{
-			"getColumnWidths": func(NumOfCols int, colWidth float64) string {
+			"getColumnWidths": func(numOfCols int, colWidth float64) string {
 				// Calculate column widths given the number of columns and the total width.
 				var widths string
-				width := colWidth / float64(NumOfCols)
-				for i := 0; i < NumOfCols; i++ {
+				width := colWidth / float64(numOfCols)
+				for i := 0; i < numOfCols; i++ {
 					s := fmt.Sprintf("%.4f", width)
-					if i == NumOfCols-1 {
+					if i == numOfCols-1 {
 						widths += s
 					} else {
 						widths += (s + " ")
