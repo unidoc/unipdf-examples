@@ -5,7 +5,7 @@
         </table-cell>
         <table-cell indent="0" vertical-align="middle">
             <paragraph text-align="center">
-                <text-chunk font="helvetica-bold" font-size="14" color="text">UniPDF templates tutorial</text-chunk>
+                <text-chunk font="helvetica-bold" font-size="14" color="text">UniPDF templates documentation</text-chunk>
             </paragraph>
         </table-cell>
         <table-cell indent="0" vertical-align="middle">
