@@ -10,13 +10,13 @@
     </paragraph>
 
     {{$components := array
-             (dict "name" "paragraph" "description" "" "children" (array (dict "name" "text-chunk" "description" "")))
-             (dict "name" "image" "description" "" "children" (array))
-             (dict "name" "rectangle" "description" "" "children" (array))
-             (dict "name" "ellipse" "description" "" "children" (array))
-             (dict "name" "line" "description" "" "children" (array))
-             (dict "name" "chart" "description" "" "children" (array))
-             (dict "name" "page-break" "description" "" "children" (array))
+             (dict "name" "paragraph" "children" (array (dict "name" "text-chunk")))
+             (dict "name" "image" "children" (array))
+             (dict "name" "rectangle" "children" (array))
+             (dict "name" "ellipse" "children" (array))
+             (dict "name" "line" "children" (array))
+             (dict "name" "chart" "children" (array))
+             (dict "name" "page-break" "children" (array))
     }}
 
     {{range $i, $component := $components}}

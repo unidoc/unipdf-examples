@@ -10,10 +10,10 @@
     </paragraph>
 
     {{$components := array
-             (dict "name" "division" "description" "" "children" (array (dict "name" "background" "description" "")))
-             (dict "name" "table" "description" "" "children" (array (dict "name" "table-cell" "description" "")))
-             (dict "name" "list" "description" "" "children" (array (dict "name" "list-item" "description" "") (dict "name" "list-marker" "description" "")))
-             (dict "name" "chapter" "description" "" "children" (array (dict "name" "chapter-heading" "description" "")))
+             (dict "name" "division" "children" (array (dict "name" "background")))
+             (dict "name" "table" "children" (array (dict "name" "table-cell")))
+             (dict "name" "list" "children" (array (dict "name" "list-item") (dict "name" "list-marker")))
+             (dict "name" "chapter" "children" (array (dict "name" "chapter-heading")))
     }}
 
     {{range $i, $component := $components}}
