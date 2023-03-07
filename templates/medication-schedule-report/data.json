@@ -1,0 +1,208 @@
+{
+    "patient": {
+        "name": "Jane Doe",
+        "social_security_number": "123-45-6789",
+        "dob": "03-22-1985"
+    },
+    "start_date": "02-14-2021",
+    "end_date": "02-28-2021",
+    "information_line": "0-123-456-789",
+    "emergency_line": "0-123-456-789",
+    "website": "www.samplehealthcare.com",
+    "drugs": [
+        {
+            "name": "Zerit",
+            "description": "(Stavudine), 15mg Capsule(s) 4 tablets/day for 4 week(s)",
+            "times_taken": [
+                "8 AM",
+                "12 PM",
+                "5 PM",
+                "9 PM"
+            ],
+            "days_taken": [
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T"
+            ]
+        },
+        {
+            "name": "Valcyte",
+            "description": "(Valgancyclovir Hidrocloride), 450 mg Tablet(s) 2 tablets/day for 2 week(s)",
+            "times_taken": [
+                "Noon",
+                "Bedtime"
+            ],
+            "days_taken": [
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F"
+            ]
+        },
+        {
+            "name": "Prednisone",
+            "description": "4 tablets/day for 4 week(s)",
+            "times_taken": [
+                "10 AM"
+            ],
+            "days_taken": [
+                "T",
+                "F",
+                "F",
+                "T",
+                "F",
+                "F",
+                "T",
+                "F",
+                "F",
+                "T",
+                "F",
+                "F",
+                "T",
+                "F"
+            ]
+        },
+        {
+            "name": "Aspirin",
+            "description": "375 mg film coated Tablet(s) 4 tablets/day for 1 week",
+            "times_taken": [
+                "8 AM",
+                "12 PM",
+                "4 PM",
+                "8 PM"
+            ],
+            "days_taken": [
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "F",
+                "F",
+                "F",
+                "F",
+                "F",
+                "F",
+                "F"
+            ]
+        },
+        {
+            "name": "Salbutamol",
+            "description": "Aerosol, spray 90 mg Inhalation 6 times/day for 2 week(s)",
+            "times_taken": [
+                "10 AM",
+                "12 PM",
+                "2 PM",
+                "4 PM",
+                "6 PM",
+                "8 PM"
+            ],
+            "days_taken": [
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F",
+                "T",
+                "F"
+            ]
+        },
+        {
+            "name": "Vitamin D3",
+            "description": "(Cholecalciferol), 1.25 mg Capsule(s) 3 capsules/day for 2 week(s)",
+            "times_taken": [
+                "Morning",
+                "Afternoon",
+                "Evening"
+            ],
+            "days_taken": [
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T",
+                "T"
+            ]
+        },
+        {
+            "name": "Ibuprofen",
+            "description": "1 tablet/day for 3 week(s)",
+            "times_taken": [
+                "6 PM"
+            ],
+            "days_taken": [
+                "T",
+                "T",
+                "F",
+                "T",
+                "T",
+                "F",
+                "T",
+                "T",
+                "F",
+                "T",
+                "T",
+                "F",
+                "T",
+                "T"
+            ]
+        }
+    ],
+    "list_of_days": [
+        "Su",
+        "Mo",
+        "Tu",
+        "We",
+        "Th",
+        "Fr",
+        "Sa",
+        "Su",
+        "Mo",
+        "Tu",
+        "We",
+        "Th",
+        "Fr",
+        "Sa"
+    ],
+    "form_number":"6626 04/04",
+    "permanent_record_number":"P1234.5",
+    "medication_record_number":"M67890"
+}
