@@ -8,6 +8,14 @@ The aim of templates is to make creating complex layouts a lot easier, faster,
 and by writing less code. If no new data is required, template files can be
 modified without the need to rebuild the application.
 
+## Documentation
+
+Full documentation can be found in the [documentation](documentation) directory.
+The documentation is written entirely using templates so the source code can also serve as a
+starting point for creating technical documents/tutorials.
+
+Documentation PDF file: [unipdf-templates-documentation.pdf](documentation/unipdf-templates-documentation.pdf).
+
 ## Examples
 
 - [Sample Security Report](security-report): showcases the usage of creator templates by creating a sample security report.
@@ -21,3 +29,4 @@ modified without the need to rebuild the application.
 - [Sample Lab Results](lab-results): showcases the usage of creator templates by creating a sample lab results document.
 - [Sample Medical Bill Document](medical-bill): showcases the usage of creator templates by creating a sample medical bill document.
 - [Sample Rental Agreement](rental-agreement): showcases the usage of creator templates by creating a sample rental agreement.
+- [Sample Medication Schedule Document](medication-schedule-report): showcases the usage of creator templates by creating a sample medication schedule document.
