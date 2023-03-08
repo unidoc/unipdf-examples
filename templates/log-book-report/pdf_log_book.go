@@ -51,7 +51,6 @@ func main() {
 	size := creator.PageSize{842, 595}
 	c.SetPageSize(size)
 	c.SetPageMargins(10, 10, 65, 55)
-	rowsPerPage := 25
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
 	if err != nil {
@@ -91,21 +90,11 @@ func main() {
 			"add": func(num1, num2 int) int {
 				return num1 + num2
 			},
-			"mod": func(num int) bool {
-				return num%rowsPerPage == 0
-			},
 			"getSlice": func(s string) []string {
 				return strings.Split(s, ",")
 			},
 			"htmlescaper": func(value string) string {
 				return template.HTMLEscaper(value)
-			},
-			"getNext": func(index int) Item {
-				return items[index]
-			},
-			"getNexData": func(start int) []Item {
-				end := start + rowsPerPage
-				return items[start:end]
 			},
 		},
 	}
