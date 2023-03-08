@@ -77,7 +77,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	pageContent := splitData(items)
 	tplOpts := &creator.TemplateOptions{
 		FontMap: map[string]*model.PdfFont{
 			"exo-bold":    exoBold,
@@ -110,7 +110,7 @@ func main() {
 		},
 	}
 
-	if err = c.DrawTemplate(mainTpl, items, tplOpts); err != nil {
+	if err = c.DrawTemplate(mainTpl, pageContent, tplOpts); err != nil {
 		log.Fatal(err)
 	}
 	// Draw front page.
@@ -185,4 +185,29 @@ func readData(jsonFile string) ([]Item, error) {
 		return nil, err
 	}
 	return data, nil
+}
+
+// splitData splits `items` data to per page content.
+func splitData(items []Item) map[int][]Item {
+	start := 0
+	end := 0
+	page := 2
+	size := 0
+	pageContent := map[int][]Item{}
+	for end < len(items) {
+		if page == 2 {
+			size = 21
+		} else if page == 4 {
+			size = 27
+		} else {
+			size = 28
+		}
+		end = end + size
+		current := items[start:end]
+		start = end
+		pageContent[page] = current
+		page += 2
+	}
+
+	return pageContent
 }

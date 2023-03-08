@@ -29,3 +29,5 @@ require (
 )
 
 go 1.15
+
+replace github.com/unidoc/unipdf/v3 => ../unipdf-src

@@ -39,6 +39,7 @@
         </table-cell>
     {{end}}
 {{end}}
+
 {{define "sent-row"}}
     {{$i := add 1 .Num}}
     <table-cell border-width-bottom="0.5" border-width-top="0.5">
@@ -61,7 +62,15 @@
             <text-chunk font="exo-regular">{{.Item.Buyer_Address}}</text-chunk>
         </paragraph>
     </table-cell>
+    {{if eq .Item.Discarded "true"}}
+        <table-cell border-width-bottom="0.5" border-width-top="0.5" colspan="4" background-color="#fff8e2">
+            <paragraph>
+                <text-chunk font="exo-regular"></text-chunk>
+            </paragraph>
+        </table-cell>
+    {{end}}
 {{end}}
+
 {{define "recieved-row"}}
     {{$i := add 1 .Num}}
     <table-cell border-width-bottom="0.5" border-width-top="0.5">
@@ -101,18 +110,36 @@
                 <text-chunk font="exo-regular"></text-chunk>
             </paragraph>
         </table-cell>
-        <table-cell border-width-bottom="0.5" border-width-top="0.5" colspan="5" background-color="#fff8e2">
+        <table-cell border-width-bottom="0.5" border-width-top="0.5" colspan="2" background-color="#fff8e2">
             <paragraph>
                 <text-chunk font="exo-regular">{{.Item.DiscardReason}}</text-chunk>
             </paragraph>
         </table-cell>
+         <table-cell border-width-bottom="0.5" border-width-top="0.5" background-color="#fff8e2">
+            <paragraph>
+                <text-chunk font="exo-regular"></text-chunk>
+            </paragraph>
+        </table-cell>
+         <table-cell border-width-bottom="0.5" border-width-top="0.5" background-color="#fff8e2">
+            <paragraph>
+                <text-chunk font="exo-regular"></text-chunk>
+            </paragraph>
+        </table-cell>
+         <table-cell border-width-bottom="0.5" border-width-top="0.5" background-color="#fff8e2">
+            <paragraph>
+                <text-chunk font="exo-regular"></text-chunk>
+            </paragraph>
+        </table-cell>
     {{end}}
 {{end}}
+
 {{define "sent-page"}}
     <table columns="4" column-widths = "0.1 0.3 0.3 0.3">
     {{template "sent-header"}}
-    {{range $i, $item := .}}
-            {{template "sent-row" dict "Num" $i "Item" $item }}
+    {{$SNum := .StartingNum}}
+    {{range $i, $item := .Items}}
+        {{$num := add $i $SNum}}
+        {{template "sent-row" dict "Num" $num "Item" $item }}
     {{end}}
     </table>
 {{end}}
@@ -120,18 +147,47 @@
 {{define "received-page"}}
     <table columns="6" column-widths = "0.05 0.19 0.19 0.19 0.19 0.19">
     {{template "received-header"}}
-    {{range $i, $item := .}}
-        {{template "recieved-row" dict "Item" $item "Num" $i}}
+    {{$SNum := .StartingNum}}
+    {{range $i, $item := .Items}}
+        {{$num := add $i $SNum}}
+        {{template "recieved-row" dict "Item" $item "Num" $num}}
     {{end}}
     </table>
 {{end}}
+
 {{$currentPos := 0}}
-{{range $i, $item := .}}
-    {{if mod $i}}
-        {{$Data := getNexData $i}}
-        {{template "received-page" $Data}}
-            <page-break></page-break>
-        {{template "sent-page" $Data}}
-            <page-break></page-break>
-    {{end}}
+{{range $key, $items := .}}
+    {{template "received-page" dict "Items" $items "StartingNum" $currentPos}}
+        <page-break></page-break>
+    {{template "sent-page" dict "Items" $items "StartingNum" $currentPos}}
+        <page-break></page-break>
+    {{$currentPos = add $currentPos (len $items)}}
 {{end}}
+
+<division margin="80 50 0 50 ">
+    <paragraph text-align="center" margin="20 0 5 0">
+        <text-chunk font-size="16" font="exo-regular">Book Name</text-chunk>
+    </paragraph>
+    <paragraph text-align="center">
+        <text-chunk font-size="16" font="exo-bold">Operations Log Book</text-chunk>
+    </paragraph>
+    <paragraph text-align="center" margin="20 0 10 0">
+        <text-chunk font-size="16" font="exo-regular">Date of Print</text-chunk>
+    </paragraph>
+
+    <paragraph text-align="center">
+        <text-chunk font-size="16" font="exo-bold">12/28/2020</text-chunk>
+    </paragraph>
+     <paragraph text-align="center" margin="20 0 10 0">
+        <text-chunk font-size="16" font="exo-regular">Date range</text-chunk>
+    </paragraph>
+    <paragraph text-align="center">
+        <text-chunk font-size="16" font="exo-bold">06/10/2018 - 06/09/2019</text-chunk>
+    </paragraph>
+    <paragraph text-align="center" margin="20 0 10 0">
+        <text-chunk font-size="16" font="exo-regular">Number of Records</text-chunk>
+    </paragraph>
+    <paragraph text-align="center">
+        <text-chunk font-size="16" font="exo-bold">1000</text-chunk>
+    </paragraph>
+</division>

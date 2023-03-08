@@ -1,4 +1,4 @@
-{{if gt .PageNum 1}}
+{{if and (gt .PageNum 1) (lt .PageNum 74)}}
 <table columns="2" margin="10 10 35 10" indent="0">
     <table-cell align="left">
         <paragraph>
