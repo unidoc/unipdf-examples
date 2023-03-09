@@ -72,7 +72,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Read data from JSON.
+	// Read data from JSON file.
 	items, err := readData("contents/operations_log.json")
 	if err != nil {
 		log.Fatal(err)
