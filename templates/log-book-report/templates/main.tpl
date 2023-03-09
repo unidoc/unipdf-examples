@@ -156,7 +156,8 @@
 {{end}}
 
 {{$currentPos := 0}}
-{{range $key, $items := .}}
+{{$pageContent := .PageToItems}}
+{{range $key, $items := $pageContent}}
     {{template "received-page" dict "Items" $items "StartingNum" $currentPos}}
         <page-break></page-break>
     {{template "sent-page" dict "Items" $items "StartingNum" $currentPos}}
@@ -174,20 +175,19 @@
     <paragraph text-align="center" margin="20 0 10 0">
         <text-chunk font-size="16" font="exo-regular">Date of Print</text-chunk>
     </paragraph>
-
     <paragraph text-align="center">
-        <text-chunk font-size="16" font="exo-bold">12/28/2020</text-chunk>
+        <text-chunk font-size="16" font="exo-bold">{{.DateOfPrint}}</text-chunk>
     </paragraph>
      <paragraph text-align="center" margin="20 0 10 0">
         <text-chunk font-size="16" font="exo-regular">Date range</text-chunk>
     </paragraph>
     <paragraph text-align="center">
-        <text-chunk font-size="16" font="exo-bold">06/10/2018 - 06/09/2019</text-chunk>
+        <text-chunk font-size="16" font="exo-bold">{{.DateRange}}</text-chunk>
     </paragraph>
     <paragraph text-align="center" margin="20 0 10 0">
         <text-chunk font-size="16" font="exo-regular">Number of Records</text-chunk>
     </paragraph>
     <paragraph text-align="center">
-        <text-chunk font-size="16" font="exo-bold">1000</text-chunk>
+        <text-chunk font-size="16" font="exo-bold">{{.NumOfRecords}}</text-chunk>
     </paragraph>
 </division>

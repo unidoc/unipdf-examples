@@ -31,6 +31,7 @@ func init() {
 	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 }
 
+// Item represents a logbook item.
 type Item struct {
 	Source        string `json:"Source"`
 	Manufacturer  string `json:"Manufacturer"`
@@ -98,8 +99,13 @@ func main() {
 			},
 		},
 	}
-
-	if err = c.DrawTemplate(mainTpl, pageContent, tplOpts); err != nil {
+	data := map[string]interface{}{
+		"DateOfPrint":  "12/28/2020",
+		"DateRange":    "06/10/2018 - 06/09/2019",
+		"NumOfRecords": len(items),
+		"PageToItems":  pageContent,
+	}
+	if err = c.DrawTemplate(mainTpl, data, tplOpts); err != nil {
 		log.Fatal(err)
 	}
 	// Draw front page.
@@ -176,7 +182,7 @@ func readData(jsonFile string) ([]Item, error) {
 	return data, nil
 }
 
-// splitData splits `items` data to per page content.
+// splitData splits `items` data and returns a map of page to items.
 func splitData(items []Item) map[int][]Item {
 	start := 0
 	end := 0
