@@ -9,11 +9,11 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"html/template"
 	"io"
 	"log"
 	"os"
 	"strings"
+	"text/template"
 
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
