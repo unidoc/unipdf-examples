@@ -36,7 +36,7 @@ type Item struct {
 	Source        string `json:"Source"`
 	Manufacturer  string `json:"Manufacturer"`
 	Model         string `json:"Model"`
-	VIN           string `json"VIN"`
+	VIN           string `json:"VIN"`
 	Received      string `json:"Received"`
 	Sent          string `json:"Sent"`
 	Buyer_Name    string `json:"Buyer_Name"`
@@ -45,6 +45,13 @@ type Item struct {
 	Buyer_Zip     string `json:"Buyer_Zip"`
 	Discarded     string `json:"Discarded"`
 	DiscardReason string `json:"DiscardReason"`
+}
+
+// LogBookData represents data used for log book document.
+type LogBookData struct {
+	Items       []Item `json:"Items"`
+	DateOfPrint string `json:"DateOfPrint"`
+	DateRange   string `json:"DateRange"`
 }
 
 func main() {
@@ -73,11 +80,13 @@ func main() {
 	}
 
 	// Read data from JSON file.
-	items, err := readData("contents/operations_log.json")
+	data, err := readData("contents/operations_log.json")
 	if err != nil {
 		log.Fatal(err)
 	}
-	pageContent := splitData(items)
+	pageContent := splitData(data.Items)
+
+	// Create template options.
 	tplOpts := &creator.TemplateOptions{
 		FontMap: map[string]*model.PdfFont{
 			"exo-bold":    exoBold,
@@ -99,15 +108,19 @@ func main() {
 			},
 		},
 	}
-	data := map[string]interface{}{
-		"DateOfPrint":  "12/28/2020",
-		"DateRange":    "06/10/2018 - 06/09/2019",
-		"NumOfRecords": len(items),
+
+	// Draw template.
+	logBookData := map[string]interface{}{
+		"DateOfPrint":  data.DateOfPrint,
+		"DateRange":    data.DateRange,
+		"NumOfRecords": len(data.Items),
 		"PageToItems":  pageContent,
 	}
-	if err = c.DrawTemplate(mainTpl, data, tplOpts); err != nil {
+
+	if err = c.DrawTemplate(mainTpl, logBookData, tplOpts); err != nil {
 		log.Fatal(err)
 	}
+
 	// Draw front page.
 	c.CreateFrontPage(func(args creator.FrontpageFunctionArgs) {
 		// Read front page template.
@@ -121,6 +134,7 @@ func main() {
 			log.Fatal(err)
 		}
 	})
+
 	draw := func(tplPath string, block *creator.Block, pageNum int) {
 		// Read template.
 		tpl, err := readTemplate(tplPath)
@@ -131,8 +145,8 @@ func main() {
 		// Draw template.
 		data := map[string]interface{}{
 			"PageNum":     pageNum,
-			"DateOfPrint": "12/28/2020",
-			"DateRange":   "06/10/2018 - 06/09/2019",
+			"DateOfPrint": data.DateOfPrint,
+			"DateRange":   data.DateRange,
 		}
 		if err := block.DrawTemplate(c, tpl, data, tplOpts); err != nil {
 			log.Fatal(err)
@@ -142,9 +156,11 @@ func main() {
 	c.DrawHeader(func(block *creator.Block, args creator.HeaderFunctionArgs) {
 		draw("templates/header.tpl", block, args.PageNum)
 	})
+
 	c.DrawFooter(func(block *creator.Block, args creator.FooterFunctionArgs) {
 		draw("templates/footer.tpl", block, args.PageNum)
 	})
+
 	// Write output file.
 	if err := c.WriteToFile("unipdf-log-book.pdf"); err != nil {
 		log.Fatal(err)
@@ -166,20 +182,20 @@ func readTemplate(tplFile string) (io.Reader, error) {
 	return buf, nil
 }
 
-// readData reads data from the json file and decodes it to `MedicalData` object.
-func readData(jsonFile string) ([]Item, error) {
+// readData reads data from the json file and decodes it to LogBookData.
+func readData(jsonFile string) (*LogBookData, error) {
 	file, err := os.Open(jsonFile)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	var data []Item
+	var data LogBookData
 	err = json.NewDecoder(file).Decode(&data)
 	if err != nil {
 		return nil, err
 	}
-	return data, nil
+	return &data, nil
 }
 
 // splitData splits `items` data and returns a map of page to items.

@@ -1,4 +1,5 @@
-[
+{
+    "Items": [
     {
         "Source": "Photobug",
         "Manufacturer": "Ford",
@@ -13003,4 +13004,7 @@
         "Buyer_Zip": "79188",
         "Discarded": "false"
     }
-]
+],
+"DateOfPrint": "12/28/2020",
+"DateRange":   "06/10/2018 - 06/09/2019"
+}
