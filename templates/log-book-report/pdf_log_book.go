@@ -31,7 +31,7 @@ func init() {
 	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 }
 
-// Item represents a logbook item.
+// Item represents a log book item.
 type Item struct {
 	Source        string `json:"Source"`
 	Manufacturer  string `json:"Manufacturer"`
@@ -123,6 +123,7 @@ func main() {
 
 	// Draw front page.
 	c.CreateFrontPage(func(args creator.FrontpageFunctionArgs) {
+
 		// Read front page template.
 		frontPageTpl, err := readTemplate("templates/front-page.tpl")
 		if err != nil {
