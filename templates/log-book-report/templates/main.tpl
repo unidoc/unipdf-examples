@@ -1,12 +1,13 @@
 {{define "received-header"}}
-    {{range $item := (getSlice "#,Manufacturer,Model,VIN,DateReceived,Source")}}
+    {{$receivedColumns := "#,Manufacturer,Model,VIN,DateReceived,Source"}}
+    {{range $item := (getSlice $receivedColumns)}}
         <table-cell background-color="#cfcfcb" border-width-bottom="0.5" border-width-top="0.5">
             <paragraph>
                 <text-chunk font="exo-bold" font-size="11">{{$item}}</text-chunk>
             </paragraph>
         </table-cell>
     {{end}}
-    {{range $i, $item := (getSlice "#,Manufacturer,Model,VIN,DateReceived,Source")}}
+    {{range $i, $item := (getSlice $receivedColumns)}}
         <table-cell border-width-bottom="0.5" border-width-top="0.5">
             <paragraph>
                 {{if eq $i 1}}
@@ -20,18 +21,19 @@
 {{end}}
 
 {{define "sent-header"}}
-    {{range $columName := (getSlice "#,Date Sent,Buyer Name,Buyer Address")}}
+    {{$sentColumns := "#,Date Sent,Buyer Name,Buyer Address"}}
+    {{range $columName := (getSlice $sentColumns)}}
         <table-cell background-color="#cfcfcb" border-width-bottom="0.5" border-width-top="0.5">
             <paragraph>
                 <text-chunk font="exo-bold" font-size="11">{{$columName}}</text-chunk>
             </paragraph>
         </table-cell>
     {{end}}
-    {{range $i, $columName := (getSlice "#,Date Sent,Buyer Name,Buyer Address")}}
+    {{range $i, $columName := (getSlice $sentColumns)}}
         <table-cell border-width-bottom="0.5" border-width-top="0.5">
             <paragraph>
                 {{if eq $i 1}}
-                    <text-chunk font="exo-regular" font-size="11">Reciept</text-chunk>
+                    <text-chunk font="exo-regular" font-size="11">Receipt</text-chunk>
                 {{else}}
                     <text-chunk font="exo-regular" font-size="11"></text-chunk>
                 {{end}}
@@ -54,12 +56,12 @@
     </table-cell>
     <table-cell border-width-bottom="0.5" border-width-top="0.5">
         <paragraph>
-            <text-chunk font="exo-regular">{{.Item.Buyer_Name}}</text-chunk>
+            <text-chunk font="exo-regular">{{.Item.BuyerName}}</text-chunk>
         </paragraph>
     </table-cell>
     <table-cell border-width-bottom="0.5" border-width-top="0.5">
         <paragraph>
-            <text-chunk font="exo-regular">{{.Item.Buyer_Address}}</text-chunk>
+            <text-chunk font="exo-regular">{{.Item.BuyerAddress}}</text-chunk>
         </paragraph>
     </table-cell>
     {{if eq .Item.Discarded "true"}}
@@ -71,7 +73,7 @@
     {{end}}
 {{end}}
 
-{{define "recieved-row"}}
+{{define "received-row"}}
     {{$i := add 1 .Num}}
     <table-cell border-width-bottom="0.5" border-width-top="0.5">
         <paragraph>
@@ -150,7 +152,7 @@
         {{$sNum := .StartingNum}}
         {{range $i, $item := .Items}}
             {{$num := add $i $sNum}}
-            {{template "recieved-row" dict "Item" $item "Num" $num}}
+            {{template "received-row" dict "Item" $item "Num" $num}}
         {{end}}
     </table>
 {{end}}

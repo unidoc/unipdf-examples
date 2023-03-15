@@ -2,7 +2,7 @@
  * This example showcases the usage of creator templates by creating a sample
  * log book report.
  *
- * Run as: go pdf_log_book.go
+ * Run as: go run pdf_log_book.go
  */
 package main
 
@@ -39,10 +39,10 @@ type Item struct {
 	VIN           string `json:"VIN"`
 	Received      string `json:"Received"`
 	Sent          string `json:"Sent"`
-	Buyer_Name    string `json:"Buyer_Name"`
-	Buyer_Address string `json:"Buyer_Address"`
-	Buyer_State   string `json:"Buyer_State"`
-	Buyer_Zip     string `json:"Buyer_Zip"`
+	BuyerName     string `json:"Buyer_Name"`
+	BuyerAddress  string `json:"Buyer_Address"`
+	BuyerState    string `json:"Buyer_State"`
+	BuyerZip      string `json:"Buyer_Zip"`
 	Discarded     string `json:"Discarded"`
 	DiscardReason string `json:"DiscardReason"`
 }
@@ -56,9 +56,9 @@ type LogBookData struct {
 
 func main() {
 	c := creator.New()
-	size := creator.PageSize{842, 595}
-	c.SetPageSize(size)
+	c.SetPageSize(creator.PageSize{842, 595})
 	c.SetPageMargins(10, 10, 65, 55)
+
 	// Read main content template.
 	mainTpl, err := readTemplate("templates/main.tpl")
 	if err != nil {
@@ -74,6 +74,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	exoRegular, err := model.NewPdfFontFromTTFFile("./templates/res/Exo-Regular.ttf")
 	if err != nil {
 		log.Fatal(err)
@@ -123,7 +124,6 @@ func main() {
 
 	// Draw front page.
 	c.CreateFrontPage(func(args creator.FrontpageFunctionArgs) {
-
 		// Read front page template.
 		frontPageTpl, err := readTemplate("templates/front-page.tpl")
 		if err != nil {
