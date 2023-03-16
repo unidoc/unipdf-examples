@@ -1,4 +1,4 @@
-Sample logbook document
+Sample log book document
 ======================
 
 This example showcases the usage of creator templates by creating a sample
