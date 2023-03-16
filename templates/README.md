@@ -30,3 +30,5 @@ Documentation PDF file: [unipdf-templates-documentation.pdf](documentation/unipd
 - [Sample Medical Bill Document](medical-bill): showcases the usage of creator templates by creating a sample medical bill document.
 - [Sample Rental Agreement](rental-agreement): showcases the usage of creator templates by creating a sample rental agreement.
 - [Sample Medication Schedule Document](medication-schedule-report): showcases the usage of creator templates by creating a sample medication schedule document.
+- [Sample log book document](log-book-report): showcases the usage of creator templates by creating a sample
+log book document.
