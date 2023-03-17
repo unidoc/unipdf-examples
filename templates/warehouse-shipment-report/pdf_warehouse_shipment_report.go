@@ -3,15 +3,22 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"image"
+	"image/color"
 	"io"
 	"log"
 	"os"
 	"text/template"
 
-	"github.com/unidoc/unipdf/v3/common"
+	"github.com/boombuler/barcode/code128"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/creator"
+	"github.com/unidoc/unipdf/v3/model"
+	"golang.org/x/image/draw"
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/basicfont"
+	"golang.org/x/image/math/fixed"
 )
 
 func init() {
@@ -42,7 +49,9 @@ func main() {
 	}
 
 	// Draw main content template.
+	imageMap := map[string]*model.Image{}
 	tplOpts := &creator.TemplateOptions{
+		ImageMap: imageMap,
 		HelperFuncMap: template.FuncMap{
 			"extendDict": func(m map[string]interface{}, params ...interface{}) (map[string]interface{}, error) {
 				lenParams := len(params)
@@ -68,6 +77,36 @@ func main() {
 			},
 			"add": func(a, b int) int {
 				return a + b
+			},
+			"createBarcode": func(text string) (string, error) {
+				barcode, err := code128.Encode(text)
+				if err != nil {
+					return "", err
+				}
+
+				tmpImg := image.NewRGBA(image.Rect(0, 0, 100, 30))
+
+				draw.NearestNeighbor.Scale(tmpImg, image.Rect(0, 0, 100, 20), image.Image(barcode), barcode.Bounds(), draw.Over, nil)
+
+				col := color.RGBA{0, 0, 0, 255}
+				point := fixed.Point26_6{X: fixed.I(10), Y: fixed.I(30)}
+
+				d := &font.Drawer{
+					Dst:  tmpImg,
+					Src:  image.NewUniform(col),
+					Face: basicfont.Face7x13,
+					Dot:  point,
+				}
+				d.DrawString(text)
+
+				img, err := model.ImageHandling.NewImageFromGoImage(tmpImg)
+				if err != nil {
+					return "", err
+				}
+
+				imageMap[text] = img
+
+				return text, nil
 			},
 		},
 	}

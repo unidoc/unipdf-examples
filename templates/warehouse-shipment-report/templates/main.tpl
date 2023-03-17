@@ -42,9 +42,27 @@
     <list-item>
         <list-marker>{{ .ProductIndex }}. </list-marker>
 
-        <paragraph>
-            <text-chunk>{{ .Product.Barcode }}</text-chunk>
-        </paragraph>
+        <list indent="-5">
+            <list-marker>- </list-marker>
+
+            <list-item>
+                <list-marker> </list-marker>
+                
+                <image src="{{ createBarcode .Product.Barcode }}"></image>
+            </list-item>
+
+            <list-item>
+                <paragraph>
+                    <text-chunk>Product Code: {{ .Product.Code }}</text-chunk>
+                </paragraph>
+            </list-item>
+
+            <list-item>
+                <paragraph>
+                    <text-chunk>Product Name: {{ html .Product.Name }}</text-chunk>
+                </paragraph>
+            </list-item>
+        </list>
     </list-item>
 {{end}}
 
