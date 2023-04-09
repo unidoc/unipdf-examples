@@ -15,6 +15,7 @@ The examples in this folder illustrate a few capabilities for creating ellipse, 
 ## Examples
 
 - [pdf_annotate_add_ellipse.go](pdf_annotate_add_ellipse.go) adds a circle/ellipse annotation to a specified location on a page.
+- [pdf_annotate_add_ink.go](pdf_annotate_add_ink.go) adds an ink annotation to a specified location on a page.
 - [pdf_annotate_add_line.go](pdf_annotate_add_line.go) adds a line with arrowhead between two specified points on a page.
 - [pdf_annotate_add_rectangle.go](pdf_annotate_add_rectangle.go) adds a rectangle annotation to a specified location on a page.
 - [pdf_annotate_add_text.go](pdf_annotate_add_text.go) adds a text annotation with a user specified string to a fixed location on every page.
