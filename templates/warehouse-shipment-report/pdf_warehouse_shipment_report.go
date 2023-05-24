@@ -1,3 +1,10 @@
+/*
+ * This example showcases the usage of creator templates by creating a sample
+ * warehouse shipment report.
+ *
+ * Run as: go run pdf_warehouse_shipment_report.go
+ */
+
 package main
 
 import (
@@ -13,7 +20,6 @@ import (
 	"github.com/boombuler/barcode/code128"
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 	"golang.org/x/image/draw"
@@ -54,28 +60,6 @@ func main() {
 	tplOpts := &creator.TemplateOptions{
 		ImageMap: imageMap,
 		HelperFuncMap: template.FuncMap{
-			"extendDict": func(m map[string]interface{}, params ...interface{}) (map[string]interface{}, error) {
-				lenParams := len(params)
-				if lenParams%2 != 0 {
-					return nil, core.ErrRangeError
-				}
-
-				out := make(map[string]interface{}, len(m))
-				for key, val := range m {
-					out[key] = val
-				}
-
-				for i := 0; i < lenParams; i += 2 {
-					key, ok := params[i].(string)
-					if !ok {
-						return nil, core.ErrTypeError
-					}
-
-					out[key] = params[i+1]
-				}
-
-				return out, nil
-			},
 			"add": func(a, b int) int {
 				return a + b
 			},
