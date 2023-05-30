@@ -20,6 +20,7 @@ require (
 	github.com/wcharczuk/go-chart/v2 v2.1.0
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
+	golang.org/x/image v0.5.0
 	golang.org/x/text v0.7.0
 	google.golang.org/api v0.102.0
 	google.golang.org/genproto v0.0.0-20221024183307-1bc688fe9f3e
