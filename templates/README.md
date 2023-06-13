@@ -32,3 +32,4 @@ Documentation PDF file: [unipdf-templates-documentation.pdf](documentation/unipd
 - [Sample Medication Schedule Document](medication-schedule-report): showcases the usage of creator templates by creating a sample medication schedule document.
 - [Sample log book document](log-book-report): showcases the usage of creator templates by creating a sample
 log book document.
+- [Sample Warehouse Shipment Report](warehouse-shipment-report): showcases the usage of creator templates by creating a sample warehouse shipment report.

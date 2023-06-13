@@ -1,0 +1,289 @@
+{
+    "company": {
+        "brand": "Sample company",
+        "name": "Sample company GmbH",
+        "pobox": "13248",
+        "address": "Adenauerstrasse 10",
+        "area": "Hellesdorf",
+        "city": "Bayern",
+        "country": "Germany"
+    },
+    "shipments": [
+        {
+            "time": "2021-01-23 10:13AM",
+            "orders": [
+                {
+                    "time": "2020-10-08 11:14AM",
+                    "pic": "John Smith",
+                    "products": [
+                        {
+                            "barcode": "840749284261",
+                            "code": "559555",
+                            "name": "Samsung 128GB 100MB/s (U3) MicroSDXC EVO Select Memory Card"
+                        },
+                        {
+                            "barcode": "140749244261",
+                            "code": "626666",
+                            "name": "Logitech MK270 Wireless Keyboard"
+                        }
+                    ]
+                },
+                {
+                    "time": "2020-11-15 09:25AM",
+                    "pic": "Jack Jackson",
+                    "products": [
+                        {
+                            "barcode": "34074914261",
+                            "code": "222292",
+                            "name": "iPhone Charger, YUNSONG 3Pack 6FT Nylon Braided Lightning Cable Charging Cord USB Cable Compatible with iPhone 11 Pro Max XS XR X 8 7 6S 6 Plus SE 5S 5C 5 iPad"
+                        },
+                        {
+                            "barcode": "540749274261",
+                            "code": "452444",
+                            "name": "HP 63 | 2 Ink Cartridges | Black, Tri-color | F6U61AN, F6U62AN"
+                        }
+                    ]
+                },
+                {
+                    "time": "2020-10-08 11:14AM",
+                    "pic": "Jane Doe",
+                    "products": [
+                        {
+                            "barcode": "240749224261",
+                            "code": "218111",
+                            "name": "Razer DeathAdder Elite Gaming Mouse: 16,000 DPI Optical Sensor - Chroma RGB Lighting - 7 Programmable Buttons - Mechanical Switches - Rubber Side Grips - Matte Black"
+                        },
+                        {
+                            "barcode": "440749254261",
+                            "code": "377577",
+                            "name": "Logitech C920S HD Pro Webcam with Privacy Shutter - Widescreen Video Calling and Recording, 1080p Streaming Camera, Desktop or Laptop Webcam"
+                        }
+                    ]
+                },
+                {
+                    "time": "2020-11-15 09:25AM",
+                    "pic": "John Doe",
+                    "products": [
+                        {
+                            "barcode": "740749294261",
+                            "code": "828858",
+                            "name": "WD 2TB Elements Portable External Hard Drive - USB 3.0 - WDBU6Y0020BBK"
+                        },
+                        {
+                            "barcode": "840749214261",
+                            "code": "919989",
+                            "name": "VicTsing MM057 2.4G Wireless Mouse Portable Mobile Optical Mouse with USB Receiver, 5 Adjustable DPI Levels, 6 Buttons for Notebook, PC, Laptop, Computer, Macbook - Black"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "time": "2021-02-11 09:15AM",
+            "orders": [
+                {
+                    "time": "2020-10-08 11:14AM",
+                    "pic": "John Smith",
+                    "products": [
+                        {
+                            "barcode": "140749234261",
+                            "code": "527565",
+                            "name": "Samsung 970 EVO SSD 1TB - M.2 NVMe Interface Internal Solid State Drive with V-NAND Technology (MZ-V7E1T0BW), Black/Red"
+                        },
+                        {
+                            "barcode": "940749284261",
+                            "code": "666261",
+                            "name": "Seagate FireCuda Gaming (Compute) 2TB Solid State Hybrid Drive Performance SSHD ? 2.5 Inch SATA 6GB/s Flash Accelerated for Gaming PC Laptop - Frustration Free Packaging (ST2000LX001)"
+                        }
+                    ]
+                },
+                {
+                    "time": "2020-11-15 09:25AM",
+                    "pic": "Jack Jackson",
+                    "products": [
+                        {
+                            "barcode": "24074929461",
+                            "code": "515759",
+                            "name": "AMD Ryzen 9 3900X 12-core, 24-Thread Unlocked Desktop Processor with Wraith Prism LED Cooler"
+                        },
+                        {
+                            "barcode": "540749274261",
+                            "code": "126964",
+                            "name": "Crucial MX500 500GB 3D NAND SATA 2.5 Inch Internal SSD - CT500MX500SSD1"
+                        }
+                    ]
+                },
+                {
+                    "time": "2020-10-08 11:14AM",
+                    "pic": "Jane Doe",
+                    "products": [
+                        {
+                            "barcode": "240749224261",
+                            "code": "153595",
+                            "name": "Texas Instruments TI-30X IIS 2-Line Scientific Calculator, Black with Blue Accents"
+                        },
+                        {
+                            "barcode": "440749254261",
+                            "code": "616466",
+                            "name": "Corsair Vengeance LPX 16GB (2x8GB) DDR4 DRAM 3000MHz C15 Desktop Memory Kit - Black (CMK16GX4M2B3000C15)"
+                        }
+                    ]
+                },
+                {
+                    "time": "2020-11-15 09:25AM",
+                    "pic": "John Doe",
+                    "products": [
+                        {
+                            "barcode": "740749294261",
+                            "code": "424595",
+                            "name": "Rioddas External CD Drive, USB 3.0 Portable CD/DVD +/-RW Drive Slim DVD/CD ROM Rewriter Burner Compatible with Laptop Desktop PC Windows Linux OS Apple Mac(Black)"
+                        },
+                        {
+                            "barcode": "840749214261",
+                            "code": "267668",
+                            "name": "CanaKit Raspberry Pi 4 4GB Starter Kit - 4GB RAM"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "time": "2021-01-16 11:33AM",
+            "orders": [
+                {
+                    "time": "2020-10-08 11:14AM",
+                    "pic": "John Smith",
+                    "products": [
+                        {
+                            "barcode": "140749234261",
+                            "code": "953255",
+                            "name": "ARCTIC MX-4 - Thermal Compound Paste For Coolers | Heat Sink Paste | Composed of Carbon Micro-particles | Easy to Apply | High Durability - 4 Grams"
+                        },
+                        {
+                            "barcode": "940749284261",
+                            "code": "636667",
+                            "name": "SanDisk 1TB Extreme Portable External SSD - Up to 550MB/s - USB-C, USB 3.1 - SDSSDE60-1T00-G25"
+                        }
+                    ]
+                },
+                {
+                    "time": "2020-11-15 09:25AM",
+                    "pic": "Jack Jackson",
+                    "products": [
+                        {
+                            "barcode": "24074929461",
+                            "code": "575555",
+                            "name": "NZXT H510 - CA-H510B-W1 - Compact ATX Mid-Tower PC Gaming Case - Front I/O USB Type-C Port - Tempered Glass Side Panel - Cable Management System - Water-Cooling Ready - White/Black"
+                        },
+                        {
+                            "barcode": "540749274261",
+                            "code": "165696",
+                            "name": "ELEGOO UNO Project Super Starter Kit with Tutorial and UNO R3 Compatible with Arduino IDE"
+                        }
+                    ]
+                },
+                {
+                    "time": "2020-10-08 11:14AM",
+                    "pic": "Jane Doe",
+                    "products": [
+                        {
+                            "barcode": "240749224261",
+                            "code": "126559",
+                            "name": "ASUS ROG Strix X570-E Gaming ATX Motherboard with PCIe 4.0, Aura Sync RGB Lighting, 2.5 Gbps and Intel Gigabit LAN, WiFi 6 (802.11Ax), Dual M.2 with Heatsinks, SATA 6GB/S and USB 3.2 Gen 2"
+                        },
+                        {
+                            "barcode": "440749254261",
+                            "code": "826566",
+                            "name": "AMD Ryzen 9 3900X 12-core, 24-Thread Unlocked Desktop Processor with Wraith Prism LED Cooler"
+                        }
+                    ]
+                },
+                {
+                    "time": "2020-11-15 09:25AM",
+                    "pic": "John Doe",
+                    "products": [
+                        {
+                            "barcode": "740749294261",
+                            "code": "155358",
+                            "name": "Samsung 256GB 200MB/s (U3) MicroSDXC EVO Select Memory Card"
+                        },
+                        {
+                            "barcode": "840749214261",
+                            "code": "166686",
+                            "name": "Elgato Video Capture - Digitize Video for Mac, PC or iPad (USB 2.0)"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "time": "2020-09-19 06:56AM",
+            "orders": [
+                {
+                    "time": "2020-10-08 11:14AM",
+                    "pic": "John Smith",
+                    "products": [
+                        {
+                            "barcode": "140749234261",
+                            "code": "525758",
+                            "name": "Samsung 128GB 100MB/s (U3) MicroSDXC EVO Select Memory Card"
+                        },
+                        {
+                            "barcode": "940749284261",
+                            "code": "364666",
+                            "name": "Corsair Vengeance LPX 16GB (2x8GB) DDR4 DRAM 3000MHz C15 Desktop Memory Kit - Black (CMK16GX4M2B3000C15)"
+                        }
+                    ]
+                },
+                {
+                    "time": "2020-11-15 09:25AM",
+                    "pic": "Jack Jackson",
+                    "products": [
+                        {
+                            "barcode": "24074929461",
+                            "code": "157555",
+                            "name": "Samsung 128GB 100MB/s (U3) MicroSDXC EVO Select Memory Card"
+                        },
+                        {
+                            "barcode": "540749274261",
+                            "code": "364666",
+                            "name": "Sabrent Adattatore USB Audio Esterno Stereo per Windows e Mac. Plug & Play Nessun driver necessario. [Nero] (AU-MMSA)"
+                        }
+                    ]
+                },
+                {
+                    "time": "2020-10-08 11:14AM",
+                    "pic": "Jane Doe",
+                    "products": [
+                        {
+                            "barcode": "240749224261",
+                            "code": "525755",
+                            "name": "Samsung 128GB 100MB/s (U3) MicroSDXC EVO Select Memory Card"
+                        },
+                        {
+                            "barcode": "440749254261",
+                            "code": "367666",
+                            "name": "Logitech MK270 Wireless Keyboard"
+                        }
+                    ]
+                },
+                {
+                    "time": "2020-11-15 09:25AM",
+                    "pic": "John Doe",
+                    "products": [
+                        {
+                            "barcode": "740749294261",
+                            "code": "458552",
+                            "name": "LaCie Rugged Mini 4TB External Hard Drive Portable HDD ? USB 3.0 USB 2.0 compatible, Drop Shock Dust Rain Resistant Shuttle Drive, for Mac and PC Computer Desktop Workstation PC Laptop (LAC9000633)"
+                        },
+                        {
+                            "barcode": "840749214261",
+                            "code": "763696",
+                            "name": "WD 2TB Elements Portable External Hard Drive - USB 3.0 - WDBU6Y0020BBK"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
