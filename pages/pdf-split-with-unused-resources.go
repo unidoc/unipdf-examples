@@ -2,7 +2,7 @@
  * This example shows how to remove unused resource from pdf pages while splitting.
  *
  * Run as: go run pdf-split-with-unused-resources.go <input.pdf> <output-dir>
- * In this example the splitting is done one page per document but it can be easily extended to any kind of splitting.
+ * In this example the document is split in to 1 page small documents, the idea can be easily extended into any kind of page splitting.
  */
 
 package main
@@ -40,6 +40,8 @@ func main() {
 	outputDir := os.Args[2]
 	splitPdfFile(inputPath, outputDir)
 }
+
+// splitPdfFile splits inputFile and saves the output files in `outputDir`.
 func splitPdfFile(inputFile string, outputDir string) {
 	pdfBytes, err := os.ReadFile(inputFile)
 	if err != nil {
@@ -69,6 +71,7 @@ func splitPdfFile(inputFile string, outputDir string) {
 	}
 }
 
+// cleanUnusedXobjects removes entries of unused XObjects from teh Resource's XObjects dictionary.
 func cleanUnusedXobjects(page *model.PdfPage) {
 	contents, err := page.GetAllContentStreams()
 	if err != nil {
@@ -105,6 +108,7 @@ func cleanUnusedXobjects(page *model.PdfPage) {
 
 }
 
+// getKeys gets the keys of the dictionary `dict`.
 func getKeys(dict *core.PdfObjectDictionary) []string {
 	keys := []string{}
 	for _, k := range dict.Keys() {
@@ -112,6 +116,8 @@ func getKeys(dict *core.PdfObjectDictionary) []string {
 	}
 	return keys
 }
+
+// exists checks if `element` exists in `elements`.
 func exists(element string, elements []string) bool {
 	for _, el := range elements {
 		if element == el {
