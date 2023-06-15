@@ -1,7 +1,7 @@
 /*
- * This example shows how to remove unused resource from pdf pages while splitting.
+ * This example shows how to split pdf pages and removes unused resources.
  *
- * Run as: go run pdf-split-with-unused-resources.go <input.pdf> <output-dir>
+ * Run as: go run pdf_split_and_remove_unused_resources.go <input.pdf> <output-dir>
  * In this example the document is split in to 1 page small documents, the idea can be easily extended into any kind of page splitting.
  */
 
@@ -31,7 +31,7 @@ func init() {
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Printf("Usage: go run pdf-split-with-unused-resources.go <input.pdf> <output-dir>\n")
+		fmt.Printf("Usage: go run pdf_split_and_remove_unused_resources.go <input.pdf> <output-dir>\n")
 		os.Exit(1)
 	}
 
@@ -51,12 +51,12 @@ func splitPdfFile(inputFile string, outputDir string) {
 	r := bytes.NewReader(pdfBytes)
 	pdfReader, err := model.NewPdfReader(r)
 	if err != nil {
-		log.Printf("Failed to create reader: %v", err)
+		log.Fatalf("Failed to create reader: %v", err)
 	}
 
 	numPages, err := pdfReader.GetNumPages()
 	if err != nil {
-		log.Printf("Failed to get number of pages: %v", err)
+		log.Fatalf("Failed to get number of pages: %v", err)
 	}
 	for pageIdx := 0; pageIdx < numPages; pageIdx++ {
 		pdfPage, _ := pdfReader.GetPage(pageIdx + 1)
@@ -85,7 +85,7 @@ func cleanUnusedXobjects(page *model.PdfPage) {
 	usedObjectsNames := []string{}
 	for _, op := range *operations {
 		operand := op.Operand
-		// Draw xObject operator.
+		// Check for `Do` (Draw XObject) operator.
 		if operand == "Do" {
 			params := op.Params
 			imageName := params[0].String()
