@@ -1,5 +1,7 @@
 /*
  * This example shows how to split pdf pages and removes unused resources.
+ * When a big pdf file is split into small parts, each page gets its own copy of the `XObject` dictionary. This causes each part to have unnecessarily big size
+ * This example shows how to remove the unused resources from the XObject dictionary.
  *
  * Run as: go run pdf_split_and_remove_unused_resources.go <input.pdf> <output-dir>
  * In this example the document is split in to 1 page small documents, the idea can be easily extended into any kind of page splitting.
