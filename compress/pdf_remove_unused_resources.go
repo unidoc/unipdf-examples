@@ -1,5 +1,5 @@
 /*
- * PDF optimization remove unused resources example.
+ * This example shows how to use remove unused resources optimization example.
  *
  * Run as: go run pdf_remove_unused_resources.go <input.pdf> <output.pdf>
  */
@@ -73,6 +73,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to get input file stat: %v\n", err)
 	}
+
 	// Get output file stat
 	outputFileInfo, err := os.Stat(outputPath)
 	if err != nil {
