@@ -1,3 +1,8 @@
+/*
+ * This example demonstrates the usage of Sanitizer package to sanitize document.
+ *
+ * Run as: go run pdf_sanitize_document.go <input.pdf> <output.pdf>
+ */
 package main
 
 import (
@@ -29,6 +34,7 @@ func main() {
 	inputPath := args[1]
 	outputPath := args[2]
 
+	// Initialize starting time.
 	start := time.Now()
 	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
 	if err != nil {
@@ -41,6 +47,7 @@ func main() {
 		log.Fatalf("Failed to get writer object: %v", err)
 	}
 
+	// Define sanitization options and set writer's optimizer
 	opts := sanitize.SanitizationOpts{
 		JavaScript:  true,
 		URI:         true,
@@ -50,11 +57,14 @@ func main() {
 		OpenAction:  true,
 		Launch:      true,
 	}
-
 	pdfWriter.SetOptimizer(sanitize.New(opts))
+	
+	// Write to file.
 	pdfWriter.WriteToFile(outputPath)
 
+	// Measure processing time.
 	duration := float64(time.Since(start)) / float64(time.Millisecond)
+
 	inputFileInfo, err := os.Stat(inputPath)
 	if err != nil {
 		fmt.Printf("Failed to get inputFile info %v", err)
@@ -65,8 +75,9 @@ func main() {
 		fmt.Printf("Failed to get outputFile info %v", err)
 	}
 
+	// Print information.
 	fmt.Printf("Input file size %d bytes\n", inputFileInfo.Size())
-	fmt.Printf("Output file size %d bytest\n",outputFileInfo.Size())
-	fmt.Printf("Processing time %.2f ms",duration)
+	fmt.Printf("Output file size %d bytest\n", outputFileInfo.Size())
+	fmt.Printf("Processing time %.2f ms", duration)
 
 }
