@@ -16,7 +16,7 @@ require (
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.1.1-0.20220329190817-dd59b9eba14c
 	github.com/unidoc/unichart v0.1.0
-	github.com/unidoc/unipdf/v3 v3.46.0
+	github.com/unidoc/unipdf/v3 v3.48.0
 	github.com/wcharczuk/go-chart/v2 v2.1.0
 	go.opencensus.io v0.24.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa

@@ -1,5 +1,6 @@
 /*
  * This example shows how to use remove unused resources optimization example.
+ * The compression accomplished using this filter is lossless.
  *
  * Run as: go run pdf_remove_unused_resources.go <input.pdf> <output.pdf>
  */
