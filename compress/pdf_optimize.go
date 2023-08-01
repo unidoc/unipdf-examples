@@ -71,6 +71,7 @@ func main() {
 		UseObjectStreams:                true,
 		ImageQuality:                    80,
 		ImageUpperPPI:                   100,
+		CleanUnusedResources:            true,
 	}))
 
 	// Create output file.
