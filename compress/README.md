@@ -18,7 +18,7 @@ type Options struct {
 }
 ```
 
-From the available filters `CleanFonts`, `CleanUnusedResources`, `CombineDuplicateStreams`, `CombineDuplicateDirectObjects`,`CombineDuplicateDirectObjects`, `CleanFonts` and `CompressStreams` enable lossless compressions.
+From the available filters listed above, all of them except `ImageQuality` and `ImageUpperPPI` enable lossless compression.
 
 ## Examples
 
