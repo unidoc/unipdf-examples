@@ -46,7 +46,7 @@ func main() {
 		log.Fatal("Fail: %v\n", err)
 	}
 
-	// Create signature handler.
+	// Create signature handler. It is possible to validate B-T level the same way if you create NewEtsiPAdESLevelT here
 	padesHandler, err := sighandler.NewEtsiPAdESLevelB(nil, nil, nil)
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)

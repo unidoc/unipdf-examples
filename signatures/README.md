@@ -9,7 +9,9 @@ Examples for digital signing of PDF files with UniDoc:
 - [pdf_sign_appearance.go](pdf_sign_appearance.go) Example of creating signature appearance fields.
 - [pdf_sign_validate.go](pdf_sign_validate.go) Example of signature validation.
 - [pdf_sign_pem_multicert.go](pdf_sign_pem_multicert.go) Example of signing using a certificate chain and a private key, extracted from PEM files.
-
+- [pdf_sign_pades_b_b.go](pdf_sign_pades_b_b.go) Example of signing with a PAdES B-B compatible digital signature.
+- [pdf_sign_pades_b_t.go](pdf_sign_pades_b_t.go) Example of signing with a PAdES B-T compatible digital signature.
+- [pdf_sign_validate_pades_b_b.go](pdf_sign_validate_pades_b_b.go) Example of PAdES signature validation.
 For LTV enabling digital signatures, see the [LTV](ltv) guide and samples.
 
 ## pdf_sign_hsm_pkcs11_cgo.go
