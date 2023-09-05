@@ -184,7 +184,7 @@
                 {{$src := CreateStackedBarChart "stacked-bar-chart-1"
                     (CreateStackedBar "" (dict "Abnormal and Unauthorized" 40.0 "Abnormal but Authorized" 60.0))}}
                 {{template "sectionContent" dict "BackgroundColor" "#ffffff" "GradeColor" "#ff9721" "GradeText" "D" "Title" "Average Time to Close Smart Alerts" "Subtitle" "3.2 Days (Using a trailing 7-day average)" "HideBar" true}}
-                <chart height="50" src="{{$src}}" margin="-20 0 0 0"></chart>
+                <chart height="50" src="{{$src}}" margin="0 0 0 0"></chart>
             </division>
         </table-cell>
         <table-cell indent="0">
@@ -279,7 +279,7 @@
                 {{$src := CreateBarChart "bar-chart-1"
                     (dict "SSH Server" 15.0 "Web Server" 9.0 "DNS Server" 5.0 "FTP Server" 4.0 "DHCP Server" 4.0)}}
                 {{template "sectionContent" dict "BackgroundColor" "#ffffff" "GradeColor" "#ff0000" "GradeText" "F" "Title" "Unidentified Assets" "Subtitle" "68.2%" "HideBar" true}}
-                <chart height="175" src="{{$src}}" margin="0 20 0 0"></chart>
+                <chart height="100" src="{{$src}}" margin="0 20 20 0"></chart>
             </division>
         </table-cell>
         <table-cell indent="0">
@@ -290,7 +290,7 @@
             </division>
         </table-cell>
     </table>
-    <line fit-mode="fill-width" position="relative" color="#555" margin="-20 0 5 0"></line>
+    <line fit-mode="fill-width" position="relative" color="#555" margin="0 0 5 0"></line>
 
     <table columns="2" column-widths="0.5 0.5">
         <table-cell indent="0" align="center">
@@ -301,7 +301,7 @@
                     (CreateStackedBar "DHCP Server" (dict "" 1.0))
                 }}
                 {{template "sectionContent" dict "BackgroundColor" "#ffffff" "GradeColor" "#159635" "GradeText" "A" "Title" "High Risk Assets " "Subtitle" "0.0%" "HideBar" true}}
-                <chart height="200" src="{{$src}}" margin="-15 20 0 0"></chart>
+                <chart height="120" src="{{$src}}" margin="0 20 0 0"></chart>
             </division>
         </table-cell>
         <table-cell indent="0">
@@ -312,7 +312,7 @@
             </division>
         </table-cell>
     </table>
-    <line fit-mode="fill-width" position="relative" color="#555" margin="-40 0 5 0"></line>
+    <line fit-mode="fill-width" position="relative" color="#555" margin="0 0 5 0"></line>
 
     <table columns="2" column-widths="0.5 0.5">
         <table-cell indent="0" align="center">
@@ -328,8 +328,10 @@
             </division>
         </table-cell>
     </table>
-    <line fit-mode="fill-width" position="relative" color="#555" margin="0 0 100 0"></line>
+    <line fit-mode="fill-width" position="relative" color="#555" margin="0 0 5 0"></line>
 </chapter>
+
+<page-break></page-break>
 
 <chapter show-numbering="false">
     <chapter-heading font="helvetica-bold" font-size="16" margin="0 0 5 0">How to Use this Report</chapter-heading>
