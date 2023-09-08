@@ -59,7 +59,7 @@ func main() {
 		log.Fatal("Fail: %v\n", err)
 	}
 
-	// Get cacert certificate from the PEM file.
+	// Get CA Certificate from the PEM file.
 	caCertF, err := ioutil.ReadFile(pemPath)
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
