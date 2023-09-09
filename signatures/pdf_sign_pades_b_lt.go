@@ -1,13 +1,12 @@
 /*
- * This example showcases how to create a  PAdES B-LTA compatible digital signature for a PDF file.
+ * This example showcases how to create a  PAdES B-LT compatible digital signature for a PDF file.
  *
- * $ ./pdf_sign_pades_b_lta <FILE.PFX> <PASSWORD> <FILE.PEM> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
+ * $ ./pdf_sign_pades_b_lt <FILE.PFX> <PASSWORD> <FILE.PEM> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
 package main
 
 import (
 	"bytes"
-	"crypto"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -104,7 +103,7 @@ func main() {
 
 	// Create signature.
 	signature := model.NewPdfSignature(handler)
-	signature.SetName("PAdES B-LTA Signature PDF")
+	signature.SetName("PAdES B-LT Signature PDF")
 	signature.SetReason("TestPAdESPDF")
 	signature.SetDate(time.Now(), "")
 
@@ -152,55 +151,8 @@ func main() {
 
 	appender2.SetDSS(appender.GetDSS())
 
-	buf2 := bytes.NewBuffer(nil)
-	err = appender2.Write(buf2)
-	if err != nil {
-		log.Fatal("Fail: %v\n", err)
-	}
-
-	// Finally, we add document timestamp for B-LTA compatibility.
-	pdf3, err := model.NewPdfReader(bytes.NewReader(buf2.Bytes()))
-	if err != nil {
-		log.Fatal("Fail: %v\n", err)
-	}
-
-	appender3, err := model.NewPdfAppender(pdf3)
-	if err != nil {
-		log.Fatal("Fail: %v\n", err)
-	}
-
-	handler, err = sighandler.NewDocTimeStamp(timestampServerURL, crypto.SHA512)
-	if err != nil {
-		log.Fatal("Fail: %v\n", err)
-	}
-
-	signature = model.NewPdfSignature(handler)
-	signature.SetName("Test Signature")
-	signature.SetDate(time.Now(), "")
-
-	err = signature.Initialize()
-	if err != nil {
-		log.Fatal("Fail: %v\n", err)
-	}
-
-	// Create signature appearance.
-	opts = annotator.NewSignatureFieldOpts()
-	opts.Rect = []float64{0, 0, 0, 0}
-
-	sigField, err := annotator.NewSignatureField(
-		signature,
-		[]*annotator.SignatureLine{
-			annotator.NewSignatureLine("Name", "Jane Doe"),
-			annotator.NewSignatureLine("Reason", "Test Document TimeStamp"),
-		},
-		opts,
-	)
-
-	if err = appender3.Sign(1, sigField); err != nil {
-		log.Fatal("Fail: %v\n", err)
-	}
-
-	err = appender3.WriteToFile(outputPath)
+	// Write output to the PDF file.
+	err = appender2.WriteToFile(outputPath)
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
 	}
