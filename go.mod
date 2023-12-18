@@ -19,9 +19,9 @@ require (
 	github.com/unidoc/unipdf/v3 v3.50.0
 	github.com/wcharczuk/go-chart/v2 v2.1.0
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
+	golang.org/x/crypto v0.17.0
 	golang.org/x/image v0.10.0
-	golang.org/x/text v0.11.0
+	golang.org/x/text v0.14.0
 	google.golang.org/api v0.102.0
 	google.golang.org/genproto v0.0.0-20221024183307-1bc688fe9f3e
 	google.golang.org/protobuf v1.28.1
