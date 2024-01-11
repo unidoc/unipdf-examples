@@ -14,8 +14,6 @@ import (
 
 	"github.com/unidoc/unipdf/v3/annotator"
 	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/contentstream"
-	"github.com/unidoc/unipdf/v3/core"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
@@ -163,86 +161,5 @@ func createForm(page *model.PdfPage) *model.PdfAcroForm {
 		page.AddAnnotation(comboboxf.Annotations[0].PdfAnnotation)
 	}
 
-	addSubmitButton(page, form)
-
 	return form
-}
-
-func addSubmitButton(page *model.PdfPage, form *model.PdfAcroForm) error {
-	submitUrl := "https://url-to-backend"
-	btnX := 400.0
-	btnY := 400.0
-	btnW := 50.0
-	btnH := 20.0
-
-	// Construct a new pdf field for the submit button.
-	field := model.NewPdfField()
-	btnField := &model.PdfFieldButton{}
-	field.SetContext(btnField)
-	btnField.PdfField = field
-
-	btnField.T = core.MakeString("btnSubmit")
-	btnField.SetType(model.ButtonTypePush)
-
-	btnField.V = core.MakeName("Off")
-	btnField.TU = core.MakeString("submit")
-
-	// Define an Action that will be executed when the button is clicked.
-	submitAction := model.NewPdfActionSubmitForm()
-	submitAction.Flags = core.MakeInteger(5) // This will submit all fields value using HTTP Form format.
-	submitAction.F = model.NewPdfFilespec()
-	submitAction.F.F = core.MakeString(submitUrl)
-	submitAction.F.FS = core.MakeName("URL")
-
-	widgetText := core.MakeDict()
-	widgetText.Set(*core.MakeName("CA"), core.MakeString("Submit"))
-
-	fontData, err := model.NewStandard14Font("Helvetica")
-	if err != nil {
-		return err
-	}
-	fontName := core.MakeName("Helv")
-
-	// Construct button.
-	cc := contentstream.NewContentCreator()
-	cc.Add_q()
-	cc.Add_g(0.7)
-	cc.Add_re(0, 0, btnW, btnH)
-	cc.Add_f()
-	cc.Add_Q()
-	cc.Add_q()
-	cc.Add_BT()
-	cc.Add_Tf(*fontName, 10)
-	cc.Add_g(0)
-	cc.Add_Td(5, 5)
-	cc.Add_Tj(*core.MakeString("Submit"))
-	cc.Add_ET()
-	cc.Add_Q()
-
-	xform := model.NewXObjectForm()
-	xform.SetContentStream(cc.Bytes(), core.NewRawEncoder())
-	xform.BBox = core.MakeArrayFromFloats([]float64{0, 0, btnW, btnH})
-	xform.Resources = model.NewPdfPageResources()
-	xform.Resources.SetFontByName(*fontName, fontData.ToPdfObject())
-
-	appearance := core.MakeDict()
-	appearance.Set("N", xform.ToPdfObject())
-
-	// Construct a widget annotation.
-	btnWidget := model.NewPdfAnnotationWidget()
-	btnWidget.Rect = core.MakeArrayFromFloats([]float64{btnX, btnY, btnX + btnW, btnY + btnH})
-	btnWidget.P = page.ToPdfObject()
-	btnWidget.F = core.MakeInteger(4)
-	btnWidget.Parent = btnField.ToPdfObject()
-	btnWidget.A = submitAction.ToPdfObject()
-	btnWidget.MK = widgetText
-	btnWidget.AP = appearance
-
-	btnField.Annotations = append(btnField.Annotations, btnWidget)
-
-	// Add widget to existing form.
-	*form.Fields = append(*form.Fields, btnField.PdfField)
-	page.AddAnnotation(btnField.Annotations[0].PdfAnnotation)
-
-	return nil
 }
