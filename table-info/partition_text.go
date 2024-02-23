@@ -26,7 +26,6 @@ func init() {
 }
 
 func main() {
-
 	if len(os.Args) < 3 {
 		fmt.Printf("Usage: go run partition_text.go inputFile.pdf pageNum\n")
 		os.Exit(1)
