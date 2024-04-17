@@ -8,13 +8,14 @@ require (
 	github.com/aws/aws-sdk-go v1.44.130
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/boombuler/barcode v1.0.1
+	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/trimmer-io/go-xmp v1.0.0
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.2.0
 	github.com/unidoc/unichart v0.3.0
-	github.com/unidoc/unipdf/v3 v3.55.0
+	github.com/unidoc/unipdf/v3 v3.57.0
 	github.com/wcharczuk/go-chart/v2 v2.1.0
-	golang.org/x/crypto v0.21.0
+	golang.org/x/crypto v0.22.0
 	golang.org/x/image v0.15.0
 	golang.org/x/text v0.14.0
 	google.golang.org/api v0.114.0
@@ -51,9 +52,9 @@ require (
 	github.com/unidoc/timestamp v0.0.0-20200412005513-91597fd3793a // indirect
 	github.com/unidoc/unitype v0.4.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/net v0.22.0 // indirect
+	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/sys v0.19.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/grpc v1.56.3 // indirect
