@@ -8,6 +8,7 @@ require (
 	github.com/aws/aws-sdk-go v1.51.22
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/boombuler/barcode v1.0.1
+	github.com/gabriel-vasile/mimetype v1.4.3
 	github.com/trimmer-io/go-xmp v1.0.0
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.2.0
@@ -32,7 +33,6 @@ require (
 	github.com/blend/go-sdk v1.20220411.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
-	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
