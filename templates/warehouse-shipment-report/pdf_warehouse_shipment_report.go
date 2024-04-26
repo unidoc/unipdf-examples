@@ -60,9 +60,6 @@ func main() {
 	tplOpts := &creator.TemplateOptions{
 		ImageMap: imageMap,
 		HelperFuncMap: template.FuncMap{
-			"add": func(a, b int) int {
-				return a + b
-			},
 			"createBarcode": func(text string) (string, error) {
 				barcode, err := code128.Encode(text)
 				if err != nil {

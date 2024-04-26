@@ -12,8 +12,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"text/template"
-	"time"
 
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
@@ -74,12 +72,6 @@ func main() {
 	tplOpts := &creator.TemplateOptions{
 		ImageMap: map[string]*model.Image{
 			"qr-code": qrCode,
-		},
-		HelperFuncMap: template.FuncMap{
-			"formatTime": func(val, format string) string {
-				t, _ := time.Parse("2006-01-02T15:04:05Z", val)
-				return t.Format(format)
-			},
 		},
 	}
 

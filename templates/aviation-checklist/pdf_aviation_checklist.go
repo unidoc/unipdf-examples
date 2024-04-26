@@ -98,9 +98,6 @@ func main() {
 			"isFitInPageHeight": func(height float64) bool {
 				return height <= c.Height()-320
 			},
-			"add": func(a, b float64) float64 {
-				return a + b
-			},
 		},
 	}
 
