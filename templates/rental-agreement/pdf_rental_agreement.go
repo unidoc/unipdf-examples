@@ -13,6 +13,7 @@ import (
 	"log"
 	"os"
 	"text/template"
+	"time"
 
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
@@ -111,6 +112,10 @@ func main() {
 			"arial-bold": arialBold,
 		},
 		HelperFuncMap: template.FuncMap{
+			"formatTime": func(val, format string) string {
+				t, _ := time.Parse("2006-01-02T15:04:05Z", val)
+				return t.Format(format)
+			},
 			"listItems": func(items []string, useAnd bool) string {
 				nameList := ""
 				for i, t := range items {

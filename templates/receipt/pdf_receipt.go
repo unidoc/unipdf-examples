@@ -43,7 +43,7 @@ func main() {
 	c := creator.New()
 	c.SetPageMargins(15, 15, 20, 20)
 	c.SetPageSize(creator.PageSizeA5)
-	
+
 	// Read main content template.
 	tpl, err := readTemplate("./templates/main.tpl")
 	if err != nil {

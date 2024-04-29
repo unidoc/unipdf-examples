@@ -55,6 +55,10 @@ func main() {
 			"loop": func(size uint64) []struct{} {
 				return make([]struct{}, size)
 			},
+			"formatTime": func(val, format string) string {
+				t, _ := time.Parse("2006-01-02T15:04:05", val)
+				return t.Format(format)
+			},
 		},
 	}
 
