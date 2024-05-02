@@ -17,6 +17,7 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 )
@@ -29,7 +30,7 @@ func init() {
 		panic(err)
 	}
 
-	// common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
+	common.SetLogger(common.NewConsoleLogger(common.LogLevelDebug))
 }
 
 func main() {
