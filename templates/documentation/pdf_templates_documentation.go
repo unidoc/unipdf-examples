@@ -265,9 +265,6 @@ func createTplOpts(c *creator.Creator) *creator.TemplateOptions {
 
 	// Create function map.
 	funcMap := template.FuncMap{
-		"array": func(elements ...interface{}) []interface{} {
-			return elements
-		},
 		"loop": func(size uint64) []struct{} {
 			return make([]struct{}, size)
 		},

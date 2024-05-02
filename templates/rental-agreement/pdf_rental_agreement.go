@@ -113,7 +113,7 @@ func main() {
 		},
 		HelperFuncMap: template.FuncMap{
 			"formatTime": func(val, format string) string {
-				t, _ := time.Parse("2006-01-02T00:00:00", val)
+				t, _ := time.Parse("2006-01-02T15:04:05Z", val)
 				return t.Format(format)
 			},
 			"listItems": func(items []string, useAnd bool) string {

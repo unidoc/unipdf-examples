@@ -98,9 +98,6 @@ func main() {
 			"isEven": func(num int) bool {
 				return num%2 == 0
 			},
-			"add": func(num1, num2 int) int {
-				return num1 + num2
-			},
 			"getSlice": func(s string) []string {
 				return strings.Split(s, ",")
 			},
