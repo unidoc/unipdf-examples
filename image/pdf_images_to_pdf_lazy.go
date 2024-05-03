@@ -71,12 +71,13 @@ func imageFolderToPdf(inputPath string, outputPath string) error {
 		// Lazy mode is helpful for creating PDF with a lot of images
 		img.SetLazy(true)
 
-		img.ScaleToWidth(612.0)
-
 		// Use page width of 612 points, and calculate the height proportionally based on the image.
 		// Standard PPI is 72 points per inch, thus a width of 8.5"
-		height := 612.0 * img.Height() / img.Width()
-		c.SetPageSize(creator.PageSize{612, height})
+		pageWidth := 612.0
+		img.ScaleToWidth(pageWidth)
+
+		pageHeight := pageWidth * img.Height() / img.Width()
+		c.SetPageSize(creator.PageSize{pageWidth, pageHeight})
 		c.NewPage()
 		img.SetPos(0, 0)
 		_ = c.Draw(img)
