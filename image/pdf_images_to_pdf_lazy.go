@@ -1,7 +1,7 @@
 /*
  * Add JPG images from given folder to a PDF file, one image per page using lazy mode.
  *
- * Run as: go run pdf_images_to_pdf.go output.pdf image_folder
+ * Run as: go run pdf_images_to_pdf_lazy.go output.pdf image_folder
  */
 
 package main
@@ -29,7 +29,7 @@ func init() {
 
 func main() {
 	if len(os.Args) < 3 {
-		fmt.Printf("Usage: go run pdf_images_to_pdf.go output.pdf image_folder\n")
+		fmt.Printf("Usage: go run pdf_images_to_pdf_lazy.go output.pdf image_folder\n")
 		os.Exit(1)
 	}
 
