@@ -141,15 +141,16 @@ func fillFields(inputPath, jsonPath, outputPath string) error {
 		SkipAcroForm: true,
 	}
 
+	// Subset the composite font file to reduce pdf file size.
+	// Refer to `text/pdf_using_cjk_font.go` example file for more information
+	// Note: This should be called before `pdfReader.ToWriter` conversion to prevent text extraction issues on the flattened document.
+	cjkFont.SubsetRegistered()
+
 	// Generate a PdfWriter instance from existing PdfReader.
 	pdfWriter, err := pdfReader.ToWriter(opt)
 	if err != nil {
 		return err
 	}
-
-	// Subset the composite font file to reduce pdf file size.
-	// Refer to `text/pdf_using_cjk_font.go` example file for more information
-	cjkFont.SubsetRegistered()
 
 	// Write to file.
 	err = pdfWriter.WriteToFile(outputPath)
