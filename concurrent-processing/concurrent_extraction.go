@@ -54,7 +54,7 @@ func main() {
 
 // runConcurrent takes the list of input documents and destination output directory and runs the extraction concurrently.
 func runConcurrent(documents []string, outputDir string) {
-	res := make(chan map[string]string, 3)
+	res := make(chan map[string]string, len(documents))
 
 	err := concurrentExtraction(documents, res)
 	if err != nil {
