@@ -86,13 +86,11 @@ func runConcurrent(documents []string, outputDir string) {
 			}
 		}
 	}
-
 }
 
 // concurrentExtraction launches a go routine for each document in `documents` and writes the result of extraction to
 // the channel `res`.
 func concurrentExtraction(documents []string, res chan map[string]string) error {
-
 	for _, docPath := range documents {
 		filePath := docPath
 		go func(path string, res chan map[string]string) {
@@ -106,6 +104,7 @@ func concurrentExtraction(documents []string, res chan map[string]string) error 
 			res <- temp
 		}(filePath, res)
 	}
+
 	return nil
 }
 
