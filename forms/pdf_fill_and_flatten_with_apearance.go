@@ -1,7 +1,7 @@
 /*
  * Fill PDF form JSON input data and flatten it with a customized appearance to output PDF.
 *
-* Run as: go run pdf_fill_and_flatten_with_apearance.go .
+* Run as: go run pdf_fill_and_flatten_with_apearance.go.
 */
 
 package main
