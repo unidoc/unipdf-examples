@@ -13,11 +13,11 @@ require (
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.2.0
 	github.com/unidoc/unichart v0.3.0
-	github.com/unidoc/unipdf/v3 v3.59.0
+	github.com/unidoc/unipdf/v3 v3.61.0
 	github.com/wcharczuk/go-chart/v2 v2.1.0
 	golang.org/x/crypto v0.22.0
-	golang.org/x/image v0.15.0
-	golang.org/x/text v0.14.0
+	golang.org/x/image v0.18.0
+	golang.org/x/text v0.16.0
 	google.golang.org/api v0.114.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/protobuf v1.30.0
