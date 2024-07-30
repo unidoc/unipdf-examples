@@ -135,7 +135,7 @@ func main() {
 
 	c.SetForms(form)
 
-	model.SetPdfProducer(`UniDoc v3.53.0 (Unlicensed) - http://unidoc.io`)
+	model.SetPdfProducer(`UniDoc v3.61.0 (Unlicensed) - http://unidoc.io`)
 	defer model.SetPdfProducer("")
 
 	outPath := filepath.Join(".", "form_field_with_colored_text_fields.pdf")
