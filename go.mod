@@ -13,7 +13,7 @@ require (
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.2.0
 	github.com/unidoc/unichart v0.3.0
-	github.com/unidoc/unipdf/v3 v3.61.0
+	github.com/unidoc/unipdf/v3 v3.62.0
 	github.com/wcharczuk/go-chart/v2 v2.1.0
 	golang.org/x/crypto v0.22.0
 	golang.org/x/image v0.18.0
