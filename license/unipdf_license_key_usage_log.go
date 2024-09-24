@@ -28,7 +28,6 @@ func init() {
 	}
 	license.SetMeteredKeyUsageLogVerboseMode(true)
 	common.SetLogger(common.NewConsoleLogger(common.LogLevelInfo))
-	license.SetMeteredKeyPersistentCache(false)
 }
 
 func main() {
