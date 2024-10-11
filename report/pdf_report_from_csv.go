@@ -13,7 +13,7 @@ import (
 	"github.com/unidoc/unichart/dataset"
 	"github.com/unidoc/unichart/dataset/sequence"
 	"github.com/unidoc/unichart/render"
-	"github.com/unidoc/unioffice/common/license"
+	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 )
@@ -23,9 +23,9 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Successfully set the Unidoc License Key")
 }
 
+// chartColors list some colors to be used.
 var chartColors = []color.Color{
 	color.RGBA{R: 38, G: 198, B: 218},
 	color.RGBA{R: 255, G: 167, B: 38},
@@ -35,7 +35,8 @@ var chartColors = []color.Color{
 	color.RGBA{R: 255, G: 109, B: 0},
 }
 
-type SalesData struct {
+// salesData represents a single row of sales data.
+type salesData struct {
 	DateOfSale      time.Time
 	QuantitySold    float64
 	SalePrice       float64
@@ -55,21 +56,16 @@ func main() {
 
 	c := creator.New()
 	filePath := "./test-data.csv"
-	data, _, err := load_csv(filePath)
+	data, _, err := loadCsv(filePath)
 	if err != nil {
 		panic("failed to load data ")
 	}
 
-	logoImg, err := c.NewImageFromFile("./unidoc-logo.png")
-	if err != nil {
-		panic("filed to load image %s")
-	}
-
-	cumulativeSums := make(map[string]float64)
+	cumulativeSums := make(map[string]float64) // Cumulative Sales by person
 	sum := 0.0
-	dates := []time.Time{}
-	totalSums := []float64{}
-	dailySales := []float64{}
+	dates := []time.Time{}    // for the x-axis
+	totalSums := []float64{}  // commutative sum over time
+	dailySales := []float64{} // daily sales
 	for _, dataRow := range data {
 		sum += dataRow.SalePrice
 		cumulativeSums[dataRow.SalespersonName] += dataRow.SalePrice
@@ -79,7 +75,6 @@ func main() {
 	}
 
 	Contributions := map[string]float64{}
-
 	for person, totalSale := range cumulativeSums {
 		Contribution := totalSale / sum
 		Contributions[person] = Contribution
@@ -87,43 +82,80 @@ func main() {
 
 	// create front page
 	c.CreateFrontPage(func(args creator.FrontpageFunctionArgs) {
-		DoFirstPage(c, robotoFontRegular, robotoFontPro)
+		doFirstPage(c, robotoFontRegular, robotoFontPro)
 	})
 
 	doFooter(c, robotoFontPro)
-	c.DrawHeader(func(block *creator.Block, args creator.HeaderFunctionArgs) {
-		// Draw the header on a block. The block size is the size of the page's top margins.
-		block.Draw(logoImg)
-	})
 
-	chartTile := "Sales Contributions by Sales Persons"
-	pChart := createPieChart(Contributions, false, chartTile)
-	pChart.SetHeight(200)
-	pChart.SetWidth(200)
-	pieChart := creator.NewChart(pChart)
-	pieChart.SetPos(350, 30)
-	err = c.Draw(pieChart)
-	if err != nil {
-		panic(err)
-	}
+	// Create the chapter on page 1
+	ch := c.NewChapter("Sales Report")
 
-	barTitle := "Total Sales By Sales Person"
-	bChart := createBarChart(cumulativeSums, barTitle)
+	chapterFont := robotoFontRegular
+	chapterFontColor := creator.ColorRGBFrom8bit(72, 86, 95)
+	chapterFontSize := 18.0
+
+	normalFont := robotoFontRegular
+	normalFontColor := creator.ColorRGBFrom8bit(72, 86, 95)
+	normalFontSize := 10.0
+
+	ch.GetHeading().SetFont(chapterFont)
+	ch.GetHeading().SetFontSize(chapterFontSize)
+	ch.GetHeading().SetColor(chapterFontColor)
+
+	p := c.NewParagraph("Here we provide sales report for the month of January." +
+		"The data reflects a diverse range of sales activities, showcasing the efforts of various salespeople. " +
+		"The sales prices ranged from $40 to $250, highlighting the varying value of the products sold." +
+		"Overall, this month demonstrated strong performance across the board," +
+		" indicating effective sales strategies and engagement by the team throughout January.")
+	p.SetFont(normalFont)
+	p.SetFontSize(normalFontSize)
+	p.SetColor(normalFontColor)
+	p.SetMargins(0, 0, 5, 0)
+	ch.Add(p)
+	c.Draw(ch)
+
+	// Create Bar chart
+	p = c.NewParagraph("Total Sales By SalesPerson")
+	p.SetFont(robotoFontRegular)
+	p.SetFontSize(10)
+	p.SetPos(60, 150)
+	c.Draw(p)
+
+	bChart := createBarChart(cumulativeSums)
 	bChart.SetHeight(200)
 	bChart.SetWidth(300)
 	barChart := creator.NewChart(bChart)
-	barChart.SetPos(10, 30)
+	barChart.SetPos(50, 170)
 	err = c.Draw(barChart)
 
 	if err != nil {
 		panic(err)
 	}
 
-	lChart := createLineChart(dates, totalSums, dailySales)
-	lChart.SetHeight(350)
-	lChart.SetWidth(600)
+	// Create pie chart
+	p = c.NewParagraph("Sales Contributions by Sales Persons")
+	p.SetFont(robotoFontRegular)
+	p.SetFontSize(10)
+	p.SetPos(370, 150)
+	c.Draw(p)
+
+	pChart := createPieChart(Contributions, false)
+	pChart.SetHeight(200)
+	pChart.SetWidth(200)
+	pieChart := creator.NewChart(pChart)
+	pieChart.SetPos(360, 170)
+	err = c.Draw(pieChart)
+	if err != nil {
+		panic(err)
+	}
+
+	// Create Line Chart
+	title := "Total sales trend over time"
+	lChart := createLineChart(dates, title, totalSums, dailySales)
+	lChart.SetHeight(300)
+	lChart.SetWidth(550)
 	lineChart := creator.NewChart(lChart)
-	lineChart.SetPos(5, 300)
+	lineChart.SetPos(40, 400)
 
 	err = c.Draw(lineChart)
 
@@ -131,12 +163,13 @@ func main() {
 		panic(err)
 	}
 
-	err = c.WriteToFile("bar-chart.pdf")
+	err = c.WriteToFile("report_from_csv.pdf")
 	if err != nil {
 		panic(err)
 	}
 }
 
+// doFooter adds the page footers.
 func doFooter(c *creator.Creator, font *model.PdfFont) {
 	c.DrawFooter(func(block *creator.Block, args creator.FooterFunctionArgs) {
 		// Draw the on a block for each page.
@@ -157,7 +190,8 @@ func doFooter(c *creator.Creator, font *model.PdfFont) {
 	})
 }
 
-func DoFirstPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model.PdfFont) {
+// DoFirstPage creates the front page of the document.
+func doFirstPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model.PdfFont) {
 	helvetica, _ := model.NewStandard14Font("Helvetica")
 	helveticaBold, _ := model.NewStandard14Font("Helvetica-Bold")
 
@@ -168,7 +202,7 @@ func DoFirstPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model
 	p.SetColor(creator.ColorRGBFrom8bit(56, 68, 77))
 	c.Draw(p)
 
-	p = c.NewParagraph("Example Report")
+	p = c.NewParagraph("Sample Report From CSV")
 	p.SetFont(helveticaBold)
 	p.SetFontSize(30)
 	p.SetMargins(85, 0, 0, 0)
@@ -186,19 +220,10 @@ func DoFirstPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model
 	c.Draw(p)
 }
 
-func createBarChart(valMap map[string]float64, title string) render.ChartRenderable {
+// createBarChart creates a bar chart given `valMap`.
+func createBarChart(valMap map[string]float64) render.ChartRenderable {
 	chart := &unichart.BarChart{
-		Bars:  parseChartValMap(valMap),
-		Title: title,
-		TitleStyle: render.Style{
-			FontSize:            12,
-			TextHorizontalAlign: render.TextHorizontalAlignLeft,
-			Padding: render.Box{
-				Top:    10,
-				Bottom: 10,
-				IsSet:  true,
-			},
-		},
+		Bars: parseChartValMap(valMap),
 	}
 
 	// Set Y-axis custom range.
@@ -216,14 +241,16 @@ func createBarChart(valMap map[string]float64, title string) render.ChartRendera
 	return chart
 }
 
-func createLineChart(xValues1 []time.Time, yValues1, yValues2 []float64) render.ChartRenderable {
+// createLineChart creates line chart using xValues time series  and yValues1, yValues2 series values.
+func createLineChart(xValues []time.Time, title string, yValues1, yValues2 []float64) render.ChartRenderable {
 	mainSeries := dataset.TimeSeries{
-		XValues: xValues1,
+		XValues: xValues,
 		YValues: yValues1,
-		Name:    "Total Sale",
+		Name:    "Total Sales Price",
 	}
+
 	secondSeries := dataset.TimeSeries{
-		XValues: xValues1,
+		XValues: xValues,
 		YValues: yValues2,
 		Name:    "Sales By Person",
 	}
@@ -232,6 +259,13 @@ func createLineChart(xValues1 []time.Time, yValues1, yValues2 []float64) render.
 			mainSeries,
 			secondSeries,
 		},
+		Title: title,
+		XAxis: unichart.XAxis{
+			Name: "Time",
+		},
+		YAxis: unichart.YAxis{
+			Name: "Sales Price",
+		},
 	}
 	ch.Elements = []render.Renderable{
 		unichart.Legend(ch),
@@ -239,7 +273,8 @@ func createLineChart(xValues1 []time.Time, yValues1, yValues2 []float64) render.
 	return ch
 }
 
-func createPieChart(valMap map[string]float64, isDonut bool, title string) render.ChartRenderable {
+// createPieChart creates pie chart based on the valMap values.
+func createPieChart(valMap map[string]float64, isDonut bool) render.ChartRenderable {
 	var (
 		vals = make([]dataset.Value, 0, len(valMap))
 		idx  = 0
@@ -274,20 +309,10 @@ func createPieChart(valMap map[string]float64, isDonut bool, title string) rende
 
 	return &unichart.PieChart{
 		Values: vals,
-		Title:  title,
-
-		TitleStyle: render.Style{
-			FontSize:            12,
-			TextHorizontalAlign: render.TextHorizontalAlignCenter,
-			Padding: render.Box{
-				Top:    10,
-				Bottom: 10,
-				IsSet:  true,
-			},
-		},
 	}
 }
 
+// parseChartValMap parses the valMap and returns an array of dataset.Value.
 func parseChartValMap(valMap map[string]float64) []dataset.Value {
 	var (
 		vals = make([]dataset.Value, 0, len(valMap))
@@ -319,7 +344,8 @@ func parseChartValMap(valMap map[string]float64) []dataset.Value {
 	return vals
 }
 
-func load_csv(filePath string) ([]SalesData, []string, error) {
+// loadCsv loads values from csv files and returns SalesData object and the list of csv headers.
+func loadCsv(filePath string) ([]salesData, []string, error) {
 	file, err := os.Open(filePath) // Ensure the filename matches your CSV file
 	if err != nil {
 		return nil, nil, err
@@ -332,7 +358,7 @@ func load_csv(filePath string) ([]SalesData, []string, error) {
 		return nil, nil, err
 	}
 
-	var sales []SalesData
+	var sales []salesData
 	var header []string
 
 	for i, row := range rows {
@@ -357,15 +383,14 @@ func load_csv(filePath string) ([]SalesData, []string, error) {
 			return nil, nil, fmt.Errorf("error parsing sale price: %v", err)
 		}
 
-		// Create a new Sale object and populate it
-		sale := SalesData{
+		sale := salesData{
 			DateOfSale:      dateOfSale,
 			QuantitySold:    quantitySold,
 			SalePrice:       salePrice,
 			SalespersonName: row[3],
 		}
-
 		sales = append(sales, sale)
 	}
+
 	return sales, header, nil
 }
