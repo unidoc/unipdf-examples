@@ -1,3 +1,8 @@
+/*
+ * This example showcases how to prepare report with charts from csv data.
+ *
+ * Run as: go run pdf_report_from_csv.go
+ */
 package main
 
 import (
@@ -13,6 +18,7 @@ import (
 	"github.com/unidoc/unichart/dataset"
 	"github.com/unidoc/unichart/dataset/sequence"
 	"github.com/unidoc/unichart/render"
+	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
@@ -46,19 +52,22 @@ type salesData struct {
 func main() {
 	robotoFontRegular, err := model.NewPdfFontFromTTFFile("./Roboto-Regular.ttf")
 	if err != nil {
-		panic(err)
+		common.Log.Info("Failed to load font %s", err)
+		return
 	}
 
 	robotoFontPro, err := model.NewPdfFontFromTTFFile("./Roboto-Bold.ttf")
 	if err != nil {
-		panic(err)
+		common.Log.Info("Failed to load font %s", err)
+		return
 	}
 
 	c := creator.New()
 	filePath := "./test-data.csv"
 	data, _, err := loadCsv(filePath)
 	if err != nil {
-		panic("failed to load data ")
+		common.Log.Info("failed to load data %s", err)
+		return
 	}
 
 	cumulativeSums := make(map[string]float64) // Cumulative Sales by person
@@ -129,7 +138,8 @@ func main() {
 	err = c.Draw(barChart)
 
 	if err != nil {
-		panic(err)
+		common.Log.Info("Failed to draw chart. %s.", err)
+		return
 	}
 
 	// Create pie chart
@@ -146,7 +156,8 @@ func main() {
 	pieChart.SetPos(360, 170)
 	err = c.Draw(pieChart)
 	if err != nil {
-		panic(err)
+		common.Log.Info("Failed to draw pie chart. %s", err)
+		return
 	}
 
 	// Create Line Chart
@@ -160,12 +171,14 @@ func main() {
 	err = c.Draw(lineChart)
 
 	if err != nil {
-		panic(err)
+		common.Log.Info("Failed to draw line chart. %s", err)
+		return
 	}
 
 	err = c.WriteToFile("report_from_csv.pdf")
 	if err != nil {
-		panic(err)
+		common.Log.Info("Failed to write to file. %s", err)
+		return
 	}
 }
 
@@ -223,7 +236,8 @@ func doFirstPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model
 // createBarChart creates a bar chart given `valMap`.
 func createBarChart(valMap map[string]float64) render.ChartRenderable {
 	chart := &unichart.BarChart{
-		Bars: parseChartValMap(valMap),
+		Bars:     parseChartValMap(valMap),
+		BarWidth: 35,
 	}
 
 	// Set Y-axis custom range.
