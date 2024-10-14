@@ -14,7 +14,6 @@ require (
 	github.com/unidoc/pkcs7 v0.2.0
 	github.com/unidoc/unichart v0.3.0
 	github.com/unidoc/unipdf/v3 v3.62.0
-	github.com/wcharczuk/go-chart/v2 v2.1.0
 	golang.org/x/crypto v0.22.0
 	golang.org/x/image v0.18.0
 	golang.org/x/text v0.16.0
@@ -32,7 +31,6 @@ require (
 	github.com/adrg/sysfont v0.1.2 // indirect
 	github.com/adrg/xdg v0.4.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect

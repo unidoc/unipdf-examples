@@ -5,25 +5,24 @@
  */
 /*
  * NOTE: This example depends on github.com/boombuler/barcode, MIT licensed,
- *       and github.com/wcharczuk/go-chart, MIT licensed,
+ *       and github.com/unidoc/unichart, MIT licensed,
  *       and the Roboto font (Roboto-Bold.ttf, Roboto-Regular.ttf), Apache-2 licensed.
  */
 
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"image"
 	"math"
 	"os"
 	"time"
 
-	"github.com/wcharczuk/go-chart/v2"
-
 	"github.com/boombuler/barcode"
 	"github.com/boombuler/barcode/qr"
 
+	"github.com/unidoc/unichart"
+	"github.com/unidoc/unichart/dataset"
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
 	"github.com/unidoc/unipdf/v3/creator"
@@ -452,7 +451,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.GetHeading().SetFontSize(chapterFontSize)
 	sc.GetHeading().SetColor(chapterFontColor)
 
-	p = c.NewParagraph("Graphs can be generated via packages such as github.com/wcharczuk/go-chart as illustrated " +
+	p = c.NewParagraph("Graphs can be generated via packages such as github.com/unidoc/unichart as illustrated " +
 		"in the following plot:")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
@@ -460,26 +459,18 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	p.SetMargins(0, 0, 5, 0)
 	sc.Add(p)
 
-	graph := chart.PieChart{
-		Width:  200,
-		Height: 200,
-		Values: []chart.Value{
+	chart := &unichart.PieChart{
+		Values: []dataset.Value{
 			{Value: 70, Label: "Compliant"},
 			{Value: 30, Label: "Non-Compliant"},
 		},
 	}
+	chart.SetWidth(175)
+	chart.SetHeight(175)
 
-	buffer := bytes.NewBuffer([]byte{})
-	err = graph.Render(chart.PNG, buffer)
-	if err != nil {
-		panic(err)
-	}
-	img, err = c.NewImageFromData(buffer.Bytes())
-	if err != nil {
-		panic(err)
-	}
-	img.SetMargins(0, 0, 10, 0)
-	sc.Add(img)
+	// Create unipdf chart component.
+	chartComponent := creator.NewChart(chart)
+	sc.Add(chartComponent)
 
 	sc = ch.NewSubchapter("Headers and footers")
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
