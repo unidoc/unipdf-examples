@@ -98,8 +98,8 @@ func addImageToPdf(inputPath string, outputPath string, imagePath string, pageNu
 	encoder := core.NewDCTEncoder()
 	// The default quality is 75. There is not much difference in the image
 	// quality between 75 and 100 but the size difference when compressing the
-	// image stream is signficant.
-	// encoder.Quality = 100
+	// image stream is significant so setting quality to 100 is not recommended.
+	// encoder.Quality = 80
 	img.SetEncoder(encoder)
 
 	// Read the input pdf file.

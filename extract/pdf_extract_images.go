@@ -103,7 +103,7 @@ func extractImagesToArchive(inputPath, outputPath string) error {
 			if err != nil {
 				return err
 			}
-			opt := jpeg.Options{Quality: 100}
+			opt := jpeg.Options{Quality: 80}
 			err = jpeg.Encode(imgf, gimg, &opt)
 			if err != nil {
 				return err
