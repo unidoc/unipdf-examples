@@ -24,7 +24,7 @@ jobs:
 
     - name: Setup ImageMagick's MagickWand
       run:
-        sudo apt-get install libmagickwand-dev
+        sudo apt-get install libmagickwand-dev imagemagick
 
     - name: Build all
       run: |
