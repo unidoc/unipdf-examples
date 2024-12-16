@@ -13,7 +13,6 @@ import (
 
 	"github.com/unidoc/unipdf/v3/common"
 	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/creator"
 	"github.com/unidoc/unipdf/v3/model"
 )
 
@@ -49,8 +48,6 @@ func main() {
 func addWatermarkImage(inputPath string, outputPath string, watermarkPath string) error {
 	common.Log.Debug("Input PDF: %v", inputPath)
 	common.Log.Debug("Watermark image: %s", watermarkPath)
-
-	c := creator.New()
 
 	// Create the watermark image from file.
 	wImgFile, err := os.Open(watermarkPath)
@@ -99,17 +96,17 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 
 		// Add watermark with options.
 		page.AddWatermarkImage(xImage, model.WatermarkImageOptions{Alpha: 0.5, FitToWidth: true})
-
-		// Add to creator.
-		c.AddPage(page)
 	}
 
-	// Add reader outline tree to the creator.
-	c.SetOutlineTree(pdfReader.GetOutlineTree())
+	// Generate a PDFWriter from PDFReader.
+	pdfWriter, err := pdfReader.ToWriter(nil)
+	if err != nil {
+		return err
+	}
 
-	// Add reader AcroForm to the creator.
-	c.SetForms(pdfReader.AcroForm)
-
-	err = c.WriteToFile(outputPath)
-	return err
+	err = pdfWriter.WriteToFile(outputPath)
+	if err != nil {
+		return err
+	}
+	return nil
 }
