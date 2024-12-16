@@ -8,6 +8,7 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"os"
 
 	"github.com/unidoc/unipdf/v3/common"
@@ -51,10 +52,24 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 
 	c := creator.New()
 
-	watermarkImg, err := c.NewImageFromFile(watermarkPath)
+	// Create the watermark image from file.
+	wImgFile, err := os.Open(watermarkPath)
 	if err != nil {
 		return err
 	}
+	defer wImgFile.Close()
+
+	watermarkImg, _, err := image.Decode(wImgFile)
+	if err != nil {
+		return err
+	}
+
+	image, err := model.DefaultImageHandler{}.NewImageFromGoImage(watermarkImg)
+	if err != nil {
+		return err
+	}
+
+	xImage, err := model.NewXObjectImageFromImage(image, nil, nil)
 
 	// Read the input pdf file.
 	f, err := os.Open(inputPath)
@@ -82,13 +97,11 @@ func addWatermarkImage(inputPath string, outputPath string, watermarkPath string
 			return err
 		}
 
+		// Add watermark with options.
+		page.AddWatermarkImage(xImage, model.WatermarkImageOptions{Alpha: 0.5, FitToWidth: true})
+
 		// Add to creator.
 		c.AddPage(page)
-
-		watermarkImg.ScaleToWidth(c.Context().PageWidth)
-		watermarkImg.SetPos(0, (c.Context().PageHeight-watermarkImg.Height())/2)
-		watermarkImg.SetOpacity(0.5)
-		_ = c.Draw(watermarkImg)
 	}
 
 	// Add reader outline tree to the creator.
