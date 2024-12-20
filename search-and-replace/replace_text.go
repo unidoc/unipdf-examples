@@ -44,5 +44,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println("Finished replacing %s by %s and saved the output file at %s", pattern, replacement, filePath)
+	fmt.Printf("Finished replacing %s by %s and saved the output file at %s\n", pattern, replacement, filePath)
 }
