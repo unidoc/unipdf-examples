@@ -3,7 +3,7 @@
  *
  * Run as: go run replace_text.go <pattern> <replacement> <pages> <input> <output>
  *
- * example: go run replace_text.go "Australia" "America" "1,2" ./test-data/file1.pdf ./test-data/result2.pdf
+ * example: go run replace_text.go "Australia" "America" "1,2" ./test-data/file1.pdf ./test-data/result.pdf
  */
 package main
 
