@@ -9,4 +9,5 @@ Having the ability to play around with images allows for the creation of attract
 - [pdf_images_to_pdf.go](pdf_images_to_pdf.go) explains how to add multiple images in a PDF document, one image per page. 
 - [pdf_list_images.go](pdf_list_images.go) explains how to list images in a PDF file. Passes through each page, goes through the content stream and finds instances of both. XObject Images and inline images. Also handles images referred within XObject Form content streams.
 - [pdf_watermark_image.go](pdf_watermark_image.go) explains how to add watermark image to each page of a PDF file.
+- [pdf_remove_watermark_image.go](pdf_remove_watermark_image.go) explains how to remove watermark image from a PDF file.
 - Image extraction example can be found in [../extract](extract) example subfolder.
