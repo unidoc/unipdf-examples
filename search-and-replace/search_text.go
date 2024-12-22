@@ -1,8 +1,17 @@
+/*
+ * This example code shows how to do text searching on pdf using unipdf
+ *
+ * Run as: go run search_text.go <pattern> <pages> <input>
+ *
+ * Example: go run search_text.go "copyright law" "1,2" ./test-data/file1.pdf
+ */
+
 package main
 
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/unidoc/unipdf/v3/common/license"
@@ -20,10 +29,28 @@ func init() {
 }
 
 func main() {
-	// Input parameters
-	filePath := "./test-data/file1.pdf" // Path to the PDF file
-	pattern := "Australia"              // Text pattern to search for
-	pages := []int{1}                   // Page numbers to search on
+	// Ensure enough arguments are provided
+	if len(os.Args) < 4 {
+		fmt.Println("Usage: go run main.go <pattern> <pages> <input>")
+		os.Exit(1)
+	}
+
+	// Parse positional arguments
+	pattern := os.Args[1]
+	pagesArg := os.Args[2]
+	filePath := os.Args[3]
+
+	// Convert pages string to a slice of integers
+	pageStrings := strings.Split(pagesArg, ",")
+	pageList := []int{}
+	for _, pageStr := range pageStrings {
+		page, err := strconv.Atoi(pageStr)
+		if err != nil {
+			fmt.Printf("Invalid page number: %s\n", pageStr)
+			os.Exit(1)
+		}
+		pageList = append(pageList, page)
+	}
 
 	// Create a new PDF reader
 	reader, _, err := model.NewPdfReaderFromFile(filePath, nil)
@@ -36,14 +63,14 @@ func main() {
 	editor := extractor.NewEditor(reader)
 
 	// Perform the search for the specified pattern on the given pages
-	matchesPerPage, err := editor.Search(pattern, pages)
+	matchesPerPage, err := editor.Search(pattern, pageList)
 	if err != nil {
 		fmt.Printf("Failed to search pattern: %v\n", err)
 		os.Exit(1)
 	}
 
 	// Print formatted search results
-	printSearchResults(matchesPerPage, pages, pattern)
+	printSearchResults(matchesPerPage, pageList, pattern)
 }
 
 // printSearchResults formats and prints the search results.
