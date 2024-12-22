@@ -19,7 +19,7 @@ require (
 	golang.org/x/text v0.21.0
 	google.golang.org/api v0.114.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
-	google.golang.org/protobuf v1.30.0
+	google.golang.org/protobuf v1.33.0
 	gopkg.in/gographics/imagick.v2 v2.7.0
 )
 
