@@ -76,12 +76,6 @@ func main() {
 		c.AddPage(page)
 	}
 
-	writer, err := pdfReader.ToWriter(nil)
-	if err != nil {
-		fmt.Printf("Error: %v\n", err)
-		os.Exit(1)
-	}
-
-	writer.WriteToFile(outputPath)
+	c.WriteToFile(outputPath)
 	fmt.Print("Watermark added successfully.\n")
 }
