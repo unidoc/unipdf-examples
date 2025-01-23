@@ -62,10 +62,11 @@ func main() {
 			os.Exit(1)
 		}
 		options := model.WatermarkTextOptions{
-			Alpha:     0.5,
+			Alpha:     0.3,
 			FontSize:  40,
 			FontPath:  "Roboto-Regular.ttf",
 			FontColor: color.RGBA{R: 255, G: 0, B: 0, A: 1},
+			Angle:     30,
 		}
 
 		err = page.AddWatermarkText(watermark, options)
