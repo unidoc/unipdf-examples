@@ -27,7 +27,7 @@ func init() {
 	}
 }
 
-// FieldData represents the field data structure.
+// FieldData represents the field data with name and text color attributes.
 type FieldData struct {
 	Name      string `json:"name"`
 	TextColor string `json:"text_color"`
@@ -91,6 +91,7 @@ func main() {
 	fmt.Printf("Success, output written to %s\n", outputPath)
 }
 
+// loadFieldColors loads field colors from json fila and returns a map of field name to PdfColor.
 func loadFieldColors(jsonPath string) (map[string]model.PdfColor, error) {
 	file, err := os.Open(jsonPath)
 	if err != nil {
