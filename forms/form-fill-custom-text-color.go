@@ -91,7 +91,7 @@ func main() {
 	fmt.Printf("Success, output written to %s\n", outputPath)
 }
 
-// loadFieldColors loads field colors from json fila and returns a map of field name to PdfColor.
+// loadFieldColors loads field colors from json file and returns a map of field name to PdfColor.
 func loadFieldColors(jsonPath string) (map[string]model.PdfColor, error) {
 	file, err := os.Open(jsonPath)
 	if err != nil {
