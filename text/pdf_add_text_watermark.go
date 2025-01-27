@@ -1,5 +1,5 @@
 /*
- * An example of adding text water mark to pdf pages.
+ * An example of adding text watermark to pdf pages.
  *
  * Run as: go run pdf_add_text_watermark.go <input.pdf> <watermark text> <output.pdf>
  */
