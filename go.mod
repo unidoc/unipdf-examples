@@ -1,6 +1,6 @@
 module github.com/unidoc/unidoc-examples
 
-go 1.18
+go 1.19
 
 require (
 	cloud.google.com/go/kms v1.10.1
@@ -13,7 +13,7 @@ require (
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.2.0
 	github.com/unidoc/unichart v0.3.0
-	github.com/unidoc/unipdf/v3 v3.65.0
+	github.com/unidoc/unipdf/v3 v3.66.0
 	golang.org/x/crypto v0.31.0
 	golang.org/x/image v0.18.0
 	golang.org/x/text v0.21.0
