@@ -1,6 +1,6 @@
 module github.com/unidoc/unidoc-examples
 
-go 1.18
+go 1.19
 
 require (
 	cloud.google.com/go/kms v1.10.1
@@ -13,14 +13,14 @@ require (
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.2.0
 	github.com/unidoc/unichart v0.3.0
-	github.com/unidoc/unipdf/v3 v3.62.0
-	golang.org/x/crypto v0.22.0
+	github.com/unidoc/unipdf/v3 v3.66.0
+	golang.org/x/crypto v0.31.0
 	golang.org/x/image v0.18.0
-	golang.org/x/text v0.16.0
+	golang.org/x/text v0.21.0
 	google.golang.org/api v0.114.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
-	google.golang.org/protobuf v1.30.0
-	gopkg.in/gographics/imagick.v2 v2.6.0
+	google.golang.org/protobuf v1.33.0
+	gopkg.in/gographics/imagick.v2 v2.7.0
 )
 
 require (
@@ -50,9 +50,9 @@ require (
 	github.com/unidoc/timestamp v0.0.0-20200412005513-91597fd3793a // indirect
 	github.com/unidoc/unitype v0.4.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/net v0.24.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/grpc v1.56.3 // indirect

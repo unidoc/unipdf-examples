@@ -1,0 +1,71 @@
+[
+    {
+        "name": "formID",
+        "value": "202286033286049"
+    },
+    {
+        "name": "pdf_submission_new",
+        "value": "1",
+        "text_color": "#40E0D0"
+    },
+    {
+        "name": "simple_spc",
+        "value": "202286033286049-202286033286049",
+        "text_color": "#6495ED"
+    },
+    {
+        "name": "adobeWarning",
+        "value": "In order to submit this form, you should open it with Adobe Acrobat Reader.",
+        "text_color": "#008000"
+    },
+    {
+        "name": "name3[first]",
+        "value": "John",
+        "text_color": "#0000FF",
+        "fill_color": "#FFD700",
+        "border_color": "#CD5C5C"
+    },
+    {
+        "name": "name3[last]",
+        "value": "Doe",
+        "text_color": "#7dcea0"
+    },
+    {
+        "name": "email4",
+        "value": "alpha@omega.com",
+        "text_color": "#CD5C5C"
+    },
+    {
+        "name": "address5[addr_line1]",
+        "value": "sample address line 1",
+        "text_color": "#008000"
+    },
+    {
+        "name": "address5[addr_line2]",
+        "value": "sample address line 2",
+        "text_color": "#40E0D0"
+    },
+    {
+        "name": "address5[city]",
+        "value": "sample address",
+        "text_color": "#00FF00"
+    },
+    {
+        "name": "address5[state]",
+        "value": "sample state",
+        "text_color": "#2596be"
+    },
+    {
+        "name": "address5[postal]",
+        "value": "3538148",
+        "text_color": "#063970"
+    },
+    {
+        "name": "fakeSubmitButton",
+        "value": "Submit"
+    },
+    {
+        "name": "submitButton",
+        "value": ""
+    }
+]
