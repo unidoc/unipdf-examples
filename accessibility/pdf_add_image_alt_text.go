@@ -104,12 +104,22 @@ func addImage(c *creator.Creator, imageFile string, x, y float64, mcid int64, al
 		return err
 	}
 
+	// Add the image to the marked content section.
 	altKdictEntry := img.SetMarkedContentID(mcid)
+
+	// Set the alternate text.
 	altKdictEntry.Alt = core.MakeString(altText)
+
+	// Set the page number.
 	altKdictEntry.SetPageNumber(int64(c.Context().Page))
+
+	// Set the bounding box.
 	altKdictEntry.SetBoundingBox(x, y, img.Width(), img.Height())
+
+	// Set the ID.
 	altKdictEntry.ID = core.MakeString(kID)
 
+	// Add the K dictionary entry to the marked content section.
 	pageMarkedContentSection.AddKChild(altKdictEntry)
 
 	return nil
