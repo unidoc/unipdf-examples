@@ -65,7 +65,7 @@ func main() {
 	pageMarkedContentSection.S = core.MakeName(model.StructureTypeSection)
 	pageMarkedContentSection.ID = core.MakeString(kIds[1])
 
-	// Add as a chile
+	// Add as a child
 	docK.AddKChild(pageMarkedContentSection)
 
 	// Add first image

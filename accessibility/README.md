@@ -1,4 +1,4 @@
-## PDF Acccessibility Examples.
+## PDF Accessibility Examples.
 
 The examples in this section are showcasing how to work with accessibility features.
 
