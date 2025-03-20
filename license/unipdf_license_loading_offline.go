@@ -1,6 +1,6 @@
 /*
  * unipdf_license_loading_offline.go:
- * Illustrates how to load an offline (perpetual) license key.
+ * Illustrates how to load an offline license key.
  * Offline keys can be purchased at https://www.unidoc.io
  *
  * Run as: go run unipdf_license_loading_offline.go
@@ -14,7 +14,7 @@ import (
 	"github.com/unidoc/unipdf/v3/common/license"
 )
 
-// Example of an offline perpetual license key.
+// Example of an offline license key.
 const offlineLicenseKey = `
 -----BEGIN UNIDOC LICENSE KEY-----
 contents here.
