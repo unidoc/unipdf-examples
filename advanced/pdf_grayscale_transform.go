@@ -108,7 +108,7 @@ func convertPageToGrayscale(page *model.PdfPage) error {
 	}
 	page.SetContentStreams([]string{string(grayContent)}, core.NewFlateEncoder())
 
-	//fmt.Printf("Processed contents: %s\n", grayContent)
+	// fmt.Printf("Processed contents: %s\n", grayContent)
 
 	return nil
 }
@@ -493,7 +493,7 @@ func transformContentStreamToGrayscale(contents string, resources *model.PdfPage
 
 			_, xtype := resources.GetXObjectByName(*name)
 			if xtype == model.XObjectTypeImage {
-				//fmt.Printf(" XObject Image: %s\n", *name)
+				// fmt.Printf(" XObject Image: %s\n", *name)
 
 				ximg, err := resources.GetXObjectImageByName(*name)
 				if err != nil {
@@ -542,6 +542,11 @@ func transformContentStreamToGrayscale(contents string, resources *model.PdfPage
 					}
 				}
 
+				// If there's image Smask.
+				if ximg.SMask != nil {
+					ximgGray.SMask = ximg.SMask
+				}
+
 				// Update the entry.
 				err = resources.SetXObjectImageByName(*name, ximgGray)
 				if err != nil {
@@ -549,7 +554,7 @@ func transformContentStreamToGrayscale(contents string, resources *model.PdfPage
 					return err
 				}
 			} else if xtype == model.XObjectTypeForm {
-				//fmt.Printf(" XObject Form: %s\n", *name)
+				// fmt.Printf(" XObject Form: %s\n", *name)
 
 				// Go through the XObject Form content stream.
 				xform, err := resources.GetXObjectFormByName(*name)
@@ -596,14 +601,14 @@ func transformContentStreamToGrayscale(contents string, resources *model.PdfPage
 
 	// For debug purposes: (high level logging).
 	//
-	//fmt.Printf("=== Unprocessed - Full list\n")
-	//for idx, op := range operations {
+	// fmt.Printf("=== Unprocessed - Full list\n")
+	// for idx, op := range operations {
 	//	fmt.Printf("U. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
-	//}
-	//fmt.Printf("=== Processed - Full list\n")
-	//for idx, op := range *processedOperations {
+	// }
+	// fmt.Printf("=== Processed - Full list\n")
+	// for idx, op := range *processedOperations {
 	//	fmt.Printf("P. Operation %d: %s - Params: %v\n", idx+1, op.Operand, op.Params)
-	//}
+	// }
 
 	return processedOperations.Bytes(), nil
 }
@@ -678,6 +683,20 @@ func convertShadingToGray(shading *model.PdfShading) (*model.PdfShading, error) 
 		rgbToGrayPsProgram.Append(ps.MakeOperand("mul"))
 		rgbToGrayPsProgram.Append(ps.MakeOperand("add"))
 		transformFunc.Program = rgbToGrayPsProgram
+
+		// This is a bit of a hack, but we need to keep the /Bounds to shading function even it's empty array.
+		if shCtx, ok := shading.GetContext().(*model.PdfShadingType2); ok {
+			// Update the function bounds to grayscale.
+			var updateDict []model.PdfFunction
+			for _, fc := range shCtx.Function {
+				if fcDict, ok := core.GetDict(fc.ToPdfObject()); ok {
+					arr := core.MakeArray()
+					fcDict.Set("Bounds", arr)
+				}
+			}
+			shCtx.Function = updateDict
+			shading.SetContext(shCtx.PdfShading.GetContext())
+		}
 
 		// Define the DeviceN colorspace that performs the R,G,B -> Gray conversion for us.
 		transformcs := model.NewPdfColorspaceDeviceN()
