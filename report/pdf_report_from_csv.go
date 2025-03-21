@@ -107,24 +107,27 @@ func main() {
 	normalFontColor := creator.ColorRGBFrom8bit(72, 86, 95)
 	normalFontSize := 10.0
 
-	ch.GetHeading().SetFont(chapterFont)
-	ch.GetHeading().SetFontSize(chapterFontSize)
-	ch.GetHeading().SetFontColor(chapterFontColor)
+	heading := ch.GetHeading()
+	heading.SetFont(chapterFont)
+	heading.SetFontSize(chapterFontSize)
+	heading.SetFontColor(chapterFontColor)
 
-	p := c.NewParagraph("Here we provide sales report for the month of January." +
+	p := c.NewStyledParagraph()
+	p.SetText("Here we provide sales report for the month of January." +
 		"The data reflects a diverse range of sales activities, showcasing the efforts of various salespeople. " +
 		"The sales prices ranged from $40 to $250, highlighting the varying value of the products sold." +
 		"Overall, this month demonstrated strong performance across the board," +
 		" indicating effective sales strategies and engagement by the team throughout January.")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 0)
 	ch.Add(p)
 	c.Draw(ch)
 
 	// Create Bar chart
-	p = c.NewParagraph("Total Sales By SalesPerson")
+	p = c.NewStyledParagraph()
+	p.SetText("Total Sales By SalesPerson")
 	p.SetFont(robotoFontRegular)
 	p.SetFontSize(10)
 	p.SetPos(60, 150)
@@ -143,7 +146,8 @@ func main() {
 	}
 
 	// Create pie chart
-	p = c.NewParagraph("Sales Contributions by Sales Persons")
+	p = c.NewStyledParagraph()
+	p.SetText("Sales Contributions by Sales Persons")
 	p.SetFont(robotoFontRegular)
 	p.SetFontSize(10)
 	p.SetPos(370, 150)
@@ -186,19 +190,21 @@ func main() {
 func doFooter(c *creator.Creator, font *model.PdfFont) {
 	c.DrawFooter(func(block *creator.Block, args creator.FooterFunctionArgs) {
 		// Draw the on a block for each page.
-		p := c.NewParagraph("unidoc.io")
+		p := c.NewStyledParagraph()
+		p.SetText("unidoc.io")
 		p.SetFont(font)
 		p.SetFontSize(8)
 		p.SetPos(50, 20)
-		p.SetColor(creator.ColorRGBFrom8bit(63, 68, 76))
+		p.SetFontColor(creator.ColorRGBFrom8bit(63, 68, 76))
 		block.Draw(p)
 
 		strPage := fmt.Sprintf("Page %d of %d", args.PageNum, args.TotalPages)
-		p = c.NewParagraph(strPage)
+		p = c.NewStyledParagraph()
+		p.SetText(strPage)
 		p.SetFont(font)
 		p.SetFontSize(8)
 		p.SetPos(300, 20)
-		p.SetColor(creator.ColorRGBFrom8bit(63, 68, 76))
+		p.SetFontColor(creator.ColorRGBFrom8bit(63, 68, 76))
 		block.Draw(p)
 	})
 }
@@ -208,28 +214,31 @@ func doFirstPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model
 	helvetica, _ := model.NewStandard14Font("Helvetica")
 	helveticaBold, _ := model.NewStandard14Font("Helvetica-Bold")
 
-	p := c.NewParagraph("UniDoc")
+	p := c.NewStyledParagraph()
+	p.SetText("UniDoc")
 	p.SetFont(helvetica)
 	p.SetFontSize(48)
 	p.SetMargins(85, 0, 150, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(56, 68, 77))
+	p.SetFontColor(creator.ColorRGBFrom8bit(56, 68, 77))
 	c.Draw(p)
 
-	p = c.NewParagraph("Sample Report From CSV")
+	p = c.NewStyledParagraph()
+	p.SetText("Sample Report From CSV")
 	p.SetFont(helveticaBold)
 	p.SetFontSize(30)
 	p.SetMargins(85, 0, 0, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(45, 148, 215))
+	p.SetFontColor(creator.ColorRGBFrom8bit(45, 148, 215))
 	c.Draw(p)
 
 	t := time.Now().UTC()
 	dateStr := t.Format("1 Jan, 2006 15:04")
 
-	p = c.NewParagraph(dateStr)
+	p = c.NewStyledParagraph()
+	p.SetText(dateStr)
 	p.SetFont(helveticaBold)
 	p.SetFontSize(12)
 	p.SetMargins(90, 0, 5, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(56, 68, 77))
+	p.SetFontColor(creator.ColorRGBFrom8bit(56, 68, 77))
 	c.Draw(p)
 }
 

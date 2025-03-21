@@ -33,7 +33,8 @@ func main() {
 	c.AddTOC = true
 	c.CustomTOC = true
 	c.CreateTableOfContents(func(toc *creator.TOC) error {
-		tocTitle := c.NewParagraph("Table of Contents")
+		tocTitle := c.NewStyledParagraph()
+		tocTitle.SetText("Table of Contents")
 		tocTitle.SetFontSize(20)
 		tocTitle.SetMargins(0, 0, 0, 20)
 

@@ -71,15 +71,17 @@ func rowWrapDisabled(c *creator.Creator, headingFont *model.PdfFont) error {
 
 	return fillTable(c, 22, false, func(table *creator.Table) error {
 		sp1 := c.NewStyledParagraph()
-		sp1.Append("This is a styled paragraph which will not fit on the current page. All its content should be moved on the next page, along with the entire row, as row wrapping is disabled.").Style.FontSize = 14
+		sp1.SetText("This is a styled paragraph which will not fit on the current page. All its content should be moved on the next page, along with the entire row, as row wrapping is disabled.").Style.FontSize = 14
 
-		p1 := c.NewParagraph("This is a regular paragraph which will fit on the current page. However, it will be moved on the next page.")
+		p1 := c.NewStyledParagraph()
+		p1.SetText("This is a regular paragraph which will fit on the current page. However, it will be moved on the next page.")
 		p1.SetFontSize(14)
 
 		sp2 := c.NewStyledParagraph()
-		sp2.Append("This is a styled paragraph which will fit on the current page. However, it will be moved on the next page.").Style.FontSize = 14
+		sp2.SetText("This is a styled paragraph which will fit on the current page. However, it will be moved on the next page.").Style.FontSize = 14
 
-		p2 := c.NewParagraph("This is a regular paragraph which will not fit on the current page. All its content should be moved on the next page, along with the entire row.")
+		p2 := c.NewStyledParagraph()
+		p2.SetText("This is a regular paragraph which will not fit on the current page. All its content should be moved on the next page, along with the entire row.")
 		p2.SetFontSize(14)
 
 		// Draw table row.
@@ -119,15 +121,17 @@ func rowWrapEnabled(c *creator.Creator, headingFont *model.PdfFont) error {
 
 	return fillTable(c, 22, true, func(table *creator.Table) error {
 		sp1 := c.NewStyledParagraph()
-		sp1.Append("This is a styled paragraph. When table row wrapping is enabled, the content that fits on the current page stays on the current page. The rest of the content will be placed on the next page.").Style.FontSize = 14
+		sp1.SetText("This is a styled paragraph. When table row wrapping is enabled, the content that fits on the current page stays on the current page. The rest of the content will be placed on the next page.").Style.FontSize = 14
 
-		p1 := c.NewParagraph("This is a regular paragraph which will fit on the current page. All its content should remain on the current page.")
+		p1 := c.NewStyledParagraph()
+		p1.SetText("This is a regular paragraph which will fit on the current page. All its content should remain on the current page.")
 		p1.SetFontSize(14)
 
 		sp2 := c.NewStyledParagraph()
-		sp2.Append("This is a styled paragraph which will fit on the current page. All its content should remain on the current page.").Style.FontSize = 14
+		sp2.SetText("This is a styled paragraph which will fit on the current page. All its content should remain on the current page.").Style.FontSize = 14
 
-		p2 := c.NewParagraph("This is a regular paragraph which will not fit on the current page. All its content should be moved on the next page, in the wrapped row, leaving the current cell empty.")
+		p2 := c.NewStyledParagraph()
+		p2.SetText("This is a regular paragraph which will not fit on the current page. All its content should be moved on the next page, in the wrapped row, leaving the current cell empty.")
 		p2.SetFontSize(14)
 
 		// Draw table row.

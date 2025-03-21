@@ -70,19 +70,21 @@ func generatePDFReport(outputPath string) error {
 	// Draw footer on each page.
 	c.DrawFooter(func(block *creator.Block, args creator.FooterFunctionArgs) {
 		// Draw the on a block for each page.
-		p := c.NewParagraph("unidoc.io")
+		p := c.NewStyledParagraph()
+		p.SetText("unidoc.io")
 		p.SetFont(robotoFontRegular)
 		p.SetFontSize(8)
 		p.SetPos(50, 20)
-		p.SetColor(creator.ColorRGBFrom8bit(63, 68, 76))
+		p.SetFontColor(creator.ColorRGBFrom8bit(63, 68, 76))
 		block.Draw(p)
 
 		strPage := fmt.Sprintf("Page %d of %d", args.PageNum, args.TotalPages)
-		p = c.NewParagraph(strPage)
+		p = c.NewStyledParagraph()
+		p.SetText(strPage)
 		p.SetFont(robotoFontRegular)
 		p.SetFontSize(8)
 		p.SetPos(300, 20)
-		p.SetColor(creator.ColorRGBFrom8bit(63, 68, 76))
+		p.SetFontColor(creator.ColorRGBFrom8bit(63, 68, 76))
 		block.Draw(p)
 	})
 
@@ -99,28 +101,31 @@ func createCoverPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *m
 	helvetica, _ := model.NewStandard14Font("Helvetica")
 	helveticaBold, _ := model.NewStandard14Font("Helvetica-Bold")
 
-	p := c.NewParagraph("UniDoc")
+	p := c.NewStyledParagraph()
+	p.SetText("UniDoc")
 	p.SetFont(helvetica)
 	p.SetFontSize(48)
 	p.SetMargins(85, 0, 150, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(56, 68, 77))
+	p.SetFontColor(creator.ColorRGBFrom8bit(56, 68, 77))
 	c.Draw(p)
 
-	p = c.NewParagraph("Example Report")
+	p = c.NewStyledParagraph()
+	p.SetText("Example Report")
 	p.SetFont(helveticaBold)
 	p.SetFontSize(30)
 	p.SetMargins(85, 0, 0, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(45, 148, 215))
+	p.SetFontColor(creator.ColorRGBFrom8bit(45, 148, 215))
 	c.Draw(p)
 
 	t := time.Now().UTC()
 	dateStr := t.Format("01 Jan, 2006 15:04")
 
-	p = c.NewParagraph(dateStr)
+	p = c.NewStyledParagraph()
+	p.SetText(dateStr)
 	p.SetFont(helveticaBold)
 	p.SetFontSize(12)
 	p.SetMargins(90, 0, 5, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(56, 68, 77))
+	p.SetFontColor(creator.ColorRGBFrom8bit(56, 68, 77))
 	c.Draw(p)
 }
 
@@ -139,63 +144,71 @@ func doFirstHeader(c *creator.Creator, fontRegular *model.PdfFont, fontBold *mod
 	normalFontColor := creator.ColorRGBFrom8bit(72, 86, 95)
 	normalFontSize := 10.0
 
-	ch.GetHeading().SetFont(chapterFont)
-	ch.GetHeading().SetFontSize(chapterFontSize)
-	ch.GetHeading().SetFontColor(chapterFontColor)
+	heading := ch.GetHeading()
+	heading.SetFont(chapterFont)
+	heading.SetFontSize(chapterFontSize)
+	heading.SetFontColor(chapterFontColor)
 
-	p := c.NewParagraph("This is an example sentence showcasing the content of the first header. It provides a brief introduction to the section, highlighting the key points that will be discussed under the header.")
+	p := c.NewStyledParagraph()
+	p.SetText("This is an example sentence showcasing the content of the first header. It provides a brief introduction to the section, highlighting the key points that will be discussed under the header.")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 0)
 	ch.Add(p)
 
 	// Paragraphs.
 	sc := ch.NewSubchapter("Sub Header")
-	sc.GetHeading().SetMargins(0, 0, 20, 0)
-	sc.GetHeading().SetFont(chapterFont)
-	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetFontColor(chapterFontColor)
 
-	p = c.NewParagraph("Paragraphs are used to represent text, as little as a single character, a word or " +
+	heading = sc.GetHeading()
+	heading.SetMargins(0, 0, 20, 0)
+	heading.SetFont(chapterFont)
+	heading.SetFontSize(chapterFontSize)
+	heading.SetFontColor(chapterFontColor)
+
+	p = c.NewStyledParagraph()
+	p.SetText("Paragraphs are used to represent text, as little as a single character, a word or " +
 		"multiple words forming multiple sentences. UniDoc handles automatically wrapping those across lines and pages, making " +
 		"it relatively easy to work with. They can also be left, center, right aligned or justified as illustrated below:")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 0)
 	sc.Add(p)
 
 	// Example paragraphs:
-	p = c.NewParagraph("This paragraph shows the first paragraph of the subheader. It introduces the topic that will be " +
+	p = c.NewStyledParagraph()
+	p.SetText("This paragraph shows the first paragraph of the subheader. It introduces the topic that will be " +
 		"discussed in the subsequent sections. The purpose of this introduction is to set the context for " +
 		"the reader. By doing so, it ensures a smooth transition into the more detailed points. The reader " +
 		"can expect an overview of the important aspects related to the subheader.")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 0)
 	sc.Add(p)
 
-	p = c.NewParagraph("This paragraph demonstrates the second paragraph of the subheader. It delves deeper into the " +
+	p = c.NewStyledParagraph()
+	p.SetText("This paragraph demonstrates the second paragraph of the subheader. It delves deeper into the " +
 		"specific details of the topic introduced earlier. Here, more focus is given to explaining key " +
 		"concepts or arguments that are central to the subject. The paragraph aims to elaborate on " +
 		"important points while keeping the reader engaged. By offering clear explanations, it supports the " +
 		"overall understanding of the subject matter.")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 0)
 	sc.Add(p)
 
-	p = c.NewParagraph("This is the third paragraph of the subheader. It provides a conclusion or a summary of the key " +
+	p = c.NewStyledParagraph()
+	p.SetText("This is the third paragraph of the subheader. It provides a conclusion or a summary of the key " +
 		"takeaways discussed in the previous paragraphs. This section often reinforces the main message " +
 		"or insights of the topic. By wrapping up the discussion, it offers closure and emphasizes the most " +
 		"important points. The paragraph also paves the way for the reader to reflect on the subject and " +
 		"prepare for what might come next.")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 0)
 	sc.Add(p)
 

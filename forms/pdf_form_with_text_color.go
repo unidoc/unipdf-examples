@@ -68,7 +68,8 @@ func main() {
 
 		y := pageHeight - fdef.Rect[1]
 
-		p := c.NewParagraph(fdef.Label)
+		p := c.NewStyledParagraph()
+		p.SetText(fdef.Label)
 		p.SetPos(fdef.Rect[0]-80, y-10)
 		err = c.Draw(p)
 		if err != nil {

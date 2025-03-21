@@ -101,19 +101,21 @@ func RunPdfReport(outputPath string) error {
 	// Draw footer on each page.
 	c.DrawFooter(func(block *creator.Block, args creator.FooterFunctionArgs) {
 		// Draw the on a block for each page.
-		p := c.NewParagraph("unidoc.io")
+		p := c.NewStyledParagraph()
+		p.SetText("unidoc.io")
 		p.SetFont(robotoFontRegular)
 		p.SetFontSize(8)
 		p.SetPos(50, 20)
-		p.SetColor(creator.ColorRGBFrom8bit(63, 68, 76))
+		p.SetFontColor(creator.ColorRGBFrom8bit(63, 68, 76))
 		block.Draw(p)
 
 		strPage := fmt.Sprintf("Page %d of %d", args.PageNum, args.TotalPages)
-		p = c.NewParagraph(strPage)
+		p = c.NewStyledParagraph()
+		p.SetText(strPage)
 		p.SetFont(robotoFontRegular)
 		p.SetFontSize(8)
 		p.SetPos(750, 20)
-		p.SetColor(creator.ColorRGBFrom8bit(63, 68, 76))
+		p.SetFontColor(creator.ColorRGBFrom8bit(63, 68, 76))
 		block.Draw(p)
 	})
 
@@ -130,28 +132,31 @@ func DoFirstPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model
 	helvetica, _ := model.NewStandard14Font("Helvetica")
 	helveticaBold, _ := model.NewStandard14Font("Helvetica-Bold")
 
-	p := c.NewParagraph("UniDoc")
+	p := c.NewStyledParagraph()
+	p.SetText("UniDoc")
 	p.SetFont(helvetica)
 	p.SetFontSize(48)
 	p.SetMargins(85, 0, 150, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(56, 68, 77))
+	p.SetFontColor(creator.ColorRGBFrom8bit(56, 68, 77))
 	c.Draw(p)
 
-	p = c.NewParagraph("Example Report")
+	p = c.NewStyledParagraph()
+	p.SetText("Example Report")
 	p.SetFont(helveticaBold)
 	p.SetFontSize(30)
 	p.SetMargins(85, 0, 0, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(45, 148, 215))
+	p.SetFontColor(creator.ColorRGBFrom8bit(45, 148, 215))
 	c.Draw(p)
 
 	t := time.Now().UTC()
 	dateStr := t.Format("1 Jan, 2006 15:04")
 
-	p = c.NewParagraph(dateStr)
+	p = c.NewStyledParagraph()
+	p.SetText(dateStr)
 	p.SetFont(helveticaBold)
 	p.SetFontSize(12)
 	p.SetMargins(90, 0, 5, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(56, 68, 77))
+	p.SetFontColor(creator.ColorRGBFrom8bit(56, 68, 77))
 	c.Draw(p)
 }
 
@@ -159,14 +164,18 @@ func DoFirstPage(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model
 func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold *model.PdfFont) {
 	ch := c.NewChapter("Document control")
 	ch.SetMargins(0, 0, 40, 0)
-	ch.GetHeading().SetFont(fontRegular)
-	ch.GetHeading().SetFontSize(18)
-	ch.GetHeading().SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
+
+	heading := ch.GetHeading()
+	heading.SetFont(fontRegular)
+	heading.SetFontSize(18)
+	heading.SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
 	sc := ch.NewSubchapter("Issuer details")
-	sc.GetHeading().SetFont(fontRegular)
-	sc.GetHeading().SetFontSize(18)
-	sc.GetHeading().SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
+
+	heading = ch.GetHeading()
+	heading.SetFont(fontRegular)
+	heading.SetFontSize(18)
+	heading.SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
 	issuerTable := c.NewTable(2)
 	issuerTable.SetMargins(0, 0, 30, 0)
@@ -174,87 +183,105 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	pColor := creator.ColorRGBFrom8bit(72, 86, 95)
 	bgColor := creator.ColorRGBFrom8bit(56, 68, 67)
 
-	p := c.NewParagraph("Issuer")
+	p := c.NewStyledParagraph()
+	p.SetText("Issuer")
 	p.SetFont(fontBold)
 	p.SetFontSize(10)
-	p.SetColor(creator.ColorWhite)
+	p.SetFontColor(creator.ColorWhite)
+
 	cell := issuerTable.NewCell()
 	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetBackgroundColor(bgColor)
 	cell.SetContent(p)
 
-	p = c.NewParagraph("UniDoc")
+	p = c.NewStyledParagraph()
+	p.SetText("UniDoc")
 	p.SetFont(fontRegular)
 	p.SetFontSize(10)
-	p.SetColor(pColor)
+	p.SetFontColor(pColor)
+
 	cell = issuerTable.NewCell()
 	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
-	p = c.NewParagraph("Address")
+	p = c.NewStyledParagraph()
+	p.SetText("Address")
 	p.SetFont(fontBold)
-	p.SetFontSize(10)
-	p.SetColor(creator.ColorWhite)
+	p.SetFontColor(creator.ColorWhite)
+
 	cell = issuerTable.NewCell()
 	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetBackgroundColor(bgColor)
 	cell.SetContent(p)
 
-	p = c.NewParagraph("Klapparstig 16, 101 Reykjavik, Iceland")
+	p = c.NewStyledParagraph()
+	p.SetText("Klapparstig 16, 101 Reykjavik, Iceland")
 	p.SetFont(fontRegular)
 	p.SetFontSize(10)
-	p.SetColor(pColor)
+	p.SetFontColor(pColor)
 	cell = issuerTable.NewCell()
 	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
-	p = c.NewParagraph("Email")
+	p = c.NewStyledParagraph()
+	p.SetText("Email")
 	p.SetFont(fontBold)
 	p.SetFontSize(10)
-	p.SetColor(creator.ColorWhite)
+	p.SetFontColor(creator.ColorWhite)
+
 	cell = issuerTable.NewCell()
 	cell.SetBackgroundColor(bgColor)
 	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
-	p = c.NewParagraph("sales@unidoc.io")
+	p = c.NewStyledParagraph()
+	p.SetText("sales@unidoc.io")
 	p.SetFont(fontRegular)
 	p.SetFontSize(10)
-	p.SetColor(pColor)
+	p.SetFontColor(pColor)
+
 	cell = issuerTable.NewCell()
 	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
-	p = c.NewParagraph("Web")
+	p = c.NewStyledParagraph()
+	p.SetText("Web")
 	p.SetFont(fontBold)
 	p.SetFontSize(10)
-	p.SetColor(creator.ColorWhite)
+	p.SetFontColor(creator.ColorWhite)
+
 	cell = issuerTable.NewCell()
 	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetBackgroundColor(bgColor)
 	cell.SetContent(p)
 
-	p = c.NewParagraph("unidoc.io")
+	p = c.NewStyledParagraph()
+	p.SetText("unidoc.io")
 	p.SetFont(fontRegular)
 	p.SetFontSize(10)
-	p.SetColor(pColor)
+	p.SetFontColor(pColor)
+
 	cell = issuerTable.NewCell()
 	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
-	p = c.NewParagraph("Author")
+	p = c.NewStyledParagraph()
+	p.SetText("Author")
 	p.SetFont(fontBold)
 	p.SetFontSize(10)
-	p.SetColor(creator.ColorWhite)
+	p.SetFontColor(creator.ColorWhite)
+
 	cell = issuerTable.NewCell()
 	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetBackgroundColor(bgColor)
 	cell.SetContent(p)
 
-	p = c.NewParagraph("UniDoc report generator")
+	p = c.NewStyledParagraph()
+	p.SetText("UniDoc report generator")
 	p.SetFont(fontRegular)
 	p.SetFontSize(10)
-	p.SetColor(pColor)
+	p.SetFontColor(pColor)
+
 	cell = issuerTable.NewCell()
 	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
@@ -264,19 +291,23 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	// 1.2 - Document history
 	sc = ch.NewSubchapter("Document History")
 	sc.SetMargins(0, 0, 5, 0)
-	sc.GetHeading().SetFont(fontRegular)
-	sc.GetHeading().SetFontSize(18)
-	sc.GetHeading().SetFontColor(pColor)
+
+	heading = sc.GetHeading()
+	heading.SetFont(fontRegular)
+	heading.SetFontSize(18)
+	heading.SetFontColor(pColor)
 
 	histTable := c.NewTable(3)
 	histTable.SetMargins(0, 0, 30, 50)
 
 	histCols := []string{"Date Issued", "UniDoc Version", "Type/Change"}
 	for _, histCol := range histCols {
-		p = c.NewParagraph(histCol)
+		p = c.NewStyledParagraph()
+		p.SetText(histCol)
 		p.SetFont(fontBold)
 		p.SetFontSize(10)
-		p.SetColor(creator.ColorWhite)
+		p.SetFontColor(creator.ColorWhite)
+
 		cell = histTable.NewCell()
 		cell.SetBackgroundColor(bgColor)
 		cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
@@ -289,10 +320,12 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 
 	histVals := []string{dateStr, common.Version, "First issue"}
 	for _, histVal := range histVals {
-		p = c.NewParagraph(histVal)
+		p = c.NewStyledParagraph()
+		p.SetText(histVal)
 		p.SetFont(fontRegular)
 		p.SetFontSize(10)
-		p.SetColor(pColor)
+		p.SetFontColor(pColor)
+
 		cell = histTable.NewCell()
 		cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 		cell.SetHorizontalAlignment(creator.CellHorizontalAlignmentCenter)
@@ -326,30 +359,35 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 
 	bgColor := creator.ColorRGBFrom8bit(56, 68, 67)
 
-	ch.GetHeading().SetFont(chapterFont)
-	ch.GetHeading().SetFontSize(chapterFontSize)
-	ch.GetHeading().SetFontColor(chapterFontColor)
+	heading := ch.GetHeading()
+	heading.SetFont(chapterFont)
+	heading.SetFontSize(chapterFontSize)
+	heading.SetFontColor(chapterFontColor)
 
-	p := c.NewParagraph("This chapter demonstrates a few of the features of UniDoc that can be used for report generation.")
+	p := c.NewStyledParagraph()
+	p.SetText("This chapter demonstrates a few of the features of UniDoc that can be used for report generation.")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 0)
 	ch.Add(p)
 
 	// Paragraphs.
 	sc := ch.NewSubchapter("Paragraphs")
-	sc.GetHeading().SetMargins(0, 0, 20, 0)
-	sc.GetHeading().SetFont(chapterFont)
-	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetFontColor(chapterFontColor)
 
-	p = c.NewParagraph("Paragraphs are used to represent text, as little as a single character, a word or " +
+	heading = sc.GetHeading()
+	heading.SetMargins(0, 0, 20, 0)
+	heading.SetFont(chapterFont)
+	heading.SetFontSize(chapterFontSize)
+	heading.SetFontColor(chapterFontColor)
+
+	p = c.NewStyledParagraph()
+	p.SetText("Paragraphs are used to represent text, as little as a single character, a word or " +
 		"multiple words forming multiple sentences. UniDoc handles automatically wrapping those across lines and pages, making " +
 		"it relatively easy to work with. They can also be left, center, right aligned or justified as illustrated below:")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 0)
 	sc.Add(p)
 
@@ -362,10 +400,11 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	alignments := []creator.TextAlignment{creator.TextAlignmentLeft, creator.TextAlignmentCenter,
 		creator.TextAlignmentRight, creator.TextAlignmentJustify}
 	for j := 0; j < 4; j++ {
-		p = c.NewParagraph(loremTxt)
+		p = c.NewStyledParagraph()
+		p.SetText(loremTxt)
 		p.SetFont(normalFont)
 		p.SetFontSize(normalFontSize)
-		p.SetColor(normalFontColor)
+		p.SetFontColor(normalFontColor)
 		p.SetMargins(20, 0, 10, 10)
 		p.SetTextAlignment(alignments[j%4])
 
@@ -379,10 +418,12 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	// Column headers:
 	tableCols := []string{"Priority", "Items fulfilled / available"}
 	for _, tableCol := range tableCols {
-		p = c.NewParagraph(tableCol)
+		p = c.NewStyledParagraph()
+		p.SetText(tableCol)
 		p.SetFont(fontBold)
 		p.SetFontSize(10)
-		p.SetColor(creator.ColorWhite)
+		p.SetFontColor(creator.ColorWhite)
+
 		cell := priTable.NewCell()
 		cell.SetBackgroundColor(bgColor)
 		cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
@@ -395,10 +436,12 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	}
 	for _, lineItems := range items {
 		for _, item := range lineItems {
-			p = c.NewParagraph(item)
+			p = c.NewStyledParagraph()
+			p.SetText(item)
 			p.SetFont(fontBold)
 			p.SetFontSize(10)
-			p.SetColor(creator.ColorWhite)
+			p.SetFontColor(creator.ColorWhite)
+
 			cell := priTable.NewCell()
 			cell.SetBackgroundColor(bgColor)
 			cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
@@ -408,15 +451,18 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.Add(priTable)
 
 	sc = ch.NewSubchapter("Images")
-	sc.GetHeading().SetMargins(0, 0, 20, 0)
-	sc.GetHeading().SetFont(chapterFont)
-	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetFontColor(chapterFontColor)
 
-	p = c.NewParagraph("Images can be loaded from multiple file formats, example from a PNG image:")
+	heading = sc.GetHeading()
+	heading.SetMargins(0, 0, 20, 0)
+	heading.SetFont(chapterFont)
+	heading.SetFontSize(chapterFontSize)
+	heading.SetFontColor(chapterFontColor)
+
+	p = c.NewStyledParagraph()
+	p.SetText("Images can be loaded from multiple file formats, example from a PNG image:")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 5)
 	sc.Add(p)
 
@@ -429,15 +475,18 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.Add(img)
 
 	sc = ch.NewSubchapter("QR Codes / Barcodes")
-	sc.GetHeading().SetMargins(0, 0, 20, 0)
-	sc.GetHeading().SetFont(chapterFont)
-	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetFontColor(chapterFontColor)
 
-	p = c.NewParagraph("Example of a QR code generated with package github.com/boombuler/barcode:")
+	heading = sc.GetHeading()
+	heading.SetMargins(0, 0, 20, 0)
+	heading.SetFont(chapterFont)
+	heading.SetFontSize(chapterFontSize)
+	heading.SetFontColor(chapterFontColor)
+
+	p = c.NewStyledParagraph()
+	p.SetText("Example of a QR code generated with package github.com/boombuler/barcode:")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 5)
 	sc.Add(p)
 
@@ -451,16 +500,19 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.Add(img)
 
 	sc = ch.NewSubchapter("Graphing / Charts")
-	sc.GetHeading().SetMargins(0, 0, 20, 0)
-	sc.GetHeading().SetFont(chapterFont)
-	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetFontColor(chapterFontColor)
 
-	p = c.NewParagraph("Graphs can be generated via packages such as github.com/unidoc/unichart as illustrated " +
+	heading = sc.GetHeading()
+	heading.SetMargins(0, 0, 20, 0)
+	heading.SetFont(chapterFont)
+	heading.SetFontSize(chapterFontSize)
+	heading.SetFontColor(chapterFontColor)
+
+	p = c.NewStyledParagraph()
+	p.SetText("Graphs can be generated via packages such as github.com/unidoc/unichart as illustrated " +
 		"in the following plot:")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 0)
 	sc.Add(p)
 
@@ -478,12 +530,15 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.Add(chartComponent)
 
 	sc = ch.NewSubchapter("Headers and footers")
-	sc.GetHeading().SetMargins(0, 0, 20, 0)
-	sc.GetHeading().SetFont(chapterFont)
-	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetFontColor(chapterFontColor)
 
-	p = c.NewParagraph("Convenience functions are provided to generate headers and footers, see: " +
+	heading = sc.GetHeading()
+	heading.SetMargins(0, 0, 20, 0)
+	heading.SetFont(chapterFont)
+	heading.SetFontSize(chapterFontSize)
+	heading.SetFontColor(chapterFontColor)
+
+	p = c.NewStyledParagraph()
+	p.SetText("Convenience functions are provided to generate headers and footers, see: " +
 		"https://godoc.org/github.com/unidoc/unipdf/creator#Creator.DrawHeader and " +
 		"https://godoc.org/github.com/unidoc/unipdf/creator#Creator.DrawFooter " +
 		"They both set a function that accepts a block which the header/footer is drawn on for each page. " +
@@ -491,22 +546,25 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 		"showing page number and count.")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 0)
 	sc.Add(p)
 
 	sc = ch.NewSubchapter("Table of contents generation")
-	sc.GetHeading().SetMargins(0, 0, 20, 0)
-	sc.GetHeading().SetFont(chapterFont)
-	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetFontColor(chapterFontColor)
 
-	p = c.NewParagraph("A convenience function is provided to generate table of contents " +
+	heading = sc.GetHeading()
+	heading.SetMargins(0, 0, 20, 0)
+	heading.SetFont(chapterFont)
+	heading.SetFontSize(chapterFontSize)
+	heading.SetFontColor(chapterFontColor)
+
+	p = c.NewStyledParagraph()
+	p.SetText("A convenience function is provided to generate table of contents " +
 		"as can be seen on https://godoc.org/github.com/unidoc/unipdf/creator#Creator.CreateTableOfContents and " +
 		"in our example code on unidoc.io.")
 	p.SetFont(normalFont)
 	p.SetFontSize(normalFontSize)
-	p.SetColor(normalFontColor)
+	p.SetFontColor(normalFontColor)
 	p.SetMargins(0, 0, 5, 0)
 	sc.Add(p)
 

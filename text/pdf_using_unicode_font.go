@@ -61,25 +61,28 @@ func genPdfFile(outputFile string) error {
 }
 
 func writeContent(c *creator.Creator, compositeFont *model.PdfFont) {
-	p := c.NewParagraph("こんにちは世界")
+	p := c.NewStyledParagraph()
+	p.SetText("こんにちは世界")
 	p.SetFont(compositeFont)
 	p.SetFontSize(48)
 	p.SetMargins(85, 0, 150, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(56, 68, 77))
+	p.SetFontColor(creator.ColorRGBFrom8bit(56, 68, 77))
 	c.Draw(p)
 
-	p = c.NewParagraph("UniPDFへようこそ")
+	p = c.NewStyledParagraph()
+	p.SetText("UniPDFへようこそ")
 	p.SetFont(compositeFont)
 	p.SetFontSize(48)
 	p.SetMargins(85, 0, 0, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(56, 68, 77))
+	p.SetFontColor(creator.ColorRGBFrom8bit(56, 68, 77))
 	c.Draw(p)
 
-	p = c.NewParagraph("Welcome To UniPDF")
+	p = c.NewStyledParagraph()
+	p.SetText("Welcome To UniPDF")
 	p.SetFont(compositeFont)
 	p.SetFontSize(30)
 	p.SetMargins(85, 0, 0, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(45, 148, 215))
+	p.SetFontColor(creator.ColorRGBFrom8bit(45, 148, 215))
 	c.Draw(p)
 }
 
@@ -99,10 +102,11 @@ func addCurrencyPage(c *creator.Creator, compositeFont *model.PdfFont) {
 		"\u5143 (TWD - New Taiwan Dollar)\n" +
 		"\u20ab (VND - Dong)\n"
 
-	p := c.NewParagraph(currencyText)
+	p := c.NewStyledParagraph()
+	p.SetText(currencyText)
 	p.SetFont(compositeFont)
 	p.SetFontSize(20)
 	p.SetMargins(85, 0, 150, 0)
-	p.SetColor(creator.ColorRGBFrom8bit(56, 68, 77))
+	p.SetFontColor(creator.ColorRGBFrom8bit(56, 68, 77))
 	c.Draw(p)
 }

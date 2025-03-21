@@ -49,7 +49,8 @@ func main() {
 		panic(err)
 	}
 
-	par := c.NewParagraph(textArabicShaped)
+	par := c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentCenter)
@@ -71,7 +72,8 @@ func main() {
 		panic(err)
 	}
 
-	par = c.NewParagraph(textArabicShaped)
+	par = c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
@@ -81,7 +83,8 @@ func main() {
 		fmt.Println(err)
 	}
 
-	par = c.NewParagraph("This is a pretty simple paragraph")
+	par = c.NewStyledParagraph()
+	par.SetText("This is a pretty simple paragraph")
 	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
@@ -89,7 +92,8 @@ func main() {
 		fmt.Println(err)
 	}
 
-	par = c.NewParagraph("LTR: Looks, we adding more simple paragraph here lets try to write it, how it looks like. Is it good? How about we add more word here")
+	par = c.NewStyledParagraph()
+	par.SetText("LTR: Looks, we adding more simple paragraph here lets try to write it, how it looks like. Is it good? How about we add more word here")
 	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
@@ -97,7 +101,8 @@ func main() {
 		fmt.Println(err)
 	}
 
-	par = c.NewParagraph("RTL: Looks, we adding more simple paragraph here lets try to write it, how it looks like. Is it good? How about we add more word here")
+	par = c.NewStyledParagraph()
+	par.SetText("RTL: Looks, we adding more simple paragraph here lets try to write it, how it looks like. Is it good? How about we add more word here")
 	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
@@ -109,7 +114,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	par = c.NewParagraph(textArabicShaped)
+	par = c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -119,7 +125,8 @@ func main() {
 		fmt.Println(err)
 	}
 
-	par = c.NewParagraph("Looks, we adding more paragraph here")
+	par = c.NewStyledParagraph()
+	par.SetText("Looks, we adding more paragraph here")
 	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
@@ -131,7 +138,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	par = c.NewParagraph(textArabicShaped)
+	par = c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -145,7 +153,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	par = c.NewParagraph(textArabicShaped)
+	par = c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -155,7 +164,8 @@ func main() {
 		fmt.Println(err)
 	}
 
-	par = c.NewParagraph("How about we add more paragraphs?")
+	par = c.NewStyledParagraph()
+	par.SetText("How about we add more paragraphs?")
 	par.SetTextAlignment(creator.TextAlignmentRight)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
 	err = c.Draw(par)
@@ -164,7 +174,8 @@ func main() {
 	}
 
 	textMixed, err := textshaping.ArabicShape("The names of these states in Arabic are مصر, البحري and الكويت respectively. Add another word here, should be in new line.")
-	par = c.NewParagraph(textMixed)
+	par = c.NewStyledParagraph()
+	par.SetText(textMixed)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetMargins(marginLeft, marginRight, marginTop, marginBottom)
@@ -178,7 +189,8 @@ func main() {
 		panic(err)
 	}
 
-	par = c.NewParagraph(textArabicShaped)
+	par = c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -193,7 +205,8 @@ func main() {
 		panic(err)
 	}
 
-	par = c.NewParagraph(textArabicShaped)
+	par = c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -208,7 +221,8 @@ func main() {
 		panic(err)
 	}
 
-	par = c.NewParagraph(textArabicShaped)
+	par = c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -223,7 +237,8 @@ func main() {
 		panic(err)
 	}
 
-	par = c.NewParagraph(textArabicShaped)
+	par = c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -238,7 +253,8 @@ func main() {
 		panic(err)
 	}
 
-	par = c.NewParagraph(textArabicShaped)
+	par = c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -253,7 +269,8 @@ func main() {
 		panic(err)
 	}
 
-	par = c.NewParagraph(textArabicShaped)
+	par = c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -268,7 +285,8 @@ func main() {
 		panic(err)
 	}
 
-	par = c.NewParagraph(textArabicShaped)
+	par = c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
@@ -283,7 +301,8 @@ func main() {
 		panic(err)
 	}
 
-	par = c.NewParagraph(textArabicShaped)
+	par = c.NewStyledParagraph()
+	par.SetText(textArabicShaped)
 	par.SetFont(arabicFont)
 	par.SetFontSize(fontSize)
 	par.SetTextAlignment(creator.TextAlignmentRight)
