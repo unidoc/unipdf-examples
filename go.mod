@@ -12,8 +12,8 @@ require (
 	github.com/trimmer-io/go-xmp v1.0.0
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.2.0
-	github.com/unidoc/unichart v0.3.0
-	github.com/unidoc/unipdf/v3 v3.67.0
+	github.com/unidoc/unichart v0.4.0
+	github.com/unidoc/unipdf/v3 v3.68.0
 	golang.org/x/crypto v0.33.0
 	golang.org/x/image v0.24.0
 	golang.org/x/text v0.22.0
