@@ -14,7 +14,7 @@ require (
 	github.com/unidoc/pkcs7 v0.2.0
 	github.com/unidoc/unichart v0.4.0
 	github.com/unidoc/unipdf/v3 v3.68.0
-	golang.org/x/crypto v0.33.0
+	golang.org/x/crypto v0.35.0
 	golang.org/x/image v0.24.0
 	golang.org/x/text v0.22.0
 	google.golang.org/api v0.191.0
