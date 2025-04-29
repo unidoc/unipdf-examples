@@ -32,23 +32,23 @@ func main() {
 
 	// Creating first row:
 	row := grid.NewRow()
-	AddCell("Company", c, row)
-	AddCell("UniDoc", c, row)
+	AddCell("Company", c, row, true, true)
+	AddCell("UniDoc", c, row, true, false)
 
 	// Creating second row:
 	row = grid.NewRow()
-	AddCell("Programming language", c, row)
-	AddCell("Golang", c, row)
+	AddCell("Programming language", c, row, true, true)
+	AddCell("Golang", c, row, true, false)
 
 	// Creating third row:
 	row = grid.NewRow()
-	AddCell("Library", c, row)
-	AddCell("UniPDF", c, row)
+	AddCell("Library", c, row, true, true)
+	AddCell("UniPDF", c, row, true, false)
 
 	// Creating fourth row:
 	row = grid.NewRow()
-	AddCell("Version", c, row)
-	AddCell("4.0", c, row)
+	AddCell("Version", c, row, true, true)
+	AddCell("4.0", c, row, true, false)
 
 	err := c.Draw(grid)
 	if err != nil {
@@ -61,7 +61,7 @@ func main() {
 	}
 }
 
-func AddCell(text string, c *creator.Creator, row *creator.GridRow) error {
+func AddCell(text string, c *creator.Creator, row *creator.GridRow, isBorder, isBackground bool) error {
 	cell, err := row.NewCell()
 	if err {
 		return err
@@ -72,8 +72,12 @@ func AddCell(text string, c *creator.Creator, row *creator.GridRow) error {
 	p.SetMargins(5, 5, 5, 5)
 	p.SetFontSize(14)
 	// for cell it is possible to modify border, background color and other properties
-	cell.SetBorder(CellBorderSideAll, CellBorderStyleSingle, 1)
-	cell.SetBackgroundColor(ColorBlue)
+	if isBorder {
+		cell.SetBorder(CellBorderSideAll, CellBorderStyleSingle, 1)
+	}
+	if isBackground {
+		cell.SetBackgroundColor(ColorBlue)
+	}
 	cell.SetContent(p)
 	return nil
 }
