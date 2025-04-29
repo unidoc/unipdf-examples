@@ -61,7 +61,7 @@ func main() {
 	}
 }
 
-func AddCell(text string, c *creator.Creator, row *GridRow) error {
+func AddCell(text string, c *creator.Creator, row *creator.GridRow) error {
 	cell, err := row.NewCell()
 	if err {
 		return err
