@@ -56,7 +56,7 @@ func writeContent(c *creator.Creator, font *model.PdfFont) {
 	blueColor := creator.ColorCMYKFrom8bit(100, 40, 0, 0)
 
 	ch := c.NewChapter("CMYK color model")
-	ch.GetHeading().SetColor(redColor)
+	ch.GetHeading().SetFontColor(redColor)
 	ch.GetHeading().SetFontSize(20)
 
 	p := c.NewStyledParagraph()

@@ -141,7 +141,7 @@ func doFirstHeader(c *creator.Creator, fontRegular *model.PdfFont, fontBold *mod
 
 	ch.GetHeading().SetFont(chapterFont)
 	ch.GetHeading().SetFontSize(chapterFontSize)
-	ch.GetHeading().SetColor(chapterFontColor)
+	ch.GetHeading().SetFontColor(chapterFontColor)
 
 	p := c.NewParagraph("This is an example sentence showcasing the content of the first header. It provides a brief introduction to the section, highlighting the key points that will be discussed under the header.")
 	p.SetFont(normalFont)
@@ -155,7 +155,7 @@ func doFirstHeader(c *creator.Creator, fontRegular *model.PdfFont, fontBold *mod
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetColor(chapterFontColor)
+	sc.GetHeading().SetFontColor(chapterFontColor)
 
 	p = c.NewParagraph("Paragraphs are used to represent text, as little as a single character, a word or " +
 		"multiple words forming multiple sentences. UniDoc handles automatically wrapping those across lines and pages, making " +

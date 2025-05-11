@@ -109,7 +109,7 @@ func main() {
 
 	ch.GetHeading().SetFont(chapterFont)
 	ch.GetHeading().SetFontSize(chapterFontSize)
-	ch.GetHeading().SetColor(chapterFontColor)
+	ch.GetHeading().SetFontColor(chapterFontColor)
 
 	p := c.NewParagraph("Here we provide sales report for the month of January." +
 		"The data reflects a diverse range of sales activities, showcasing the efforts of various salespeople. " +

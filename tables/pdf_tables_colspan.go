@@ -58,7 +58,7 @@ func columnSpan(c *creator.Creator, font, fontBold *model.PdfFont) error {
 	ch.SetMargins(0, 0, 30, 0)
 	ch.GetHeading().SetFont(font)
 	ch.GetHeading().SetFontSize(13)
-	ch.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
+	ch.GetHeading().SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
 	// Create subchapter description.
 	desc := c.NewStyledParagraph()

@@ -60,7 +60,7 @@ func stylingContent(c *creator.Creator, font, fontBold *model.PdfFont) error {
 	ch.SetMargins(0, 0, 50, 0)
 	ch.GetHeading().SetFont(font)
 	ch.GetHeading().SetFontSize(18)
-	ch.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
+	ch.GetHeading().SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
 	// Draw subchapters.
 	contentBorders(c, ch, font, fontBold)
@@ -80,7 +80,7 @@ func contentBorders(c *creator.Creator, ch *creator.Chapter, font, fontBold *mod
 	sc.SetMargins(0, 0, 30, 0)
 	sc.GetHeading().SetFont(font)
 	sc.GetHeading().SetFontSize(13)
-	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
+	sc.GetHeading().SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
 	// Create subchapter description.
 	desc := c.NewStyledParagraph()
@@ -146,7 +146,7 @@ func contentBackground(c *creator.Creator, ch *creator.Chapter, font, fontBold *
 	sc.SetMargins(0, 0, 30, 0)
 	sc.GetHeading().SetFont(font)
 	sc.GetHeading().SetFontSize(13)
-	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
+	sc.GetHeading().SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
 	// Create subchapter description.
 	desc := c.NewStyledParagraph()

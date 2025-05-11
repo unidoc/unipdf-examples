@@ -75,7 +75,8 @@ func main() {
 
 // markTextLocations finds all instances of `term` in the text extracted from PDF file `inPath` and
 // saves a PDF file marked-up with boxes around the instances of `term` and a JSON file with the
-//  box coordinates.
+//
+//	box coordinates.
 func markTextLocations(inPath, term string) error {
 	f, err := os.Open(inPath)
 	if err != nil {

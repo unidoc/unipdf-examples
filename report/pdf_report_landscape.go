@@ -161,12 +161,12 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	ch.SetMargins(0, 0, 40, 0)
 	ch.GetHeading().SetFont(fontRegular)
 	ch.GetHeading().SetFontSize(18)
-	ch.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
+	ch.GetHeading().SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
 	sc := ch.NewSubchapter("Issuer details")
 	sc.GetHeading().SetFont(fontRegular)
 	sc.GetHeading().SetFontSize(18)
-	sc.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
+	sc.GetHeading().SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
 	issuerTable := c.NewTable(2)
 	issuerTable.SetMargins(0, 0, 30, 0)
@@ -266,7 +266,7 @@ func DoDocumentControl(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.SetMargins(0, 0, 5, 0)
 	sc.GetHeading().SetFont(fontRegular)
 	sc.GetHeading().SetFontSize(18)
-	sc.GetHeading().SetColor(pColor)
+	sc.GetHeading().SetFontColor(pColor)
 
 	histTable := c.NewTable(3)
 	histTable.SetMargins(0, 0, 30, 50)
@@ -328,7 +328,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 
 	ch.GetHeading().SetFont(chapterFont)
 	ch.GetHeading().SetFontSize(chapterFontSize)
-	ch.GetHeading().SetColor(chapterFontColor)
+	ch.GetHeading().SetFontColor(chapterFontColor)
 
 	p := c.NewParagraph("This chapter demonstrates a few of the features of UniDoc that can be used for report generation.")
 	p.SetFont(normalFont)
@@ -342,7 +342,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetColor(chapterFontColor)
+	sc.GetHeading().SetFontColor(chapterFontColor)
 
 	p = c.NewParagraph("Paragraphs are used to represent text, as little as a single character, a word or " +
 		"multiple words forming multiple sentences. UniDoc handles automatically wrapping those across lines and pages, making " +
@@ -411,7 +411,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetColor(chapterFontColor)
+	sc.GetHeading().SetFontColor(chapterFontColor)
 
 	p = c.NewParagraph("Images can be loaded from multiple file formats, example from a PNG image:")
 	p.SetFont(normalFont)
@@ -432,7 +432,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetColor(chapterFontColor)
+	sc.GetHeading().SetFontColor(chapterFontColor)
 
 	p = c.NewParagraph("Example of a QR code generated with package github.com/boombuler/barcode:")
 	p.SetFont(normalFont)
@@ -454,7 +454,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetColor(chapterFontColor)
+	sc.GetHeading().SetFontColor(chapterFontColor)
 
 	p = c.NewParagraph("Graphs can be generated via packages such as github.com/unidoc/unichart as illustrated " +
 		"in the following plot:")
@@ -481,7 +481,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetColor(chapterFontColor)
+	sc.GetHeading().SetFontColor(chapterFontColor)
 
 	p = c.NewParagraph("Convenience functions are provided to generate headers and footers, see: " +
 		"https://godoc.org/github.com/unidoc/unipdf/creator#Creator.DrawHeader and " +
@@ -499,7 +499,7 @@ func DoFeatureOverview(c *creator.Creator, fontRegular *model.PdfFont, fontBold 
 	sc.GetHeading().SetMargins(0, 0, 20, 0)
 	sc.GetHeading().SetFont(chapterFont)
 	sc.GetHeading().SetFontSize(chapterFontSize)
-	sc.GetHeading().SetColor(chapterFontColor)
+	sc.GetHeading().SetFontColor(chapterFontColor)
 
 	p = c.NewParagraph("A convenience function is provided to generate table of contents " +
 		"as can be seen on https://godoc.org/github.com/unidoc/unipdf/creator#Creator.CreateTableOfContents and " +

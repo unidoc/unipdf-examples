@@ -41,7 +41,7 @@ func main() {
 	chap := c.NewChapter("Styled Paragraphs")
 	chap.GetHeading().SetFont(fontBold)
 	chap.GetHeading().SetFontSize(18)
-	chap.GetHeading().SetColor(creator.ColorRed)
+	chap.GetHeading().SetFontColor(creator.ColorRed)
 
 	// Generate styled paragraph text style subchapter.
 	err = styledParagraphTextStyle(c, chap, fontRegular, fontBold)
