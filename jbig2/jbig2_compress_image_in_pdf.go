@@ -14,10 +14,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/unidoc/unipdf/v3/common"
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/core"
-	"github.com/unidoc/unipdf/v3/creator"
+	"github.com/unidoc/unipdf/v4/common"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/core"
+	"github.com/unidoc/unipdf/v4/creator"
 )
 
 func init() {

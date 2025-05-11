@@ -11,8 +11,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/unidoc/unipdf/v3/core"
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v4/core"
+	"github.com/unidoc/unipdf/v4/model"
 	"gopkg.in/gographics/imagick.v2/imagick"
 )
 

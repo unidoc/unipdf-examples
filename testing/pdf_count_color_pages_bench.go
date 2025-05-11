@@ -36,11 +36,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/unidoc/unipdf/v3/common"
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/contentstream"
-	"github.com/unidoc/unipdf/v3/core"
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v4/common"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/contentstream"
+	"github.com/unidoc/unipdf/v4/core"
+	"github.com/unidoc/unipdf/v4/model"
 )
 
 func init() {

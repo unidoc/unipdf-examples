@@ -17,11 +17,11 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/unidoc/unipdf/v3/common"
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/creator"
-	"github.com/unidoc/unipdf/v3/extractor"
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v4/common"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/creator"
+	"github.com/unidoc/unipdf/v4/extractor"
+	"github.com/unidoc/unipdf/v4/model"
 )
 
 func init() {
@@ -75,7 +75,8 @@ func main() {
 
 // markTextLocations finds all instances of `term` in the text extracted from PDF file `inPath` and
 // saves a PDF file marked-up with boxes around the instances of `term` and a JSON file with the
-//  box coordinates.
+//
+//	box coordinates.
 func markTextLocations(inPath, term string) error {
 	f, err := os.Open(inPath)
 	if err != nil {

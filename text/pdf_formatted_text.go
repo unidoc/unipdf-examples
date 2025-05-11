@@ -10,9 +10,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/creator"
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/creator"
+	"github.com/unidoc/unipdf/v4/model"
 )
 
 func init() {
@@ -41,7 +41,7 @@ func main() {
 	chap := c.NewChapter("Styled Paragraphs")
 	chap.GetHeading().SetFont(fontBold)
 	chap.GetHeading().SetFontSize(18)
-	chap.GetHeading().SetColor(creator.ColorRed)
+	chap.GetHeading().SetFontColor(creator.ColorRed)
 
 	// Generate styled paragraph text style subchapter.
 	err = styledParagraphTextStyle(c, chap, fontRegular, fontBold)

@@ -11,9 +11,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/model"
-	"github.com/unidoc/unipdf/v3/sanitize"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v4/sanitize"
 )
 
 func init() {
@@ -58,7 +58,7 @@ func main() {
 		Launch:      true,
 	}
 	pdfWriter.SetOptimizer(sanitize.New(opts))
-	
+
 	// Write to file.
 	pdfWriter.WriteToFile(outputPath)
 

@@ -2,7 +2,7 @@
 * This example shows how to calculate the percentage of page content that is inside a table
 * using the TextMark.TableInfo() method.
 * Run as: go run table_content.go inputFile.pdf pageNum
-*/
+ */
 
 package main
 
@@ -11,9 +11,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/extractor"
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/extractor"
+	"github.com/unidoc/unipdf/v4/model"
 )
 
 func init() {

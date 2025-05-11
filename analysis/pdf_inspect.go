@@ -11,8 +11,8 @@ import (
 	"os"
 	"sort"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/model"
 )
 
 func init() {

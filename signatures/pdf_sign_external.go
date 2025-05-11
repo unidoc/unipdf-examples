@@ -15,17 +15,16 @@ import (
 	"crypto/x509/pkix"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"math/big"
 	"os"
 	"time"
 
-	"github.com/unidoc/unipdf/v3/annotator"
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/core"
-	"github.com/unidoc/unipdf/v3/model"
-	"github.com/unidoc/unipdf/v3/model/sighandler"
+	"github.com/unidoc/unipdf/v4/annotator"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/core"
+	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v4/model/sighandler"
 )
 
 func init() {
@@ -81,11 +80,11 @@ func main() {
 	sigBytes := make([]byte, 8192)
 	copy(sigBytes, signatureData)
 
-	sig := core.MakeHexString(string(sigBytes)).WriteString()
-	copy(pdfData[byteRange[1]:byteRange[2]], []byte(sig))
+	sig := core.MakeHexString(string(sigBytes)).Write()
+	copy(pdfData[byteRange[1]:byteRange[2]], sig)
 
 	// Write output file.
-	if err := ioutil.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
+	if err := os.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
 		log.Fatal("Fail: %v\n", err)
 	}
 

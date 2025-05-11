@@ -11,9 +11,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/creator"
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/creator"
+	"github.com/unidoc/unipdf/v4/model"
 )
 
 func init() {
@@ -58,7 +58,7 @@ func subtables(c *creator.Creator, font, fontBold *model.PdfFont) error {
 	ch.SetMargins(0, 0, 30, 0)
 	ch.GetHeading().SetFont(font)
 	ch.GetHeading().SetFontSize(13)
-	ch.GetHeading().SetColor(creator.ColorRGBFrom8bit(72, 86, 95))
+	ch.GetHeading().SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
 	// Create subchapter description.
 	desc := c.NewStyledParagraph()

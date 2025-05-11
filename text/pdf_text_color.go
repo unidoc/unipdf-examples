@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/creator"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/creator"
 )
 
 func init() {
@@ -46,7 +46,7 @@ func colorRGB(c *creator.Creator) {
 	outlineColor := creator.ColorRGBFromHex("#283A3F")
 
 	ch := c.NewChapter("Text Color RGB")
-	ch.GetHeading().SetColor(black)
+	ch.GetHeading().SetFontColor(black)
 
 	// Red colored text.
 	p := c.NewStyledParagraph()
@@ -97,7 +97,7 @@ func colorCMYK(c *creator.Creator) {
 	outlineColor := creator.ColorCMYKFrom8bit(37, 8, 0, 75)
 
 	ch := c.NewChapter("Text Color CMYK")
-	ch.GetHeading().SetColor(black)
+	ch.GetHeading().SetFontColor(black)
 	ch.SetMargins(0, 0, 50, 0)
 
 	p := c.NewStyledParagraph()

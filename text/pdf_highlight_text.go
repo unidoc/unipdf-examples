@@ -11,10 +11,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/creator"
-	"github.com/unidoc/unipdf/v3/extractor"
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/creator"
+	"github.com/unidoc/unipdf/v4/extractor"
+	"github.com/unidoc/unipdf/v4/model"
 )
 
 func init() {

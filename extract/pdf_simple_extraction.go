@@ -1,5 +1,5 @@
 /*
- * Using a simple extraction procedure in the text extraction process, which skips table processing and topological ordering.
+ * Using a plain/simple extraction mode in the text extraction process, which skips table processing and topological ordering.
  *
  * Run as: go run pdf_simple_extraction.go input.pdf
  */
@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/extractor"
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/extractor"
+	"github.com/unidoc/unipdf/v4/model"
 )
 
 func init() {
@@ -70,7 +70,7 @@ func outputPdfText(inputPath string) error {
 		}
 
 		ex, err := extractor.NewWithOptions(page, &extractor.Options{
-			UseSimplerExtractionProcess: true,
+			ExtractionMode: extractor.ExtractionModePlain,
 		})
 		if err != nil {
 			return err

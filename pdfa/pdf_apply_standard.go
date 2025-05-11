@@ -12,11 +12,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/model"
-	"github.com/unidoc/unipdf/v3/model/pdfa"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v4/model/pdfa"
 )
-
 
 func init() {
 	// Make sure to load your metered License API key prior to using the library.
@@ -64,4 +63,3 @@ func main() {
 	duration := float64(time.Since(start)) / float64(time.Millisecond)
 	fmt.Printf("Processing time: %.2f ms\n", duration)
 }
-

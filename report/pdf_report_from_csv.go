@@ -18,10 +18,10 @@ import (
 	"github.com/unidoc/unichart/dataset"
 	"github.com/unidoc/unichart/dataset/sequence"
 	"github.com/unidoc/unichart/render"
-	"github.com/unidoc/unipdf/v3/common"
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/creator"
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v4/common"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/creator"
+	"github.com/unidoc/unipdf/v4/model"
 )
 
 func init() {
@@ -109,7 +109,7 @@ func main() {
 
 	ch.GetHeading().SetFont(chapterFont)
 	ch.GetHeading().SetFontSize(chapterFontSize)
-	ch.GetHeading().SetColor(chapterFontColor)
+	ch.GetHeading().SetFontColor(chapterFontColor)
 
 	p := c.NewParagraph("Here we provide sales report for the month of January." +
 		"The data reflects a diverse range of sales activities, showcasing the efforts of various salespeople. " +
