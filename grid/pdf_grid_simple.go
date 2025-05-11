@@ -63,7 +63,7 @@ func main() {
 
 func AddCell(text string, c *creator.Creator, row *creator.GridRow, isBorder, isBackground bool) error {
 	cell, err := row.NewCell()
-	if err {
+	if err != nil {
 		return err
 	}
 	// it is possible to add any content to cell
@@ -73,10 +73,10 @@ func AddCell(text string, c *creator.Creator, row *creator.GridRow, isBorder, is
 	p.SetFontSize(14)
 	// for cell it is possible to modify border, background color and other properties
 	if isBorder {
-		cell.SetBorder(CellBorderSideAll, CellBorderStyleSingle, 1)
+		cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	}
 	if isBackground {
-		cell.SetBackgroundColor(ColorBlue)
+		cell.SetBackgroundColor(creator.ColorBlue)
 	}
 	cell.SetContent(p)
 	return nil

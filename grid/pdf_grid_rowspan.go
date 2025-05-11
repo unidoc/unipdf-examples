@@ -39,21 +39,21 @@ func main() {
 	p.SetText("Rowspan = 3")
 	p.SetMargins(5, 5, 5, 5)
 	p.SetFontSize(12)
-	cell.SetBorder(CellBorderSideAll, CellBorderStyleSingle, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
-	AddCell("Row: 0 Cell: 1", c, row, true, false)
-	AddCell("Row: 0 Cell: 2", c, row, true, false)
+	AddTextCell("Row: 0 Cell: 1", c, row, true, false)
+	AddTextCell("Row: 0 Cell: 2", c, row, true, false)
 
 	// add second row
 	row = grid.NewRow()
-	AddCell("Row: 1 Cell: 1", c, row, true, false)
-	AddCell("Row: 1 Cell: 2", c, row, true, false)
+	AddTextCell("Row: 1 Cell: 1", c, row, true, false)
+	AddTextCell("Row: 1 Cell: 2", c, row, true, false)
 
 	// add third row
 	row = grid.NewRow()
-	AddCell("Row: 2 Cell: 1", c, row, true, false)
-	AddCell("Row: 2 Cell: 2", c, row, true, false)
+	AddTextCell("Row: 2 Cell: 1", c, row, true, false)
+	AddTextCell("Row: 2 Cell: 2", c, row, true, false)
 
 	err = c.Draw(grid)
 	if err != nil {
@@ -64,4 +64,25 @@ func main() {
 	if err := c.WriteToFile("unipdf-grid-rowspan.pdf"); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func AddTextCell(text string, c *creator.Creator, row *creator.GridRow, isBorder, isBackground bool) error {
+	cell, err := row.NewCell()
+	if err != nil {
+		return err
+	}
+	// it is possible to add any content to cell
+	p := c.NewStyledParagraph()
+	p.SetText(text)
+	p.SetMargins(5, 5, 5, 5)
+	p.SetFontSize(14)
+	// for cell it is possible to modify border, background color and other properties
+	if isBorder {
+		cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
+	}
+	if isBackground {
+		cell.SetBackgroundColor(creator.ColorBlue)
+	}
+	cell.SetContent(p)
+	return nil
 }

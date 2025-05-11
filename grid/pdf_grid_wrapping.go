@@ -15,6 +15,8 @@ import (
 	"github.com/unidoc/unipdf/v4/creator"
 )
 
+const lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar consectetur augue, et molestie erat porttitor id. Integer id elementum justo. Vestibulum ut luctus arcu. Nam varius nibh non vulputate condimentum. Etiam molestie velit at ex blandit condimentum. Maecenas vulputate velit quis maximus mattis. Donec dolor velit, vehicula non est suscipit, rutrum congue tortor. Morbi facilisis sed metus non volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar consectetur augue, et molestie erat porttitor id. Integer id elementum justo. Vestibulum ut luctus arcu. Nam varius nibh non vulputate condimentum. Etiam molestie velit at ex blandit condimentum. Maecenas vulputate velit quis maximus mattis. Donec dolor velit, vehicula non est suscipit, rutrum congue tortor. Morbi facilisis sed metus non volutpat."
+
 func init() {
 	// Make sure to load your metered License API key prior to using the library.
 	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
@@ -41,10 +43,10 @@ func main() {
 
 			p := c.NewStyledParagraph()
 
-			p.SetText(fmt.Sprintf("Row: %d Cell: %d", cell.row, cell.col))
+			p.SetText(fmt.Sprintf("Row: %d Cell: %d", i, j))
 			p.SetMargins(5, 5, 5, 5)
 			p.SetFontSize(12)
-			cell.SetBorder(CellBorderSideAll, CellBorderStyleSingle, 1)
+			cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 			cell.SetContent(p)
 		}
 	}
@@ -56,22 +58,22 @@ func main() {
 		log.Fatal(err)
 	}
 	p := c.NewStyledParagraph()
-	p.SetText(loremShort)
+	p.SetText(lorem)
 	p.SetMargins(5, 5, 5, 5)
 	p.SetFontSize(12)
-	cell.SetBorder(CellBorderSideAll, CellBorderStyleSingle, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell.SetContent(p)
 
 	cell, err = row.NewCell()
 	if err != nil {
 		log.Fatal(err)
 	}
-	cell.SetBorder(CellBorderSideAll, CellBorderStyleSingle, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 	cell, err = row.NewCell()
 	if err != nil {
 		log.Fatal(err)
 	}
-	cell.SetBorder(CellBorderSideAll, CellBorderStyleSingle, 1)
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 
 	err = c.Draw(grid)
 	if err != nil {

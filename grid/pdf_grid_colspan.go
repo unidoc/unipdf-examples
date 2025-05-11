@@ -51,8 +51,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cell.SetHorizontalAlignment(CellHorizontalAlignmentCenter)
-	cell.SetVerticalAlignment(CellVerticalAlignmentMiddle)
+	cell.SetHorizontalAlignment(creator.CellHorizontalAlignmentCenter)
+	cell.SetVerticalAlignment(creator.CellVerticalAlignmentMiddle)
 
 	cell.SetContent(img)
 
@@ -75,7 +75,7 @@ func main() {
 
 func AddLoremIpsumCell(c *creator.Creator, row *creator.GridRow) error {
 	cell, err := row.NewCell()
-	if err {
+	if err != nil {
 		return err
 	}
 	// it is possible to add any content to cell
