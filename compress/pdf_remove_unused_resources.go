@@ -13,9 +13,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/model"
-	"github.com/unidoc/unipdf/v3/model/optimize"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v4/model/optimize"
 )
 
 func init() {
@@ -38,13 +38,13 @@ func main() {
 
 	// Initialize starting time
 	start := time.Now()
-	
+
 	inputFile, err := os.Open(inputPath)
 	if err != nil {
 		log.Fatalf("Failed to read file: %v", err)
 	}
 	defer inputFile.Close()
-	
+
 	pdfReader, err := model.NewPdfReader(inputFile)
 	if err != nil {
 		log.Fatalf("Failed to create reader: %v", err)
@@ -59,7 +59,7 @@ func main() {
 	pdfWriter.SetOptimizer(optimize.New(optimize.Options{
 		CleanUnusedResources: true,
 	}))
-	
+
 	// Write document to file.
 	if err := pdfWriter.WriteToFile(outputPath); err != nil {
 		log.Fatalf("Failed to write to file %v", err)
@@ -82,7 +82,7 @@ func main() {
 	}
 
 	// Print information
-	fmt.Printf("Input file size = %d bytes \n",inputFileInfo.Size())
+	fmt.Printf("Input file size = %d bytes \n", inputFileInfo.Size())
 	fmt.Printf("Optimized file Size = %d bytes\n", outputFileInfo.Size())
 	fmt.Printf("Time taken to process %s = %.2fms\n", inputPath, duration)
 }

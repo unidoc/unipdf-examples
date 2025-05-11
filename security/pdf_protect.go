@@ -20,10 +20,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/unidoc/unipdf/v4/model"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/core/security"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/core/security"
 )
 
 func init() {

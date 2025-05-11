@@ -10,8 +10,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/creator"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/creator"
 )
 
 const loremShort = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce pulvinar consectetur augue, et molestie erat porttitor id. Integer id elementum justo. Vestibulum ut luctus arcu. Nam varius nibh non vulputate condimentum. Etiam molestie velit at ex blandit condimentum. Maecenas vulputate velit quis maximus mattis. Donec dolor velit, vehicula non est suscipit, rutrum congue tortor. Morbi facilisis sed metus non volutpat."

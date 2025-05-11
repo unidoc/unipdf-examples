@@ -6,10 +6,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/core"
-	"github.com/unidoc/unipdf/v3/model"
-	"github.com/unidoc/unipdf/v3/model/xmputil"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/core"
+	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v4/model/xmputil"
 
 	xmprights "github.com/trimmer-io/go-xmp/models/xmp_rights"
 	"github.com/trimmer-io/go-xmp/xmp"
@@ -27,7 +27,7 @@ func init() {
 func main() {
 	args := os.Args
 	if len(args) < 3 {
-		fmt.Printf( "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH\n", os.Args[0])
+		fmt.Printf("Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH\n", os.Args[0])
 		return
 	}
 	inputPath := args[1]

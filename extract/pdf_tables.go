@@ -24,11 +24,11 @@ import (
 	"golang.org/x/text/unicode/norm"
 
 	"github.com/bmatcuk/doublestar"
-	"github.com/unidoc/unipdf/v3/common"
-	"github.com/unidoc/unipdf/v3/common/license"
-	"github.com/unidoc/unipdf/v3/extractor"
-	"github.com/unidoc/unipdf/v3/model"
-	"github.com/unidoc/unipdf/v3/pdfutil"
+	"github.com/unidoc/unipdf/v4/common"
+	"github.com/unidoc/unipdf/v4/common/license"
+	"github.com/unidoc/unipdf/v4/extractor"
+	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v4/pdfutil"
 )
 
 func init() {
@@ -236,11 +236,12 @@ func (r *docTables) String() string {
 }
 
 // describe returns a string describing the tables in `r`.
-//                               (level 0)
-//   %d pages %d tables          (level 1)
-//     page %d: %d tables        (level 2)
-//       table %d: %d x %d       (level 3)
-//           contents            (level 4)
+//
+//	                            (level 0)
+//	%d pages %d tables          (level 1)
+//	  page %d: %d tables        (level 2)
+//	    table %d: %d x %d       (level 3)
+//	        contents            (level 4)
 func (r *docTables) describe(level int) string {
 	if level == 0 || r.numTables() == 0 {
 		return "\n"

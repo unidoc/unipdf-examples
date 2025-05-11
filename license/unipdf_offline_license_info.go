@@ -9,7 +9,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/unidoc/unipdf/v3/common/license"
+	"github.com/unidoc/unipdf/v4/common/license"
 )
 
 const offlineLicenseKey = `
