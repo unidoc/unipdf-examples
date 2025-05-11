@@ -17,7 +17,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"math/big"
 	"os"
@@ -96,11 +95,11 @@ func main() {
 	sigBytes := make([]byte, sigLen)
 	copy(sigBytes, signatureData)
 
-	sig := core.MakeHexString(string(sigBytes)).WriteString()
-	copy(pdfData[byteRange[1]:byteRange[2]], []byte(sig))
+	sig := core.MakeHexString(string(sigBytes)).Write()
+	copy(pdfData[byteRange[1]:byteRange[2]], sig)
 
 	// Write output file.
-	if err := ioutil.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
+	if err := os.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
