@@ -104,12 +104,13 @@ func reconstruct(pdfPath string) error {
 			}
 			fmt.Printf("%s\n", tm.Text)
 			// Reconstruct by drawing each glyph from textmarks with the creator package.
-			para := c.NewParagraph(tm.Original)
+			para := c.NewStyledParagraph()
+			para.SetText(tm.Original)
 			para.SetFont(tm.Font)
 			para.SetFontSize(tm.FontSize)
 			r, g, b, _ := tm.StrokeColor.RGBA()
 			rf, gf, bf := float64(r)/0xffff, float64(g)/0xffff, float64(b)/0xffff
-			para.SetColor(creator.ColorRGBFromArithmetic(rf, gf, bf))
+			para.SetFontColor(creator.ColorRGBFromArithmetic(rf, gf, bf))
 			// Convert to PDF coordinate system.
 			yPos := c.Context().PageHeight - (tm.BBox.Lly + tm.BBox.Height())
 			para.SetPos(tm.BBox.Llx, yPos) // Upper left corner.

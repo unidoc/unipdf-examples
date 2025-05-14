@@ -162,7 +162,8 @@ func addBarcodeToPdf(inputPath string, outputPath string, codeStr string, pageNu
 			_ = c.Draw(img)
 
 			// Add the code below.
-			p := c.NewParagraph(codeStr)
+			p := c.NewStyledParagraph()
+			p.SetText(codeStr)
 			p.SetWidth(width)
 			p.SetTextAlignment(creator.TextAlignmentCenter)
 			p.SetPos(xPos, yPos+img.Height())

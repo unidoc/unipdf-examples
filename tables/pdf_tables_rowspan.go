@@ -57,9 +57,11 @@ func rowSpan(c *creator.Creator, font, fontBold *model.PdfFont) error {
 	// Create subchapter.
 	ch := c.NewChapter("Row span")
 	ch.SetMargins(0, 0, 30, 0)
-	ch.GetHeading().SetFont(font)
-	ch.GetHeading().SetFontSize(13)
-	ch.GetHeading().SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
+
+	heading := ch.GetHeading()
+	heading.SetFont(font)
+	heading.SetFontSize(13)
+	heading.SetFontColor(creator.ColorRGBFrom8bit(72, 86, 95))
 
 	// Create subchapter description.
 	desc := c.NewStyledParagraph()
@@ -81,9 +83,12 @@ func rowSpan(c *creator.Creator, font, fontBold *model.PdfFont) error {
 			cell = table.MultiRowCell(rowspan)
 		}
 
+		p := c.NewStyledParagraph()
+		p.SetText(fmt.Sprintf("%d - %d", table.CurRow(), table.CurCol()))
+
 		cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
 		cell.SetBackgroundColor(bgColor)
-		cell.SetContent(c.NewParagraph(fmt.Sprintf("%d - %d", table.CurRow(), table.CurCol())))
+		cell.SetContent(p)
 		cell.SetHorizontalAlignment(creator.CellHorizontalAlignmentCenter)
 		cell.SetIndent(0)
 	}

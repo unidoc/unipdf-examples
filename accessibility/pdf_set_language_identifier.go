@@ -51,8 +51,9 @@ func main() {
 
 	str.AddKDict(docK)
 
-	// Create a new paragraph.
-	p := c.NewParagraph("Hello World")
+	// Create a new styled paragraph.
+	p := c.NewStyledParagraph()
+	p.SetText("Hello World")
 	p.SetPos(100, 100)
 
 	// Set marked content identifier for the paragraph.
