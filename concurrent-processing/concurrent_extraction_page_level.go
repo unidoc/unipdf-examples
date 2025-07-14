@@ -102,16 +102,19 @@ func testGoroutineExtract(reader *model.PdfReader, numPages int, outputDir strin
 		if err != nil {
 			return err
 		}
+		
 		// for test purposes, save each page text to its own file
 		filePath := filepath.Join(outputDir, strconv.Itoa(pageNum)+".txt")
 		file, err := os.Create(filePath)
 		if err != nil {
 			fmt.Printf("Error. failed to create file. %v\n", err)
 		}
+		
 		_, err = file.WriteString(text)
 		if err != nil {
 			fmt.Printf("Error. failed to write content. %v\n", err)
 		}
+		
 		return nil
 	}
 
