@@ -1,7 +1,6 @@
 /*
  * This example demonstrates how to extract content form multiple documents concurrently
  * with each document extraction running in its own go routine.
- * N.B. currently concurrency is supported on a document level which means we can only extract one document per go routine.
  *
  * Run as: go run concurrent_extraction.go <input1.pdf> <input2.pdf> <input3.pdf>... <output_dir>
  */
