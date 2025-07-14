@@ -1,7 +1,7 @@
-# concurrent processing
+# Concurrent Processing
 
 UniPDF supports document level concurrent processing (this means processing each document separately in its own go routine) for all operations. 
-Page level concurrent processing is now support for rendering to image and text extraction.
+Page level concurrent processing is now supported by UniPDF for rendering to image and text extraction.
 
 
 ## Examples

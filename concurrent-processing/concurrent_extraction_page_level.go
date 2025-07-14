@@ -1,7 +1,7 @@
 /*
  * This example demonstrates how to extract text concurrently
  * with each page extraction running in its own go routine.
- * This can be useful for processing of large documents.
+ * This can be useful for large documents processing.
  *
  * Run as: go run concurrent_extraction_page_level.go <input.pdf> <output_dir>
  */
