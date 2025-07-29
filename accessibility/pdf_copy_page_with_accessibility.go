@@ -65,7 +65,7 @@ func main() {
 
 	// Construct base K dictionary.
 	docK := model.NewKDictionary()
-	docK.S = core.MakeName(model.StructureTypeDocument)
+	docK.S = core.MakeName(string(model.StructureTypeDocument))
 
 	newStr.AddKDict(docK)
 
@@ -115,7 +115,7 @@ func main() {
 
 		// Add section K object to store all original K objects from template page.
 		sectK := model.NewKDictionary()
-		sectK.S = core.MakeName(model.StructureTypeSection)
+		sectK.S = core.MakeName(string(model.StructureTypeSection))
 		sectK.T = core.MakeString(fmt.Sprintf("Page %d", n))
 		sectK.GenerateRandomID()
 
