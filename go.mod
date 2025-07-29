@@ -13,7 +13,7 @@ require (
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.2.0
 	github.com/unidoc/unichart v0.4.0
-	github.com/unidoc/unipdf/v4 v4.1.0
+	github.com/unidoc/unipdf/v4 v4.2.0
 	golang.org/x/crypto v0.33.0
 	golang.org/x/image v0.24.0
 	golang.org/x/text v0.22.0
@@ -70,4 +70,5 @@ require (
 	google.golang.org/grpc v1.64.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	software.sslmate.com/src/go-pkcs12 v0.6.0 // indirect
 )

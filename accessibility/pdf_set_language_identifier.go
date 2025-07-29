@@ -47,7 +47,7 @@ func main() {
 
 	// Construct base K dictionary.
 	docK := model.NewKDictionary()
-	docK.S = core.MakeName(model.StructureTypeDocument)
+	docK.S = core.MakeName(string(model.StructureTypeDocument))
 
 	str.AddKDict(docK)
 
@@ -57,7 +57,12 @@ func main() {
 	p.SetPos(100, 100)
 
 	// Set marked content identifier for the paragraph.
-	pMarkedContent := p.SetMarkedContentID(0)
+	p.SetMarkedContentID(0)
+
+	pMarkedContent, err := p.GenerateKDict()
+	if err != nil {
+		fmt.Errorf("Error: %v", err)
+	}
 
 	// Set the language identifier for the paragraph to British English.
 	pMarkedContent.Lang = core.MakeString("en-GB")
@@ -76,7 +81,11 @@ func main() {
 	// It's "Hello World" in Indonesian.
 	sp.SetText("Halo Dunia")
 	sp.SetPos(100, 200)
-	pMarkedContent = sp.SetMarkedContentID(1)
+	sp.SetMarkedContentID(1)
+	pMarkedContent, err = p.GenerateKDict()
+	if err != nil {
+		fmt.Errorf("Error: %v", err)
+	}
 
 	// Set the language identifier for the styled paragraph to Indonesian.
 	pMarkedContent.Lang = core.MakeString("id-ID")
@@ -88,7 +97,7 @@ func main() {
 
 	c.SetStructTreeRoot(str)
 
-	err := c.WriteToFile("pdf_set_language_identifier.pdf")
+	err = c.WriteToFile("pdf_set_language_identifier.pdf")
 	if err != nil {
 		fmt.Errorf("Error: %v", err)
 	}

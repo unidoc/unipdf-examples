@@ -49,7 +49,7 @@ func main() {
 
 	// Construct base K dictionary.
 	docK := model.NewKDictionary()
-	docK.S = core.MakeName(model.StructureTypeDocument)
+	docK.S = core.MakeName(string(model.StructureTypeDocument))
 	// Manually set optional ID for the K object
 	docK.ID = core.MakeString(kIds[0])
 	// Or generate the ID automatically using the following:
@@ -62,7 +62,7 @@ func main() {
 	pageMarkedContentSection := model.NewKDictionary()
 
 	// Set the structure type to Section.
-	pageMarkedContentSection.S = core.MakeName(model.StructureTypeSection)
+	pageMarkedContentSection.S = core.MakeName(string(model.StructureTypeSection))
 	pageMarkedContentSection.ID = core.MakeString(kIds[1])
 
 	// Add as a child
@@ -105,7 +105,12 @@ func addImage(c *creator.Creator, imageFile string, x, y float64, mcid int64, al
 	}
 
 	// Add the image to the marked content section.
-	altKdictEntry := img.SetMarkedContentID(mcid)
+	img.SetMarkedContentID(mcid)
+
+	altKdictEntry, err := img.GenerateKDict()
+	if err != nil {
+		fmt.Errorf("Error: %v", err)
+	}
 
 	// Set the alternate text.
 	altKdictEntry.Alt = core.MakeString(altText)

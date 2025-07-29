@@ -131,6 +131,8 @@ github.com/unidoc/unichart v0.4.0 h1:uXk9ZjbqzKb8Lt2Qv2oM9D2ftNRXvezPevgxQhsTQys
 github.com/unidoc/unichart v0.4.0/go.mod h1:9QsE8RbS0fE7ndHNroeCEFkRPqqk47Qsoj6QSAtcwN0=
 github.com/unidoc/unipdf/v4 v4.1.0 h1:qeEUEVm0rVPocIGZdKoSsRCUTrA3RD+VlBQX7NnP/kY=
 github.com/unidoc/unipdf/v4 v4.1.0/go.mod h1:SbSYFUoutyBR+hLlsHyNiCzzcSVVuG10S5Xu8RIJ6EY=
+github.com/unidoc/unipdf/v4 v4.2.0 h1:nMBQMOp8WDmm0L1fAdPKZ57pVNloxG+JHClXucwufLo=
+github.com/unidoc/unipdf/v4 v4.2.0/go.mod h1:csApn6iwjybsHb43/6BSXAubkSumZ7et0zlcIpJ4iXI=
 github.com/unidoc/unitype v0.5.1 h1:UwTX15K6bktwKocWVvLoijIeu4JAVEAIeFqMOjvxqQs=
 github.com/unidoc/unitype v0.5.1/go.mod h1:3dxbRL+f1otNqFQIRHho8fxdg3CcUKrqS8w1SXTsqcI=
 go.opencensus.io v0.24.0 h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=
@@ -238,3 +240,5 @@ gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 honnef.co/go/tools v0.0.0-20190102054323-c2f93a96b099/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
+software.sslmate.com/src/go-pkcs12 v0.6.0 h1:f3sQittAeF+pao32Vb+mkli+ZyT+VwKaD014qFGq6oU=
+software.sslmate.com/src/go-pkcs12 v0.6.0/go.mod h1:Qiz0EyvDRJjjxGyUQa2cCNZn/wMyzrRJ/qcDXOQazLI=
