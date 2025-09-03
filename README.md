@@ -35,7 +35,7 @@ Both options start with:
 Then one can decide between the two options:
 
 1. Remove the `/v4/` in the unipdf import paths, e.g. use `github.com/unidoc/unipdf/core` instead of `github.com/unidoc/unipdf/v4/core`
-2. Alternatively create a symbolic link from the v3 subdirectory of unipdf to the unipdf repository, i.e.
+2. Alternatively create a symbolic link from the v4 subdirectory of unipdf to the unipdf repository, i.e.
 ```bash
 ln -s $GOPATH/src/github.com/unidoc/unipdf $GOPATH/src/github.com/unidoc/unipdf/v4
 ```
