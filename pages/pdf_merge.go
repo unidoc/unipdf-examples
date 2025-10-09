@@ -13,7 +13,7 @@ import (
 	"os"
 
 	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v4/pdfutil"
 )
 
 func init() {
@@ -47,56 +47,12 @@ func main() {
 		inputPaths = append(inputPaths, arg)
 	}
 
-	err := mergePdf(inputPaths, outputPath)
+	// Merge pdfs without forms.
+	err := pdfutil.MergePdf(inputPaths, outputPath, false)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
 	fmt.Printf("Complete, see output file: %s\n", outputPath)
-}
-
-func mergePdf(inputPaths []string, outputPath string) error {
-	pdfWriter := model.NewPdfWriter()
-
-	for _, inputPath := range inputPaths {
-		pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
-		if err != nil {
-			return err
-		}
-		defer f.Close()
-
-		numPages, err := pdfReader.GetNumPages()
-		if err != nil {
-			return err
-		}
-
-		for i := 0; i < numPages; i++ {
-			pageNum := i + 1
-
-			page, err := pdfReader.GetPage(pageNum)
-			if err != nil {
-				return err
-			}
-
-			err = pdfWriter.AddPage(page)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	fWrite, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

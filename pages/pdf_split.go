@@ -13,7 +13,7 @@ import (
 	"strconv"
 
 	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v4/pdfutil"
 )
 
 func init() {
@@ -49,57 +49,12 @@ func main() {
 
 	outputPath := os.Args[4]
 
-	err = splitPdf(inputPath, outputPath, splitFrom, splitTo)
+	// Extracting page range from input PDF into output PDF.
+	err = pdfutil.ExtractPageRange(inputPath, outputPath, splitFrom, splitTo, false)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
 	fmt.Printf("Complete, see output file: %s\n", outputPath)
-}
-
-func splitPdf(inputPath string, outputPath string, pageFrom int, pageTo int) error {
-	pdfWriter := model.NewPdfWriter()
-	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	numPages, err := pdfReader.GetNumPages()
-	if err != nil {
-		return err
-	}
-
-	if numPages < pageTo {
-		return err
-	}
-
-	for i := pageFrom; i <= pageTo; i++ {
-		pageNum := i
-
-		page, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			return err
-		}
-	}
-
-	fWrite, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
