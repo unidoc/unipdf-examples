@@ -136,6 +136,8 @@ github.com/unidoc/unichart v0.5.1 h1:qnYavwBV5sg9NUF59KbMOqJdh2kA454nVxdDTPPtSz8
 github.com/unidoc/unichart v0.5.1/go.mod h1:/8yJsL49OqBOyG53JFVZOwwDXDquo/ZRMkfz9fNsVgc=
 github.com/unidoc/unipdf/v4 v4.3.0 h1:eA4zjRHTULtV5thy3MausfFYDP1i59qGdsfxe709oUY=
 github.com/unidoc/unipdf/v4 v4.3.0/go.mod h1:oR0EX7TmS7KaAuzFQPA9t9HjbU4f2NbWMvzXNqtXo70=
+github.com/unidoc/unipdf/v4 v4.4.0 h1:JvfRBjQgaT1FkdUiZXmrGLp5RFhk9GB/NfHEzsiU4i0=
+github.com/unidoc/unipdf/v4 v4.4.0/go.mod h1:oR0EX7TmS7KaAuzFQPA9t9HjbU4f2NbWMvzXNqtXo70=
 github.com/unidoc/unitype v0.5.1 h1:UwTX15K6bktwKocWVvLoijIeu4JAVEAIeFqMOjvxqQs=
 github.com/unidoc/unitype v0.5.1/go.mod h1:3dxbRL+f1otNqFQIRHho8fxdg3CcUKrqS8w1SXTsqcI=
 go.opencensus.io v0.24.0 h1:y73uSU6J157QMP2kn2r30vwW1A2W2WFwSCGnAVxeaD0=
