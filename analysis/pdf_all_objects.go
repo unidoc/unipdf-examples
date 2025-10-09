@@ -12,7 +12,6 @@ import (
 	"os"
 
 	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/core"
 	"github.com/unidoc/unipdf/v4/model"
 )
 
@@ -42,46 +41,18 @@ func main() {
 	inputPath := args[0]
 
 	fmt.Printf("Input file: %s\n", inputPath)
-	err := inspectPdf(inputPath, opt)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
-	}
-}
-
-func inspectPdf(inputPath string, opt cmdOptions) error {
 	readerOpts := model.NewReaderOpts()
 	readerOpts.Password = opt.pdfPassword
 
 	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, readerOpts)
 	if err != nil {
-		return err
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
 	}
 	defer f.Close()
-
-	objNums := pdfReader.GetObjectNums()
-
-	// Output.
-	fmt.Printf("%d PDF objects:\n", len(objNums))
-	for i, objNum := range objNums {
-		obj, err := pdfReader.GetIndirectObjectByNumber(objNum)
-		if err != nil {
-			return err
-		}
-		fmt.Println("=========================================================")
-		fmt.Printf("%3d: %d 0 %T\n", i, objNum, obj)
-		if stream, is := obj.(*core.PdfObjectStream); is {
-			decoded, err := core.DecodeStream(stream)
-			if err != nil {
-				return err
-			}
-			fmt.Printf("Decoded:\n%s\n", decoded)
-		} else if indObj, is := obj.(*core.PdfIndirectObject); is {
-			fmt.Printf("%T\n", indObj.PdfObject)
-			fmt.Printf("%s\n", indObj.PdfObject.String())
-		}
-
+	err = pdfReader.PrintPdfObjects(os.Stdout)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
 	}
-
-	return nil
 }

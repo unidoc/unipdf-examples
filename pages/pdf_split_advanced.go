@@ -13,7 +13,7 @@ import (
 	"strconv"
 
 	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v4/pdfutil"
 )
 
 func init() {
@@ -49,65 +49,12 @@ func main() {
 
 	outputPath := os.Args[4]
 
-	err = splitPdf(inputPath, outputPath, splitFrom, splitTo)
+	// Extract page range taking into account OCProperties.
+	err = pdfutil.ExtractPageRange(inputPath, outputPath, splitFrom, splitTo, true)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
 
 	fmt.Printf("Complete, see output file: %s\n", outputPath)
-}
-
-func splitPdf(inputPath string, outputPath string, pageFrom int, pageTo int) error {
-	pdfWriter := model.NewPdfWriter()
-	pdfReader, f, err := model.NewPdfReaderFromFile(inputPath, nil)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	numPages, err := pdfReader.GetNumPages()
-	if err != nil {
-		return err
-	}
-
-	if numPages < pageTo {
-		return fmt.Errorf("numPages (%d) < pageTo (%d)", numPages, pageTo)
-	}
-
-	// Keep the OC properties intact (optional content).
-	// Rarely used but can be relevant in certain cases.
-	ocProps, err := pdfReader.GetOCProperties()
-	if err != nil {
-		return err
-	}
-	pdfWriter.SetOCProperties(ocProps)
-
-	for i := pageFrom; i <= pageTo; i++ {
-		pageNum := i
-
-		page, err := pdfReader.GetPage(pageNum)
-		if err != nil {
-			return err
-		}
-
-		err = pdfWriter.AddPage(page)
-		if err != nil {
-			return err
-		}
-	}
-
-	fWrite, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-
-	defer fWrite.Close()
-
-	err = pdfWriter.Write(fWrite)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
