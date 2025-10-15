@@ -21,15 +21,14 @@ import (
 	"fmt"
 	"hash/crc32"
 	"io"
-	"io/ioutil"
 	"log"
 	"math/big"
 	"os"
 	"time"
 
 	kms "cloud.google.com/go/kms/apiv1"
+	kmspb "cloud.google.com/go/kms/apiv1/kmspb"
 	gcOption "google.golang.org/api/option"
-	kmspb "google.golang.org/genproto/googleapis/cloud/kms/v1"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"github.com/unidoc/pkcs7"
@@ -104,7 +103,7 @@ func main() {
 	copy(pdfData[byteRange[1]:byteRange[2]], sig)
 
 	// Write output file.
-	if err := ioutil.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
+	if err := os.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
@@ -119,7 +118,7 @@ func generateSignedFile(inputPath string, handler model.SignatureHandler) ([]byt
 	if err != nil {
 		return nil, nil, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
@@ -182,7 +181,7 @@ func getExternalSignatureAndSign(inputPath, credPath, keyName string) ([]byte, [
 	if err != nil {
 		return nil, nil, err
 	}
-	defer gcKmsSign.client.Close()
+	defer func() { _ = gcKmsSign.client.Close() }()
 
 	now := time.Now()
 

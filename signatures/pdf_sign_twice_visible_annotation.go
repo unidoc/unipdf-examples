@@ -13,7 +13,6 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"math/big"
 	"os"
@@ -76,7 +75,7 @@ func main() {
 	}
 
 	// Write the resulting file to output.pdf file.
-	err = ioutil.WriteFile(outputPath, buf, 0666)
+	err = os.WriteFile(outputPath, buf, 0666)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
