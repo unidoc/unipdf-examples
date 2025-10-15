@@ -70,7 +70,6 @@ func main() {
 
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
-		return
 	}
 
 	// Create reader.
