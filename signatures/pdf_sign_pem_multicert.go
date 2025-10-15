@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"hash"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -82,7 +81,7 @@ func main() {
 
 func loadPrivateKey(privateKeyPath string) (*rsa.PrivateKey, error) {
 	// Read private key file contents.
-	privateKeyData, err := ioutil.ReadFile(privateKeyPath)
+	privateKeyData, err := os.ReadFile(privateKeyPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -101,7 +100,7 @@ func loadPrivateKey(privateKeyPath string) (*rsa.PrivateKey, error) {
 
 func loadCertificates(certPath string) (*x509.Certificate, *core.PdfObjectArray, error) {
 	// Read certificate file contents.
-	certData, err := ioutil.ReadFile(certPath)
+	certData, err := os.ReadFile(certPath)
 	if err != nil {
 		return nil, nil, err
 	}

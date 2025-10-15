@@ -11,7 +11,6 @@ import (
 	"crypto"
 	"crypto/rsa"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -48,7 +47,7 @@ func main() {
 	outputPath := args[4]
 
 	// Get private key and X509 certificate from the P12 file.
-	pfxData, err := ioutil.ReadFile(p12Path)
+	pfxData, err := os.ReadFile(p12Path)
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
 	}

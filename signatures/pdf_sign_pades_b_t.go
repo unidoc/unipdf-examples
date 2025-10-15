@@ -10,7 +10,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -48,7 +47,7 @@ func main() {
 	outputPath := args[5]
 
 	// Get private key and X509 certificate from the PFX file.
-	pfxData, err := ioutil.ReadFile(pfxPath)
+	pfxData, err := os.ReadFile(pfxPath)
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
 	}
@@ -59,7 +58,7 @@ func main() {
 	}
 
 	// Get cacert certificate from the PEM file.
-	caCertF, err := ioutil.ReadFile(pemPath)
+	caCertF, err := os.ReadFile(pemPath)
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
 	}

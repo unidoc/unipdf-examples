@@ -1,26 +1,27 @@
 /*
- * This example showcases how to create a  PAdES B-B compatible digital signature for a PDF file.
+ * This example showcases how to create a digital signature for a PDF file using a custom timestamp client.
  *
- * $ ./pdf_sign_pades_b_b <FILE.PFX> <PASSWORD> <FILE.PEM> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
+ * $ ./pdf_sign_custom_client <FILE.PFX> <PASSWORD> <FILE.PEM> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
 package main
 
 import (
-	"crypto/rsa"
+	"bytes"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"time"
-
-	"golang.org/x/crypto/pkcs12"
 
 	"github.com/unidoc/unipdf/v4/annotator"
 	"github.com/unidoc/unipdf/v4/common/license"
 	"github.com/unidoc/unipdf/v4/core"
 	"github.com/unidoc/unipdf/v4/model"
 	"github.com/unidoc/unipdf/v4/model/sighandler"
+	"github.com/unidoc/unipdf/v4/model/sigutil"
+	"golang.org/x/crypto/pkcs12"
 )
 
 func init() {
@@ -57,7 +58,7 @@ func main() {
 		log.Fatal("Fail: %v\n", err)
 	}
 
-	// Get cacert certificate from the PEM file.
+	// Get CA Certificate from the PEM file.
 	caCertF, err := os.ReadFile(pemPath)
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
@@ -69,7 +70,6 @@ func main() {
 
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
-		return
 	}
 
 	// Create reader.
@@ -90,15 +90,32 @@ func main() {
 		log.Fatal("Fail: %v\n", err)
 	}
 
-	// Create signature handler.
-	handler, err := sighandler.NewEtsiPAdESLevelB(priv.(*rsa.PrivateKey), cert, cacert)
-	if err != nil {
-		log.Fatal("Fail: %v\n", err)
-	}
+	// Set timestamp server.
+	timestampServerURL := "https://freetsa.org/tsr"
+
+	// Create PAdES signature handler.
+	padEs := sighandler.NewEtsiPAdES(sighandler.LevelLT)
+	padEs.SetCertificate(cert)
+	padEs.SetPrivateKey(priv)
+	padEs.SetCA(cacert)
+	padEs.SetTimestampServerURL(timestampServerURL)
+	padEs.SetAppender(appender)
+
+	// Set a custom timestamp client with a custom HTTP client (with timeout).
+	// This is optional. If not set, a default client will be used.
+	// Here we set a timeout of 30 seconds for the HTTP client (the default is 5 seconds).
+	padEs.SetTimestampClient(&sigutil.TimestampClient{
+		HTTPClient: &http.Client{
+			Timeout: 30 * time.Second,
+		},
+	})
+
+	var handler model.SignatureHandler
+	handler = padEs
 
 	// Create signature.
 	signature := model.NewPdfSignature(handler)
-	signature.SetName("PAdES B-B Signature PDF")
+	signature.SetName("PAdES B-LT Signature PDF")
 	signature.SetReason("TestPAdESPDF")
 	signature.SetDate(time.Now(), "")
 
@@ -115,8 +132,8 @@ func main() {
 		signature,
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
-			annotator.NewSignatureLine("Date", "2023.05.08"),
-			annotator.NewSignatureLine("Reason", "PAdES signature test"),
+			annotator.NewSignatureLine("Date", "2025.10.15"),
+			annotator.NewSignatureLine("Reason", "PAdES signature with custom client"),
 		},
 		opts,
 	)
@@ -126,8 +143,28 @@ func main() {
 		log.Fatal("Fail: %v\n", err)
 	}
 
-	// Write output PDF file.
-	err = appender.WriteToFile(outputPath)
+	// Write output to buffer.
+	buffer := bytes.NewBuffer(nil)
+	err = appender.Write(buffer)
+	if err != nil {
+		log.Fatal("Fail: %v\n", err)
+	}
+
+	// We need the second pass to correctly save DSS/VRI information.
+	pdf2, err := model.NewPdfReader(bytes.NewReader(buffer.Bytes()))
+	if err != nil {
+		log.Fatal("Fail: %v\n", err)
+	}
+
+	appender2, err := model.NewPdfAppender(pdf2)
+	if err != nil {
+		log.Fatal("Fail: %v\n", err)
+	}
+
+	appender2.SetDSS(appender.GetDSS())
+
+	// Write output to the PDF file.
+	err = appender2.WriteToFile(outputPath)
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
 	}
