@@ -112,7 +112,7 @@ func createPdfWithTextAnnotations(outputPath string) error {
 	c.SetStructTreeRoot(str)
 
 	// Add the page to the writer.
-	err := c.AddPage(page)
+	err = c.AddPage(page)
 	if err != nil {
 		return err
 	}
