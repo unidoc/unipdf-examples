@@ -10,6 +10,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/unidoc/unipdf/v4/common/license"
@@ -55,7 +56,10 @@ func main() {
 	heading.SetFontSize(20)
 	chunk := heading.Append("Accessible Links in PDF Documents")
 	chunk.Style.FontSize = 20
-	c.Draw(heading)
+
+	if err := c.Draw(heading); err != nil {
+		log.Fatalf("failed to draw heading: %v", err)
+	}
 
 	// Example 1: Link with descriptive text (no Alt needed)
 	p1 := c.NewStyledParagraph()
@@ -76,7 +80,10 @@ func main() {
 		AltText: altText,
 		MCID:    1,
 	})
-	c.Draw(p1)
+
+	if err := c.Draw(p1); err != nil {
+		log.Fatalf("failed to draw paragraph: %v", err)
+	}
 
 	docK.AddKChild(annot)
 
@@ -97,7 +104,10 @@ func main() {
 		AltText: altText,
 		MCID:    2,
 	})
-	c.Draw(p2)
+
+	if err := c.Draw(p2); err != nil {
+		log.Fatalf("failed to draw paragraph: %v", err)
+	}
 
 	docK.AddKChild(annot)
 
@@ -117,7 +127,10 @@ func main() {
 		AltText: altText,
 		MCID:    3,
 	})
-	c.Draw(p3)
+
+	if err := c.Draw(p3); err != nil {
+		log.Fatalf("failed to draw paragraph: %v", err)
+	}
 
 	docK.AddKChild(annot)
 
@@ -136,7 +149,10 @@ func main() {
 		AltText: altText,
 		MCID:    4,
 	})
-	c.Draw(p4)
+
+	if err := c.Draw(p4); err != nil {
+		log.Fatalf("failed to draw paragraph: %v", err)
+	}
 
 	docK.AddKChild(annot)
 

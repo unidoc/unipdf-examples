@@ -54,7 +54,11 @@ func createPdfWithTextAnnotations(outputPath string) error {
 	// Create a new page with standard letter size.
 	page := model.NewPdfPage()
 	mediaBox := core.MakeArrayFromFloats([]float64{0, 0, 612, 792})
-	page.MediaBox, _ = model.NewPdfRectangle(*mediaBox)
+	mediaRect, err := model.NewPdfRectangle(*mediaBox)
+	if err != nil {
+		return fmt.Errorf("failed to create MediaBox rectangle: %w", err)
+	}
+	page.MediaBox = mediaRect
 
 	// Add first text annotation.
 	textAnnotation1 := model.NewPdfAnnotationText()

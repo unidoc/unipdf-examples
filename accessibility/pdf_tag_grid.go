@@ -38,12 +38,16 @@ func main() {
 	// Add K dictionary to the struct tree root.
 	structTreeRoot.AddKDict(docK)
 
-	drawGrid(c, docK)
+	err := drawGrid(c, docK)
+	if err != nil {
+		fmt.Printf("Error drawing grid: %v\n", err)
+		return
+	}
 
 	// Set the struct tree root.
 	c.SetStructTreeRoot(structTreeRoot)
 
-	err := c.WriteToFile("pdf_tag_grid.pdf")
+	err = c.WriteToFile("pdf_tag_grid.pdf")
 	if err != nil {
 		fmt.Printf("Error writing to file: %v\n", err)
 		return
@@ -51,7 +55,7 @@ func main() {
 }
 
 func drawGrid(c *creator.Creator, rootKObj *model.KDict) error {
-	// Create table.
+	// Create grid.
 	grid := c.NewGrid(3)
 	grid.SetMargins(0, 0, 10, 0)
 
@@ -75,12 +79,12 @@ func drawGrid(c *creator.Creator, rootKObj *model.KDict) error {
 	currentRow = grid.NewRow()
 	currentRow.SetSection(creator.GridRowSectionHeader) // Set the first row as a header row.
 
-	// Draw table header.
+	// Draw grid header.
 	drawCell("Align left", creator.CellHorizontalAlignmentLeft)
 	drawCell("Align center", creator.CellHorizontalAlignmentCenter)
 	drawCell("Align right", creator.CellHorizontalAlignmentRight)
 
-	// Draw table content.
+	// Draw grid content.
 	for i := 0; i < 5; i++ {
 		num := i + 1
 
@@ -91,7 +95,7 @@ func drawGrid(c *creator.Creator, rootKObj *model.KDict) error {
 		drawCell(fmt.Sprintf("$%d", num*10), creator.CellHorizontalAlignmentRight)
 	}
 
-	// Draw tabke footer.
+	// Draw grid footer.
 	currentRow = grid.NewRow()
 	currentRow.SetSection(creator.GridRowSectionFooter) // Set the last row as a footer row.
 

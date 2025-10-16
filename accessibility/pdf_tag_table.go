@@ -46,7 +46,10 @@ func main() {
 	// Add K dictionary to the struct tree root.
 	structTreeRoot.AddKDict(docK)
 
-	drawTable(c, docK)
+	if err := drawTable(c, docK); err != nil {
+		fmt.Printf("Error drawing table: %v\n", err)
+		return
+	}
 
 	// Set the struct tree root.
 	c.SetStructTreeRoot(structTreeRoot)

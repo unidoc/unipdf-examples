@@ -80,7 +80,9 @@ func main() {
 		}
 	}
 
-	c.Draw(list)
+	if err := c.Draw(list); err != nil {
+		log.Fatalf("failed to draw list: %v", err)
+	}
 
 	// Set the struct tree root.
 	c.SetStructTreeRoot(structTreeRoot)

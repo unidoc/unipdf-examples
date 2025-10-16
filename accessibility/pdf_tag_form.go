@@ -15,7 +15,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -67,7 +66,7 @@ func main() {
 	form := model.NewPdfAcroForm()
 	fields := core.MakeArray()
 
-	// Create text fields and it's label
+	// Create text fields and its label
 	for idx, fdef := range textFieldsDef {
 		opt := annotator.TextFieldOptions{}
 		textf, err := annotator.NewTextField(page, fdef.Name, fdef.Rect, opt)
@@ -97,7 +96,7 @@ func main() {
 
 		k, err := p.GenerateKDict()
 		if err != nil {
-			fmt.Errorf("Error: %v", err)
+			log.Fatalf("Error: %v", err)
 		}
 
 		k.Alt = core.MakeString(fdef.Tooltip) // Set alternative text for the label.
@@ -137,7 +136,7 @@ func main() {
 	}
 }
 
-// Add Submit button that will submit all fields value.
+// Add Submit button that will submit all field values.
 func addSubmitButton(page *model.PdfPage, form *model.PdfAcroForm) error {
 	optSubmit := annotator.FormSubmitActionOptions{
 		Url: "https://unidoc.io",
@@ -163,7 +162,7 @@ func addSubmitButton(page *model.PdfPage, form *model.PdfAcroForm) error {
 	return nil
 }
 
-// Add Reset button that would reset the specified fields to it's default value.
+// Add Reset button that would reset the specified fields to its default value.
 func addResetButton(page *model.PdfPage, form *model.PdfAcroForm, fields *core.PdfObjectArray) error {
 	optReset := annotator.FormResetActionOptions{
 		Rectangle: draw.Rectangle{
