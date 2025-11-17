@@ -1,7 +1,7 @@
 /*
- * PDF/A-2 optimization (standard applying) example.
+ * PDF/A-4 optimization (standard applying) example.
  *
- * Run as: go run pdfa2_apply_standard.go <input.pdf> <output.pdf>
+ * Run as: go run pdfa4_apply_standard.go <input.pdf> <output.pdf>
  */
 
 package main
@@ -51,8 +51,8 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Apply standard PDF/A-2B.
-	pdfWriter.ApplyStandard(pdfa.NewProfile2B(nil))
+	// Apply standard PDF/A-4.
+	pdfWriter.ApplyStandard(pdfa.NewProfile4(nil))
 
 	// Create output file.
 	err = pdfWriter.WriteToFile(outputPath)
