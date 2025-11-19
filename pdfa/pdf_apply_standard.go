@@ -1,5 +1,5 @@
 /*
- * PDF optimization (compression) example.
+ * PDF optimization (PDF/A standard applying) example.
  *
  * Run as: go run pdf_apply_standard.go <input.pdf> <output.pdf>
  */

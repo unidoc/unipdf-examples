@@ -1,7 +1,7 @@
 /*
- * PDF/A-2 optimization (standard applying) example.
+ * PDF/A-4 validation example.
  *
- * Run as: go run pdfa2_apply_standard.go <input.pdf> <output.pdf>
+ * Run as: go run pdfa4_validate_standard.go <input.pdf>
  */
 
 package main
@@ -28,36 +28,39 @@ func init() {
 
 func main() {
 	args := os.Args
-	if len(args) < 3 {
-		fmt.Printf("Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH", os.Args[0])
+	if len(args) < 2 {
+		fmt.Printf("Usage: %s INPUT_PDF_PATH", os.Args[0])
 		return
 	}
 	inputPath := args[1]
-	outputPath := args[2]
 
 	// Initialize starting time.
 	start := time.Now()
 
 	// Create reader.
-	reader, file, err := model.NewPdfReaderFromFile(inputPath, nil)
+	inputFile, err := os.Open(inputPath)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-	defer file.Close()
+	defer inputFile.Close()
 
-	// Generate a PDFWriter from PDFReader.
-	pdfWriter, err := reader.ToWriter(nil)
+	detailedReader, err := model.NewCompliancePdfReader(inputFile)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Apply standard PDF/A-2B.
-	pdfWriter.ApplyStandard(pdfa.NewProfile2B(nil))
+	// Validate standard PDF/A-4.
+	standards := []model.StandardImplementer{
+		pdfa.NewProfile4(nil),
+		pdfa.NewProfile4E(nil),
+		pdfa.NewProfile4F(nil),
+	}
 
-	// Create output file.
-	err = pdfWriter.WriteToFile(outputPath)
-	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
+	// Iterate over input standards and check if the document passes its requirements.
+	for _, standard := range standards {
+		if err = standard.ValidateStandard(detailedReader); err != nil {
+			fmt.Printf("Input document didn't pass the standard: %s - %v\n", standard.StandardName(), err)
+		}
 	}
 
 	duration := float64(time.Since(start)) / float64(time.Millisecond)

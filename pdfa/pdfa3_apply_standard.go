@@ -1,5 +1,5 @@
 /*
- * PDF/A-3 optimization (compression) example.
+ * PDF/A-3 optimization (standard applying) example.
  *
  * Run as: go run pdfa3_apply_standard.go <input.pdf> <output.pdf>
  */

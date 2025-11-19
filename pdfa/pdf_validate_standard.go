@@ -1,5 +1,5 @@
 /*
- * PDF optimization (compression) example.
+ * PDF/A-1 validation example.
  *
  * Run as: go run pdfa_validate_standard.go <input.pdf>
  */
@@ -49,7 +49,7 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Apply standard PDF/A-1B.
+	// Validate standard PDF/A-1.
 	standards := []model.StandardImplementer{
 		pdfa.NewProfile1A(nil),
 		pdfa.NewProfile1B(nil),
