@@ -4,6 +4,10 @@
  * output. The program parses the HOCR response and extracts word-level information
  * including bounding boxes and confidence scores.
  *
+ * This example uses https://github.com/unidoc/ocrserver as the OCR service.
+ * However, UniPDF's OCR API is designed to support other OCR services that accept
+ * image uploads via HTTP and return text or HOCR formatted results.
+ *
  * Run as: go run hocr_sample.go input.jpg
  */
 package main

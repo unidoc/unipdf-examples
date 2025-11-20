@@ -4,6 +4,10 @@
  * The program processes multiple image files concurrently and displays the extracted
  * text results along with a summary of successful and failed operations.
  *
+ * This example uses https://github.com/unidoc/ocrserver as the OCR service.
+ * However, UniPDF's OCR API is designed to support other OCR services that accept
+ * image uploads via HTTP and return text or HOCR formatted results.
+ *
  * Run as: go run ocr_batch.go image1.jpg image2.png [image3.jpg ...]
  */
 package main

@@ -3,6 +3,10 @@
  * to perform OCR on an image using an HTTP OCR service. The program sends an image
  * to the configured OCR endpoint and displays the extracted text.
  *
+ * This example uses https://github.com/unidoc/ocrserver as the OCR service.
+ * However, UniPDF's OCR API is designed to support other OCR services that accept
+ * image uploads via HTTP and return text or HOCR formatted results.
+ *
  * Run as: go run ocr_sample.go input.jpg
  */
 package main

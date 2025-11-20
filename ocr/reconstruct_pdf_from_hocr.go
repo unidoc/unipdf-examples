@@ -3,6 +3,10 @@
  * to extract text from within images in a PDF using an OCR service that returns
  * HOCR formatted output then writes the reconstructed text to a new PDF.
  *
+ * This example uses https://github.com/unidoc/ocrserver as the OCR service.
+ * However, UniPDF's OCR API is designed to support other OCR services that accept
+ * image uploads via HTTP and return text or HOCR formatted results.
+ *
  * Run as: go run reconstruct_pdf_from_hocr.go input.pdf
  */
 package main
