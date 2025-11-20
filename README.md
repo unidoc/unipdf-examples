@@ -7,6 +7,19 @@ a pull request.
 While the majority of examples are fully in pure Go, there are a few examples that demonstrate additional 
 functionality that requires CGO and external dependencies. Those examples are clarified by filename suffix "_cgo.go".
 
+## Disclaimer
+
+**IMPORTANT:** The code examples provided in this repository are for educational and demonstration purposes only. They are provided "as is" without warranty of any kind, either express or implied. These examples are intended to help developers understand how to use the UniPDF library and may not be suitable for production environments without additional security hardening, error handling, and testing.
+
+UniDoc (the maintainers of this repository) shall not be held responsible for any risks, damages, or issues arising from the use of these code examples in production or any other environment. Users are solely responsible for reviewing, testing, and adapting the code to meet their specific requirements and security standards before deploying to production systems.
+
+It is strongly recommended that you:
+- Conduct thorough security reviews and testing
+- Implement proper input validation and sanitization
+- Add appropriate error handling and logging
+- Follow security best practices for your specific use case
+- Consult with security professionals when handling sensitive data
+
 ## License codes
 UniPDF requires license codes to operate, there are two options:
 - Metered License API keys: Free ones can be obtained at https://cloud.unidoc.io
