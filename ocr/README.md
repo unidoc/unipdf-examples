@@ -9,7 +9,7 @@ The OCR functionality works by sending images to a configured HTTP endpoint that
 - [hocr_sample.go](hocr_sample.go) illustrates how to process HOCR formatted OCR output, parsing word-level information including bounding boxes and confidence scores.
 - [ocr_batch.go](ocr_batch.go) shows how to perform batch OCR processing on multiple images concurrently, with error handling and summary reporting.
 - [ocr_sample.go](ocr_sample.go) demonstrates basic OCR usage by sending a single image to an HTTP OCR service and extracting the text content.
-- [reconstruct_pdf_from hocr.go](reconstruct_pdf_from%20hocr.go) demonstrates a complete workflow to extract images from a PDF, perform OCR with HOCR output, parse the structured results, and reconstruct a searchable PDF with properly positioned text.
+- [reconstruct_pdf_from_hocr.go](reconstruct_pdf_from_hocr.go) demonstrates a complete workflow to extract images from a PDF, perform OCR with HOCR output, parse the structured results, and reconstruct a searchable PDF with properly positioned text.
 
 ## Requirements
 

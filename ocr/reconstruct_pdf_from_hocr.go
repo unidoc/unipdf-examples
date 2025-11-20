@@ -1,9 +1,9 @@
 /**
  * This is a sample Go program that demonstrates how to use the UniPDF library
- * to extrtact text from within images in a PDF using an OCR service that returns
+ * to extract text from within images in a PDF using an OCR service that returns
  * HOCR formatted output then writes the reconstructed text to a new PDF.
  *
- * Run as: go run reconstruct_pdf.go input.pdf
+ * Run as: go run reconstruct_pdf_from_hocr.go input.pdf
  */
 package main
 
@@ -118,7 +118,7 @@ func ParseTitleAttributes(title string) *TitleAttributes {
 	xDescendersRe := regexp.MustCompile(`x_descenders\s+([\d.]+)`)
 	xAscendersRe := regexp.MustCompile(`x_ascenders\s+([\d.]+)`)
 	xWConfRe := regexp.MustCompile(`x_wconf\s+(\d+)`)
-	ppagenoRe := regexp.MustCompile(`ppageno\s+(\d+)`)
+	pagenoRe := regexp.MustCompile(`ppageno\s+(\d+)`)
 	imageRe := regexp.MustCompile(`image\s+"([^"]*)"`)
 
 	// Parse bbox
@@ -158,7 +158,7 @@ func ParseTitleAttributes(title string) *TitleAttributes {
 	}
 
 	// Parse ppageno
-	if matches := ppagenoRe.FindStringSubmatch(title); matches != nil {
+	if matches := pagenoRe.FindStringSubmatch(title); matches != nil {
 		attrs.PageNo, _ = strconv.Atoi(matches[1])
 	}
 
@@ -261,23 +261,23 @@ func init() {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("Usage: go run reconstruct_pdf.go input.pdf\n")
+		fmt.Printf("Usage: go run reconstruct_pdf_from_hocr.go input.pdf\n")
 		os.Exit(1)
 	}
 
 	// Load images from the PDF.
 	images, err := loadImages(os.Args[1])
 	if err != nil {
-		fmt.Printf("Error loading images: %s", err)
-		return
+		fmt.Printf("Error loading images: %v\n", err)
+		os.Exit(1)
 	}
 
 	outDir := "output"
 	if _, err := os.Stat(outDir); os.IsNotExist(err) {
 		err := os.Mkdir(outDir, 0755)
 		if err != nil {
-			fmt.Printf("Error creating output directory: %s", err)
-			return
+			fmt.Printf("Error creating output directory: %v\n", err)
+			os.Exit(1)
 		}
 	}
 
@@ -384,24 +384,24 @@ func processImage(img image.Image) (*OCRPage, error) {
 
 	result, err := client.ExtractText(context.Background(), imgReader, "image.jpg")
 	if err != nil {
-		fmt.Printf("Error extracting text: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("error extracting text: %w", err)
 	}
 
 	// Parse JSON response to extract the "result" field.
 	var jsonObj map[string]interface{}
 	if err := json.Unmarshal(result, &jsonObj); err != nil {
-		fmt.Printf("Error parsing JSON response: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("error parsing JSON response: %w", err)
 	}
 
-	content := jsonObj["result"].(string)
+	content, ok := jsonObj["result"].(string)
+	if !ok {
+		return nil, fmt.Errorf("result field is not a string")
+	}
 
 	// Parse hOCR HTML content
 	var ocrPage OCRPage
 	if err := xml.Unmarshal([]byte(content), &ocrPage); err != nil {
-		fmt.Printf("Error unmarshalling HOCR data: %s\n", err)
-		return nil, err
+		return nil, fmt.Errorf("error unmarshalling HOCR data: %w", err)
 	}
 
 	return &ocrPage, nil
