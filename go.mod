@@ -8,7 +8,9 @@ require (
 	github.com/aws/aws-sdk-go v1.55.6
 	github.com/bmatcuk/doublestar v1.3.4
 	github.com/boombuler/barcode v1.0.2
+	github.com/disintegration/imaging v1.6.2
 	github.com/gabriel-vasile/mimetype v1.4.8
+	github.com/stefanhengl/gohocr v0.0.0-20171024154250-dde96807b100
 	github.com/trimmer-io/go-xmp v1.0.0
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.3.0
