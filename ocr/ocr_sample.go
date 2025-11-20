@@ -12,8 +12,18 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/unidoc/unipdf/v4/common/license"
 	"github.com/unidoc/unipdf/v4/ocr"
 )
+
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	if len(os.Args) < 2 {
@@ -23,10 +33,10 @@ func main() {
 
 	f, err := os.Open(os.Args[1])
 	if err != nil {
-		fmt.Printf("Error opening file: %s", err)
-		return
+		fmt.Printf("Error opening file: %v\n", err)
+		os.Exit(1)
 	}
-	defer func() { _ = f.Close() }()
+	defer f.Close()
 
 	// Configure OCR service options.
 	opts := ocr.OCROptions{
@@ -44,9 +54,9 @@ func main() {
 
 	result, err := client.ExtractText(context.Background(), f, "image.jpg")
 	if err != nil {
-		fmt.Printf("Error extracting text: %s", err)
-		return
+		fmt.Printf("Error extracting text: %v\n", err)
+		os.Exit(1)
 	}
 
-	fmt.Printf("Extracted text: %s", result)
+	fmt.Printf("Extracted text: %s\n", string(result))
 }

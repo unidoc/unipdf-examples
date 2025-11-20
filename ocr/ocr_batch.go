@@ -14,12 +14,22 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/unidoc/unipdf/v4/common/license"
 	"github.com/unidoc/unipdf/v4/ocr"
 )
 
+func init() {
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
+	if err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("Usage: go run hocr_batch.go image1.jpg image2.png [image3.jpg ...]")
+		fmt.Printf("Usage: go run ocr_batch.go image1.jpg image2.png [image3.jpg ...]\n")
 		os.Exit(1)
 	}
 
