@@ -18,14 +18,13 @@ import (
 	"encoding/xml"
 	"fmt"
 	"image"
-	"image/color"
 	"image/jpeg"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
 
-	"github.com/disintegration/imaging"
+	"github.com/anthonynsimon/bild/transform"
 	"github.com/unidoc/unipdf/v4/common/license"
 	"github.com/unidoc/unipdf/v4/creator"
 	"github.com/unidoc/unipdf/v4/extractor"
@@ -343,7 +342,7 @@ func loadImages(inputPath string) ([][]image.Image, error) {
 				return nil, err
 			}
 
-			rotatedImg := imaging.Rotate(goImg, 360-float64(*page.Rotate), color.Transparent)
+			rotatedImg := transform.Rotate(goImg, float64(*page.Rotate), nil)
 
 			result[i] = append(result[i], rotatedImg)
 		}
