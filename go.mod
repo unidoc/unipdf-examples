@@ -1,6 +1,6 @@
 module github.com/unidoc/unidoc-examples
 
-go 1.24.0
+go 1.23.0
 
 require (
 	cloud.google.com/go/kms v1.18.5
