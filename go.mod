@@ -15,7 +15,7 @@ require (
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.3.0
 	github.com/unidoc/unichart v0.5.1
-	github.com/unidoc/unipdf/v4 v4.5.0
+	github.com/unidoc/unipdf/v4 v4.7.0
 	golang.org/x/crypto v0.41.0
 	golang.org/x/image v0.30.0
 	golang.org/x/text v0.28.0
@@ -39,7 +39,6 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
-	github.com/go-text/typesetting v0.3.0 // indirect
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
@@ -56,6 +55,7 @@ require (
 	github.com/unidoc/freetype v0.2.3 // indirect
 	github.com/unidoc/garabic v0.0.0-20220702200334-8c7cb25baa11 // indirect
 	github.com/unidoc/timestamp v0.0.0-20200412005513-91597fd3793a // indirect
+	github.com/unidoc/typesetting v0.1.0 // indirect
 	github.com/unidoc/unitype v0.5.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
