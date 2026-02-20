@@ -6,23 +6,23 @@ require (
 	cloud.google.com/go/kms v1.18.5
 	github.com/ThalesIgnite/crypto11 v1.2.5
 	github.com/anthonynsimon/bild v0.14.0
-	github.com/aws/aws-sdk-go v1.55.6
+	github.com/aws/aws-sdk-go v1.55.8
 	github.com/bmatcuk/doublestar v1.3.4
-	github.com/boombuler/barcode v1.0.2
-	github.com/gabriel-vasile/mimetype v1.4.8
+	github.com/boombuler/barcode v1.1.0
+	github.com/gabriel-vasile/mimetype v1.4.13
 	github.com/stefanhengl/gohocr v0.0.0-20171024154250-dde96807b100
 	github.com/trimmer-io/go-xmp v1.0.0
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.3.0
-	github.com/unidoc/unichart v0.5.1
+	github.com/unidoc/unichart v0.5.2
 	github.com/unidoc/unipdf/v4 v4.7.0
 	golang.org/x/crypto v0.41.0
 	golang.org/x/image v0.30.0
 	golang.org/x/text v0.28.0
 	google.golang.org/api v0.191.0
 	google.golang.org/protobuf v1.34.2
-	gopkg.in/gographics/imagick.v2 v2.7.0
-	software.sslmate.com/src/go-pkcs12 v0.6.0
+	gopkg.in/gographics/imagick.v2 v2.7.1
+	software.sslmate.com/src/go-pkcs12 v0.7.0
 )
 
 require (
