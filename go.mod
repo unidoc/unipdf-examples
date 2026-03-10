@@ -1,6 +1,6 @@
 module github.com/unidoc/unidoc-examples
 
-go 1.23.0
+go 1.24.0
 
 require (
 	cloud.google.com/go/kms v1.18.5
@@ -15,10 +15,10 @@ require (
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.3.0
 	github.com/unidoc/unichart v0.5.2
-	github.com/unidoc/unipdf/v4 v4.7.0
-	golang.org/x/crypto v0.41.0
-	golang.org/x/image v0.30.0
-	golang.org/x/text v0.28.0
+	github.com/unidoc/unipdf/v4 v4.8.0
+	golang.org/x/crypto v0.48.0
+	golang.org/x/image v0.36.0
+	golang.org/x/text v0.34.0
 	google.golang.org/api v0.191.0
 	google.golang.org/protobuf v1.34.2
 	gopkg.in/gographics/imagick.v2 v2.7.1
@@ -49,7 +49,7 @@ require (
 	github.com/miekg/pkcs11 v1.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.9.3 // indirect
+	github.com/sirupsen/logrus v1.9.4 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/thales-e-security/pool v0.0.2 // indirect
 	github.com/unidoc/freetype v0.2.3 // indirect
@@ -63,10 +63,10 @@ require (
 	go.opentelemetry.io/otel v1.24.0 // indirect
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
-	golang.org/x/net v0.43.0 // indirect
+	golang.org/x/net v0.50.0 // indirect
 	golang.org/x/oauth2 v0.22.0 // indirect
-	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/sync v0.19.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
 	golang.org/x/time v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/genproto v0.0.0-20240730163845-b1a4ccb954bf // indirect
