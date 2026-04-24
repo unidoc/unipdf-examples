@@ -40,7 +40,7 @@ func main() {
 
 		err := c.Draw(tocTitle)
 		if err != nil {
-			common.Log.Debug("Error drawing table of content's title: %v", err)
+			common.Log.Debug("Error drawing table of contents title: %v", err)
 			return err
 		}
 
@@ -73,7 +73,7 @@ func main() {
 
 		err = c.Draw(tocTable)
 		if err != nil {
-			common.Log.Debug("Error drawing table of content's content: %v", err)
+			common.Log.Debug("Error drawing table of contents: %v", err)
 			return err
 		}
 

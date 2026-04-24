@@ -108,7 +108,7 @@ func main() {
 
 		err = c.Draw(tocTable)
 		if err != nil {
-			common.Log.Debug("Error drawing table of content's content: %v", err)
+			common.Log.Debug("Error drawing table of contents: %v", err)
 			return err
 		}
 
