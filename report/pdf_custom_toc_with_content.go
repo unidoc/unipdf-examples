@@ -1,7 +1,7 @@
 /*
- * This example showcases the capabilities of creating a custom table of contents layout.
+ * This example showcases the capabilities of creating a custom table of contents layout with additional content.
  *
- * Run as: go run pdf_custom_toc.go
+ * Run as: go run pdf_custom_toc_with_content.go
  */
 
 package main
@@ -33,12 +33,47 @@ func main() {
 	c.AddTOC = true
 	c.CustomTOC = true
 	c.CreateTableOfContents(func(toc *creator.TOC) error {
+		// Draw UniDOC label.
+		uniDocLabel := c.NewStyledParagraph()
+		uniDocChunk := uniDocLabel.Append("UniDOC")
+		uniDocChunk.Style.FontSize = 48
+		uniDocChunk.Style.Color = creator.ColorRGBFromHex("#0b5394")
+		uniDocLabel.SetTextAlignment(creator.TextAlignmentCenter)
+		uniDocLabel.SetMargins(0, 0, 0, 30)
+
+		err := c.Draw(uniDocLabel)
+		if err != nil {
+			common.Log.Debug("Error drawing UniDOC label: %v", err)
+			return err
+		}
+
+		// Draw small Products table.
+		productsTable := c.NewTable(2)
+		productsTable.SetColumnWidths(0.3, 0.7)
+
+		drawProductsHeaderCell(c, productsTable, "Products")
+		drawProductsCell(c, productsTable, "UniPDF", true)
+		drawProductsCell(c, productsTable, "PDF generation and processing", false)
+		drawProductsCell(c, productsTable, "UniOffice", true)
+		drawProductsCell(c, productsTable, "Word, Excel and PowerPoint processing", false)
+		drawProductsCell(c, productsTable, "UniHTML", true)
+		drawProductsCell(c, productsTable, "Convert HTML to PDF", false)
+
+		productsTable.SetMargins(0, 0, 0, 30)
+
+		err = c.Draw(productsTable)
+		if err != nil {
+			common.Log.Debug("Error drawing products table: %v", err)
+			return err
+		}
+
+		// Draw custom table of contents title and content.
 		tocTitle := c.NewStyledParagraph()
 		tocTitle.SetText("Table of Contents")
 		tocTitle.SetFontSize(20)
 		tocTitle.SetMargins(0, 0, 0, 20)
 
-		err := c.Draw(tocTitle)
+		err = c.Draw(tocTitle)
 		if err != nil {
 			common.Log.Debug("Error drawing table of contents title: %v", err)
 			return err
@@ -94,7 +129,7 @@ func main() {
 		common.Log.Error(err.Error())
 	}
 
-	err = c.WriteToFile("pdf-custom-toc.pdf")
+	err = c.WriteToFile("pdf-custom-toc_with_content.pdf")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -122,5 +157,34 @@ func drawTitleCell(c *creator.Creator, tocTable *creator.Table, title string, an
 	cell := tocTable.NewCell()
 	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 0)
 	cell.SetVerticalAlignment(creator.CellVerticalAlignmentBottom)
+	cell.SetContent(p)
+}
+
+func drawProductsHeaderCell(c *creator.Creator, table *creator.Table, text string) {
+	p := c.NewStyledParagraph()
+	chunk := p.Append(text)
+	chunk.Style.FontSize = 14
+	chunk.Style.Color = creator.ColorWhite
+
+	cell := table.MultiColCell(2)
+	cell.SetBackgroundColor(creator.ColorRGBFromHex("#0b5394"))
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
+	cell.SetHorizontalAlignment(creator.CellHorizontalAlignmentCenter)
+	cell.SetVerticalAlignment(creator.CellVerticalAlignmentMiddle)
+	cell.SetIndent(0)
+	cell.SetContent(p)
+}
+
+func drawProductsCell(c *creator.Creator, table *creator.Table, text string, highlight bool) {
+	p := c.NewStyledParagraph()
+	chunk := p.Append(text)
+	chunk.Style.FontSize = 11
+	if highlight {
+		chunk.Style.Color = creator.ColorRGBFromHex("#0b5394")
+	}
+
+	cell := table.NewCell()
+	cell.SetBorder(creator.CellBorderSideAll, creator.CellBorderStyleSingle, 1)
+	cell.SetVerticalAlignment(creator.CellVerticalAlignmentMiddle)
 	cell.SetContent(p)
 }
