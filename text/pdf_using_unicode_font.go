@@ -34,7 +34,7 @@ func main() {
 }
 
 func genPdfFile(outputFile string) error {
-	compositeFontRegular, err := model.NewCompositePdfFontFromTTFFile("./rounded-mplus-1p-regular.ttf")
+	compositeFontRegular, err := model.NewCompositePdfFontFile("./rounded-mplus-1p-regular.ttf")
 
 	if err != nil {
 		return err

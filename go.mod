@@ -15,7 +15,7 @@ require (
 	github.com/unidoc/globalsign-dss v0.0.0-20220330092912-b69d85b63736
 	github.com/unidoc/pkcs7 v0.3.0
 	github.com/unidoc/unichart v0.5.2
-	github.com/unidoc/unipdf/v4 v4.8.0
+	github.com/unidoc/unipdf/v4 v4.9.0
 	golang.org/x/crypto v0.48.0
 	golang.org/x/image v0.36.0
 	golang.org/x/text v0.34.0
@@ -56,7 +56,7 @@ require (
 	github.com/unidoc/freetype v0.2.3 // indirect
 	github.com/unidoc/garabic v0.0.0-20220702200334-8c7cb25baa11 // indirect
 	github.com/unidoc/timestamp v0.0.0-20200412005513-91597fd3793a // indirect
-	github.com/unidoc/typesetting v0.1.0 // indirect
+	github.com/unidoc/typesetting v0.1.1 // indirect
 	github.com/unidoc/unitype v0.5.1 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect

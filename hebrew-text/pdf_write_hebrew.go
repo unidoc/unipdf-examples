@@ -24,7 +24,7 @@ func init() {
 }
 
 func main() {
-	font, err := model.NewCompositePdfFontFromTTFFile("./OpenSans-Regular.ttf")
+	font, err := model.NewCompositePdfFontFile("./OpenSans-Regular.ttf")
 	if err != nil {
 		panic(err)
 	}

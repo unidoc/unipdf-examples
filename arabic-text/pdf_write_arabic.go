@@ -33,7 +33,7 @@ func main() {
 	c.NewPage()
 
 	// Load font as composite PDF font.
-	arabicFont, err := model.NewCompositePdfFontFromTTFFile("./Amiri-Regular.ttf")
+	arabicFont, err := model.NewCompositePdfFontFile("./Amiri-Regular.ttf")
 	if err != nil {
 		panic(err)
 	}
