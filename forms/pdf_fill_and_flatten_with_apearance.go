@@ -113,7 +113,7 @@ func fillFieldsWithAppearance(inputPath, jsonPath, outputPath string) error {
 }
 
 func getFont(path string) (*model.PdfFont, error) {
-	font, err := model.NewCompositePdfFontFromTTFFile(path)
+	font, err := model.NewCompositePdfFontFile(path)
 	if err != nil {
 		return nil, err
 	}

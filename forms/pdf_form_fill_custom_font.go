@@ -72,7 +72,7 @@ func fillFields(inputPath, jsonPath, outputPath string) error {
 
 	// use composite ttf font file
 	// refer to `text/pdf_using_cjk_font.go` example file for more information
-	cjkFont, err := model.NewCompositePdfFontFromTTFFile("./rounded-mplus-1p-regular.ttf")
+	cjkFont, err := model.NewCompositePdfFontFile("./rounded-mplus-1p-regular.ttf")
 
 	if err != nil {
 		log.Fatalf("Error %s", err)

@@ -50,7 +50,7 @@ func main() {
 func getFonts(fontPaths []string) []*model.PdfFont {
 	fonts := []*model.PdfFont{}
 	for _, path := range fontPaths {
-		font, err := model.NewCompositePdfFontFromTTFFile(path)
+		font, err := model.NewCompositePdfFontFile(path)
 		if err != nil {
 			panic(err)
 		}
