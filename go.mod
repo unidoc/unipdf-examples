@@ -1,6 +1,6 @@
 module github.com/unidoc/unidoc-examples
 
-go 1.24.0
+go 1.25.0
 
 require (
 	cloud.google.com/go/kms v1.18.5
@@ -16,9 +16,9 @@ require (
 	github.com/unidoc/pkcs7 v0.3.0
 	github.com/unidoc/unichart v0.5.2
 	github.com/unidoc/unipdf/v4 v4.9.0
-	golang.org/x/crypto v0.48.0
+	golang.org/x/crypto v0.51.0
 	golang.org/x/image v0.36.0
-	golang.org/x/text v0.34.0
+	golang.org/x/text v0.37.0
 	google.golang.org/api v0.191.0
 	google.golang.org/protobuf v1.36.10
 	gopkg.in/gographics/imagick.v2 v2.7.1
@@ -65,10 +65,10 @@ require (
 	go.opentelemetry.io/otel v1.41.0 // indirect
 	go.opentelemetry.io/otel/metric v1.41.0 // indirect
 	go.opentelemetry.io/otel/trace v1.41.0 // indirect
-	golang.org/x/net v0.50.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/oauth2 v0.34.0 // indirect
-	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/sync v0.20.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/time v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
 	google.golang.org/genproto v0.0.0-20240730163845-b1a4ccb954bf // indirect
