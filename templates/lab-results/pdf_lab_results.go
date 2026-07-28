@@ -15,9 +15,9 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/unidoc/unipdf/v4/common"
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/creator"
+	"github.com/unidoc/unipdf/v5/common"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/creator"
 )
 
 func init() {

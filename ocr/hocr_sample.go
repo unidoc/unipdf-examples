@@ -20,8 +20,8 @@ import (
 	"strconv"
 
 	"github.com/stefanhengl/gohocr"
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/ocr"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/ocr"
 )
 
 func init() {

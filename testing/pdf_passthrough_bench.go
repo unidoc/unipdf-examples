@@ -39,10 +39,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/unidoc/unipdf/v4/common"
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/model"
-	"github.com/unidoc/unipdf/v4/model/optimize"
+	"github.com/unidoc/unipdf/v5/common"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/model"
+	"github.com/unidoc/unipdf/v5/model/optimize"
 )
 
 func init() {
