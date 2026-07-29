@@ -11,7 +11,7 @@ import (
 	"github.com/unidoc/unipdf/v5/model"
 	"github.com/unidoc/unipdf/v5/model/xmputil"
 
-	xmprights "github.com/trimmer-io/go-xmp/models/xmp_rights"
+	xmprights "github.com/unidoc/go-xmp/models/xmp_rights"
 )
 
 func init() {
@@ -63,11 +63,11 @@ func main() {
 		log.Fatalf("Reading XMP metadata failed: %v", err)
 	}
 
-	// Unwrap github.com/trimmer-io/go-xmp/xmp.Document implementation on which base xmputil is implemented.
+	// Unwrap github.com/unidoc/go-xmp/xmp.Document implementation on which base xmputil is implemented.
 	goXmpDoc := xmpDoc.GetGoXmpDocument()
 
 	// Getting direct access to go-xmp/xmp.Document allows extracting custom or undefined model for the XMP Metadata.
-	// Multiple XMP Metadata models could be find in: https://github.com/trimmer-io/go-xmp/tree/master/models.
+	// Multiple XMP Metadata models could be find in: https://github.com/unidoc/go-xmp/tree/master/models.
 	xmpRightsModel := xmprights.FindModel(goXmpDoc)
 	if xmpRightsModel == nil {
 		fmt.Println("No XMP Media Management namespace defined within XMP document.")
