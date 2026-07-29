@@ -40,19 +40,19 @@ $ ./build_examples.sh
 ```
 
 #### Building with GOPATH:
-Building with GOPATH requires a slightly different approach due to the `/v4` semantic import portion of the unipdf import paths.  There are two options:
+Building with GOPATH requires a slightly different approach due to the `/v5` semantic import portion of the unipdf import paths.  There are two options:
 
 Both options start with:
 - `go get github.com/unidoc/unipdf/...` to download the packages
 
 Then one can decide between the two options:
 
-1. Remove the `/v4/` in the unipdf import paths, e.g. use `github.com/unidoc/unipdf/core` instead of `github.com/unidoc/unipdf/v4/core`
-2. Alternatively create a symbolic link from the v4 subdirectory of unipdf to the unipdf repository, i.e.
+1. Remove the `/v5/` in the unipdf import paths, e.g. use `github.com/unidoc/unipdf/core` instead of `github.com/unidoc/unipdf/v5/core`
+2. Alternatively create a symbolic link from the v5 subdirectory of unipdf to the unipdf repository, i.e.
 ```bash
-ln -s $GOPATH/src/github.com/unidoc/unipdf $GOPATH/src/github.com/unidoc/unipdf/v4
+ln -s $GOPATH/src/github.com/unidoc/unipdf $GOPATH/src/github.com/unidoc/unipdf/v5
 ```
-or move/copy the unipdf folder to unipdf/v4 if symbolic links are not an option.
+or move/copy the unipdf folder to unipdf/v5 if symbolic links are not an option.
 
 Once this has been done, then can build using the build script as well:
 ```bash
