@@ -14,7 +14,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -164,7 +163,9 @@ func signFile(inputPath string, priv *rsa.PrivateKey, cert *x509.Certificate) ([
 	return buf.Bytes(), nil
 }
 
-func ltvEnable(r io.ReadSeeker, outputPath string, certChain []*x509.Certificate) error {
+// ltvEnable takes a *bytes.Reader rather than an io.ReadSeeker because the
+// reader and appender require an io.ReaderAt source.
+func ltvEnable(r *bytes.Reader, outputPath string, certChain []*x509.Certificate) error {
 	// Create reader.
 	reader, err := model.NewPdfReader(r)
 	if err != nil {

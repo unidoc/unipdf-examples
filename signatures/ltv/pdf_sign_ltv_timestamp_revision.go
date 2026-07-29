@@ -16,7 +16,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -178,7 +177,9 @@ func signFile(inputPath string, priv *rsa.PrivateKey, cert *x509.Certificate) ([
 	return buf.Bytes(), nil
 }
 
-func ltvEnableAndTimestamp(r io.ReadSeeker, certChain []*x509.Certificate) ([]byte, error) {
+// ltvEnableAndTimestamp takes a *bytes.Reader rather than an io.ReadSeeker
+// because the reader and appender require an io.ReaderAt source.
+func ltvEnableAndTimestamp(r *bytes.Reader, certChain []*x509.Certificate) ([]byte, error) {
 	// Create reader.
 	reader, err := model.NewPdfReader(r)
 	if err != nil {
@@ -238,7 +239,7 @@ func ltvEnableAndTimestamp(r io.ReadSeeker, certChain []*x509.Certificate) ([]by
 	return buf.Bytes(), nil
 }
 
-func ltvEnableTimestampSig(r io.ReadSeeker) ([]byte, error) {
+func ltvEnableTimestampSig(r *bytes.Reader) ([]byte, error) {
 	// Create reader.
 	reader, err := model.NewPdfReader(r)
 	if err != nil {
