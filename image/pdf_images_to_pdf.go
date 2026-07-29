@@ -1,6 +1,15 @@
 /*
  * Add images to a PDF file, one image per page.
  *
+ * Images keep as much of their source fidelity as possible without any extra
+ * configuration:
+ *   - A JPEG source embedded with the default DCT encoder is passed through
+ *     byte for byte, so there is no lossy decode/re-encode round trip. Encoder
+ *     settings such as quality therefore do not apply; call Image.SetEncoder
+ *     with a non-DCT encoder (e.g. a Flate encoder) to force a re-encode.
+ *   - An ICC color profile embedded in the source image is preserved and
+ *     attached to the embedded image as an ICCBased colorspace.
+ *
  * Run as: go run pdf_images_to_pdf.go output.pdf img1.jpg img2.jpg img3.png ...
  */
 
