@@ -30,7 +30,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -201,12 +200,12 @@ func patternsToPaths(patternList []string) ([]string, error) {
 
 			// One level of directories supported.
 			if fi.Mode().IsDir() {
-				innerFiles, err := ioutil.ReadDir(path)
+				innerFiles, err := os.ReadDir(path)
 				if err != nil {
 					panic(err)
 				}
 				for _, f := range innerFiles {
-					if f.Mode().IsRegular() {
+					if f.Type().IsRegular() {
 						pathList = append(pathList, filepath.Join(path, f.Name()))
 					}
 				}

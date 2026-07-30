@@ -10,7 +10,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -277,7 +276,7 @@ func (l *markupList) saveOutputPdf() error {
 	if err != nil {
 		return fmt.Errorf("MarshalIndent failed. err=%v", err)
 	}
-	err = ioutil.WriteFile(metaPath, b, 0666)
+	err = os.WriteFile(metaPath, b, 0666)
 	if err != nil {
 		return fmt.Errorf("WriteFile failed. metaPath=%q err=%v", metaPath, err)
 	}

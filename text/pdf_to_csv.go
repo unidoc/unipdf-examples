@@ -17,7 +17,6 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"sort"
@@ -188,7 +187,7 @@ func extractTableData(inPath string, outPath string) error {
 		}
 	}
 
-	return ioutil.WriteFile(outPath, csvData.Bytes(), 0666)
+	return os.WriteFile(outPath, csvData.Bytes(), 0666)
 }
 
 func rectUnion(b1, b2 model.PdfRectangle) model.PdfRectangle {

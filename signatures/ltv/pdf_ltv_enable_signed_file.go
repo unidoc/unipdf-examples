@@ -11,7 +11,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -42,7 +41,7 @@ func main() {
 	// Load certificate chain.
 	var certChain []*x509.Certificate
 	if len(args) == 4 {
-		issuerCertData, err := ioutil.ReadFile(args[3])
+		issuerCertData, err := os.ReadFile(args[3])
 		if err != nil {
 			log.Fatal("Fail: %v\n", err)
 		}

@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 
@@ -41,7 +41,7 @@ func main() {
 	}
 	defer f.Close()
 
-	data, err := ioutil.ReadAll(f)
+	data, err := io.ReadAll(f)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}

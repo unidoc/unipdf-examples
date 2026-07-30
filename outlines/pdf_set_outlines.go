@@ -11,7 +11,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/unidoc/unipdf/v5/common/license"
@@ -49,7 +48,7 @@ func main() {
 }
 
 func applyOutlines(inputPath, outlinesPath, outPath string) error {
-	data, err := ioutil.ReadFile(outlinesPath)
+	data, err := os.ReadFile(outlinesPath)
 	if err != nil {
 		return err
 	}

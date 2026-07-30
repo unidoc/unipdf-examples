@@ -12,7 +12,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -49,7 +48,7 @@ func main() {
 	outputPath := args[4]
 
 	// Get private key and X509 certificate from the PKCS12 file.
-	pfxData, err := ioutil.ReadFile(p12Path)
+	pfxData, err := os.ReadFile(p12Path)
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
 	}
@@ -62,7 +61,7 @@ func main() {
 	// Load certificate chain.
 	certChain := []*x509.Certificate{cert}
 	if len(args) == 6 {
-		issuerCertData, err := ioutil.ReadFile(args[5])
+		issuerCertData, err := os.ReadFile(args[5])
 		if err != nil {
 			log.Fatal("Fail: %v\n", err)
 		}

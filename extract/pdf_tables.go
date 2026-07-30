@@ -11,7 +11,6 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -199,7 +198,7 @@ func (r docTables) saveCSVFiles(csvRoot string) error {
 		for i, table := range r.pageTables[pageNum] {
 			csvPath := fmt.Sprintf("%s.page%d.table%d.csv", csvRoot, pageNum, i+1)
 			contents := table.csv()
-			if err := ioutil.WriteFile(csvPath, []byte(contents), 0666); err != nil {
+			if err := os.WriteFile(csvPath, []byte(contents), 0666); err != nil {
 				return fmt.Errorf("failed to write csvPath=%q err=%w", csvPath, err)
 			}
 		}
