@@ -21,7 +21,7 @@ require (
 	golang.org/x/text v0.34.0
 	google.golang.org/api v0.247.0
 	google.golang.org/protobuf v1.36.11
-	gopkg.in/gographics/imagick.v3 v3.7.3
+	gopkg.in/gographics/imagick.v2 v2.7.1
 	software.sslmate.com/src/go-pkcs12 v0.7.3
 )
 
