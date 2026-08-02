@@ -2,6 +2,8 @@
 
 UniPDF allows you to add, extract, list images in your PDF documents. Having the ability to play around with images allows for the creation of attractive PDF reports.
 
+When an image is loaded from a file, its original encoded bytes and any embedded ICC color profile are retained. Embedding a JPEG with the default DCT encoder passes the original bytes through unchanged instead of decoding and re-encoding them, and a source ICC profile is attached to the embedded image as an `ICCBased` colorspace. Both apply automatically; the retained data is discarded by operations that mutate pixels.
+
 ## Examples
 
 - [pdf_add_image_to_page.go](pdf_add_image_to_page.go) explains how to add an image in a PDF document

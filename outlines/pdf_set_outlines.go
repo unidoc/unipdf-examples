@@ -11,11 +11,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/model"
 )
 
 func init() {
@@ -49,7 +48,7 @@ func main() {
 }
 
 func applyOutlines(inputPath, outlinesPath, outPath string) error {
-	data, err := ioutil.ReadFile(outlinesPath)
+	data, err := os.ReadFile(outlinesPath)
 	if err != nil {
 		return err
 	}

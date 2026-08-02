@@ -15,10 +15,10 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/unidoc/unipdf/v4/common"
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/creator"
-	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v5/common"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/creator"
+	"github.com/unidoc/unipdf/v5/model"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )

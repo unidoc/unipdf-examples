@@ -30,7 +30,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -39,10 +38,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/unidoc/unipdf/v4/common"
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/model"
-	"github.com/unidoc/unipdf/v4/model/optimize"
+	"github.com/unidoc/unipdf/v5/common"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/model"
+	"github.com/unidoc/unipdf/v5/model/optimize"
 )
 
 func init() {
@@ -201,12 +200,12 @@ func patternsToPaths(patternList []string) ([]string, error) {
 
 			// One level of directories supported.
 			if fi.Mode().IsDir() {
-				innerFiles, err := ioutil.ReadDir(path)
+				innerFiles, err := os.ReadDir(path)
 				if err != nil {
 					panic(err)
 				}
 				for _, f := range innerFiles {
-					if f.Mode().IsRegular() {
+					if f.Type().IsRegular() {
 						pathList = append(pathList, filepath.Join(path, f.Name()))
 					}
 				}

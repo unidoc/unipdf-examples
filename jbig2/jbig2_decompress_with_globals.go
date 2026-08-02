@@ -16,12 +16,12 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/core"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/core"
 )
 
 func init() {
@@ -53,7 +53,7 @@ func main() {
 	defer globalsFile.Close()
 
 	// Read all data from the globals file.
-	globalsData, err := ioutil.ReadAll(globalsFile)
+	globalsData, err := io.ReadAll(globalsFile)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}
@@ -74,7 +74,7 @@ func main() {
 	}
 	defer jbig2File.Close()
 
-	exampleFileData, err := ioutil.ReadAll(jbig2File)
+	exampleFileData, err := io.ReadAll(jbig2File)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}

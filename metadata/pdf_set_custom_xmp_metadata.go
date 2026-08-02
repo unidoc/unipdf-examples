@@ -6,13 +6,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/core"
-	"github.com/unidoc/unipdf/v4/model"
-	"github.com/unidoc/unipdf/v4/model/xmputil"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/core"
+	"github.com/unidoc/unipdf/v5/model"
+	"github.com/unidoc/unipdf/v5/model/xmputil"
 
-	xmprights "github.com/trimmer-io/go-xmp/models/xmp_rights"
-	"github.com/trimmer-io/go-xmp/xmp"
+	xmprights "github.com/unidoc/go-xmp/models/xmp_rights"
+	"github.com/unidoc/go-xmp/xmp"
 )
 
 func init() {
@@ -71,11 +71,11 @@ func main() {
 		xmpDoc = xmputil.NewDocument()
 	}
 
-	// Unwrap github.com/trimmer-io/go-xmp/xmp.Document implementation on which base xmputil is implemented.
+	// Unwrap github.com/unidoc/go-xmp/xmp.Document implementation on which base xmputil is implemented.
 	goXmpDoc := xmpDoc.GetGoXmpDocument()
 
 	// Getting direct access to go-xmp/xmp.Document allows extracting custom or undefined model for the XMP Metadata.
-	// Multiple XMP Metadata models could be find in: https://github.com/trimmer-io/go-xmp/tree/master/models.
+	// Multiple XMP Metadata models could be find in: https://github.com/unidoc/go-xmp/tree/master/models.
 	xmpRightsModel, err := xmprights.MakeModel(goXmpDoc)
 	if err != nil {
 		log.Fatalf("Err: %v\n", err)

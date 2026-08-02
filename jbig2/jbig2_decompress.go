@@ -11,12 +11,12 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/core"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/core"
 )
 
 func init() {
@@ -41,7 +41,7 @@ func main() {
 	}
 	defer f.Close()
 
-	data, err := ioutil.ReadAll(f)
+	data, err := io.ReadAll(f)
 	if err != nil {
 		log.Fatalf("Error: %v\n", err)
 	}

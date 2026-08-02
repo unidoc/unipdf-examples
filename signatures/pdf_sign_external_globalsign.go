@@ -17,17 +17,16 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
 
 	"github.com/unidoc/globalsign-dss"
 	"github.com/unidoc/pkcs7"
-	"github.com/unidoc/unipdf/v4/annotator"
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/core"
-	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v5/annotator"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/core"
+	"github.com/unidoc/unipdf/v5/model"
 
 	"golang.org/x/crypto/ocsp"
 )
@@ -71,7 +70,7 @@ func main() {
 	}
 
 	// Write output file.
-	if err := ioutil.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
+	if err := os.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 

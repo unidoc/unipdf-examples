@@ -11,7 +11,6 @@ import (
 	"encoding/csv"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -24,11 +23,11 @@ import (
 	"golang.org/x/text/unicode/norm"
 
 	"github.com/bmatcuk/doublestar"
-	"github.com/unidoc/unipdf/v4/common"
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/extractor"
-	"github.com/unidoc/unipdf/v4/model"
-	"github.com/unidoc/unipdf/v4/pdfutil"
+	"github.com/unidoc/unipdf/v5/common"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/extractor"
+	"github.com/unidoc/unipdf/v5/model"
+	"github.com/unidoc/unipdf/v5/pdfutil"
 )
 
 func init() {
@@ -199,7 +198,7 @@ func (r docTables) saveCSVFiles(csvRoot string) error {
 		for i, table := range r.pageTables[pageNum] {
 			csvPath := fmt.Sprintf("%s.page%d.table%d.csv", csvRoot, pageNum, i+1)
 			contents := table.csv()
-			if err := ioutil.WriteFile(csvPath, []byte(contents), 0666); err != nil {
+			if err := os.WriteFile(csvPath, []byte(contents), 0666); err != nil {
 				return fmt.Errorf("failed to write csvPath=%q err=%w", csvPath, err)
 			}
 		}

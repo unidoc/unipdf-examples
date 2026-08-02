@@ -25,11 +25,11 @@ import (
 	"strings"
 
 	"github.com/anthonynsimon/bild/transform"
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/creator"
-	"github.com/unidoc/unipdf/v4/extractor"
-	"github.com/unidoc/unipdf/v4/model"
-	"github.com/unidoc/unipdf/v4/ocr"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/creator"
+	"github.com/unidoc/unipdf/v5/extractor"
+	"github.com/unidoc/unipdf/v5/model"
+	"github.com/unidoc/unipdf/v5/ocr"
 )
 
 // BBox represents a bounding box with coordinates.

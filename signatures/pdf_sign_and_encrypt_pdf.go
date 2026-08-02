@@ -13,19 +13,18 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"math/big"
 	"os"
 	"time"
 
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/core/security"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/core/security"
 
-	"github.com/unidoc/unipdf/v4/annotator"
-	"github.com/unidoc/unipdf/v4/core"
-	"github.com/unidoc/unipdf/v4/model"
-	"github.com/unidoc/unipdf/v4/model/sighandler"
+	"github.com/unidoc/unipdf/v5/annotator"
+	"github.com/unidoc/unipdf/v5/core"
+	"github.com/unidoc/unipdf/v5/model"
+	"github.com/unidoc/unipdf/v5/model/sighandler"
 )
 
 func init() {
@@ -102,7 +101,7 @@ func main() {
 	}
 
 	// Write the resulting file to output.pdf file.
-	err = ioutil.WriteFile(outputPath, buf, 0666)
+	err = os.WriteFile(outputPath, buf, 0666)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}

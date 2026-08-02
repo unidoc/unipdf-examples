@@ -17,9 +17,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/extractor"
-	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/extractor"
+	"github.com/unidoc/unipdf/v5/model"
 )
 
 func init() {
@@ -102,19 +102,19 @@ func testGoroutineExtract(reader *model.PdfReader, numPages int, outputDir strin
 		if err != nil {
 			return err
 		}
-		
+
 		// for test purposes, save each page text to its own file
 		filePath := filepath.Join(outputDir, strconv.Itoa(pageNum)+".txt")
 		file, err := os.Create(filePath)
 		if err != nil {
 			fmt.Printf("Error. failed to create file. %v\n", err)
 		}
-		
+
 		_, err = file.WriteString(text)
 		if err != nil {
 			fmt.Printf("Error. failed to write content. %v\n", err)
 		}
-		
+
 		return nil
 	}
 

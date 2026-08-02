@@ -10,9 +10,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/creator"
-	"github.com/unidoc/unipdf/v4/model"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/creator"
+	"github.com/unidoc/unipdf/v5/model"
 )
 
 func init() {
@@ -40,6 +40,12 @@ func main() {
 	c.NewPage()
 
 	if err := rowWrapEnabled(c, headingFont); err != nil {
+		log.Fatal(err)
+	}
+
+	c.NewPage()
+
+	if err := rowWrapDisabledForRow(c, headingFont); err != nil {
 		log.Fatal(err)
 	}
 
@@ -142,6 +148,46 @@ func rowWrapEnabled(c *creator.Creator, headingFont *model.PdfFont) error {
 		}
 
 		return nil
+	})
+}
+
+// rowWrapDisabledForRow keeps row wrapping enabled for the table as a whole but
+// excludes a single row from it, so that row moves to the next page intact
+// instead of splitting at the page boundary.
+func rowWrapDisabledForRow(c *creator.Creator, headingFont *model.PdfFont) error {
+	heading := c.NewStyledParagraph()
+	chunk := heading.Append("3. Table row wrap disabled for a single row")
+	chunk.Style.Font = headingFont
+	chunk.Style.FontSize = 20
+
+	if err := c.Draw(heading); err != nil {
+		return err
+	}
+
+	description := c.NewStyledParagraph()
+	description.SetMargins(0, 0, 10, 20)
+	chunk = description.Append("Row wrapping is enabled for the table, but the last row is excluded from it using SetRowWrapDisabled. Instead of splitting across the page boundary, that row is moved to the next page as a whole.")
+	chunk.Style.FontSize = 14
+	chunk.Style.Color = creator.ColorRGBFromHex("#777")
+
+	if err := c.Draw(description); err != nil {
+		return err
+	}
+
+	return fillTable(c, 22, true, func(table *creator.Table) error {
+		for i := 0; i < 4; i++ {
+			sp := c.NewStyledParagraph()
+			sp.SetText("This is a styled paragraph in a row that would normally wrap across pages. Because the row is excluded from row wrapping, all of its content is moved to the next page together.").Style.FontSize = 14
+
+			if err := drawCell(table, sp); err != nil {
+				return err
+			}
+		}
+
+		// Exclude the row that was just added. Rows are 1-based, and the call
+		// applies to the cells currently in the row, so it has to come after
+		// those cells have been added.
+		return table.SetRowWrapDisabled(table.Rows(), true)
 	})
 }
 

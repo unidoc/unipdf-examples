@@ -16,19 +16,17 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
 
 	"golang.org/x/crypto/pkcs12"
 
-	"github.com/unidoc/unipdf/v4/annotator"
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/core"
-	"github.com/unidoc/unipdf/v4/model"
-	"github.com/unidoc/unipdf/v4/model/sighandler"
+	"github.com/unidoc/unipdf/v5/annotator"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/core"
+	"github.com/unidoc/unipdf/v5/model"
+	"github.com/unidoc/unipdf/v5/model/sighandler"
 )
 
 func init() {
@@ -54,7 +52,7 @@ func main() {
 	outputPath := args[4]
 
 	// Load private key and X509 certificate from the PKCS12 file.
-	pfxData, err := ioutil.ReadFile(p12Path)
+	pfxData, err := os.ReadFile(p12Path)
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
 	}
@@ -67,7 +65,7 @@ func main() {
 	// Load certificate chain.
 	certChain := []*x509.Certificate{cert}
 	if len(args) == 6 {
-		issuerCertData, err := ioutil.ReadFile(args[5])
+		issuerCertData, err := os.ReadFile(args[5])
 		if err != nil {
 			log.Fatal("Fail: %v\n", err)
 		}
@@ -106,7 +104,7 @@ func main() {
 	}
 
 	// Write output file to disk.
-	err = ioutil.WriteFile(outputPath, signedBytes, 0644)
+	err = os.WriteFile(outputPath, signedBytes, 0644)
 	if err != nil {
 		log.Fatal("Fail: %v\n", err)
 	}
@@ -178,7 +176,9 @@ func signFile(inputPath string, priv *rsa.PrivateKey, cert *x509.Certificate) ([
 	return buf.Bytes(), nil
 }
 
-func ltvEnableAndTimestamp(r io.ReadSeeker, certChain []*x509.Certificate) ([]byte, error) {
+// ltvEnableAndTimestamp takes a *bytes.Reader rather than an io.ReadSeeker
+// because the reader and appender require an io.ReaderAt source.
+func ltvEnableAndTimestamp(r *bytes.Reader, certChain []*x509.Certificate) ([]byte, error) {
 	// Create reader.
 	reader, err := model.NewPdfReader(r)
 	if err != nil {
@@ -238,7 +238,7 @@ func ltvEnableAndTimestamp(r io.ReadSeeker, certChain []*x509.Certificate) ([]by
 	return buf.Bytes(), nil
 }
 
-func ltvEnableTimestampSig(r io.ReadSeeker) ([]byte, error) {
+func ltvEnableTimestampSig(r *bytes.Reader) ([]byte, error) {
 	// Create reader.
 	reader, err := model.NewPdfReader(r)
 	if err != nil {

@@ -11,8 +11,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/unidoc/unipdf/v4/common/license"
-	"github.com/unidoc/unipdf/v4/pdfutil"
+	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/pdfutil"
 )
 
 func init() {
