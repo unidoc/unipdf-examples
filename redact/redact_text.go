@@ -7,6 +7,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -78,13 +79,24 @@ func redactText(patterns []string, rectProps *redactor.RectangleProps, inputFile
 	}
 	defer f.Close()
 	// Define RedactionOptions.
-	options := redactor.RedactionOptions{Terms: terms}
+	// Verification is enabled by default: after redaction, the redactor checks that every
+	// matched term was physically removed from the page and form XObject content streams.
+	// Set DisableVerification to true to skip this check.
+	options := redactor.RedactionOptions{Terms: terms, DisableVerification: false}
 	red := redactor.New(pdfReader, &options, rectProps)
 	if err != nil {
 		return err
 	}
 	err = red.Redact()
 	if err != nil {
+		// An IncompleteRedactionError means the document was processed, but some matches
+		// could not be verified as removed. The output must not be treated as safely redacted.
+		var incomplete *redactor.IncompleteRedactionError
+		if errors.As(err, &incomplete) {
+			for _, failure := range incomplete.Failures {
+				fmt.Printf("Unverified redaction on page %d, term %q: %s\n", failure.Page, failure.Term, failure.Reason)
+			}
+		}
 		return err
 	}
 	// write the redacted document to destFile.

@@ -1,6 +1,6 @@
 module github.com/unidoc/unidoc-examples
 
-go 1.24.0
+go 1.25.0
 
 require (
 	cloud.google.com/go/kms v1.22.0
@@ -15,7 +15,7 @@ require (
 	github.com/unidoc/go-xmp v1.1.0
 	github.com/unidoc/pkcs7 v0.3.0
 	github.com/unidoc/unichart v0.5.2
-	github.com/unidoc/unipdf/v5 v5.0.0
+	github.com/unidoc/unipdf/v5 v5.1.0
 	golang.org/x/crypto v0.48.0
 	golang.org/x/image v0.36.0
 	golang.org/x/text v0.34.0
