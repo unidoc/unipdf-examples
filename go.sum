@@ -120,8 +120,8 @@ github.com/unidoc/typesetting v0.1.1 h1:R4BngsypjFjxImfVNfUu6bRI7ZS6TiDLeYuAWme8
 github.com/unidoc/typesetting v0.1.1/go.mod h1:eHsEFFepTNb3mQejy1xy9AfgU2gCZJod2PA8duITHEY=
 github.com/unidoc/unichart v0.5.2 h1:DVsk7IW4ZJJJAJpLJYyKndwDDx5Z4XXgtG+GF1u9Ymo=
 github.com/unidoc/unichart v0.5.2/go.mod h1:/8yJsL49OqBOyG53JFVZOwwDXDquo/ZRMkfz9fNsVgc=
-github.com/unidoc/unipdf/v5 v5.0.0 h1:9DbJGcJ16ACAb1nHeogKC37YEvolWMXxv2HbLWd2GZM=
-github.com/unidoc/unipdf/v5 v5.0.0/go.mod h1:DZSD0olgwYqspNWUOhYM28KqfHFLrorDNmiV7hNKlW8=
+github.com/unidoc/unipdf/v5 v5.1.0 h1:eWM+rCcSSMEnwBcP7ONODRR/csLGpQquAkQtlIfAO1o=
+github.com/unidoc/unipdf/v5 v5.1.0/go.mod h1:7z0yLljYAhiIom5XEM2UdI5SBX3IVMpsgFSNySOGQzA=
 github.com/unidoc/unitype v0.5.1 h1:UwTX15K6bktwKocWVvLoijIeu4JAVEAIeFqMOjvxqQs=
 github.com/unidoc/unitype v0.5.1/go.mod h1:3dxbRL+f1otNqFQIRHho8fxdg3CcUKrqS8w1SXTsqcI=
 go.opentelemetry.io/auto/sdk v1.2.1 h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ64=
