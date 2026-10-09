@@ -28,7 +28,7 @@ func init() {
 func main() {
 	args := os.Args
 	if len(args) < 3 {
-		fmt.Printf("Usage: pdf_sanitize_document.go <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>\n", os.Args[0])
+		fmt.Printf("Usage: %s <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>\n", os.Args[0])
 		return
 	}
 	inputPath := args[1]
@@ -49,13 +49,18 @@ func main() {
 
 	// Define sanitization options and set writer's optimizer
 	opts := sanitize.SanitizationOpts{
-		JavaScript:  true,
-		URI:         true,
-		GoToR:       true,
-		GoTo:        true,
-		RenditionJS: true,
-		OpenAction:  true,
-		Launch:      true,
+		JavaScript:    true, // Remove JavaScript actions.
+		URI:           true, // Remove URI actions.
+		GoToR:         true, // Remove remote go-to actions.
+		GoTo:          true, // Remove go-to actions.
+		RenditionJS:   true, // Blank the JavaScript entry of rendition actions.
+		OpenAction:    true, // Remove the OpenAction entry from the document catalog.
+		Launch:        true, // Remove launch actions.
+		EmbeddedFiles: true, // Remove embedded file attachments.
+		SubmitForm:    true, // Remove form submission actions.
+		ImportData:    true, // Remove form data import actions.
+		Movie:         true, // Remove movie actions.
+		Sound:         true, // Remove sound actions.
 	}
 	pdfWriter.SetOptimizer(sanitize.New(opts))
 
