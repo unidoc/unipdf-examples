@@ -168,7 +168,7 @@ func signFile(inputPath string, priv *rsa.PrivateKey, cert *x509.Certificate) ([
 		signature,
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
-			annotator.NewSignatureLine("Date", "2019.16.04"),
+			annotator.NewSignatureLine("Date", time.Now().Format("2006.01.02")),
 			annotator.NewSignatureLine("Reason", "Signature test"),
 		},
 		opts,
@@ -212,7 +212,7 @@ func ltvEnableAndTimestamp(r *bytes.Reader, certChain []*x509.Certificate) ([]by
 		return nil, err
 	}
 
-	if err := ltv.EnableAll(certChain); err != nil {
+	if err := enableSignedFields(reader, ltv, certChain); err != nil {
 		return nil, err
 	}
 
@@ -272,7 +272,7 @@ func ltvEnableTimestampSig(r *bytes.Reader) ([]byte, error) {
 		return nil, err
 	}
 
-	if err := ltv.EnableAll(nil); err != nil {
+	if err := enableSignedFields(reader, ltv, nil); err != nil {
 		return nil, err
 	}
 
@@ -283,4 +283,22 @@ func ltvEnableTimestampSig(r *bytes.Reader) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
+}
+
+// enableSignedFields LTV enables every signature field that holds a
+// signature. LTV.EnableAll fails on an empty signature field.
+func enableSignedFields(reader *model.PdfReader, ltv *model.LTV, extraCerts []*x509.Certificate) error {
+	if reader.AcroForm == nil {
+		return nil
+	}
+	for _, field := range reader.AcroForm.AllFields() {
+		sigField, ok := field.GetContext().(*model.PdfFieldSignature)
+		if !ok || sigField.V == nil || sigField.V.Contents == nil {
+			continue
+		}
+		if err := ltv.Enable(sigField.V, extraCerts); err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -132,7 +132,7 @@ func main() {
 		signature,
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
-			annotator.NewSignatureLine("Date", "2019.16.04"),
+			annotator.NewSignatureLine("Date", time.Now().Format("2006.01.02")),
 			annotator.NewSignatureLine("Reason", "Signature test"),
 		},
 		opts,

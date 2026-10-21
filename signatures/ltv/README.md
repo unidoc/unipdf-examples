@@ -347,8 +347,16 @@ if err != nil {
     log.Fatal(err)
 }
 
-if err := ltv.EnableAll(nil); err != nil {
-    log.Fatal(err)
+// Enable only the fields that hold a signature; EnableAll fails on an
+// empty signature field.
+for _, field := range reader.AcroForm.AllFields() {
+    sigField, ok := field.GetContext().(*model.PdfFieldSignature)
+    if !ok || sigField.V == nil || sigField.V.Contents == nil {
+        continue
+    }
+    if err := ltv.Enable(sigField.V, nil); err != nil {
+        log.Fatal(err)
+    }
 }
 
 // Write output file.
