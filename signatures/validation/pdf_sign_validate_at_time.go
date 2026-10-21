@@ -107,8 +107,8 @@ func main() {
 		log.Fatal("Fail: no signature fields found")
 	}
 
-	for i, sig := range integrity {
-		opts := &model.SignatureValidationOpts{
+	newOpts := func() *model.SignatureValidationOpts {
+		return &model.SignatureValidationOpts{
 			Roots: roots,
 			// Archived documents carry their revocation evidence in the DSS
 			// (see the LTV examples). Reading it back needs no network and
@@ -116,33 +116,56 @@ func main() {
 			Revocation:              model.RevocationCheckOffline,
 			RequireRevocationStatus: true,
 		}
-		switch timeArg {
-		case "":
-			// Default: now, or the trusted timestamp token time.
-		case "signing-time":
-			// The caller chooses to believe the signer's own date.
-			if sig.Date == (model.PdfDate{}) {
-				fmt.Printf("--- Signature %d (%s): no signing date (/M), skipped\n", i+1, sig.Name)
-				continue
-			}
-			opts.ValidationTime = sig.Date.ToGoTime()
-		default:
+	}
+
+	// Outside signing-time every signature is checked at the same time, so
+	// one validation pass serves them all.
+	var shared []model.SignatureValidationResult
+	if timeArg != "signing-time" {
+		opts := newOpts()
+		if timeArg != "" {
 			at, err := time.Parse(time.RFC3339, timeArg)
 			if err != nil {
 				log.Fatalf("Fail: invalid time %q: %v\n", timeArg, err)
 			}
 			opts.ValidationTime = at
 		}
-
-		res, err := reader.ValidateSignaturesWithOpts(handlers, opts)
+		// With no time given: now, or the trusted timestamp token time.
+		shared, err = reader.ValidateSignaturesWithOpts(handlers, opts)
 		if err != nil {
 			log.Fatalf("Fail: %v\n", err)
 		}
+	}
+
+	for i, sig := range integrity {
+		res := shared
+		if timeArg == "signing-time" {
+			// The caller chooses to believe the signer's own date.
+			if sig.Date == (model.PdfDate{}) {
+				fmt.Printf("--- Signature %d (%s): no signing date (/M), skipped\n", i+1, sig.Name)
+				continue
+			}
+			opts := newOpts()
+			opts.ValidationTime = sig.Date.ToGoTime()
+			res, err = reader.ValidateSignaturesWithOpts(handlers, opts)
+			if err != nil {
+				log.Fatalf("Fail: %v\n", err)
+			}
+		}
 		item := res[i]
 
+		signerDate := "none"
+		if sig.Date != (model.PdfDate{}) {
+			signerDate = sig.Date.ToGoTime().Format(time.RFC3339)
+		}
+		validatedAt := "not evaluated"
+		if !item.ValidatedAt.IsZero() {
+			validatedAt = item.ValidatedAt.Format(time.RFC3339)
+		}
+
 		fmt.Printf("--- Signature %d (%s)\n", i+1, item.Name)
-		fmt.Printf("Signer's date:    %s\n", sig.Date.ToGoTime().Format(time.RFC3339))
-		fmt.Printf("Validated at:     %s\n", item.ValidatedAt.Format(time.RFC3339))
+		fmt.Printf("Signer's date:    %s\n", signerDate)
+		fmt.Printf("Validated at:     %s\n", validatedAt)
 		fmt.Printf("Integrity:        %v\n", item.IsVerified)
 		fmt.Printf("Trusted:          %v\n", item.IsTrusted)
 		fmt.Printf("Revocation:       %s\n", item.RevocationStatus)

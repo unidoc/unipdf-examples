@@ -1,5 +1,8 @@
 /*
- * This example showcases how to validate a digital signature with UniDoc.
+ * This example showcases how to validate the digital signatures of a PDF with
+ * UniDoc. It covers adbe.x509.rsa_sha1, adbe.pkcs7.detached,
+ * ETSI.CAdES.detached (PAdES B-B to B-LTA) and ETSI.RFC3161 document
+ * timestamps, and exits non-zero if any signature fails.
  *
  * ValidateSignatures checks integrity only: IsVerified means the signature
  * matches the document under the certificate embedded in the PDF, which any
@@ -14,6 +17,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/unidoc/unipdf/v5/common/license"
 	"github.com/unidoc/unipdf/v5/model"
@@ -62,9 +67,22 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
+	// The PAdES handler validates every PAdES level, not only B-B.
+	handlerPAdES, err := sighandler.NewEtsiPAdESLevelB(nil, nil, nil)
+	if err != nil {
+		log.Fatalf("Fail: %v\n", err)
+	}
+
+	handlerDocTimeStamp, err := sighandler.NewDocTimeStamp("", 0)
+	if err != nil {
+		log.Fatalf("Fail: %v\n", err)
+	}
+
 	handlers := []model.SignatureHandler{
 		handlerX509RSASHA1,
 		handlerPKCS7Detached,
+		handlerPAdES,
+		handlerDocTimeStamp,
 	}
 
 	// Validate signatures.
@@ -76,11 +94,14 @@ func main() {
 		log.Fatal("Fail: no signature fields found")
 	}
 
-	if !res[0].IsSigned || !res[0].IsVerified {
-		log.Fatal("Fail: validation failed")
-	}
-
+	var failed []string
 	for i, item := range res {
 		fmt.Printf("--- Signature %d\n%s\n", i+1, item.String())
+		if !item.IsSigned || !item.IsVerified {
+			failed = append(failed, strconv.Itoa(i+1))
+		}
+	}
+	if len(failed) > 0 {
+		log.Fatalf("Fail: validation failed for signature(s) %s\n", strings.Join(failed, ", "))
 	}
 }

@@ -7,7 +7,9 @@
  * Only for chain certificates that evidence does not settle does it contact
  * the CRL distribution points and OCSP responders named in the certificate,
  * over HTTP or HTTPS, through the clients configured here. A request that
- * fails leaves the status unknown; it never fails validation by itself.
+ * fails leaves the status unknown. With RequireRevocationStatus, as set
+ * here, an unknown status makes the signature untrusted; without it the
+ * failure is only reported as a warning.
  *
  * $ ./pdf_sign_validate_online <INPUT_PDF_PATH> <ROOTS_PEM_PATH>
  */
@@ -130,7 +132,7 @@ func main() {
 		fmt.Printf("--- Signature %d (%s)\n", i+1, item.Name)
 		fmt.Printf("Integrity:  %v\n", item.IsVerified)
 		fmt.Printf("Trusted:    %v\n", item.IsTrusted)
-		fmt.Printf("Revocation: %s (CRL used: %v, OCSP used: %v)\n",
+		fmt.Printf("Revocation: %s (signer CRL found: %v, signer OCSP found: %v)\n",
 			item.RevocationStatus, item.IsCrlFound, item.IsOcspFound)
 		if item.RevocationStatus == model.RevocationStatusRevoked {
 			fmt.Printf("Revoked at: %s\n", item.RevocationTime.Format(time.RFC3339))
