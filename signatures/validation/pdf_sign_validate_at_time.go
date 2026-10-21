@@ -12,7 +12,11 @@
  * registration log, a trusted receipt) can pass that instant as
  * ValidationTime. The signature dictionary's own /M date is chosen by the
  * signer, so accepting it is a decision the caller makes knowingly; this
- * example does so only when the user asks for it.
+ * example does so only when the user asks for it, and only for signatures
+ * without a trusted timestamp token. An explicit ValidationTime takes
+ * precedence over the token, so passing /M for a timestamped signature would
+ * replace the time the TSA vouched for with the one the signer chose.
+ * Signatures without /M and document timestamps keep the default evaluation.
  *
  * $ ./pdf_sign_validate_at_time <INPUT_PDF_PATH> <ROOTS_PEM_PATH> [RFC3339_TIME|signing-time]
  */
@@ -26,6 +30,7 @@ import (
 	"time"
 
 	"github.com/unidoc/unipdf/v5/common/license"
+	"github.com/unidoc/unipdf/v5/core"
 	"github.com/unidoc/unipdf/v5/model"
 	"github.com/unidoc/unipdf/v5/model/sighandler"
 )
@@ -97,66 +102,64 @@ func main() {
 		handlerTimestamp,
 	}
 
-	// A first pass with the integrity-only API reads the signing dates the
-	// signers recorded. Nothing in these results is a trust verdict.
-	integrity, err := reader.ValidateSignatures(handlers)
+	opts := &model.SignatureValidationOpts{
+		Roots: roots,
+		// Archived documents carry their revocation evidence in the DSS
+		// (see the LTV examples). Reading it back needs no network and is
+		// the only evidence that describes the state at signing time.
+		Revocation:              model.RevocationCheckOffline,
+		RequireRevocationStatus: true,
+	}
+	if timeArg != "" && timeArg != "signing-time" {
+		at, err := time.Parse(time.RFC3339, timeArg)
+		if err != nil {
+			log.Fatalf("Fail: invalid time %q: %v\n", timeArg, err)
+		}
+		opts.ValidationTime = at
+	}
+
+	// With no time given each signature is evaluated now, or at the time of
+	// its trusted timestamp token.
+	start := time.Now()
+	res, err := reader.ValidateSignaturesWithOpts(handlers, opts)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-	if len(integrity) == 0 {
+	if len(res) == 0 {
 		log.Fatal("Fail: no signature fields found")
 	}
 
-	newOpts := func() *model.SignatureValidationOpts {
-		return &model.SignatureValidationOpts{
-			Roots: roots,
-			// Archived documents carry their revocation evidence in the DSS
-			// (see the LTV examples). Reading it back needs no network and
-			// is the only evidence that describes the state at signing time.
-			Revocation:              model.RevocationCheckOffline,
-			RequireRevocationStatus: true,
-		}
-	}
-
-	// Outside signing-time the options are the same for every signature, so
-	// one validation pass serves them all.
-	var shared []model.SignatureValidationResult
-	if timeArg != "signing-time" {
-		opts := newOpts()
-		if timeArg != "" {
-			at, err := time.Parse(time.RFC3339, timeArg)
-			if err != nil {
-				log.Fatalf("Fail: invalid time %q: %v\n", timeArg, err)
-			}
-			opts.ValidationTime = at
-		}
-		// With no time given: now, or the trusted timestamp token time.
-		shared, err = reader.ValidateSignaturesWithOpts(handlers, opts)
-		if err != nil {
-			log.Fatalf("Fail: %v\n", err)
-		}
-	}
-
-	for i, sig := range integrity {
-		res := shared
-		if timeArg == "signing-time" {
-			// The caller chooses to believe the signer's own date.
-			if sig.Date == (model.PdfDate{}) {
-				fmt.Printf("--- Signature %d (%s): no signing date (/M), skipped\n", i+1, sig.Name)
+	if timeArg == "signing-time" {
+		// The caller chooses to believe the signer's own /M date, but only
+		// where nothing better fixes the time: an explicit ValidationTime
+		// would override a trusted timestamp token, so signatures evaluated
+		// at a token time (before start) keep that result. Document
+		// timestamps carry no signer date to trust.
+		byDate := map[time.Time][]int{}
+		for i, item := range res {
+			if item.Date == (model.PdfDate{}) || isDocTimeStamp(item) || item.ValidatedAt.Before(start) {
 				continue
 			}
-			opts := newOpts()
-			opts.ValidationTime = sig.Date.ToGoTime()
-			res, err = reader.ValidateSignaturesWithOpts(handlers, opts)
+			at := item.Date.ToGoTime().UTC()
+			byDate[at] = append(byDate[at], i)
+		}
+		for at, indexes := range byDate {
+			dateOpts := *opts
+			dateOpts.ValidationTime = at
+			atRes, err := reader.ValidateSignaturesWithOpts(handlers, &dateOpts)
 			if err != nil {
 				log.Fatalf("Fail: %v\n", err)
 			}
+			for _, i := range indexes {
+				res[i] = atRes[i]
+			}
 		}
-		item := res[i]
+	}
 
+	for i, item := range res {
 		signerDate := "none"
-		if sig.Date != (model.PdfDate{}) {
-			signerDate = sig.Date.ToGoTime().Format(time.RFC3339)
+		if item.Date != (model.PdfDate{}) {
+			signerDate = item.Date.ToGoTime().Format(time.RFC3339)
 		}
 		validatedAt := "not evaluated"
 		if !item.ValidatedAt.IsZero() {
@@ -179,4 +182,16 @@ func main() {
 			fmt.Printf("  warning: %s\n", warning)
 		}
 	}
+}
+
+func isDocTimeStamp(item model.SignatureValidationResult) bool {
+	if len(item.Fields) == 0 {
+		return false
+	}
+	d, ok := core.GetDict(item.Fields[0].V)
+	if !ok {
+		return false
+	}
+	name, ok := core.GetNameVal(d.Get("SubFilter"))
+	return ok && name == "ETSI.RFC3161"
 }
