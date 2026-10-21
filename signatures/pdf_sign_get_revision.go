@@ -2,7 +2,7 @@
  * This example showcases how to retrieve the specific or previous revision of a PDF document
  * The file is signed using a private/public key pair.
  *
- * $ ./pdf_sign_docmdp <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
+ * $ ./pdf_sign_get_revision <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
 package main
 
