@@ -27,11 +27,11 @@ func init() {
 	}
 }
 
-const usagef = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS]\n"
+const usagef = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS.pem]\n"
 
 func main() {
 	args := os.Args
-	if len(args) < 3 {
+	if len(args) < 3 || len(args) > 4 {
 		fmt.Printf(usagef, os.Args[0])
 		return
 	}
@@ -85,8 +85,18 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	if err := ltv.EnableAll(certChain); err != nil {
-		log.Fatalf("Fail: %v\n", err)
+	// LTV.EnableAll fails on an empty signature field, so enable only the
+	// fields that hold a signature.
+	if reader.AcroForm != nil {
+		for _, field := range reader.AcroForm.AllFields() {
+			sigField, ok := field.GetContext().(*model.PdfFieldSignature)
+			if !ok || sigField.V == nil || sigField.V.Contents == nil {
+				continue
+			}
+			if err := ltv.Enable(sigField.V, certChain); err != nil {
+				log.Fatalf("Fail: %v\n", err)
+			}
+		}
 	}
 
 	// Write output PDF file.

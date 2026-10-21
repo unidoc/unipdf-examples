@@ -16,7 +16,7 @@ import (
 	"os"
 	"time"
 
-	"golang.org/x/crypto/pkcs12"
+	"software.sslmate.com/src/go-pkcs12"
 
 	"github.com/unidoc/unipdf/v5/annotator"
 	"github.com/unidoc/unipdf/v5/common/license"
@@ -34,11 +34,11 @@ func init() {
 	}
 }
 
-const usagef = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS]\n"
+const usagef = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS.pem]\n"
 
 func main() {
 	args := os.Args
-	if len(args) < 5 {
+	if len(args) < 5 || len(args) > 6 {
 		fmt.Printf(usagef, os.Args[0])
 		return
 	}
@@ -53,13 +53,18 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	priv, cert, err := pkcs12.Decode(pfxData, password)
+	key, cert, caCerts, err := pkcs12.DecodeChain(pfxData, password)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
+	priv, ok := key.(*rsa.PrivateKey)
+	if !ok {
+		log.Fatalf("Fail: the PKCS12 private key is %T; this example needs an RSA key\n", key)
+	}
 
-	// Load certificate chain.
-	certChain := []*x509.Certificate{cert}
+	// Load certificate chain: the signer, the CA certificates bundled in the
+	// PKCS12 file, then any certificates from EXTRA_CERTS.pem.
+	certChain := append([]*x509.Certificate{cert}, caCerts...)
 	if len(args) == 6 {
 		issuerCertData, err := os.ReadFile(args[5])
 		if err != nil {
@@ -100,7 +105,7 @@ func main() {
 	}
 
 	// Create signature handler.
-	handler, err := sighandler.NewAdobePKCS7Detached(priv.(*rsa.PrivateKey), cert)
+	handler, err := sighandler.NewAdobePKCS7Detached(priv, cert)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}

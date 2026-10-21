@@ -7,6 +7,7 @@
   - [Sign and LTV enable in the same revision](#1-sign-and-ltv-enable-in-the-same-revision)
   - [Sign and LTV enable in a separate revision](#2-sign-and-ltv-enable-in-a-separate-revision)
 - [Usage](#usage)
+  - [Running the examples](#running-the-examples)
   - [LTV client](#ltv-client)
   - [Sign and LTV enable in one revision](#workflow-1-sign-and-ltv-enable-in-one-revision)
   - [LTV enable signed file](#workflow-2-ltv-enable-signed-file)
@@ -49,7 +50,7 @@ DSS
     // signatures in a PDF document.
     Certs [PDF stream array]
     OCSPs [PDF stream array]
-    CLRs  [PDF stream array]
+    CRLs  [PDF stream array]
 
     // Signature specific validation data.
     // Each key in the VRI dictionary represents the hash of the Contents
@@ -59,11 +60,11 @@ DSS
     VRI:
         Hash signature 1: Cert [PDF stream array]
                           OCSP [PDF stream array]
-                          CLR  [PDF stream array]
+                          CRL  [PDF stream array]
         ...
         Hash signature N: Cert [PDF stream array]
                           OCSP [PDF stream array]
-                          CLR  [PDF stream array]
+                          CRL  [PDF stream array]
 ```
 
 The Contents field of a signature is only known after signing and writing a
@@ -132,6 +133,25 @@ are also possible.
 
 ## Usage
 
+#### Running the examples
+
+```
+go run pdf_sign_ltv_one_revision.go P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS.pem]
+go run pdf_ltv_enable_signed_file.go INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS.pem]
+go run pdf_sign_ltv_timestamp_revision.go P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS.pem]
+```
+
+`EXTRA_CERTS.pem` holds issuer certificates to add to the chain, in PEM
+format. The signing examples also add the CA certificates bundled in the
+PKCS12 file. All three fetch missing issuers, OCSP responses and CRLs over
+the network. `pdf_sign_ltv_timestamp_revision.go` also requests a timestamp
+from the freetsa.org TSA.
+
+To check the output, run
+[../validation/pdf_sign_validate_trust.go](../validation/pdf_sign_validate_trust.go)
+in offline mode (it reads the revocation data from the DSS) or
+[../validation/pdf_sign_validate_at_time.go](../validation/pdf_sign_validate_at_time.go).
+
 #### LTV client
 
 unipdf provides a configurable client for LTV enabling signed PDF documents,
@@ -194,21 +214,27 @@ uses a `adbe.pkcs7.detached` signature handler. However, the handler can be
 swapped with a `adbe.x509.rsa_sha1` handler (no other changes are required).
 
 The signing certificate chain must be provided (which needs to contain at
-least the signing certificate). The LTV client builds the certificate chain
-up to a trusted root certificate (by downloading any missing certificates).
+least the signing certificate). The LTV client completes the chain by
+downloading missing issuer certificates. It stops at the first self-signed CA
+certificate or when an issuer cannot be fetched, and it does not check that
+the chain ends at a root you trust.
 
 For more information, see [pdf_sign_ltv_one_revision.go](pdf_sign_ltv_one_revision.go).
 
 ```go
 // Get private key and X509 certificate from a PKCS12 (.p12/.pfx) file.
-pfxData, err := ioutil.ReadFile("p12.pfx")
+pfxData, err := os.ReadFile("p12.pfx")
 if err != nil {
     log.Fatal(err)
 }
 
-priv, cert, err := pkcs12.Decode(pfxData, password)
+key, cert, caCerts, err := pkcs12.DecodeChain(pfxData, password)
 if err != nil {
     log.Fatal(err)
+}
+priv, ok := key.(*rsa.PrivateKey)
+if !ok {
+    log.Fatal("PKCS12 private key is not an RSA key")
 }
 
 file, err := os.Open("unsigned-file.pdf")
@@ -217,6 +243,11 @@ if err != nil {
 }
 defer file.Close()
 
+reader, err := model.NewPdfReader(file)
+if err != nil {
+    log.Fatal(err)
+}
+
 // Create appender.
 appender, err := model.NewPdfAppender(reader)
 if err != nil {
@@ -224,7 +255,7 @@ if err != nil {
 }
 
 // Create signature handler.
-handler, err := sighandler.NewAdobePKCS7Detached(priv.(*rsa.PrivateKey), cert)
+handler, err := sighandler.NewAdobePKCS7Detached(priv, cert)
 if err != nil {
     log.Fatal(err)
 }
@@ -249,6 +280,9 @@ field, err := annotator.NewSignatureField(
     },
     opts,
 )
+if err != nil {
+    log.Fatal(err)
+}
 field.T = core.MakeString("Test Sign LTV enable")
 
 if err = appender.Sign(1, field); err != nil {
@@ -260,7 +294,7 @@ ltv, err := model.NewLTV(appender)
 if err != nil {
     log.Fatal(err)
 }
-if err := ltv.EnableChain([]*x509.Certificate{cert}); err != nil {
+if err := ltv.EnableChain(append([]*x509.Certificate{cert}, caCerts...)); err != nil {
     log.Fatal(err)
 }
 
@@ -277,12 +311,16 @@ revision. This workflow is useful when the signing certificate is not
 available at the time of signing (e.g.: when signing using external services).
 
 The certificate chains used for the signatures in the file are
-extracted from the signature dictionaries.  The LTV client builds the
-certificate chains up to a trusted root certificate, by downloading any
-missing certificates.
+extracted from the signature dictionaries. The LTV client completes each
+chain by downloading missing issuer certificates, with the same limits as in
+workflow #1: it stops at a self-signed CA certificate or on a fetch error and
+does not check trust.
 
-For more information, see [pdf_ltv_enable_signed_file.go](pdf_ltv_enable_signed_file.go)
-and [pdf_sign_ltv_extra_revision.go](pdf_sign_ltv_extra_revision.go).
+`LTV.EnableAll` returns an error when the form has a signature field that is
+not signed yet. The example walks the signature fields and calls `LTV.Enable`
+only on signed ones.
+
+For more information, see [pdf_ltv_enable_signed_file.go](pdf_ltv_enable_signed_file.go).
 
 ```go
 // Create reader.
