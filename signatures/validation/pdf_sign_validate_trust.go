@@ -48,8 +48,15 @@ func main() {
 	// attribute) by default. "online" additionally fetches CRLs and OCSP
 	// responses from the URLs named in the certificates.
 	revocation := model.RevocationCheckOffline
-	if len(args) > 3 && args[3] == "online" {
-		revocation = model.RevocationCheckOnline
+	if len(args) > 3 {
+		switch args[3] {
+		case "offline":
+		case "online":
+			revocation = model.RevocationCheckOnline
+		default:
+			fmt.Printf(usagef, os.Args[0])
+			return
+		}
 	}
 
 	// The trust roots come from the caller, never from the document. Load

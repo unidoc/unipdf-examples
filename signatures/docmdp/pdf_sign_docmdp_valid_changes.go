@@ -226,7 +226,7 @@ func addSignature(reader *model.PdfReader, pageNum int) ([]byte, error) {
 	sigField.T = core.MakeString("DocMDP Signature")
 
 	if err = appender.Sign(pageNum, sigField); err != nil {
-		log.Fatalf("Fail: %v\n", err)
+		return nil, err
 	}
 
 	// Write output PDF file.

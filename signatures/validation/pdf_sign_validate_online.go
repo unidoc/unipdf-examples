@@ -62,11 +62,9 @@ func main() {
 	// proxy and TLS configuration your environment needs here; the same
 	// client can be shared across many validations and wrapped with a cache
 	// if CRLs from the same issuer are fetched repeatedly.
-	transport := http.DefaultTransport.(*http.Transport).Clone()
-	transport.Proxy = http.ProxyFromEnvironment
 	httpClient := &http.Client{
 		Timeout:   10 * time.Second,
-		Transport: transport,
+		Transport: http.DefaultTransport.(*http.Transport).Clone(),
 	}
 	crlClient := sigutil.NewCRLClient()
 	crlClient.HTTPClient = httpClient
