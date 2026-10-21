@@ -215,7 +215,7 @@ func sign(inputPath, outputPath string, signingCert *x509.Certificate,
 
 	// Sign input PDF file.
 	// The signature appearance is placed on the first page of the output PDF file.
-	// See https://github.com/unidoc/unipdf-examples/blob/master/signatures/pdf_sign_appearance.go
+	// See https://github.com/unidoc/unipdf-examples/blob/master/signatures/appearance/pdf_sign_appearance.go
 	// for adding multiple signature appearance annotations, on multiple pages.
 	if err = appender.Sign(1, sigField); err != nil {
 		return err
