@@ -1,6 +1,11 @@
 /*
  * This example showcases how to validate a digital signature with UniDoc.
  *
+ * ValidateSignatures checks integrity only: IsVerified means the signature
+ * matches the document under the certificate embedded in the PDF, which any
+ * self-signed certificate satisfies. To check that the signer is trusted, see
+ * pdf_sign_validate_trust.go.
+ *
  * $ ./pdf_sign_validate <INPUT_PDF_PATH>
  */
 package main
