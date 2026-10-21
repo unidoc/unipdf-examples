@@ -8,11 +8,11 @@ Examples for digital signing of PDF files with UniDoc.
 - [pdf_sign_pkcs12.go](signing/pdf_sign_pkcs12.go) Example of signing using PKCS12 (.p12/.pfx) file.
 - [pdf_sign_pem_multicert.go](signing/pdf_sign_pem_multicert.go) Example of signing using a certificate chain and a private key, extracted from PEM files.
 - [pdf_sign_pkcs7_ecdsa.go](signing/pdf_sign_pkcs7_ecdsa.go) Example of adbe.pkcs7.detached signing with an ECDSA key.
-- [pdf_sign_timestamp.go](signing/pdf_sign_timestamp.go) Example of signing and timestamping using PKCS12 (.p12/.pfx) file.
-- [pdf_sign_custom_client.go](signing/pdf_sign_custom_client.go) Example of signing with a custom timestamp client.
+- [pdf_sign_timestamp.go](signing/pdf_sign_timestamp.go) Example of signing using PKCS12 (.p12/.pfx) file and adding an RFC 3161 document timestamp.
 - [pdf_sign_new_page.go](signing/pdf_sign_new_page.go) Example of appending a new page with signature to a PDF document.
 - [pdf_sign_twice_visible_annotation.go](signing/pdf_sign_twice_visible_annotation.go) Example of signing a PDF document twice with visible signature annotations.
-- [pdf_sign_and_encrypt_pdf.go](signing/pdf_sign_and_encrypt_pdf.go) Example of signing an encrypted PDF document.
+- [pdf_sign_and_encrypt_pdf.go](signing/pdf_sign_and_encrypt_pdf.go) Example of encrypting a PDF document with AES-128 and then signing it.
+- [pdf_sign_get_revision.go](signing/pdf_sign_get_revision.go) Example of signing a document twice and extracting the revision it had before signing.
 
 ## Signature appearance
 
@@ -25,7 +25,9 @@ Examples for digital signing of PDF files with UniDoc.
 - [pdf_sign_external_aws_kms.go](external/pdf_sign_external_aws_kms.go) Example of signing with AWS KMS.
 - [pdf_sign_external_google_cloud_kms.go](external/pdf_sign_external_google_cloud_kms.go) Example of signing with Google Cloud KMS.
 - [pdf_sign_external_globalsign.go](external/pdf_sign_external_globalsign.go) Example of signing with the GlobalSign DSS API.
-- [pdf_sign_hsm_pkcs11_cgo.go](external/pdf_sign_hsm_pkcs11_cgo.go) Example of signing with a PKCS11 service using SoftHSM and the crypto11 package. See the [external signing guide](external) for setup.
+- [pdf_sign_hsm_pkcs11_cgo.go](external/pdf_sign_hsm_pkcs11_cgo.go) Example of signing with a PKCS11 service using SoftHSM and the crypto11 package.
+
+See the [external signing guide](external) for KMS, GlobalSign and SoftHSM setup.
 
 ## PAdES
 
@@ -33,6 +35,7 @@ Examples for digital signing of PDF files with UniDoc.
 - [pdf_sign_pades_b_t.go](pades/pdf_sign_pades_b_t.go) Example of signing with a PAdES B-T compatible digital signature.
 - [pdf_sign_pades_b_lt.go](pades/pdf_sign_pades_b_lt.go) Example of signing with a PAdES B-LT compatible digital signature.
 - [pdf_sign_pades_b_lta.go](pades/pdf_sign_pades_b_lta.go) Example of signing with a PAdES B-LTA compatible digital signature.
+- [pdf_sign_custom_client.go](pades/pdf_sign_custom_client.go) Example of PAdES B-LT signing with a custom timestamp client.
 
 ## DocMDP
 
@@ -42,13 +45,10 @@ Examples for digital signing of PDF files with UniDoc.
 
 ## Validation
 
-- [pdf_sign_validate.go](validation/pdf_sign_validate.go) Example of signature integrity validation.
-- [pdf_sign_validate_pades_b_b.go](validation/pdf_sign_validate_pades_b_b.go) Example of PAdES signature integrity validation.
-- [pdf_sign_validate_timestamp.go](validation/pdf_sign_validate_timestamp.go) Example of validating a signature that contains a timestamp.
+- [pdf_sign_validate.go](validation/pdf_sign_validate.go) Example of integrity validation for every signature in a document, including PAdES signatures and document timestamps.
 - [pdf_sign_validate_trust.go](validation/pdf_sign_validate_trust.go) Example of signature validation against trusted root certificates with CRL/OCSP revocation checks.
 - [pdf_sign_validate_at_time.go](validation/pdf_sign_validate_at_time.go) Example of validating archived signatures at an explicit point in time.
 - [pdf_sign_validate_online.go](validation/pdf_sign_validate_online.go) Example of signature validation with online CRL and OCSP revocation checks through configured HTTP clients.
-- [pdf_sign_get_revision.go](validation/pdf_sign_get_revision.go) Example of retrieving a specific or previous revision of a signed PDF document.
 
 ## LTV
 
