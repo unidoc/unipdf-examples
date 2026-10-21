@@ -129,6 +129,9 @@ func main() {
 		},
 		opts,
 	)
+	if err != nil {
+		log.Fatalf("Fail: %v\n", err)
+	}
 	field.T = core.MakeString("Test Sign LTV enable")
 
 	if err = appender.Sign(1, field); err != nil {

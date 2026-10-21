@@ -141,6 +141,9 @@ func main() {
 			},
 			opts,
 		)
+		if err != nil {
+			log.Fatalf("Fail: %v\n", err)
+		}
 		sigField.T = core.MakeString(fmt.Sprintf("Signature %d", pageNum))
 
 		if err = appender.Sign(pageNum, sigField); err != nil {
@@ -164,6 +167,9 @@ func main() {
 			},
 			opts,
 		)
+		if err != nil {
+			log.Fatalf("Fail: %v\n", err)
+		}
 		sigField.T = core.MakeString(fmt.Sprintf("Signature2 %d", pageNum))
 
 		if err = appender.Sign(pageNum, sigField); err != nil {
@@ -190,6 +196,9 @@ func main() {
 			},
 			opts,
 		)
+		if err != nil {
+			log.Fatalf("Fail: %v\n", err)
+		}
 		sigField.T = core.MakeString(fmt.Sprintf("Signature3 %d", pageNum))
 
 		if err = appender.Sign(pageNum, sigField); err != nil {
@@ -218,6 +227,9 @@ func main() {
 			},
 			opts,
 		)
+		if err != nil {
+			log.Fatalf("Fail: %v\n", err)
+		}
 		sigField.T = core.MakeString(fmt.Sprintf("Signature4 %d", pageNum))
 
 		if err = appender.Sign(pageNum, sigField); err != nil {
@@ -231,6 +243,9 @@ func main() {
 		opts.WatermarkImage = signatureWImage
 
 		sigField, err = annotator.NewSignatureField(signature, nil, opts)
+		if err != nil {
+			log.Fatalf("Fail: %v\n", err)
+		}
 
 		sigField.T = core.MakeString(fmt.Sprintf("Signature5 %d", pageNum))
 

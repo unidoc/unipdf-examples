@@ -243,6 +243,9 @@ func sign(signer crypto.Signer, certificate *x509.Certificate, inputPath, output
 		},
 		opts,
 	)
+	if err != nil {
+		return err
+	}
 	sigField.T = core.MakeString("External signature")
 
 	// Sign PDF.

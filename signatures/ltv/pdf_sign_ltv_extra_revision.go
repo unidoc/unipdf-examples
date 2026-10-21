@@ -147,6 +147,9 @@ func signFile(inputPath string, priv *rsa.PrivateKey, cert *x509.Certificate) ([
 		},
 		opts,
 	)
+	if err != nil {
+		return nil, err
+	}
 	field.T = core.MakeString("Test Sign LTV enable")
 
 	if err = appender.Sign(1, field); err != nil {

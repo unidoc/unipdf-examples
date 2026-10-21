@@ -136,6 +136,9 @@ func generateSignedFile(inputPath string, handler model.SignatureHandler) ([]byt
 		},
 		opts,
 	)
+	if err != nil {
+		return nil, nil, err
+	}
 	field.T = core.MakeString("External signature")
 
 	if err = appender.Sign(1, field); err != nil {

@@ -192,6 +192,9 @@ func sign(inputPath, outputPath string, signingCert *x509.Certificate,
 		},
 		opts,
 	)
+	if err != nil {
+		return err
+	}
 	sigField.T = core.MakeString("PEM Multicert signature")
 
 	// Open input file.
