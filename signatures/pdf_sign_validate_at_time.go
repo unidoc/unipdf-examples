@@ -86,7 +86,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-	handlers := []model.SignatureHandler{handlerX509RSASHA1, handlerPKCS7Detached, handlerPAdES}
+	handlerTimestamp, err := sighandler.NewDocTimeStamp("", 0)
+	if err != nil {
+		log.Fatalf("Fail: %v\n", err)
+	}
+	handlers := []model.SignatureHandler{
+		handlerX509RSASHA1,
+		handlerPKCS7Detached,
+		handlerPAdES,
+		handlerTimestamp,
+	}
 
 	// A first pass with the integrity-only API reads the signing dates the
 	// signers recorded. Nothing in these results is a trust verdict.
@@ -112,6 +121,10 @@ func main() {
 			// Default: now, or the trusted timestamp token time.
 		case "signing-time":
 			// The caller chooses to believe the signer's own date.
+			if sig.Date == (model.PdfDate{}) {
+				fmt.Printf("--- Signature %d (%s): no signing date (/M), skipped\n", i+1, sig.Name)
+				continue
+			}
 			opts.ValidationTime = sig.Date.ToGoTime()
 		default:
 			at, err := time.Parse(time.RFC3339, timeArg)
