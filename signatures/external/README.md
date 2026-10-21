@@ -1,0 +1,77 @@
+# External signing
+
+Examples of signing with external services, cloud KMS and HSMs. See the [signatures README](../README.md) for the full list.
+
+## pdf_sign_hsm_pkcs11_cgo.go
+
+The code example shows how to sign with a HSM via PKCS11 as supported by the
+crypto11 library.  
+The example uses SoftHSM which is great for testing digital signatures via
+PKCS11 without any hardware requirements.
+
+#### Prerequisites
+
+Ubuntu/Debian
+```bash
+$ sudo apt-get install libssl-dev
+$ sudo apt-get install autotools-dev
+$ sudo apt-get install autoconf
+$ sudo apt-get install libtool
+```
+
+CentOS/RHEL
+```bash
+$ sudo yum group install "Development Tools"
+$ sudo yum install openssl-devel
+```
+
+#### Installation
+
+```bash
+$ git clone https://github.com/opendnssec/SoftHSMv2.git
+$ cd SoftHSMv2
+$ sh autogen.sh
+$ ./configure
+$ make
+$ sudo make install
+```
+
+#### Configuration
+
+```bash
+$ mkdir -p /home/user/.config/softhsm2/tokens
+$ cd /home/user/.config/softhsm2
+$ touch softhsm2.conf
+$ export SOFTHSM2_CONF=/home/user/.config/softhsm2/softhsm2.conf
+```
+
+#### Contents of softhsm2.conf
+
+```
+directories.tokendir = /home/user/.config/softhsm2/tokens
+objectstore.backend = file
+log.level = DEBUG
+slots.removable = true
+```
+
+#### Create token
+
+Creating a token "test", selecting the PIN numbers as prompted
+
+```bash
+$ softhsm2-util --init-token --slot 0 --label "test"
+```
+
+#### Usage
+
+Create a key pair:
+```bash
+$ go run pdf_sign_hsm_pkcs11_cgo.go add test <PIN> <KEYPAIR_LABEL>
+```
+
+Sign PDF file:
+```bash
+$ go run pdf_sign_hsm_pkcs11_cgo.go sign test <PIN> <KEYPAIR_LABEL> input.pdf input_signed.pdf
+```
+
+Signed output is in `input_signed.pdf`.
