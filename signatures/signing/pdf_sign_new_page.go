@@ -151,7 +151,7 @@ func addSignature(reader *model.PdfReader, pageNum int, outputPath string) error
 	sigField.T = core.MakeString("New Page Signature")
 
 	if err = appender.Sign(pageNum, sigField); err != nil {
-		log.Fatalf("Fail: %v\n", err)
+		return err
 	}
 
 	// Write output PDF file.
@@ -184,7 +184,6 @@ func generateSigKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 		NotAfter:  now.Add(time.Hour * 24 * 365),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 

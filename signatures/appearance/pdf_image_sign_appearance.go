@@ -1,6 +1,11 @@
 /*
- * This example showcases how to create appearance fields for digital signature.
- * The file is signed using a private/public key pair.
+ * This example showcases how to create image-based appearance fields for a
+ * digital signature: a signature image placed beside, above or below the
+ * text lines, an image-only appearance, and a watermark image behind each
+ * field. Five fields are added on each page of the document.
+ * All fields share one signature dictionary, so the document carries a single
+ * cryptographic signature shown in several places.
+ * The file is signed using a generated private/public key pair.
  *
  * $ ./pdf_image_sign_appearance <INPUT_PDF_PATH> <IMAGE_FILE> <WATERMARK_IMAGE_FILE> <OUTPUT_PDF_PATH>
  */
@@ -238,7 +243,7 @@ func main() {
 
 		// Only Image Signature
 		opts = annotator.NewSignatureFieldOpts()
-		opts.Rect = []float64{70, 50, 170, 100}
+		opts.Rect = []float64{330, 25, 430, 75}
 		opts.Image = signatureImage
 		opts.WatermarkImage = signatureWImage
 
@@ -274,13 +279,13 @@ func generateKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 	template := x509.Certificate{
 		SerialNumber: big.NewInt(1),
 		Subject: pkix.Name{
+			CommonName:   "Test Signer",
 			Organization: []string{"Test Company"},
 		},
 		NotBefore: now.Add(-time.Hour),
 		NotAfter:  now.Add(time.Hour * 24 * 365),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 

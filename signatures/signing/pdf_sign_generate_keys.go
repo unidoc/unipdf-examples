@@ -95,8 +95,8 @@ func main() {
 		signature,
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
-			annotator.NewSignatureLine("Date", "2019.16.04"),
-			annotator.NewSignatureLine("Reason", "External signature test"),
+			annotator.NewSignatureLine("Date", now.Format("2006.01.02")),
+			annotator.NewSignatureLine("Reason", "Generated key signature test"),
 		},
 		opts,
 	)
@@ -127,7 +127,7 @@ func generateKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 
 	// Initialize X509 certificate template.
 	template := x509.Certificate{
-		SerialNumber: new(big.Int),
+		SerialNumber: big.NewInt(1),
 		Subject: pkix.Name{
 			CommonName:   "any",
 			Organization: []string{"Test Company"},

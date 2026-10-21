@@ -13,13 +13,13 @@ import (
 	"os"
 	"time"
 
-	"golang.org/x/crypto/pkcs12"
-
 	"github.com/unidoc/unipdf/v5/annotator"
 	"github.com/unidoc/unipdf/v5/common/license"
 	"github.com/unidoc/unipdf/v5/core"
 	"github.com/unidoc/unipdf/v5/model"
 	"github.com/unidoc/unipdf/v5/model/sighandler"
+
+	"software.sslmate.com/src/go-pkcs12"
 )
 
 func init() {
@@ -35,7 +35,7 @@ const usagef = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH\n"
 
 func main() {
 	args := os.Args
-	if len(args) < 4 {
+	if len(args) < 5 {
 		fmt.Printf(usagef, os.Args[0])
 		return
 	}
@@ -50,9 +50,14 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	priv, cert, err := pkcs12.Decode(pfxData, password)
+	// DecodeChain also accepts files that bundle CA certificates with the signing certificate.
+	priv, cert, _, err := pkcs12.DecodeChain(pfxData, password)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
+	}
+	rsaKey, ok := priv.(*rsa.PrivateKey)
+	if !ok {
+		log.Fatalf("Fail: private key is %T; only RSA keys are supported, see pdf_sign_pkcs7_ecdsa.go for ECDSA\n", priv)
 	}
 
 	// Create reader.
@@ -74,7 +79,7 @@ func main() {
 	}
 
 	// Create signature handler.
-	handler, err := sighandler.NewAdobePKCS7Detached(priv.(*rsa.PrivateKey), cert)
+	handler, err := sighandler.NewAdobePKCS7Detached(rsaKey, cert)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
@@ -98,8 +103,8 @@ func main() {
 		signature,
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
-			annotator.NewSignatureLine("Date", "2019.16.04"),
-			annotator.NewSignatureLine("Reason", "External signature test"),
+			annotator.NewSignatureLine("Date", time.Now().Format("2006.01.02")),
+			annotator.NewSignatureLine("Reason", "PKCS12 signature test"),
 		},
 		opts,
 	)

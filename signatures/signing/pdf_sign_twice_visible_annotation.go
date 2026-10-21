@@ -1,6 +1,7 @@
 /*
- * This example showcases how to append a new page with signature to a PDF document.
- * The file is signed using a private/public key pair.
+ * This example showcases how to sign the last page of a PDF document twice.
+ * Each signature has its own visible annotation and is added in a separate
+ * incremental revision, signed with its own generated private/public key pair.
  *
  * $ ./pdf_sign_twice_visible_annotation <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
@@ -75,7 +76,7 @@ func main() {
 	}
 
 	// Write the resulting file to output.pdf file.
-	err = os.WriteFile(outputPath, buf, 0666)
+	err = os.WriteFile(outputPath, buf, 0644)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
@@ -87,7 +88,7 @@ func main() {
 func addSignature(pdfReader *model.PdfReader, signNumber int) ([]byte, error) {
 	totalPage, err := pdfReader.GetNumPages()
 	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
+		return nil, err
 	}
 
 	// Create appender.
@@ -129,7 +130,7 @@ func addSignature(pdfReader *model.PdfReader, signNumber int) ([]byte, error) {
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
 			annotator.NewSignatureLine("Date", "2019.03.14"),
-			annotator.NewSignatureLine("Reason", fmt.Sprintf("Test sign #%d", signNumber)),
+			annotator.NewSignatureLine("Reason", fmt.Sprintf("Test sign #%d", signNumber+1)),
 			annotator.NewSignatureLine("Location", "London"),
 			annotator.NewSignatureLine("DN", "authority2:name2"),
 		},
@@ -139,10 +140,10 @@ func addSignature(pdfReader *model.PdfReader, signNumber int) ([]byte, error) {
 		return nil, err
 	}
 
-	sigField.T = core.MakeString(fmt.Sprintf("New Page Signature %d", signNumber))
+	sigField.T = core.MakeString(fmt.Sprintf("Signature %d", signNumber+1))
 
 	if err = appender.Sign(totalPage, sigField); err != nil {
-		log.Fatalf("Fail: %v\n", err)
+		return nil, err
 	}
 
 	buf := &bytes.Buffer{}
@@ -176,7 +177,6 @@ func generateSigKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 		NotAfter:  now.Add(time.Hour * 24 * 365),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 

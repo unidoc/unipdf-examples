@@ -1,6 +1,9 @@
 /*
- * This example showcases how to create appearance fields for digital signature.
- * The file is signed using a private/public key pair.
+ * This example showcases how to create text-based appearance fields for a
+ * digital signature, three on each page of the document.
+ * All fields share one signature dictionary, so the document carries a single
+ * cryptographic signature shown in several places.
+ * The file is signed using a generated private/public key pair.
  *
  * $ ./pdf_sign_appearance <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
@@ -195,13 +198,13 @@ func generateKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 	template := x509.Certificate{
 		SerialNumber: big.NewInt(1),
 		Subject: pkix.Name{
+			CommonName:   "Test Signer",
 			Organization: []string{"Test Company"},
 		},
 		NotBefore: now.Add(-time.Hour),
 		NotAfter:  now.Add(time.Hour * 24 * 365),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 

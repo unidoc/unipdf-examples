@@ -1,6 +1,7 @@
 /*
  * This example showcases how to create an adbe.pkcs7.detached compatible digital signature for a PDF file
- * using ECDSA (elliptic curve DSA) key. ECDSA keys can be used for signing PDF files starting from version 2.0.
+ * using ECDSA (elliptic curve DSA) key. ECDSA signatures are defined by PDF 2.0, so viewers that only
+ * support earlier PDF versions may not validate them.
  *
  * $ ./pdf_sign_pkcs7_ecdsa <FILE.PFX> <PASSWORD> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
@@ -50,9 +51,14 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	priv, cert, err := pkcs12.Decode(pfxData, password)
+	// DecodeChain also accepts files that bundle CA certificates with the signing certificate.
+	priv, cert, _, err := pkcs12.DecodeChain(pfxData, password)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
+	}
+	ecdsaKey, ok := priv.(*ecdsa.PrivateKey)
+	if !ok {
+		log.Fatalf("Fail: private key is %T; only ECDSA keys are supported, see pdf_sign_pkcs12.go for RSA\n", priv)
 	}
 
 	// Create reader.
@@ -74,7 +80,7 @@ func main() {
 	}
 
 	// Create signature handler with ECDSA key.
-	handler, err := sighandler.NewAdobePKCS7DetachedEcdsa(priv.(*ecdsa.PrivateKey), cert)
+	handler, err := sighandler.NewAdobePKCS7DetachedEcdsa(ecdsaKey, cert)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}

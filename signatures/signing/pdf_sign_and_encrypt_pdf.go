@@ -1,8 +1,10 @@
 /*
- * This example showcases how to append a new page with signature to a PDF document.
- * The file is signed using a private/public key pair.
+ * This example showcases how to encrypt a PDF document with AES-128 and then
+ * sign the encrypted document. The signature is added as an incremental
+ * revision that keeps the document encryption, using a generated
+ * private/public key pair. The output opens with the password "password".
  *
- * $ ./pdf_sign_encrypted_pdf <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
+ * $ ./pdf_sign_and_encrypt_pdf <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
 package main
 
@@ -39,7 +41,7 @@ func init() {
 func main() {
 	args := os.Args
 	if len(args) < 3 {
-		log.Fatalln("Usage: go run pdf_sign_encrypted_pdf INPUT_PDF_PATH OUTPUT_PDF_PATH")
+		log.Fatalln("Usage: go run pdf_sign_and_encrypt_pdf INPUT_PDF_PATH OUTPUT_PDF_PATH")
 	}
 
 	inputPath := args[1]
@@ -73,7 +75,7 @@ func main() {
 		Algorithm:   model.AES_128bit,
 	}
 
-	// Ecnrypt document
+	// Encrypt document.
 	buf, err := encryptDocument(pdfReader, password, encryptOptions)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
@@ -82,14 +84,14 @@ func main() {
 	readerOpts := model.NewReaderOpts()
 	readerOpts.Password = password
 
-	// Open reader for the signed document
+	// Open reader for the encrypted document.
 	pdfReader, err = model.NewPdfReaderWithOpts(bytes.NewReader(buf), readerOpts)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Create appender.
-	pdfAppender, err := model.NewPdfAppenderWithOpts(pdfReader, readerOpts, encryptOptions)
+	// Create appender. The appender reuses the encryption of the input document.
+	pdfAppender, err := model.NewPdfAppenderWithOpts(pdfReader, readerOpts, nil)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
@@ -101,7 +103,7 @@ func main() {
 	}
 
 	// Write the resulting file to output.pdf file.
-	err = os.WriteFile(outputPath, buf, 0666)
+	err = os.WriteFile(outputPath, buf, 0644)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
@@ -167,7 +169,7 @@ func addSignature(pdfAppender *model.PdfAppender, pageNum int) ([]byte, error) {
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
 			annotator.NewSignatureLine("Date", "2019.03.14"),
-			annotator.NewSignatureLine("Reason", fmt.Sprintf("Test sign")),
+			annotator.NewSignatureLine("Reason", "Test sign"),
 			annotator.NewSignatureLine("Location", "London"),
 			annotator.NewSignatureLine("DN", "authority2:name2"),
 		},
@@ -177,10 +179,10 @@ func addSignature(pdfAppender *model.PdfAppender, pageNum int) ([]byte, error) {
 		return nil, err
 	}
 
-	sigField.T = core.MakeString(fmt.Sprintf("New Page Signature"))
+	sigField.T = core.MakeString("Encrypted Document Signature")
 
 	if err = pdfAppender.Sign(pageNum, sigField); err != nil {
-		log.Fatalf("Fail: %v\n", err)
+		return nil, err
 	}
 
 	buf := &bytes.Buffer{}
@@ -214,7 +216,6 @@ func generateSigKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 		NotAfter:  now.Add(time.Hour * 24 * 365),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 
