@@ -52,19 +52,19 @@ func main() {
 	// Generate key pair.
 	priv, cert, err := generateKeys()
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create the image
@@ -94,13 +94,13 @@ func main() {
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature handler.
 	handler, err := sighandler.NewAdobePKCS7Detached(priv, cert)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature.
@@ -110,12 +110,12 @@ func main() {
 	signature.SetDate(time.Now(), "")
 
 	if err := signature.Initialize(); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	numPages, err := reader.GetNumPages()
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature fields and add them on each page of the PDF file.
@@ -144,7 +144,7 @@ func main() {
 		sigField.T = core.MakeString(fmt.Sprintf("Signature %d", pageNum))
 
 		if err = appender.Sign(pageNum, sigField); err != nil {
-			log.Fatal("Fail: %v\n", err)
+			log.Fatalf("Fail: %v\n", err)
 		}
 
 		// Without image signature
@@ -167,7 +167,7 @@ func main() {
 		sigField.T = core.MakeString(fmt.Sprintf("Signature2 %d", pageNum))
 
 		if err = appender.Sign(pageNum, sigField); err != nil {
-			log.Fatal("Fail: %v\n", err)
+			log.Fatalf("Fail: %v\n", err)
 		}
 
 		// Image on the top

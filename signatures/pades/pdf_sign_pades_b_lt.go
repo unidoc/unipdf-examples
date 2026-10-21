@@ -50,18 +50,18 @@ func main() {
 	// Get private key and X509 certificate from the PFX file.
 	pfxData, err := os.ReadFile(pfxPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	priv, cert, err := pkcs12.Decode(pfxData, password)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Get CA Certificate from the PEM file.
 	caCertF, err := os.ReadFile(pemPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	certDERBlock, _ := pem.Decode(caCertF)
@@ -69,26 +69,26 @@ func main() {
 	cacert, err := x509.ParseCertificate(certDERBlock.Bytes)
 
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 		return
 	}
 
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Set timestamp server.
@@ -97,7 +97,7 @@ func main() {
 	// Create signature handler.
 	handler, err := sighandler.NewEtsiPAdESLevelLT(priv.(*rsa.PrivateKey), cert, cacert, timestampServerURL, appender)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature.
@@ -107,7 +107,7 @@ func main() {
 	signature.SetDate(time.Now(), "")
 
 	if err := signature.Initialize(); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature field and appearance.
@@ -127,25 +127,25 @@ func main() {
 	field.T = core.MakeString("Self signed PDF")
 
 	if err = appender.Sign(1, field); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Write output to buffer.
 	buffer := bytes.NewBuffer(nil)
 	err = appender.Write(buffer)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// We need the second pass to correctly save DSS/VRI information.
 	pdf2, err := model.NewPdfReader(bytes.NewReader(buffer.Bytes()))
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	appender2, err := model.NewPdfAppender(pdf2)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	appender2.SetDSS(appender.GetDSS())
@@ -153,7 +153,7 @@ func main() {
 	// Write output to the PDF file.
 	err = appender2.WriteToFile(outputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)

@@ -43,7 +43,7 @@ func main() {
 	if len(args) == 4 {
 		issuerCertData, err := os.ReadFile(args[3])
 		if err != nil {
-			log.Fatal("Fail: %v\n", err)
+			log.Fatalf("Fail: %v\n", err)
 		}
 
 		for len(issuerCertData) != 0 {
@@ -55,7 +55,7 @@ func main() {
 
 			issuer, err := x509.ParseCertificate(block.Bytes)
 			if err != nil {
-				log.Fatal("Fail: %v\n", err)
+				log.Fatalf("Fail: %v\n", err)
 			}
 			certChain = append(certChain, issuer)
 		}
@@ -64,35 +64,35 @@ func main() {
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// LTV enable the signed file.
 	ltv, err := model.NewLTV(appender)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	if err := ltv.EnableAll(certChain); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Write output PDF file.
 	err = appender.WriteToFile(outputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	log.Printf("PDF file successfully LTV enabled. Output path: %s\n", outputPath)

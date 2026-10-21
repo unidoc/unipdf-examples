@@ -54,12 +54,12 @@ func main() {
 	// Load private key and X509 certificate from the PKCS12 file.
 	pfxData, err := os.ReadFile(p12Path)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	priv, cert, err := pkcs12.Decode(pfxData, password)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Load certificate chain.
@@ -67,7 +67,7 @@ func main() {
 	if len(args) == 6 {
 		issuerCertData, err := os.ReadFile(args[5])
 		if err != nil {
-			log.Fatal("Fail: %v\n", err)
+			log.Fatalf("Fail: %v\n", err)
 		}
 
 		for len(issuerCertData) != 0 {
@@ -79,7 +79,7 @@ func main() {
 
 			issuer, err := x509.ParseCertificate(block.Bytes)
 			if err != nil {
-				log.Fatal("Fail: %v\n", err)
+				log.Fatalf("Fail: %v\n", err)
 			}
 			certChain = append(certChain, issuer)
 		}
@@ -88,25 +88,25 @@ func main() {
 	// Sign and write file to buffer.
 	signedBytes, err := signFile(inputPath, priv.(*rsa.PrivateKey), cert)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// LTV enable, timestamp and write file to buffer.
 	signedBytes, err = ltvEnableAndTimestamp(bytes.NewReader(signedBytes), certChain)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Optionally, LTV enable the applied timestamp signature.
 	signedBytes, err = ltvEnableTimestampSig(bytes.NewReader(signedBytes))
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Write output file to disk.
 	err = os.WriteFile(outputPath, signedBytes, 0644)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)

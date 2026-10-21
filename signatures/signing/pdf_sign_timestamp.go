@@ -49,36 +49,36 @@ func main() {
 	// Get private key and X509 certificate from the P12 file.
 	pfxData, err := os.ReadFile(p12Path)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	priv, cert, err := pkcs12.Decode(pfxData, password)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature handler.
 	handler, err := sighandler.NewAdobePKCS7Detached(priv.(*rsa.PrivateKey), cert)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature.
@@ -88,7 +88,7 @@ func main() {
 	signature.SetDate(time.Now(), "")
 
 	if err := signature.Initialize(); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature field and appearance.
@@ -108,27 +108,27 @@ func main() {
 	field.T = core.MakeString("Self signed PDF")
 
 	if err = appender.Sign(1, field); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	outDoc := bytes.NewBuffer(nil)
 	if err = appender.Write(outDoc); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	pdf1, err := model.NewPdfReader(bytes.NewReader(outDoc.Bytes()))
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	appender, err = model.NewPdfAppender(pdf1)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	handler, err = sighandler.NewDocTimeStamp("https://freetsa.org/tsr", crypto.SHA512)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature field and appearance.
@@ -151,12 +151,12 @@ func main() {
 	)
 
 	if err = appender.Sign(1, sigField); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	err = appender.WriteToFile(outputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)

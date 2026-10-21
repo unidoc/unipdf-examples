@@ -42,19 +42,19 @@ func main() {
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature handler. It is possible to validate B-T level the same way if you create NewEtsiPAdESLevelT here
 	padesHandler, err := sighandler.NewEtsiPAdESLevelB(nil, nil, nil)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	handlers := []model.SignatureHandler{
@@ -64,7 +64,7 @@ func main() {
 	// Validate signatures.
 	res, err := reader.ValidateSignatures(handlers)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	if len(res) == 0 {
 		log.Fatal("Fail: no signature fields found")

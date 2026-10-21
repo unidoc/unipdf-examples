@@ -52,18 +52,18 @@ func main() {
 	// Generate PDF file signed with empty signature.
 	handler, err := sighandler.NewEmptyAdobePKCS7Detached(8192)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	pdfData, signature, err := generateSignedFile(inputPath, handler)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Parse signature byte range.
 	byteRange, err := parseByteRange(signature.ByteRange)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// This would be the time to send the PDF buffer to a signing device or
@@ -71,7 +71,7 @@ func main() {
 	// signing the PDF using UniDoc and returning the signature data.
 	signatureData, err := getExternalSignature(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Apply external signature to the PDF data buffer.
@@ -85,7 +85,7 @@ func main() {
 
 	// Write output file.
 	if err := os.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)

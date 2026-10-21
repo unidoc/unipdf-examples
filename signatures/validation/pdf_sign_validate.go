@@ -42,24 +42,24 @@ func main() {
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature handlers.
 	handlerX509RSASHA1, err := sighandler.NewAdobeX509RSASHA1(nil, nil)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	handlerPKCS7Detached, err := sighandler.NewAdobePKCS7Detached(nil, nil)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	handlers := []model.SignatureHandler{
@@ -70,7 +70,7 @@ func main() {
 	// Validate signatures.
 	res, err := reader.ValidateSignatures(handlers)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	if len(res) == 0 {
 		log.Fatal("Fail: no signature fields found")
