@@ -63,7 +63,7 @@ func main() {
 	}
 
 	// Add signature and write it to output.pdf file.
-	buf, err := addSignature(pdfReader, totalPage, outputPath)
+	buf, err := addSignature(pdfReader, totalPage)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
@@ -82,8 +82,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-
-	fmt.Println("Done")
 }
 
 func addSomeValidChanges(reader *model.PdfReader, outputPath string) error {
@@ -100,7 +98,8 @@ func addSomeValidChanges(reader *model.PdfReader, outputPath string) error {
 	annotation := model.NewPdfAnnotationSquare()
 	rect := model.PdfRectangle{Ury: 250.0, Urx: 150.0, Lly: 50.0, Llx: 50.0}
 	annotation.Rect = rect.ToPdfObject()
-	annotation.IC = core.MakeArrayFromFloats([]float64{4.0, 0.0, 0.3})
+	annotation.C = core.MakeArrayFromFloats([]float64{1.0, 0.0, 0.0})
+	annotation.IC = core.MakeArrayFromFloats([]float64{1.0, 0.0, 0.3})
 	annotation.CA = core.MakeFloat(0.5)
 
 	page.AddAnnotation(annotation.PdfAnnotation)
@@ -136,8 +135,14 @@ func ValidateFile(inputPath string) error {
 		return errors.New("unexpected docMDP object")
 	}
 
-	inner_handler, _ := sighandler.NewAdobePKCS7Detached(nil, nil)
-	handlerDocMdp, _ := sighandler.NewDocMDPHandler(inner_handler, docMDPPerm)
+	inner_handler, err := sighandler.NewAdobePKCS7Detached(nil, nil)
+	if err != nil {
+		return err
+	}
+	handlerDocMdp, err := sighandler.NewDocMDPHandler(inner_handler, docMDPPerm)
+	if err != nil {
+		return err
+	}
 
 	handlers := []model.SignatureHandler{handlerDocMdp}
 
@@ -148,11 +153,22 @@ func ValidateFile(inputPath string) error {
 	for i, validateResult := range res {
 		log.Printf("== Signature %d", i+1)
 		log.Printf("%s", validateResult.String())
+
+		// DiffResults is only set for a DocMDP signature whose bytes verify,
+		// once the later revisions were compared against its permission.
+		switch diff := validateResult.DiffResults; {
+		case diff == nil:
+			fmt.Printf("Signature %d: DocMDP check not run (not a DocMDP signature, or it did not verify)\n", i+1)
+		case diff.IsPermitted():
+			fmt.Printf("Signature %d: no DocMDP violation detected\n", i+1)
+		default:
+			fmt.Printf("Signature %d: DocMDP violation detected (%d disallowed changes)\n", i+1, len(diff.Errors))
+		}
 	}
 	return nil
 }
 
-func addSignature(reader *model.PdfReader, pageNum int, outputPath string) ([]byte, error) {
+func addSignature(reader *model.PdfReader, pageNum int) ([]byte, error) {
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
@@ -190,7 +206,7 @@ func addSignature(reader *model.PdfReader, pageNum int, outputPath string) ([]by
 	opts := annotator.NewSignatureFieldOpts()
 	opts.FontSize = 8
 	opts.Rect = []float64{250, 250, 325, 300}
-	opts.TextColor = model.NewPdfColorDeviceRGB(255, 0, 0)
+	opts.TextColor = model.NewPdfColorDeviceRGB(1, 0, 0)
 
 	sigField, err := annotator.NewSignatureField(
 		signature,
@@ -207,7 +223,7 @@ func addSignature(reader *model.PdfReader, pageNum int, outputPath string) ([]by
 		return nil, err
 	}
 
-	sigField.T = core.MakeString("New Page Signature")
+	sigField.T = core.MakeString("DocMDP Signature")
 
 	if err = appender.Sign(pageNum, sigField); err != nil {
 		log.Fatalf("Fail: %v\n", err)
@@ -215,7 +231,6 @@ func addSignature(reader *model.PdfReader, pageNum int, outputPath string) ([]by
 
 	// Write output PDF file.
 	buf := &bytes.Buffer{}
-	// Write output PDF file.
 	if err = appender.Write(buf); err != nil {
 		return nil, err
 	}
@@ -245,7 +260,6 @@ func generateSigKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 		NotAfter:  now.Add(time.Hour * 24 * 365),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 

@@ -1,5 +1,7 @@
 /*
  * This example showcases how to sign a PDF document with the DocMDP restriction.
+ * It uses the mdp.FillForms permission (P=2): after signing, only filling in forms,
+ * instantiating page templates and signing are permitted.
  * The file is signed using a private/public key pair.
  *
  * $ ./pdf_sign_docmdp <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
@@ -107,7 +109,7 @@ func addSignature(reader *model.PdfReader, pageNum int, outputPath string) error
 	opts := annotator.NewSignatureFieldOpts()
 	opts.FontSize = 8
 	opts.Rect = []float64{250, 250, 325, 300}
-	opts.TextColor = model.NewPdfColorDeviceRGB(255, 0, 0)
+	opts.TextColor = model.NewPdfColorDeviceRGB(1, 0, 0)
 
 	sigField, err := annotator.NewSignatureField(
 		signature,
@@ -124,7 +126,7 @@ func addSignature(reader *model.PdfReader, pageNum int, outputPath string) error
 		return err
 	}
 
-	sigField.T = core.MakeString("New Page Signature")
+	sigField.T = core.MakeString("DocMDP Signature")
 
 	if err = appender.Sign(pageNum, sigField); err != nil {
 		log.Fatalf("Fail: %v\n", err)
@@ -135,7 +137,7 @@ func addSignature(reader *model.PdfReader, pageNum int, outputPath string) error
 		return err
 	}
 
-	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)
+	log.Printf("PDF file successfully signed with DocMDP permission P=2 (mdp.FillForms). Output path: %s\n", outputPath)
 
 	return nil
 }
@@ -160,7 +162,6 @@ func generateSigKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 		NotAfter:  now.Add(time.Hour * 24 * 365),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 

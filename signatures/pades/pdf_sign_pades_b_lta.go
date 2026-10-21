@@ -1,5 +1,5 @@
 /*
- * This example showcases how to create a  PAdES B-LTA compatible digital signature for a PDF file.
+ * This example showcases how to create a PAdES B-LTA compatible digital signature for a PDF file.
  *
  * $ ./pdf_sign_pades_b_lta <FILE.PFX> <PASSWORD> <FILE.PEM> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
@@ -8,6 +8,7 @@ package main
 import (
 	"bytes"
 	"crypto"
+	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -16,13 +17,13 @@ import (
 	"os"
 	"time"
 
-	"golang.org/x/crypto/pkcs12"
-
 	"github.com/unidoc/unipdf/v5/annotator"
 	"github.com/unidoc/unipdf/v5/common/license"
 	"github.com/unidoc/unipdf/v5/core"
 	"github.com/unidoc/unipdf/v5/model"
 	"github.com/unidoc/unipdf/v5/model/sighandler"
+
+	"software.sslmate.com/src/go-pkcs12"
 )
 
 func init() {
@@ -54,7 +55,7 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	priv, cert, err := pkcs12.Decode(pfxData, password)
+	priv, cert, _, err := pkcs12.DecodeChain(pfxData, password)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
@@ -66,12 +67,13 @@ func main() {
 	}
 
 	certDERBlock, _ := pem.Decode(caCertF)
+	if certDERBlock == nil {
+		log.Fatalf("Fail: no PEM certificate found in %s\n", pemPath)
+	}
 
 	cacert, err := x509.ParseCertificate(certDERBlock.Bytes)
-
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
-		return
 	}
 
 	// Create reader.
@@ -96,7 +98,15 @@ func main() {
 	timestampServerURL := "https://freetsa.org/tsr"
 
 	// Create signature handler.
-	handler, err := sighandler.NewEtsiPAdESLevelLT(priv.(*rsa.PrivateKey), cert, cacert, timestampServerURL, appender)
+	var handler model.SignatureHandler
+	switch key := priv.(type) {
+	case *rsa.PrivateKey:
+		handler, err = sighandler.NewEtsiPAdESLevelLT(key, cert, cacert, timestampServerURL, appender)
+	case *ecdsa.PrivateKey:
+		handler, err = sighandler.NewEtsiPAdESLevelLTEcdsa(key, cert, cacert, timestampServerURL, appender)
+	default:
+		log.Fatalf("Fail: unsupported private key type %T\n", priv)
+	}
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
@@ -128,7 +138,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-	field.T = core.MakeString("Self signed PDF")
+	field.T = core.MakeString("PAdES B-LTA Signature")
 
 	if err = appender.Sign(1, field); err != nil {
 		log.Fatalf("Fail: %v\n", err)
@@ -197,6 +207,9 @@ func main() {
 		},
 		opts,
 	)
+	if err != nil {
+		log.Fatalf("Fail: %v\n", err)
+	}
 
 	if err = appender3.Sign(1, sigField); err != nil {
 		log.Fatalf("Fail: %v\n", err)

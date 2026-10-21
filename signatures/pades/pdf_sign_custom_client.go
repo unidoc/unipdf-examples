@@ -1,5 +1,10 @@
 /*
- * This example showcases how to create a digital signature for a PDF file using a custom timestamp client.
+ * This example showcases how to create a PAdES B-LT digital signature for a PDF file
+ * using the setter-based sighandler.NewEtsiPAdES(sighandler.LevelLT) API, with a custom
+ * timestamp client whose HTTP client has a 30 second timeout.
+ *
+ * It needs a CA certificate PEM file and network access to the timestamp server
+ * (freetsa.org) and to the OCSP and CRL endpoints of the signing certificate chain.
  *
  * $ ./pdf_sign_custom_client <FILE.PFX> <PASSWORD> <FILE.PEM> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
@@ -21,7 +26,8 @@ import (
 	"github.com/unidoc/unipdf/v5/model"
 	"github.com/unidoc/unipdf/v5/model/sighandler"
 	"github.com/unidoc/unipdf/v5/model/sigutil"
-	"golang.org/x/crypto/pkcs12"
+
+	"software.sslmate.com/src/go-pkcs12"
 )
 
 func init() {
@@ -53,7 +59,7 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	priv, cert, err := pkcs12.Decode(pfxData, password)
+	priv, cert, _, err := pkcs12.DecodeChain(pfxData, password)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
@@ -65,9 +71,11 @@ func main() {
 	}
 
 	certDERBlock, _ := pem.Decode(caCertF)
+	if certDERBlock == nil {
+		log.Fatalf("Fail: no PEM certificate found in %s\n", pemPath)
+	}
 
 	cacert, err := x509.ParseCertificate(certDERBlock.Bytes)
-
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
@@ -140,7 +148,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-	field.T = core.MakeString("Self signed PDF")
+	field.T = core.MakeString("PAdES B-LT Signature")
 
 	if err = appender.Sign(1, field); err != nil {
 		log.Fatalf("Fail: %v\n", err)
