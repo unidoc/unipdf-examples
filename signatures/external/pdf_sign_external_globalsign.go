@@ -40,8 +40,15 @@ func init() {
 	}
 }
 
+// signerName is the key the globalsign client caches the DSS identity under.
+const signerName = "GLOBALSIGN TEST ACCOUNT - FOR TESTING PURPOSE ONLY"
+
 var (
-	sigLen = 8192
+	// sigLen is the number of bytes reserved for the signature Contents. The
+	// PKCS7 package carries the signing certificate, the GlobalSign CA chain,
+	// the OCSP response and a timestamp token with its TSA certificates,
+	// which together can exceed 8192 bytes.
+	sigLen = 16384
 
 	apiKey, apiSecret, certFilepath, keyFilepath string
 )
@@ -62,15 +69,14 @@ func main() {
 	certFilepath = args[5]
 	keyFilepath = args[6]
 
-	// We will simulate this by signing the PDF using GlobalSign DSS Service
-	// and returning the signatured PDF data.
+	// Sign the PDF through the GlobalSign DSS API.
 	pdfData, _, err := getExternalSignatureAndSign(inputPath)
 	if err != nil {
 		log.Fatalf("Fail signature: %v\n", err)
 	}
 
 	// Write output file.
-	if err := os.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
+	if err := os.WriteFile(outputPath, pdfData, 0644); err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
@@ -201,7 +207,7 @@ func (es *externalSigner) InitSignature(sig *model.PdfSignature) error {
 	}
 
 	// Request new identification based on signer.
-	identity, err := globalsign.DSSService.DSSGetIdentity(gsClient.DSSService, es.ctx, "GLOBALSIGN TEST ACCOUNT - FOR TESTING PURPOSE ONLY", &globalsign.IdentityRequest{
+	identity, err := globalsign.DSSService.DSSGetIdentity(gsClient.DSSService, es.ctx, signerName, &globalsign.IdentityRequest{
 		SubjectDn: globalsign.SubjectDn{},
 	})
 	if err != nil {
@@ -295,7 +301,7 @@ func (es *externalSigner) Sign(sig *model.PdfSignature, digest model.Hasher) err
 	// Callback.
 	cb := func(rand io.Reader, digest []byte, opts crypto.SignerOpts) ([]byte, error) {
 		// Sign digest.
-		signature, err := gsClient.DSSService.DSSIdentitySign(es.ctx, "GLOBALSIGN TEST ACCOUNT - FOR TESTING PURPOSE ONLY", &globalsign.IdentityRequest{SubjectDn: globalsign.SubjectDn{}}, digest)
+		signature, err := gsClient.DSSService.DSSIdentitySign(es.ctx, signerName, &globalsign.IdentityRequest{SubjectDn: globalsign.SubjectDn{}}, digest)
 		if err != nil {
 			return nil, err
 		}
@@ -341,10 +347,9 @@ func (es *externalSigner) Sign(sig *model.PdfSignature, digest model.Hasher) err
 	err = signedData.RequestSignerTimestampToken(0, func(digest []byte) ([]byte, error) {
 		hasher := sha256.New()
 		hasher.Write(digest)
-		hasher.Sum(nil)
 
 		// Request timestamp token.
-		t, err := gsClient.DSSService.DSSIdentityTimestamp(es.ctx, "UniDoc", &globalsign.IdentityRequest{SubjectDn: globalsign.SubjectDn{}}, hasher.Sum(nil))
+		t, err := gsClient.DSSService.DSSIdentityTimestamp(es.ctx, signerName, &globalsign.IdentityRequest{SubjectDn: globalsign.SubjectDn{}}, hasher.Sum(nil))
 		if err != nil {
 			return nil, err
 		}
@@ -362,6 +367,9 @@ func (es *externalSigner) Sign(sig *model.PdfSignature, digest model.Hasher) err
 	detachedSignature, err := signedData.Finish()
 	if err != nil {
 		return err
+	}
+	if len(detachedSignature) > sigLen {
+		return fmt.Errorf("signature is %d bytes, but only %d bytes are reserved for Contents", len(detachedSignature), sigLen)
 	}
 
 	data := make([]byte, sigLen)
@@ -469,22 +477,9 @@ type SignOption struct {
 
 // createSignatureField creates a signature field and an associated signature,
 // based on the specified options.
-func createSignatureField(option *SignOption, handler model.SignatureHandler, certChain ...*x509.Certificate) (*model.PdfFieldSignature, *model.PdfSignature, error) {
+func createSignatureField(option *SignOption, handler model.SignatureHandler) (*model.PdfFieldSignature, *model.PdfSignature, error) {
 	// Create new signature.
 	signature := model.NewPdfSignature(handler)
-
-	if len(certChain) > 0 {
-		// Create PDF array object which will contain the certificate chain data,
-		// The first element of the array must be the signing certificate.
-		// The rest of the certificate chain is used for validating the authenticity
-		// of the signing certificate.
-		pdfCerts := core.MakeArray()
-		for _, cert := range certChain {
-			pdfCerts.Append(core.MakeString(string(cert.Raw)))
-		}
-
-		signature.Cert = pdfCerts
-	}
 
 	if err := signature.Initialize(); err != nil {
 		return nil, nil, err

@@ -27,11 +27,11 @@ func init() {
 	}
 }
 
-const usagef = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS]\n"
+const usagef = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS.pem]\n"
 
 func main() {
 	args := os.Args
-	if len(args) < 3 {
+	if len(args) < 3 || len(args) > 4 {
 		fmt.Printf(usagef, os.Args[0])
 		return
 	}
@@ -43,7 +43,7 @@ func main() {
 	if len(args) == 4 {
 		issuerCertData, err := os.ReadFile(args[3])
 		if err != nil {
-			log.Fatal("Fail: %v\n", err)
+			log.Fatalf("Fail: %v\n", err)
 		}
 
 		for len(issuerCertData) != 0 {
@@ -55,7 +55,7 @@ func main() {
 
 			issuer, err := x509.ParseCertificate(block.Bytes)
 			if err != nil {
-				log.Fatal("Fail: %v\n", err)
+				log.Fatalf("Fail: %v\n", err)
 			}
 			certChain = append(certChain, issuer)
 		}
@@ -64,35 +64,50 @@ func main() {
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// LTV enable the signed file.
 	ltv, err := model.NewLTV(appender)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
-	if err := ltv.EnableAll(certChain); err != nil {
-		log.Fatal("Fail: %v\n", err)
+	// LTV.EnableAll fails on an empty signature field, so enable only the
+	// fields that hold a signature.
+	enabled := 0
+	if reader.AcroForm != nil {
+		for _, field := range reader.AcroForm.AllFields() {
+			sigField, ok := field.GetContext().(*model.PdfFieldSignature)
+			if !ok || sigField.V == nil || sigField.V.Contents == nil {
+				continue
+			}
+			if err := ltv.Enable(sigField.V, certChain); err != nil {
+				log.Fatalf("Fail: %v\n", err)
+			}
+			enabled++
+		}
+	}
+	if enabled == 0 {
+		log.Fatal("Fail: no signed signature fields found")
 	}
 
 	// Write output PDF file.
 	err = appender.WriteToFile(outputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	log.Printf("PDF file successfully LTV enabled. Output path: %s\n", outputPath)

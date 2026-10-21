@@ -14,9 +14,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"time"
 
-	"golang.org/x/crypto/pkcs12"
+	"software.sslmate.com/src/go-pkcs12"
 
 	"github.com/unidoc/unipdf/v5/annotator"
 	"github.com/unidoc/unipdf/v5/common/license"
@@ -34,11 +35,11 @@ func init() {
 	}
 }
 
-const usagef = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS]\n"
+const usagef = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS.pem]\n"
 
 func main() {
 	args := os.Args
-	if len(args) < 5 {
+	if len(args) < 5 || len(args) > 6 {
 		fmt.Printf(usagef, os.Args[0])
 		return
 	}
@@ -50,20 +51,25 @@ func main() {
 	// Get private key and X509 certificate from the PKCS12 file.
 	pfxData, err := os.ReadFile(p12Path)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
-	priv, cert, err := pkcs12.Decode(pfxData, password)
+	key, cert, caCerts, err := pkcs12.DecodeChain(pfxData, password)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
+	}
+	priv, ok := key.(*rsa.PrivateKey)
+	if !ok {
+		log.Fatalf("Fail: the PKCS12 private key is %T; this example needs an RSA key\n", key)
 	}
 
-	// Load certificate chain.
-	certChain := []*x509.Certificate{cert}
+	// Load certificate chain: the signer, the CA certificates bundled in the
+	// PKCS12 file, then any certificates from EXTRA_CERTS.pem.
+	certChain := append([]*x509.Certificate{cert}, caCerts...)
 	if len(args) == 6 {
 		issuerCertData, err := os.ReadFile(args[5])
 		if err != nil {
-			log.Fatal("Fail: %v\n", err)
+			log.Fatalf("Fail: %v\n", err)
 		}
 
 		for len(issuerCertData) != 0 {
@@ -75,34 +81,36 @@ func main() {
 
 			issuer, err := x509.ParseCertificate(block.Bytes)
 			if err != nil {
-				log.Fatal("Fail: %v\n", err)
+				log.Fatalf("Fail: %v\n", err)
 			}
-			certChain = append(certChain, issuer)
+			if !slices.ContainsFunc(certChain, issuer.Equal) {
+				certChain = append(certChain, issuer)
+			}
 		}
 	}
 
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature handler.
-	handler, err := sighandler.NewAdobePKCS7Detached(priv.(*rsa.PrivateKey), cert)
+	handler, err := sighandler.NewAdobePKCS7Detached(priv, cert)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature.
@@ -112,7 +120,7 @@ func main() {
 	signature.SetDate(time.Now(), "")
 
 	if err := signature.Initialize(); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature field and appearance.
@@ -124,30 +132,33 @@ func main() {
 		signature,
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
-			annotator.NewSignatureLine("Date", "2019.16.04"),
+			annotator.NewSignatureLine("Date", time.Now().Format("2006.01.02")),
 			annotator.NewSignatureLine("Reason", "Signature test"),
 		},
 		opts,
 	)
+	if err != nil {
+		log.Fatalf("Fail: %v\n", err)
+	}
 	field.T = core.MakeString("Test Sign LTV enable")
 
 	if err = appender.Sign(1, field); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// LTV enable the certificate chain used to apply the signature.
 	ltv, err := model.NewLTV(appender)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	if err := ltv.EnableChain(certChain); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Write output PDF file.
 	if err = appender.WriteToFile(outputPath); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)

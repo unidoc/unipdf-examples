@@ -83,19 +83,31 @@ func loadPrivateKey(privateKeyPath string) (*rsa.PrivateKey, error) {
 	// Read private key file contents.
 	privateKeyData, err := os.ReadFile(privateKeyPath)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	// Decode PEM block.
 	block, _ := pem.Decode(privateKeyData)
-
-	// Parse private key data.
-	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, err
+	if block == nil {
+		return nil, errors.New("no PEM block found in private key file")
 	}
 
-	return privateKey, nil
+	// Parse private key data, either PKCS#1 ("RSA PRIVATE KEY") or PKCS#8 ("PRIVATE KEY").
+	switch block.Type {
+	case "RSA PRIVATE KEY":
+		return x509.ParsePKCS1PrivateKey(block.Bytes)
+	case "PRIVATE KEY":
+		key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+		privateKey, ok := key.(*rsa.PrivateKey)
+		if !ok {
+			return nil, fmt.Errorf("private key is %T; only RSA keys are supported", key)
+		}
+		return privateKey, nil
+	}
+	return nil, fmt.Errorf("unsupported private key PEM block %q; only RSA keys are supported", block.Type)
 }
 
 func loadCertificates(certPath string) (*x509.Certificate, *core.PdfObjectArray, error) {
@@ -105,9 +117,13 @@ func loadCertificates(certPath string) (*x509.Certificate, *core.PdfObjectArray,
 		return nil, nil, err
 	}
 
+	// parseCert returns a nil certificate when data holds no more PEM blocks.
 	parseCert := func(data []byte) (*x509.Certificate, []byte, error) {
 		// Decode PEM block.
 		block, rest := pem.Decode(data)
+		if block == nil {
+			return nil, nil, nil
+		}
 
 		// Parse certificate.
 		cert, err := x509.ParseCertificate(block.Bytes)
@@ -129,14 +145,20 @@ func loadCertificates(certPath string) (*x509.Certificate, *core.PdfObjectArray,
 	if err != nil {
 		return nil, nil, err
 	}
+	if signingCert == nil {
+		return nil, nil, errors.New("no PEM certificate found in certificate file")
+	}
 	pdfCerts.Append(core.MakeString(string(signingCert.Raw)))
 
 	// Parse the rest of the certificates contained in the PEM file,
 	// if any, and add them to the PDF certificates array.
-	for len(pemUnparsedData) != 0 {
+	for {
 		cert, rest, err := parseCert(pemUnparsedData)
 		if err != nil {
 			return nil, nil, err
+		}
+		if cert == nil {
+			break
 		}
 
 		pdfCerts.Append(core.MakeString(string(cert.Raw)))
@@ -155,11 +177,13 @@ func sign(inputPath, outputPath string, signingCert *x509.Certificate,
 			return nil, errors.New("hash type error")
 		}
 
-		return privateKey.Sign(rand.Reader, h.Sum(nil), crypto.SHA1)
+		return privateKey.Sign(rand.Reader, h.Sum(nil), crypto.SHA256)
 	}
 
-	// Create custom signature handler.
-	handler, err := sighandler.NewAdobeX509RSASHA1Custom(signingCert, signFunc)
+	// Create custom signature handler. Despite the adbe.x509.rsa_sha1 name, the
+	// handler digests the document with the configured algorithm.
+	handler, err := sighandler.NewAdobeX509RSASHA1CustomWithOpts(signingCert, signFunc,
+		&sighandler.AdobeX509RSASHA1Opts{Algorithm: crypto.SHA256})
 	if err != nil {
 		return err
 	}
@@ -192,12 +216,15 @@ func sign(inputPath, outputPath string, signingCert *x509.Certificate,
 		},
 		opts,
 	)
+	if err != nil {
+		return err
+	}
 	sigField.T = core.MakeString("PEM Multicert signature")
 
 	// Open input file.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
+		return err
 	}
 	defer file.Close()
 
@@ -215,7 +242,7 @@ func sign(inputPath, outputPath string, signingCert *x509.Certificate,
 
 	// Sign input PDF file.
 	// The signature appearance is placed on the first page of the output PDF file.
-	// See https://github.com/unidoc/unipdf-examples/blob/master/signatures/pdf_sign_appearance.go
+	// See https://github.com/unidoc/unipdf-examples/blob/master/signatures/appearance/pdf_sign_appearance.go
 	// for adding multiple signature appearance annotations, on multiple pages.
 	if err = appender.Sign(1, sigField); err != nil {
 		return err

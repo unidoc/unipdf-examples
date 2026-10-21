@@ -1,11 +1,12 @@
 /*
- * This example showcases how to create a  PAdES B-T compatible digital signature for a PDF file.
+ * This example showcases how to create a PAdES B-B compatible digital signature for a PDF file.
  *
- * $ ./pdf_sign_pades_b_t <FILE.PFX> <PASSWORD> <FILE.PEM> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
+ * $ ./pdf_sign_pades_b_b <FILE.PFX> <PASSWORD> <FILE.PEM> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
 package main
 
 import (
+	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
@@ -14,13 +15,13 @@ import (
 	"os"
 	"time"
 
-	"golang.org/x/crypto/pkcs12"
-
 	"github.com/unidoc/unipdf/v5/annotator"
 	"github.com/unidoc/unipdf/v5/common/license"
 	"github.com/unidoc/unipdf/v5/core"
 	"github.com/unidoc/unipdf/v5/model"
 	"github.com/unidoc/unipdf/v5/model/sighandler"
+
+	"software.sslmate.com/src/go-pkcs12"
 )
 
 func init() {
@@ -49,64 +50,70 @@ func main() {
 	// Get private key and X509 certificate from the PFX file.
 	pfxData, err := os.ReadFile(pfxPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
-	priv, cert, err := pkcs12.Decode(pfxData, password)
+	priv, cert, _, err := pkcs12.DecodeChain(pfxData, password)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Get cacert certificate from the PEM file.
 	caCertF, err := os.ReadFile(pemPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	certDERBlock, _ := pem.Decode(caCertF)
+	if certDERBlock == nil {
+		log.Fatalf("Fail: no PEM certificate found in %s\n", pemPath)
+	}
 
 	cacert, err := x509.ParseCertificate(certDERBlock.Bytes)
-
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
-		return
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Set timestamp server.
-	timestampServerURL := "https://freetsa.org/tsr"
-
 	// Create signature handler.
-	handler, err := sighandler.NewEtsiPAdESLevelT(priv.(*rsa.PrivateKey), cert, cacert, timestampServerURL)
+	var handler model.SignatureHandler
+	switch key := priv.(type) {
+	case *rsa.PrivateKey:
+		handler, err = sighandler.NewEtsiPAdESLevelB(key, cert, cacert)
+	case *ecdsa.PrivateKey:
+		handler, err = sighandler.NewEtsiPAdESLevelBEcdsa(key, cert, cacert)
+	default:
+		log.Fatalf("Fail: unsupported private key type %T\n", priv)
+	}
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature.
 	signature := model.NewPdfSignature(handler)
-	signature.SetName("PAdES B-T Signature PDF")
+	signature.SetName("PAdES B-B Signature PDF")
 	signature.SetReason("TestPAdESPDF")
 	signature.SetDate(time.Now(), "")
 
 	if err := signature.Initialize(); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature field and appearance.
@@ -123,16 +130,19 @@ func main() {
 		},
 		opts,
 	)
-	field.T = core.MakeString("Self signed PDF")
+	if err != nil {
+		log.Fatalf("Fail: %v\n", err)
+	}
+	field.T = core.MakeString("PAdES B-B Signature")
 
 	if err = appender.Sign(1, field); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Write output PDF file.
 	err = appender.WriteToFile(outputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)

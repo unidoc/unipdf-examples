@@ -4,6 +4,10 @@
  * revision to the document (containing the validation data) and a timestamp
  * signature (in order to protect the validation information).
  *
+ * It needs network access: the timestamp is requested from the freetsa.org
+ * TSA, and the validation data is fetched from the OCSP responders and CRL
+ * distribution points named in the certificates.
+ *
  * $ ./pdf_sign_ltv_timestamp_revision <FILE.p12> <P12_PASS> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH> [<EXTRA_CERTS.pem>]
  */
 
@@ -18,9 +22,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"time"
 
-	"golang.org/x/crypto/pkcs12"
+	"software.sslmate.com/src/go-pkcs12"
 
 	"github.com/unidoc/unipdf/v5/annotator"
 	"github.com/unidoc/unipdf/v5/common/license"
@@ -38,11 +43,11 @@ func init() {
 	}
 }
 
-const usagef = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS]\n"
+const usagef = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH [EXTRA_CERTS.pem]\n"
 
 func main() {
 	args := os.Args
-	if len(args) < 5 {
+	if len(args) < 5 || len(args) > 6 {
 		fmt.Printf(usagef, os.Args[0])
 		return
 	}
@@ -54,20 +59,25 @@ func main() {
 	// Load private key and X509 certificate from the PKCS12 file.
 	pfxData, err := os.ReadFile(p12Path)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
-	priv, cert, err := pkcs12.Decode(pfxData, password)
+	key, cert, caCerts, err := pkcs12.DecodeChain(pfxData, password)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
+	}
+	priv, ok := key.(*rsa.PrivateKey)
+	if !ok {
+		log.Fatalf("Fail: the PKCS12 private key is %T; this example needs an RSA key\n", key)
 	}
 
-	// Load certificate chain.
-	certChain := []*x509.Certificate{cert}
+	// Load certificate chain: the signer, the CA certificates bundled in the
+	// PKCS12 file, then any certificates from EXTRA_CERTS.pem.
+	certChain := append([]*x509.Certificate{cert}, caCerts...)
 	if len(args) == 6 {
 		issuerCertData, err := os.ReadFile(args[5])
 		if err != nil {
-			log.Fatal("Fail: %v\n", err)
+			log.Fatalf("Fail: %v\n", err)
 		}
 
 		for len(issuerCertData) != 0 {
@@ -79,34 +89,36 @@ func main() {
 
 			issuer, err := x509.ParseCertificate(block.Bytes)
 			if err != nil {
-				log.Fatal("Fail: %v\n", err)
+				log.Fatalf("Fail: %v\n", err)
 			}
-			certChain = append(certChain, issuer)
+			if !slices.ContainsFunc(certChain, issuer.Equal) {
+				certChain = append(certChain, issuer)
+			}
 		}
 	}
 
 	// Sign and write file to buffer.
-	signedBytes, err := signFile(inputPath, priv.(*rsa.PrivateKey), cert)
+	signedBytes, err := signFile(inputPath, priv, cert)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// LTV enable, timestamp and write file to buffer.
 	signedBytes, err = ltvEnableAndTimestamp(bytes.NewReader(signedBytes), certChain)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Optionally, LTV enable the applied timestamp signature.
 	signedBytes, err = ltvEnableTimestampSig(bytes.NewReader(signedBytes))
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Write output file to disk.
 	err = os.WriteFile(outputPath, signedBytes, 0644)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)
@@ -156,11 +168,14 @@ func signFile(inputPath string, priv *rsa.PrivateKey, cert *x509.Certificate) ([
 		signature,
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
-			annotator.NewSignatureLine("Date", "2019.16.04"),
+			annotator.NewSignatureLine("Date", time.Now().Format("2006.01.02")),
 			annotator.NewSignatureLine("Reason", "Signature test"),
 		},
 		opts,
 	)
+	if err != nil {
+		return nil, err
+	}
 	field.T = core.MakeString("Test Sign LTV enable")
 
 	if err = appender.Sign(1, field); err != nil {
@@ -197,7 +212,7 @@ func ltvEnableAndTimestamp(r *bytes.Reader, certChain []*x509.Certificate) ([]by
 		return nil, err
 	}
 
-	if err := ltv.EnableAll(certChain); err != nil {
+	if err := enableSignedFields(reader, ltv, certChain); err != nil {
 		return nil, err
 	}
 
@@ -257,7 +272,7 @@ func ltvEnableTimestampSig(r *bytes.Reader) ([]byte, error) {
 		return nil, err
 	}
 
-	if err := ltv.EnableAll(nil); err != nil {
+	if err := enableSignedFields(reader, ltv, nil); err != nil {
 		return nil, err
 	}
 
@@ -268,4 +283,22 @@ func ltvEnableTimestampSig(r *bytes.Reader) ([]byte, error) {
 	}
 
 	return buf.Bytes(), nil
+}
+
+// enableSignedFields LTV enables every signature field that holds a
+// signature. LTV.EnableAll fails on an empty signature field.
+func enableSignedFields(reader *model.PdfReader, ltv *model.LTV, extraCerts []*x509.Certificate) error {
+	if reader.AcroForm == nil {
+		return nil
+	}
+	for _, field := range reader.AcroForm.AllFields() {
+		sigField, ok := field.GetContext().(*model.PdfFieldSignature)
+		if !ok || sigField.V == nil || sigField.V.Contents == nil {
+			continue
+		}
+		if err := ltv.Enable(sigField.V, extraCerts); err != nil {
+			return err
+		}
+	}
+	return nil
 }

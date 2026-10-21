@@ -1,6 +1,9 @@
 /*
- * This example showcases how to digitally sign and timestamp a PDF file using a
- * PKCS12 (.p12/.pfx) file.
+ * This example showcases how to digitally sign a PDF file using a PKCS12
+ * (.p12/.pfx) file and then add a document timestamp (ETSI.RFC3161) in a
+ * separate incremental revision after the signature.
+ * The timestamp is requested from https://freetsa.org/tsr, so the example
+ * needs network access.
  *
  * $ ./pdf_sign_timestamp <FILE.p12> <PASSWORD> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
@@ -15,13 +18,13 @@ import (
 	"os"
 	"time"
 
-	"golang.org/x/crypto/pkcs12"
-
 	"github.com/unidoc/unipdf/v5/annotator"
 	"github.com/unidoc/unipdf/v5/common/license"
 	"github.com/unidoc/unipdf/v5/core"
 	"github.com/unidoc/unipdf/v5/model"
 	"github.com/unidoc/unipdf/v5/model/sighandler"
+
+	"software.sslmate.com/src/go-pkcs12"
 )
 
 func init() {
@@ -37,7 +40,7 @@ const usagef = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH\n"
 
 func main() {
 	args := os.Args
-	if len(args) < 4 {
+	if len(args) < 5 {
 		fmt.Printf(usagef, os.Args[0])
 		return
 	}
@@ -49,36 +52,41 @@ func main() {
 	// Get private key and X509 certificate from the P12 file.
 	pfxData, err := os.ReadFile(p12Path)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
-	priv, cert, err := pkcs12.Decode(pfxData, password)
+	// DecodeChain also accepts files that bundle CA certificates with the signing certificate.
+	priv, cert, _, err := pkcs12.DecodeChain(pfxData, password)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
+	}
+	rsaKey, ok := priv.(*rsa.PrivateKey)
+	if !ok {
+		log.Fatalf("Fail: private key is %T; only RSA keys are supported, see pdf_sign_pkcs7_ecdsa.go for ECDSA\n", priv)
 	}
 
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature handler.
-	handler, err := sighandler.NewAdobePKCS7Detached(priv.(*rsa.PrivateKey), cert)
+	handler, err := sighandler.NewAdobePKCS7Detached(rsaKey, cert)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature.
@@ -88,7 +96,7 @@ func main() {
 	signature.SetDate(time.Now(), "")
 
 	if err := signature.Initialize(); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature field and appearance.
@@ -100,49 +108,52 @@ func main() {
 		signature,
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
-			annotator.NewSignatureLine("Date", "2019.16.04"),
-			annotator.NewSignatureLine("Reason", "External signature test"),
+			annotator.NewSignatureLine("Date", time.Now().Format("2006.01.02")),
+			annotator.NewSignatureLine("Reason", "PKCS12 signature test"),
 		},
 		opts,
 	)
+	if err != nil {
+		log.Fatalf("Fail: %v\n", err)
+	}
 	field.T = core.MakeString("Self signed PDF")
 
 	if err = appender.Sign(1, field); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	outDoc := bytes.NewBuffer(nil)
 	if err = appender.Write(outDoc); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	pdf1, err := model.NewPdfReader(bytes.NewReader(outDoc.Bytes()))
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	appender, err = model.NewPdfAppender(pdf1)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	handler, err = sighandler.NewDocTimeStamp("https://freetsa.org/tsr", crypto.SHA512)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature field and appearance.
 	signature = model.NewPdfSignature(handler)
-	signature.SetName("Test Appender")
-	signature.SetReason("TestAppenderSignPage4")
+	signature.SetName("Document Timestamp")
+	signature.SetReason("RFC 3161 document timestamp")
 	signature.SetDate(time.Now(), "")
 
 	if err := signature.Initialize(); err != nil {
-		return
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	sigField := model.NewPdfFieldSignature(signature)
-	sigField.T = core.MakeString("Signature1")
+	sigField.T = core.MakeString("Document Timestamp")
 	sigField.Rect = core.MakeArray(
 		core.MakeInteger(0),
 		core.MakeInteger(0),
@@ -151,13 +162,13 @@ func main() {
 	)
 
 	if err = appender.Sign(1, sigField); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	err = appender.WriteToFile(outputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
-	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)
+	log.Printf("PDF file successfully signed and timestamped. Output path: %s\n", outputPath)
 }

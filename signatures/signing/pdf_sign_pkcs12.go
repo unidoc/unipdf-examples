@@ -1,26 +1,25 @@
 /*
- * This example showcases how to create a  PAdES B-B compatible digital signature for a PDF file.
+ * This example showcases how to digitally sign a PDF file using a
+ * PKCS12 (.p12/.pfx) file.
  *
- * $ ./pdf_sign_pades_b_b <FILE.PFX> <PASSWORD> <FILE.PEM> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
+ * $ ./pdf_sign_pkcs12 <FILE.p12> <PASSWORD> <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
 package main
 
 import (
 	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
 	"fmt"
 	"log"
 	"os"
 	"time"
-
-	"golang.org/x/crypto/pkcs12"
 
 	"github.com/unidoc/unipdf/v5/annotator"
 	"github.com/unidoc/unipdf/v5/common/license"
 	"github.com/unidoc/unipdf/v5/core"
 	"github.com/unidoc/unipdf/v5/model"
 	"github.com/unidoc/unipdf/v5/model/sighandler"
+
+	"software.sslmate.com/src/go-pkcs12"
 )
 
 func init() {
@@ -32,78 +31,67 @@ func init() {
 	}
 }
 
-const usagef = "Usage: %s PFX_FILE PASSWORD PEM_FILE INPUT_PDF_PATH OUTPUT_PDF_PATH\n"
+const usagef = "Usage: %s P12_FILE PASSWORD INPUT_PDF_PATH OUTPUT_PDF_PATH\n"
 
 func main() {
 	args := os.Args
-	if len(args) < 6 {
+	if len(args) < 5 {
 		fmt.Printf(usagef, os.Args[0])
 		return
 	}
-	pfxPath := args[1]
+	p12Path := args[1]
 	password := args[2]
-	pemPath := args[3]
-	inputPath := args[4]
-	outputPath := args[5]
+	inputPath := args[3]
+	outputPath := args[4]
 
-	// Get private key and X509 certificate from the PFX file.
-	pfxData, err := os.ReadFile(pfxPath)
+	// Get private key and X509 certificate from the P12 file.
+	pfxData, err := os.ReadFile(p12Path)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
-	priv, cert, err := pkcs12.Decode(pfxData, password)
+	// DecodeChain also accepts files that bundle CA certificates with the signing certificate.
+	priv, cert, _, err := pkcs12.DecodeChain(pfxData, password)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
-
-	// Get cacert certificate from the PEM file.
-	caCertF, err := os.ReadFile(pemPath)
-	if err != nil {
-		log.Fatal("Fail: %v\n", err)
-	}
-
-	certDERBlock, _ := pem.Decode(caCertF)
-
-	cacert, err := x509.ParseCertificate(certDERBlock.Bytes)
-
-	if err != nil {
-		log.Fatal("Fail: %v\n", err)
-		return
+	rsaKey, ok := priv.(*rsa.PrivateKey)
+	if !ok {
+		log.Fatalf("Fail: private key is %T; only RSA keys are supported, see pdf_sign_pkcs7_ecdsa.go for ECDSA\n", priv)
 	}
 
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature handler.
-	handler, err := sighandler.NewEtsiPAdESLevelB(priv.(*rsa.PrivateKey), cert, cacert)
+	handler, err := sighandler.NewAdobePKCS7Detached(rsaKey, cert)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature.
 	signature := model.NewPdfSignature(handler)
-	signature.SetName("PAdES B-B Signature PDF")
-	signature.SetReason("TestPAdESPDF")
+	signature.SetName("Test Self Signed PDF")
+	signature.SetReason("TestSelfSignedPDF")
 	signature.SetDate(time.Now(), "")
 
 	if err := signature.Initialize(); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature field and appearance.
@@ -115,21 +103,24 @@ func main() {
 		signature,
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
-			annotator.NewSignatureLine("Date", "2023.05.08"),
-			annotator.NewSignatureLine("Reason", "PAdES signature test"),
+			annotator.NewSignatureLine("Date", time.Now().Format("2006.01.02")),
+			annotator.NewSignatureLine("Reason", "PKCS12 signature test"),
 		},
 		opts,
 	)
+	if err != nil {
+		log.Fatalf("Fail: %v\n", err)
+	}
 	field.T = core.MakeString("Self signed PDF")
 
 	if err = appender.Sign(1, field); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Write output PDF file.
 	err = appender.WriteToFile(outputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)

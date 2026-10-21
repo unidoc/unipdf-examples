@@ -8,6 +8,9 @@
  * To sign a PDF:
  * $ ./pdf_sign_hsm_pkcs11_cgo sign test <PIN> <keypair_label> input.pdf input_signed.pdf
  *
+ * The PKCS11 library defaults to the SoftHSM path below and can be
+ * overridden with the SOFTHSM2_LIB environment variable.
+ *
  * See instructions for testing via SoftHSM in README.md.
  */
 package main
@@ -43,7 +46,8 @@ func init() {
 	}
 }
 
-// Library path might be different on different operating systems.
+// Default PKCS11 library path. It differs between operating systems, so it
+// can be overridden with the SOFTHSM2_LIB environment variable.
 const PathSoftHSM = "/usr/local/lib/softhsm/libsofthsm2.so"
 
 const (
@@ -130,8 +134,13 @@ func main() {
 
 // initPKCS11Session initializes a PKCS11 store and creates a new session.
 func initPKCS11Session(tokenLabel, tokenPin string) (*crypto11.Context, error) {
+	libPath := os.Getenv("SOFTHSM2_LIB")
+	if libPath == "" {
+		libPath = PathSoftHSM
+	}
+
 	conf := crypto11.Config{
-		Path:       PathSoftHSM,
+		Path:       libPath,
 		TokenLabel: tokenLabel,
 		Pin:        tokenPin,
 	}
@@ -149,10 +158,12 @@ func getKeyPair(ctx *crypto11.Context, keypairLabel string) (crypto11.Signer, er
 func addKeyPair(ctx *crypto11.Context, keypairLabel string) (crypto11.SignerDecrypter, error) {
 	// Generate random keypair id.
 	resultId := make([]byte, 32)
-	rand.Read(resultId)
+	if _, err := rand.Read(resultId); err != nil {
+		return nil, err
+	}
 
 	// Generate key pair.
-	return ctx.GenerateRSAKeyPairWithLabel([]byte(resultId), []byte(keypairLabel), 2048)
+	return ctx.GenerateRSAKeyPairWithLabel(resultId, []byte(keypairLabel), 2048)
 }
 
 // generateCertificate generates a X509 certificate based on the specified private key.
@@ -168,7 +179,6 @@ func generateCertificate(signer crypto.Signer) (*x509.Certificate, error) {
 		NotAfter:  now.Add(time.Hour * 24 * 365),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 
@@ -181,13 +191,14 @@ func generateCertificate(signer crypto.Signer) (*x509.Certificate, error) {
 	return x509.ParseCertificate(certData)
 }
 
-// sign signs the specified input PDF file using an adobeX509RSASHA1 signature handler
-// and saves the result at the destination specified by the outputPath parameter.
+// sign signs the specified input PDF file using an adbe.x509.rsa_sha1 signature
+// handler configured for SHA-256 and saves the result at the destination
+// specified by the outputPath parameter.
 func sign(signer crypto.Signer, certificate *x509.Certificate, inputPath, outputPath string) error {
 	// Open input file.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
+		return err
 	}
 	defer file.Close()
 
@@ -210,11 +221,14 @@ func sign(signer crypto.Signer, certificate *x509.Certificate, inputPath, output
 			return nil, errors.New("hash type error")
 		}
 
-		return signer.Sign(rand.Reader, h.Sum(nil), crypto.SHA1)
+		return signer.Sign(rand.Reader, h.Sum(nil), crypto.SHA256)
 	}
 
-	// Create custom signature handler.
-	handler, err := sighandler.NewAdobeX509RSASHA1Custom(certificate, signFunc)
+	// Create custom signature handler. The digest passed to signFunc is a
+	// SHA-256 hash because of the Algorithm option.
+	handler, err := sighandler.NewAdobeX509RSASHA1CustomWithOpts(certificate, signFunc, &sighandler.AdobeX509RSASHA1Opts{
+		Algorithm: crypto.SHA256,
+	})
 	if err != nil {
 		return err
 	}
@@ -238,11 +252,14 @@ func sign(signer crypto.Signer, certificate *x509.Certificate, inputPath, output
 		signature,
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
-			annotator.NewSignatureLine("Date", "2019.15.03"),
+			annotator.NewSignatureLine("Date", time.Now().Format("2006.01.02")),
 			annotator.NewSignatureLine("Reason", "SoftHSM2 Signature Test"),
 		},
 		opts,
 	)
+	if err != nil {
+		return err
+	}
 	sigField.T = core.MakeString("External signature")
 
 	// Sign PDF.

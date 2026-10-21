@@ -1,8 +1,9 @@
 /*
- * This example showcases how to retrieve the specific or previous revision of a PDF document
- * The file is signed using a private/public key pair.
+ * This example showcases how to sign the last page of a PDF document twice.
+ * Each signature has its own visible annotation and is added in a separate
+ * incremental revision, signed with its own generated private/public key pair.
  *
- * $ ./pdf_sign_docmdp <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
+ * $ ./pdf_sign_twice_visible_annotation <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
 package main
 
@@ -18,16 +19,17 @@ import (
 	"os"
 	"time"
 
-	"github.com/unidoc/unipdf/v5/annotator"
 	"github.com/unidoc/unipdf/v5/common/license"
+
+	"github.com/unidoc/unipdf/v5/annotator"
 	"github.com/unidoc/unipdf/v5/core"
 	"github.com/unidoc/unipdf/v5/model"
 	"github.com/unidoc/unipdf/v5/model/sighandler"
 )
 
 func init() {
-	// Make sure to load your metered License API key prior to using the library.
-	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	//Make sure to load your metered License API key prior to using the library.
+	//If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
 	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
@@ -37,7 +39,7 @@ func init() {
 func main() {
 	args := os.Args
 	if len(args) < 3 {
-		log.Fatalln("Usage: go run pdf_sign_get_revision INPUT_PDF_PATH OUTPUT_PDF_PATH")
+		log.Fatalln("Usage: go run pdf_sign_twice_visible_annotation INPUT_PDF_PATH OUTPUT_PDF_PATH")
 	}
 
 	inputPath := args[1]
@@ -55,7 +57,6 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Preparing first revision
 	// Add signature
 	buf, err := addSignature(pdfReader, 0)
 	if err != nil {
@@ -68,70 +69,26 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Preparing second revision
 	// Add signature
 	buf, err = addSignature(pdfReader, 1)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	pdfReader2, err := model.NewPdfReader(bytes.NewReader(buf))
+	// Write the resulting file to output.pdf file.
+	err = os.WriteFile(outputPath, buf, 0644)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-
-	err = retrieveSpecificRevision(pdfReader2, 0, outputPath)
-	// or
-	//err = retrievePreviousRevision(pdfReader2, outputPath)
-	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
-	}
+	log.Printf("PDF file successfully saved to output path: %s\n", outputPath)
 
 	fmt.Println("Done")
-}
-
-func retrievePreviousRevision(reader *model.PdfReader, outputPath string) error {
-	prevReader, err := reader.GetPreviousRevision()
-	if err != nil {
-		return err
-	}
-
-	appender, err := model.NewPdfAppender(prevReader)
-	if err != nil {
-		return err
-	}
-	// Write output PDF file.
-	if err = appender.WriteToFile(outputPath); err != nil {
-		return err
-	}
-
-	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)
-	return nil
-}
-
-func retrieveSpecificRevision(reader *model.PdfReader, revisionNumber int, outputPath string) error {
-	prevReader, err := reader.GetRevision(revisionNumber)
-	if err != nil {
-		return err
-	}
-
-	appender, err := model.NewPdfAppender(prevReader)
-	if err != nil {
-		return err
-	}
-	// Write output PDF file.
-	if err = appender.WriteToFile(outputPath); err != nil {
-		return err
-	}
-
-	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)
-	return nil
 }
 
 func addSignature(pdfReader *model.PdfReader, signNumber int) ([]byte, error) {
 	totalPage, err := pdfReader.GetNumPages()
 	if err != nil {
-		log.Fatalf("Fail: %v\n", err)
+		return nil, err
 	}
 
 	// Create appender.
@@ -173,7 +130,7 @@ func addSignature(pdfReader *model.PdfReader, signNumber int) ([]byte, error) {
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
 			annotator.NewSignatureLine("Date", "2019.03.14"),
-			annotator.NewSignatureLine("Reason", fmt.Sprintf("Test sign #%d", signNumber)),
+			annotator.NewSignatureLine("Reason", fmt.Sprintf("Test sign #%d", signNumber+1)),
 			annotator.NewSignatureLine("Location", "London"),
 			annotator.NewSignatureLine("DN", "authority2:name2"),
 		},
@@ -183,10 +140,10 @@ func addSignature(pdfReader *model.PdfReader, signNumber int) ([]byte, error) {
 		return nil, err
 	}
 
-	sigField.T = core.MakeString(fmt.Sprintf("New Page Signature %d", signNumber))
+	sigField.T = core.MakeString(fmt.Sprintf("Signature %d", signNumber+1))
 
 	if err = appender.Sign(totalPage, sigField); err != nil {
-		log.Fatalf("Fail: %v\n", err)
+		return nil, err
 	}
 
 	buf := &bytes.Buffer{}
@@ -220,7 +177,6 @@ func generateSigKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 		NotAfter:  now.Add(time.Hour * 24 * 365),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 

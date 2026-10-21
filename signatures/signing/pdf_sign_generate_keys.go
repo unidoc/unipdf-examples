@@ -49,31 +49,31 @@ func main() {
 	// Generate key pair.
 	priv, cert, err := generateKeys()
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature handler.
 	handler, err := sighandler.NewAdobePKCS7Detached(priv, cert)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature.
@@ -83,7 +83,7 @@ func main() {
 	signature.SetDate(now, "")
 
 	if err := signature.Initialize(); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature field and appearance.
@@ -95,21 +95,24 @@ func main() {
 		signature,
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
-			annotator.NewSignatureLine("Date", "2019.16.04"),
-			annotator.NewSignatureLine("Reason", "External signature test"),
+			annotator.NewSignatureLine("Date", now.Format("2006.01.02")),
+			annotator.NewSignatureLine("Reason", "Generated key signature test"),
 		},
 		opts,
 	)
+	if err != nil {
+		log.Fatalf("Fail: %v\n", err)
+	}
 	field.T = core.MakeString("Self signed PDF")
 
 	if err = appender.Sign(1, field); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Write output PDF file.
 	err = appender.WriteToFile(outputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)
@@ -124,7 +127,7 @@ func generateKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 
 	// Initialize X509 certificate template.
 	template := x509.Certificate{
-		SerialNumber: new(big.Int),
+		SerialNumber: big.NewInt(1),
 		Subject: pkix.Name{
 			CommonName:   "any",
 			Organization: []string{"Test Company"},

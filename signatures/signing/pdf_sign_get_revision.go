@@ -1,8 +1,10 @@
 /*
- * This example showcases how to append a new page with signature to a PDF document.
- * The file is signed using a private/public key pair.
+ * This example showcases how to retrieve a specific or the previous revision of a PDF document.
+ * It signs the input document twice, each time in a new incremental revision with its own
+ * generated private/public key pair, and then writes the revision the input document had
+ * before it was signed.
  *
- * $ ./pdf_sign_encrypted_pdf <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
+ * $ ./pdf_sign_get_revision <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
 package main
 
@@ -18,18 +20,16 @@ import (
 	"os"
 	"time"
 
-	"github.com/unidoc/unipdf/v5/common/license"
-	"github.com/unidoc/unipdf/v5/core/security"
-
 	"github.com/unidoc/unipdf/v5/annotator"
+	"github.com/unidoc/unipdf/v5/common/license"
 	"github.com/unidoc/unipdf/v5/core"
 	"github.com/unidoc/unipdf/v5/model"
 	"github.com/unidoc/unipdf/v5/model/sighandler"
 )
 
 func init() {
-	//Make sure to load your metered License API key prior to using the library.
-	//If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
+	// Make sure to load your metered License API key prior to using the library.
+	// If you need a key, you can sign up and create a free one at https://cloud.unidoc.io
 	err := license.SetMeteredKey(os.Getenv(`UNIDOC_LICENSE_API_KEY`))
 	if err != nil {
 		panic(err)
@@ -39,7 +39,7 @@ func init() {
 func main() {
 	args := os.Args
 	if len(args) < 3 {
-		log.Fatalln("Usage: go run pdf_sign_encrypted_pdf INPUT_PDF_PATH OUTPUT_PDF_PATH")
+		log.Fatalln("Usage: go run pdf_sign_get_revision INPUT_PDF_PATH OUTPUT_PDF_PATH")
 	}
 
 	inputPath := args[1]
@@ -57,83 +57,94 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	password := "password"
+	// Revision numbers start at 0 for the original document, so this is the
+	// input's latest revision.
+	inputRevision := pdfReader.GetRevisionNumber()
 
-	permissions := security.PermPrinting | // Allow printing with low quality
-		security.PermFullPrintQuality |
-		security.PermModify | // Allow modifications.
-		security.PermAnnotate | // Allow annotations.
-		security.PermFillForms |
-		security.PermRotateInsert | // Allow modifying page order, rotating pages etc.
-		security.PermExtractGraphics | // Allow extracting graphics.
-		security.PermDisabilityExtract // Allow extracting graphics (accessibility)
-
-	encryptOptions := &model.EncryptOptions{
-		Permissions: permissions,
-		Algorithm:   model.AES_128bit,
-	}
-
-	// Ecnrypt document
-	buf, err := encryptDocument(pdfReader, password, encryptOptions)
+	// Add the first signature in a new revision.
+	buf, err := addSignature(pdfReader, 0)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-
-	readerOpts := model.NewReaderOpts()
-	readerOpts.Password = password
 
 	// Open reader for the signed document
-	pdfReader, err = model.NewPdfReaderWithOpts(bytes.NewReader(buf), readerOpts)
+	pdfReader, err = model.NewPdfReader(bytes.NewReader(buf))
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Create appender.
-	pdfAppender, err := model.NewPdfAppenderWithOpts(pdfReader, readerOpts, encryptOptions)
+	// Add the second signature in another revision.
+	buf, err = addSignature(pdfReader, 1)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Add signature
-	buf, err = addSignature(pdfAppender, 1)
+	pdfReader2, err := model.NewPdfReader(bytes.NewReader(buf))
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// Write the resulting file to output.pdf file.
-	err = os.WriteFile(outputPath, buf, 0666)
+	// Write the document as it was before both signatures.
+	err = retrieveSpecificRevision(pdfReader2, inputRevision, outputPath)
+	// or write the document with only the first signature:
+	// err = retrievePreviousRevision(pdfReader2, outputPath)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
-	log.Printf("PDF file successfully saved to output path: %s\n", outputPath)
 
 	fmt.Println("Done")
 }
 
-func encryptDocument(pdfReader *model.PdfReader, password string, encryptOptions *model.EncryptOptions) ([]byte, error) {
-	pdfWriter, err := pdfReader.ToWriter(nil)
+func retrievePreviousRevision(reader *model.PdfReader, outputPath string) error {
+	prevReader, err := reader.GetPreviousRevision()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	// Encrypt document before writing to file.
-	err = pdfWriter.Encrypt([]byte(password), []byte(password), encryptOptions)
+	appender, err := model.NewPdfAppender(prevReader)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	buf := &bytes.Buffer{}
 	// Write output PDF file.
-	if err = pdfWriter.Write(buf); err != nil {
-		return nil, err
+	if err = appender.WriteToFile(outputPath); err != nil {
+		return err
 	}
 
-	log.Println("PDF file successfully encrypted")
-
-	return buf.Bytes(), nil
+	log.Printf("Previous revision written to output path: %s\n", outputPath)
+	return nil
 }
 
-func addSignature(pdfAppender *model.PdfAppender, pageNum int) ([]byte, error) {
+func retrieveSpecificRevision(reader *model.PdfReader, revisionNumber int, outputPath string) error {
+	prevReader, err := reader.GetRevision(revisionNumber)
+	if err != nil {
+		return err
+	}
+
+	appender, err := model.NewPdfAppender(prevReader)
+	if err != nil {
+		return err
+	}
+	// Write output PDF file.
+	if err = appender.WriteToFile(outputPath); err != nil {
+		return err
+	}
+
+	log.Printf("Revision %d written to output path: %s\n", revisionNumber, outputPath)
+	return nil
+}
+
+func addSignature(pdfReader *model.PdfReader, signNumber int) ([]byte, error) {
+	totalPage, err := pdfReader.GetNumPages()
+	if err != nil {
+		return nil, err
+	}
+
+	// Create appender.
+	appender, err := model.NewPdfAppender(pdfReader)
+	if err != nil {
+		return nil, err
+	}
+
 	// Generate key pair.
 	priv, cert, err := generateSigKeys()
 	if err != nil {
@@ -159,7 +170,7 @@ func addSignature(pdfAppender *model.PdfAppender, pageNum int) ([]byte, error) {
 
 	opts := annotator.NewSignatureFieldOpts()
 	opts.FontSize = 8
-	opts.Rect = []float64{float64(50), 250, float64(150), 300}
+	opts.Rect = []float64{float64(50 + signNumber*100), 250, float64(150 + signNumber*100), 300}
 	opts.TextColor = model.NewPdfColorDeviceRGB(255, 0, 0)
 
 	sigField, err := annotator.NewSignatureField(
@@ -167,7 +178,7 @@ func addSignature(pdfAppender *model.PdfAppender, pageNum int) ([]byte, error) {
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
 			annotator.NewSignatureLine("Date", "2019.03.14"),
-			annotator.NewSignatureLine("Reason", fmt.Sprintf("Test sign")),
+			annotator.NewSignatureLine("Reason", fmt.Sprintf("Test sign #%d", signNumber+1)),
 			annotator.NewSignatureLine("Location", "London"),
 			annotator.NewSignatureLine("DN", "authority2:name2"),
 		},
@@ -177,15 +188,15 @@ func addSignature(pdfAppender *model.PdfAppender, pageNum int) ([]byte, error) {
 		return nil, err
 	}
 
-	sigField.T = core.MakeString(fmt.Sprintf("New Page Signature"))
+	sigField.T = core.MakeString(fmt.Sprintf("Signature %d", signNumber+1))
 
-	if err = pdfAppender.Sign(pageNum, sigField); err != nil {
-		log.Fatalf("Fail: %v\n", err)
+	if err = appender.Sign(totalPage, sigField); err != nil {
+		return nil, err
 	}
 
 	buf := &bytes.Buffer{}
 	// Write output PDF file.
-	if err = pdfAppender.Write(buf); err != nil {
+	if err = appender.Write(buf); err != nil {
 		return nil, err
 	}
 
@@ -214,7 +225,6 @@ func generateSigKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 		NotAfter:  now.Add(time.Hour * 24 * 365),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 

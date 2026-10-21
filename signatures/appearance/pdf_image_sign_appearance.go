@@ -1,6 +1,11 @@
 /*
- * This example showcases how to create appearance fields for digital signature.
- * The file is signed using a private/public key pair.
+ * This example showcases how to create image-based appearance fields for a
+ * digital signature: a signature image placed beside, above or below the
+ * text lines, an image-only appearance, and a watermark image behind each
+ * field. Five fields are added on each page of the document.
+ * All fields share one signature dictionary, so the document carries a single
+ * cryptographic signature shown in several places.
+ * The file is signed using a generated private/public key pair.
  *
  * $ ./pdf_image_sign_appearance <INPUT_PDF_PATH> <IMAGE_FILE> <WATERMARK_IMAGE_FILE> <OUTPUT_PDF_PATH>
  */
@@ -52,19 +57,19 @@ func main() {
 	// Generate key pair.
 	priv, cert, err := generateKeys()
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create reader.
 	file, err := os.Open(inputPath)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 	defer file.Close()
 
 	reader, err := model.NewPdfReader(file)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create the image
@@ -94,13 +99,13 @@ func main() {
 	// Create appender.
 	appender, err := model.NewPdfAppender(reader)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature handler.
 	handler, err := sighandler.NewAdobePKCS7Detached(priv, cert)
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature.
@@ -110,12 +115,12 @@ func main() {
 	signature.SetDate(time.Now(), "")
 
 	if err := signature.Initialize(); err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	numPages, err := reader.GetNumPages()
 	if err != nil {
-		log.Fatal("Fail: %v\n", err)
+		log.Fatalf("Fail: %v\n", err)
 	}
 
 	// Create signature fields and add them on each page of the PDF file.
@@ -141,10 +146,13 @@ func main() {
 			},
 			opts,
 		)
+		if err != nil {
+			log.Fatalf("Fail: %v\n", err)
+		}
 		sigField.T = core.MakeString(fmt.Sprintf("Signature %d", pageNum))
 
 		if err = appender.Sign(pageNum, sigField); err != nil {
-			log.Fatal("Fail: %v\n", err)
+			log.Fatalf("Fail: %v\n", err)
 		}
 
 		// Without image signature
@@ -164,10 +172,13 @@ func main() {
 			},
 			opts,
 		)
+		if err != nil {
+			log.Fatalf("Fail: %v\n", err)
+		}
 		sigField.T = core.MakeString(fmt.Sprintf("Signature2 %d", pageNum))
 
 		if err = appender.Sign(pageNum, sigField); err != nil {
-			log.Fatal("Fail: %v\n", err)
+			log.Fatalf("Fail: %v\n", err)
 		}
 
 		// Image on the top
@@ -190,6 +201,9 @@ func main() {
 			},
 			opts,
 		)
+		if err != nil {
+			log.Fatalf("Fail: %v\n", err)
+		}
 		sigField.T = core.MakeString(fmt.Sprintf("Signature3 %d", pageNum))
 
 		if err = appender.Sign(pageNum, sigField); err != nil {
@@ -218,6 +232,9 @@ func main() {
 			},
 			opts,
 		)
+		if err != nil {
+			log.Fatalf("Fail: %v\n", err)
+		}
 		sigField.T = core.MakeString(fmt.Sprintf("Signature4 %d", pageNum))
 
 		if err = appender.Sign(pageNum, sigField); err != nil {
@@ -226,11 +243,14 @@ func main() {
 
 		// Only Image Signature
 		opts = annotator.NewSignatureFieldOpts()
-		opts.Rect = []float64{70, 50, 170, 100}
+		opts.Rect = []float64{330, 25, 430, 75}
 		opts.Image = signatureImage
 		opts.WatermarkImage = signatureWImage
 
 		sigField, err = annotator.NewSignatureField(signature, nil, opts)
+		if err != nil {
+			log.Fatalf("Fail: %v\n", err)
+		}
 
 		sigField.T = core.MakeString(fmt.Sprintf("Signature5 %d", pageNum))
 
@@ -259,13 +279,13 @@ func generateKeys() (*rsa.PrivateKey, *x509.Certificate, error) {
 	template := x509.Certificate{
 		SerialNumber: big.NewInt(1),
 		Subject: pkix.Name{
+			CommonName:   "Test Signer",
 			Organization: []string{"Test Company"},
 		},
 		NotBefore: now.Add(-time.Hour),
 		NotAfter:  now.Add(time.Hour * 24 * 365),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 
