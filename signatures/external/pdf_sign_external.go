@@ -1,7 +1,10 @@
 /*
  * This example showcases how to digitally sign a PDF file using an external
- * signing service which returns PKCS7 package. The external service is
- * is simulated by signing the file with UniDoc.
+ * signing service which returns PKCS7 package. The PDF is first written with
+ * an empty signature, the bytes covered by its ByteRange are sent to the
+ * service, and the returned signature is placed into the Contents of that
+ * same PDF. The external service is simulated locally with a self-signed
+ * certificate.
  *
  * $ ./pdf_sign_external <INPUT_PDF_PATH> <OUTPUT_PDF_PATH>
  */
@@ -20,6 +23,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/unidoc/pkcs7"
 	"github.com/unidoc/unipdf/v5/annotator"
 	"github.com/unidoc/unipdf/v5/common/license"
 	"github.com/unidoc/unipdf/v5/core"
@@ -38,6 +42,9 @@ func init() {
 
 var now = time.Now()
 
+// sigLen is the number of bytes reserved for the signature Contents.
+const sigLen = 8192
+
 const usagef = "Usage: %s INPUT_PDF_PATH OUTPUT_PDF_PATH\n"
 
 func main() {
@@ -50,7 +57,7 @@ func main() {
 	outputPath := args[2]
 
 	// Generate PDF file signed with empty signature.
-	handler, err := sighandler.NewEmptyAdobePKCS7Detached(8192)
+	handler, err := sighandler.NewEmptyAdobePKCS7Detached(sigLen)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
@@ -66,25 +73,31 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	// This would be the time to send the PDF buffer to a signing device or
-	// signing web service and get back the signature. We will simulate this by
-	// signing the PDF using UniDoc and returning the signature data.
-	signatureData, err := getExternalSignature(inputPath)
+	// The signed content is the whole file except the Contents hex string,
+	// which sits between the two byte ranges.
+	content := append(append([]byte{}, pdfData[byteRange[0]:byteRange[1]]...), pdfData[byteRange[2]:byteRange[3]]...)
+
+	// This would be the time to send the content (or its SHA-256 digest) to a
+	// signing device or signing web service and get back the PKCS7 signature.
+	signatureData, err := getExternalSignature(content)
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
+	}
+	if len(signatureData) > sigLen {
+		log.Fatalf("Fail: signature is %d bytes, but only %d bytes are reserved for Contents\n", len(signatureData), sigLen)
 	}
 
 	// Apply external signature to the PDF data buffer.
 	// Overwrite the generated empty signature with the signature
 	// bytes retrieved from the external service.
-	sigBytes := make([]byte, 8192)
+	sigBytes := make([]byte, sigLen)
 	copy(sigBytes, signatureData)
 
 	sig := core.MakeHexString(string(sigBytes)).Write()
 	copy(pdfData[byteRange[1]:byteRange[2]], sig)
 
 	// Write output file.
-	if err := os.WriteFile(outputPath, pdfData, os.ModePerm); err != nil {
+	if err := os.WriteFile(outputPath, pdfData, 0644); err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
@@ -131,7 +144,7 @@ func generateSignedFile(inputPath string, handler model.SignatureHandler) ([]byt
 		signature,
 		[]*annotator.SignatureLine{
 			annotator.NewSignatureLine("Name", "John Doe"),
-			annotator.NewSignatureLine("Date", "2019.16.04"),
+			annotator.NewSignatureLine("Date", now.Format("2006.01.02")),
 			annotator.NewSignatureLine("Reason", "External signature test"),
 		},
 		opts,
@@ -154,9 +167,9 @@ func generateSignedFile(inputPath string, handler model.SignatureHandler) ([]byt
 	return pdfBuf.Bytes(), signature, nil
 }
 
-// getExternalSignature simulates an external service which signs the specified
-// PDF file and returns its signature.
-func getExternalSignature(inputPath string) ([]byte, error) {
+// getExternalSignature simulates an external service which signs the
+// specified content with its own key and returns a detached PKCS7 signature.
+func getExternalSignature(content []byte) ([]byte, error) {
 	// Generate private key.
 	priv, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -173,7 +186,6 @@ func getExternalSignature(inputPath string) ([]byte, error) {
 		NotAfter:  now.Add(time.Hour * 24 * 365),
 
 		KeyUsage:              x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 	}
 
@@ -188,18 +200,18 @@ func getExternalSignature(inputPath string) ([]byte, error) {
 		return nil, err
 	}
 
-	// Sign input file.
-	handler, err := sighandler.NewAdobePKCS7Detached(priv, cert)
+	// Create a detached PKCS7 signature over the content.
+	signedData, err := pkcs7.NewSignedData(content)
 	if err != nil {
 		return nil, err
 	}
-
-	_, signature, err := generateSignedFile(inputPath, handler)
-	if err != nil {
+	signedData.SetDigestAlgorithm(pkcs7.OIDDigestAlgorithmSHA256)
+	if err := signedData.AddSigner(cert, priv, pkcs7.SignerInfoConfig{}); err != nil {
 		return nil, err
 	}
+	signedData.Detach()
 
-	return signature.Contents.Bytes(), nil
+	return signedData.Finish()
 }
 
 // parseByteRange parses the ByteRange value of the signature field.
