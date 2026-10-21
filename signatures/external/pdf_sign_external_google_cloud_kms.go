@@ -270,7 +270,7 @@ func GcKmsExternalSigner(client *kms.KeyManagementClient, keyName string) (*exte
 
 	// Initialize X509 certificate template.
 	template := x509.Certificate{
-		SerialNumber: new(big.Int),
+		SerialNumber: big.NewInt(1),
 		Subject: pkix.Name{
 			CommonName:   "UniDOC",
 			Organization: []string{"Test Company"},

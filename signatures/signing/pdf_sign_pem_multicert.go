@@ -93,19 +93,21 @@ func loadPrivateKey(privateKeyPath string) (*rsa.PrivateKey, error) {
 	}
 
 	// Parse private key data, either PKCS#1 ("RSA PRIVATE KEY") or PKCS#8 ("PRIVATE KEY").
-	if privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes); err == nil {
+	switch block.Type {
+	case "RSA PRIVATE KEY":
+		return x509.ParsePKCS1PrivateKey(block.Bytes)
+	case "PRIVATE KEY":
+		key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+		privateKey, ok := key.(*rsa.PrivateKey)
+		if !ok {
+			return nil, fmt.Errorf("private key is %T; only RSA keys are supported", key)
+		}
 		return privateKey, nil
 	}
-	key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-	privateKey, ok := key.(*rsa.PrivateKey)
-	if !ok {
-		return nil, fmt.Errorf("private key is %T; only RSA keys are supported", key)
-	}
-
-	return privateKey, nil
+	return nil, fmt.Errorf("unsupported private key PEM block %q; only RSA keys are supported", block.Type)
 }
 
 func loadCertificates(certPath string) (*x509.Certificate, *core.PdfObjectArray, error) {

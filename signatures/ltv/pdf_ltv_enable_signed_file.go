@@ -87,6 +87,7 @@ func main() {
 
 	// LTV.EnableAll fails on an empty signature field, so enable only the
 	// fields that hold a signature.
+	enabled := 0
 	if reader.AcroForm != nil {
 		for _, field := range reader.AcroForm.AllFields() {
 			sigField, ok := field.GetContext().(*model.PdfFieldSignature)
@@ -96,7 +97,11 @@ func main() {
 			if err := ltv.Enable(sigField.V, certChain); err != nil {
 				log.Fatalf("Fail: %v\n", err)
 			}
+			enabled++
 		}
+	}
+	if enabled == 0 {
+		log.Fatal("Fail: no signed signature fields found")
 	}
 
 	// Write output PDF file.

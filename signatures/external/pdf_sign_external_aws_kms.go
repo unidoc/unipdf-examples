@@ -246,7 +246,7 @@ func AwsKmsExternalSigner(keyId string) (*externalSigner, error) {
 
 	// Initialize X509 certificate template.
 	template := x509.Certificate{
-		SerialNumber: new(big.Int),
+		SerialNumber: big.NewInt(1),
 		Subject: pkix.Name{
 			CommonName:   "UniDOC",
 			Organization: []string{"Test Company"},

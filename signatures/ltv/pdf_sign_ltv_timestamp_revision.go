@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"time"
 
 	"software.sslmate.com/src/go-pkcs12"
@@ -90,7 +91,9 @@ func main() {
 			if err != nil {
 				log.Fatalf("Fail: %v\n", err)
 			}
-			certChain = append(certChain, issuer)
+			if !slices.ContainsFunc(certChain, issuer.Equal) {
+				certChain = append(certChain, issuer)
+			}
 		}
 	}
 

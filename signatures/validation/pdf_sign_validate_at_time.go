@@ -118,7 +118,7 @@ func main() {
 		}
 	}
 
-	// Outside signing-time every signature is checked at the same time, so
+	// Outside signing-time the options are the same for every signature, so
 	// one validation pass serves them all.
 	var shared []model.SignatureValidationResult
 	if timeArg != "signing-time" {
