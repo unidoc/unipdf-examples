@@ -137,7 +137,12 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	handler, err = sighandler.NewDocTimeStamp("https://freetsa.org/tsr", crypto.SHA512)
+	// A fixed Contents size makes an oversized token fail with
+	// model.ErrSignNotEnoughSpace; without it a token a few bytes longer
+	// than the size probe is silently truncated.
+	handler, err = sighandler.NewDocTimeStampWithOpts("https://freetsa.org/tsr", crypto.SHA512, &sighandler.DocTimeStampOpts{
+		SignatureSize: 8192,
+	})
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}

@@ -217,7 +217,12 @@ func ltvEnableAndTimestamp(r *bytes.Reader, certChain []*x509.Certificate) ([]by
 	}
 
 	// Create timestamp handler.
-	handler, err := sighandler.NewDocTimeStamp("https://freetsa.org/tsr", crypto.SHA512)
+	// A fixed Contents size makes an oversized token fail with
+	// model.ErrSignNotEnoughSpace; without it a token a few bytes longer
+	// than the size probe is silently truncated.
+	handler, err := sighandler.NewDocTimeStampWithOpts("https://freetsa.org/tsr", crypto.SHA512, &sighandler.DocTimeStampOpts{
+		SignatureSize: 8192,
+	})
 	if err != nil {
 		return nil, err
 	}
