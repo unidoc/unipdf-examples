@@ -9,12 +9,20 @@
  * is valid at the validation time (now, or the time of a trusted timestamp
  * token), and, when requested, that it was not revoked.
  *
- * $ ./pdf_sign_validate_trust <INPUT_PDF_PATH> <ROOTS_PEM_PATH> [offline|online]
+ * Some documents embed only the signer certificate. The chain to the root
+ * then cannot be built from the document alone and trust fails with
+ * "certificate signed by unknown authority", even when the root is trusted.
+ * Pass the intermediate CA certificates as INTERMEDIATES_PEM_PATH to fill
+ * the gap. Intermediates are only used to build the chain; trust still has
+ * to come from ROOTS_PEM_PATH.
+ *
+ * $ ./pdf_sign_validate_trust <INPUT_PDF_PATH> <ROOTS_PEM_PATH> [offline|online] [INTERMEDIATES_PEM_PATH]
  */
 package main
 
 import (
 	"crypto/x509"
+	"encoding/pem"
 	"fmt"
 	"log"
 	"os"
@@ -33,7 +41,7 @@ func init() {
 	}
 }
 
-const usagef = "Usage: %s INPUT_PDF_PATH ROOTS_PEM_PATH [offline|online]\n"
+const usagef = "Usage: %s INPUT_PDF_PATH ROOTS_PEM_PATH [offline|online] [INTERMEDIATES_PEM_PATH]\n"
 
 func main() {
 	args := os.Args
@@ -68,6 +76,14 @@ func main() {
 	roots := x509.NewCertPool()
 	if !roots.AppendCertsFromPEM(rootsPEM) {
 		log.Fatalf("Fail: no certificates found in %s\n", rootsPath)
+	}
+
+	var intermediates []*x509.Certificate
+	if len(args) > 4 {
+		intermediates, err = loadCerts(args[4])
+		if err != nil {
+			log.Fatalf("Fail: %v\n", err)
+		}
 	}
 
 	file, err := os.Open(inputPath)
@@ -106,8 +122,9 @@ func main() {
 	}
 
 	opts := &model.SignatureValidationOpts{
-		Roots:      roots,
-		Revocation: revocation,
+		Roots:         roots,
+		Intermediates: intermediates,
+		Revocation:    revocation,
 		// Treat an unknown revocation status as untrusted. Leave this unset
 		// to accept documents without revocation data and inspect
 		// RevocationStatus yourself.
@@ -132,6 +149,12 @@ func main() {
 			for _, reason := range item.TrustErrors {
 				fmt.Printf("  - %s\n", reason)
 			}
+			// item.String() above prints the signer subject and issuer from
+			// SignerCertificate(). The issuer names the CA certificate to
+			// supply when the chain cannot be built.
+			if cert := item.SignerCertificate(); cert != nil {
+				fmt.Printf("  signer serial: %s\n", cert.SerialNumber)
+			}
 		default:
 			fmt.Printf("Result: signed by %s, trusted via %s\n",
 				item.TrustChain[0].Subject.CommonName,
@@ -141,4 +164,32 @@ func main() {
 			}
 		}
 	}
+}
+
+// loadCerts reads every certificate in a PEM file.
+func loadCerts(path string) ([]*x509.Certificate, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	var certs []*x509.Certificate
+	for {
+		var block *pem.Block
+		block, data = pem.Decode(data)
+		if block == nil {
+			break
+		}
+		if block.Type != "CERTIFICATE" {
+			continue
+		}
+		cert, err := x509.ParseCertificate(block.Bytes)
+		if err != nil {
+			return nil, fmt.Errorf("%s: %w", path, err)
+		}
+		certs = append(certs, cert)
+	}
+	if len(certs) == 0 {
+		return nil, fmt.Errorf("no certificates found in %s", path)
+	}
+	return certs, nil
 }

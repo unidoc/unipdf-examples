@@ -318,7 +318,8 @@ does not check trust.
 
 `LTV.EnableAll` returns an error when the form has a signature field that is
 not signed yet. The example walks the signature fields and calls `LTV.Enable`
-only on signed ones.
+only on signed ones. To LTV enable a single signature, pass its field name to
+`LTV.EnableByName`.
 
 For more information, see [pdf_ltv_enable_signed_file.go](pdf_ltv_enable_signed_file.go).
 
