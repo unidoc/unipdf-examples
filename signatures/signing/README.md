@@ -2,8 +2,11 @@
 
 Examples of signing a PDF with keys loaded from different sources. See the [signatures README](../README.md) for the full list.
 
-Each signature is added in an incremental revision, so the bytes of the input
-document stay as they were. Examples that generate their own key pair use a
+Each signature is added in an incremental revision on top of the file it
+signs. Most examples sign the input as it is, so its bytes stay as they were.
+`pdf_sign_new_page.go` and `pdf_sign_and_encrypt_pdf.go` first rewrite the
+input with `PdfReader.ToWriter` (to add a page, or to encrypt it) and sign
+the rewritten file. Examples that generate their own key pair use a
 self-signed certificate, which proves integrity but not identity. To check
 that a signer is trusted, see [../validation](../validation).
 

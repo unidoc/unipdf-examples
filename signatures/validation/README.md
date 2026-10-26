@@ -37,9 +37,10 @@ with `online`. An unknown revocation status counts as untrusted.
 
 When the document embeds only the signer certificate, the chain can't be built
 and trust fails with "certificate signed by unknown authority". Pass the
-intermediate CA certificates as a fourth argument. When a signer is not
-trusted, the example prints its subject, serial and issuer from
-`SignerCertificate()`. The issuer names the certificate that is missing.
+intermediate CA certificates as a fourth argument. The `Certificate issuer:`
+line in the output, which comes from `SignerCertificate()`, names the
+certificate that is missing. When a signer is not trusted, the example also
+prints its serial number.
 
 ```bash
 $ go run pdf_sign_validate_trust.go input_signed.pdf roots.pem
@@ -49,8 +50,9 @@ $ go run pdf_sign_validate_trust.go input_signed.pdf roots.pem offline intermedi
 ## pdf_sign_validate_online.go
 
 Checks trust with online CRL and OCSP lookups through configured HTTP clients.
-Revocation data in the document is used first. A lookup that fails makes the
-signature untrusted.
+Revocation data in the document is used first. OCSP responders are tried
+before CRLs, and a failed lookup is reported in `TrustWarnings`. A revocation
+status that is still unknown after the lookups makes the signature untrusted.
 
 ```bash
 $ go run pdf_sign_validate_online.go input_signed.pdf roots.pem

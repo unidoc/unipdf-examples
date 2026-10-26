@@ -15,7 +15,7 @@
  *   - ContentsGapOnly: the only bytes left out of the signed range are the
  *     signature's own /Contents value.
  *
- * The example exits non-zero if a signature fails integrity, does not cover
+ * The example exits non-zero if a signature does not verify, does not cover
  * its revision, or leaves out more than its /Contents value. To see what the
  * appended revisions changed, extract the signed revision with
  * PdfReader.GetRevision (see signing/pdf_sign_get_revision.go) and compare it
@@ -108,11 +108,19 @@ func main() {
 		}
 		fmt.Printf("--- Signature %d: field %q\n", i+1, name)
 
+		// IsVerified is also false when no handler supports the signature or
+		// its ByteRange is missing or invalid; Errors says which.
+		if !item.IsVerified {
+			fmt.Println("Result: signature not verified")
+			for _, e := range item.Errors {
+				fmt.Printf("  - %s\n", e)
+			}
+			failed = append(failed, strconv.Itoa(i+1))
+			continue
+		}
+
 		ok := true
 		switch {
-		case !item.IsVerified:
-			fmt.Println("Result: signature does not match the document (integrity failure)")
-			ok = false
 		case item.IsCoveringEntireFile:
 			fmt.Println("Result: signature covers the entire file")
 		case item.IsCoveringEntireRevision:

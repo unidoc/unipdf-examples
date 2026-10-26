@@ -12,8 +12,11 @@ allowed in later revisions. The permission is one of:
   annotations.
 
 A document can have only one DocMDP signature, and it must be the first
-signature. To check later revisions against the permission, validate with
-`sighandler.NewDocMDPHandler` wrapping the inner handler. A disallowed change
+signature. To check later revisions against the permission, read it from the
+document with `reader.GetPerms().DocMDP.GetDocMDPPermission()` and pass it to
+`sighandler.NewDocMDPHandler`, wrapping the inner handler. The handler
+enforces the permission it is given, not the document's /P, so a looser value
+would accept changes the document forbids. A disallowed change
 leaves the signed bytes intact, but the handler reports the signature as
 invalid and lists the changes in `SignatureValidationResult.DiffResults`. All
 examples sign with a generated key pair, so they run offline.

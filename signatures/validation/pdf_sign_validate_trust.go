@@ -149,12 +149,11 @@ func main() {
 			for _, reason := range item.TrustErrors {
 				fmt.Printf("  - %s\n", reason)
 			}
-			// The signer certificate is read from the document whether or
-			// not it is trusted. Its issuer names the CA certificate to
+			// item.String() above prints the signer subject and issuer from
+			// SignerCertificate(). The issuer names the CA certificate to
 			// supply when the chain cannot be built.
 			if cert := item.SignerCertificate(); cert != nil {
-				fmt.Printf("  signer: %s (serial %s)\n", cert.Subject, cert.SerialNumber)
-				fmt.Printf("  issued by: %s\n", cert.Issuer)
+				fmt.Printf("  signer serial: %s\n", cert.SerialNumber)
 			}
 		default:
 			fmt.Printf("Result: signed by %s, trusted via %s\n",
