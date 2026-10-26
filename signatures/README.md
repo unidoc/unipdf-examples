@@ -18,6 +18,7 @@ Examples for digital signing of PDF files with UniDoc.
 
 - [pdf_sign_appearance.go](appearance/pdf_sign_appearance.go) Example of creating signature appearance fields.
 - [pdf_image_sign_appearance.go](appearance/pdf_image_sign_appearance.go) Example of creating signature appearance fields with images.
+- [pdf_sign_with_appearance.go](appearance/pdf_sign_with_appearance.go) Example of signing with an appearance generated from the signature name, date, reason and location.
 
 ## External signing
 
@@ -46,7 +47,8 @@ See the [external signing guide](external) for KMS, GlobalSign and SoftHSM setup
 ## Validation
 
 - [pdf_sign_validate.go](validation/pdf_sign_validate.go) Example of integrity validation for every signature in a document, including PAdES signatures and document timestamps.
-- [pdf_sign_validate_trust.go](validation/pdf_sign_validate_trust.go) Example of signature validation against trusted root certificates with CRL/OCSP revocation checks.
+- [pdf_sign_validate_trust.go](validation/pdf_sign_validate_trust.go) Example of signature validation against trusted root certificates with CRL/OCSP revocation checks, with optional intermediate certificates for documents that embed only the signer certificate.
+- [pdf_sign_validate_coverage.go](validation/pdf_sign_validate_coverage.go) Example of checking how much of the file each signature covers, to detect content appended after signing.
 - [pdf_sign_validate_at_time.go](validation/pdf_sign_validate_at_time.go) Example of validating archived signatures at an explicit point in time.
 - [pdf_sign_validate_online.go](validation/pdf_sign_validate_online.go) Example of signature validation with online CRL and OCSP revocation checks through configured HTTP clients.
 
