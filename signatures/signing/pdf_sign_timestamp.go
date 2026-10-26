@@ -15,6 +15,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -23,6 +24,7 @@ import (
 	"github.com/unidoc/unipdf/v5/core"
 	"github.com/unidoc/unipdf/v5/model"
 	"github.com/unidoc/unipdf/v5/model/sighandler"
+	"github.com/unidoc/unipdf/v5/model/sigutil"
 
 	"software.sslmate.com/src/go-pkcs12"
 )
@@ -137,7 +139,15 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	handler, err = sighandler.NewDocTimeStamp("https://freetsa.org/tsr", crypto.SHA512)
+	// SignatureSize reserves space for the timestamp token; a token from
+	// freetsa.org is about 4.7 KB. Client is optional and sets the HTTP
+	// client used to reach the TSA.
+	handler, err = sighandler.NewDocTimeStampWithOpts("https://freetsa.org/tsr", crypto.SHA256, &sighandler.DocTimeStampOpts{
+		SignatureSize: 8192,
+		Client: &sigutil.TimestampClient{
+			HTTPClient: &http.Client{Timeout: 30 * time.Second},
+		},
+	})
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}

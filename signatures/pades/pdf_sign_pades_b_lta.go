@@ -181,7 +181,11 @@ func main() {
 		log.Fatalf("Fail: %v\n", err)
 	}
 
-	handler, err = sighandler.NewDocTimeStamp(timestampServerURL, crypto.SHA512)
+	// SignatureSize reserves space for the timestamp token; a token from
+	// freetsa.org is about 4.7 KB.
+	handler, err = sighandler.NewDocTimeStampWithOpts(timestampServerURL, crypto.SHA256, &sighandler.DocTimeStampOpts{
+		SignatureSize: 8192,
+	})
 	if err != nil {
 		log.Fatalf("Fail: %v\n", err)
 	}

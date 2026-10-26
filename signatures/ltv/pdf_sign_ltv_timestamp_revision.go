@@ -216,8 +216,11 @@ func ltvEnableAndTimestamp(r *bytes.Reader, certChain []*x509.Certificate) ([]by
 		return nil, err
 	}
 
-	// Create timestamp handler.
-	handler, err := sighandler.NewDocTimeStamp("https://freetsa.org/tsr", crypto.SHA512)
+	// Create timestamp handler. SignatureSize reserves space for the
+	// timestamp token; a token from freetsa.org is about 4.7 KB.
+	handler, err := sighandler.NewDocTimeStampWithOpts("https://freetsa.org/tsr", crypto.SHA256, &sighandler.DocTimeStampOpts{
+		SignatureSize: 8192,
+	})
 	if err != nil {
 		return nil, err
 	}
