@@ -96,10 +96,17 @@ func main() {
 	}
 
 	// Create the signature field with an empty widget of the size and
-	// position the appearance is drawn in.
+	// position the appearance is drawn in. The field is numbered after the
+	// Approval fields already in the document, so signing the output again
+	// adds a new field above the previous one instead of reusing its name.
+	n := 1
+	for hasField(reader, fmt.Sprintf("Approval %d", n)) {
+		n++
+	}
+	y := 50 + float64(n-1)*80
 	field := model.NewPdfFieldSignature(signature)
-	field.T = core.MakeString("Approval")
-	field.Rect = core.MakeArrayFromFloats([]float64{50, 50, 250, 120})
+	field.T = core.MakeString(fmt.Sprintf("Approval %d", n))
+	field.Rect = core.MakeArrayFromFloats([]float64{50, y, 250, y + 70})
 
 	// Generate the appearance and sign page 1.
 	if err := appender.SignWithAppearance(1, field, annotator.FieldAppearance{}); err != nil {
@@ -113,6 +120,19 @@ func main() {
 	}
 
 	log.Printf("PDF file successfully signed. Output path: %s\n", outputPath)
+}
+
+// hasField reports whether the document form has a field named name.
+func hasField(reader *model.PdfReader, name string) bool {
+	if reader.AcroForm == nil {
+		return false
+	}
+	for _, field := range reader.AcroForm.AllFields() {
+		if field.PartialName() == name {
+			return true
+		}
+	}
+	return false
 }
 
 func generateKeys() (*rsa.PrivateKey, *x509.Certificate, error) {

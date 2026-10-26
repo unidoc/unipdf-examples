@@ -14,7 +14,8 @@ Signs with `PdfAppender.SignWithAppearance` and `annotator.FieldAppearance`.
 The appearance is generated from the Name, M (signing date), Reason and
 Location entries of the signature dictionary, so the visible text matches what
 was signed. Set those entries before calling `SignWithAppearance`. The field
-needs a widget rectangle, here `[50 50 250 120]` on page 1.
+needs a widget rectangle on page 1. Running the example on its own output adds
+a new field, `Approval 2` and so on, above the previous one.
 
 ```bash
 $ go run pdf_sign_with_appearance.go input.pdf input_signed.pdf
