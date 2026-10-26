@@ -1,8 +1,8 @@
 /*
  * Decrypts a PDF file encrypted for recipients with the public-key security
  * handler (Adobe.PubSec), see pdf_encrypt_for_recipients.go, and writes an
- * unencrypted copy. The file is opened with the recipient's certificate and
- * private key passed in model.ReaderOpts.
+ * unencrypted copy. The file is decrypted with the recipient's certificate and
+ * private key using PdfReader.DecryptWithCertificate.
  *
  * The certificate is read from a PEM or DER file, the private key from a PEM file
  * (PKCS #1 or PKCS #8). The private key must be an RSA key. For a .p12/.pfx digital
@@ -19,7 +19,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/unidoc/unipdf/v5/common/license"
@@ -59,7 +58,7 @@ func main() {
 			fmt.Println("The PDF was encrypted for this certificate, but the private key does not open it. Does the key belong to the certificate?")
 		case errors.Is(err, security.ErrUnsupportedRecipient):
 			fmt.Println("The PDF has recipient entries in a format that is not supported (e.g. RSAES-OAEP), so it is unknown whether this certificate is among them.")
-		case errors.Is(err, errPasswordProtected):
+		case errors.Is(err, core.ErrPasswordRequired):
 			fmt.Println("The PDF is password protected, see pdf_unlock.go.")
 		}
 		os.Exit(1)
@@ -84,21 +83,23 @@ func decryptPdf(inputPath, certPath, keyPath, outputPath string) error {
 	}
 	defer f.Close()
 
-	// With a certificate and private key in the reader options, a PDF encrypted
-	// for recipients is decrypted while it is opened; an unencrypted PDF opens as
-	// usual. The certificate is ignored for a password protected PDF, which is
-	// opened with ReaderOpts.Password instead (empty here), see pdf_unlock.go.
-	// Opening fails with a generic error then, so usesPassword checks for it.
-	readerOpts := model.NewReaderOpts()
-	readerOpts.Certificate = cert
-	readerOpts.PrivateKey = key
-
-	pdfReader, err := model.NewPdfReaderWithOpts(f, readerOpts)
+	pdfReader, err := model.NewPdfReader(f)
 	if err != nil {
-		if usesPassword(f, cert, key) {
-			return fmt.Errorf("%w: %v", errPasswordProtected, err)
-		}
 		return err
+	}
+
+	isEncrypted, err := pdfReader.IsEncrypted()
+	if err != nil {
+		return err
+	}
+
+	// Decrypt with the recipient's certificate and private key. A password
+	// protected PDF is rejected with core.ErrPasswordRequired.
+	if isEncrypted {
+		_, err = pdfReader.DecryptWithCertificate(cert, key)
+		if err != nil {
+			return err
+		}
 	}
 
 	// Generate a PdfWriter instance from existing PdfReader.
@@ -109,22 +110,6 @@ func decryptPdf(inputPath, certPath, keyPath, outputPath string) error {
 
 	// Write to file.
 	return pdfWriter.WriteToFile(outputPath)
-}
-
-// errPasswordProtected marks a failure to open a PDF that uses password
-// encryption instead of recipient certificates.
-var errPasswordProtected = errors.New("the PDF is password protected")
-
-// usesPassword reports whether the PDF uses password encryption. Opening such a
-// PDF with ReaderOpts fails with a generic error, while the certificate check
-// reports core.ErrPasswordRequired.
-func usesPassword(f io.ReaderAt, cert *x509.Certificate, key *rsa.PrivateKey) bool {
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		return false
-	}
-	_, _, err = pdfReader.CheckAccessRightsWithCertificate(cert, key)
-	return errors.Is(err, core.ErrPasswordRequired)
 }
 
 // loadCertificate reads an X509 certificate from a PEM or DER file.

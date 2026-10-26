@@ -130,12 +130,9 @@ func printAccessInfo(inputPath, certPath, keyPath string) error {
 	fmt.Printf("--------\n")
 
 	// The same certificate and key now decrypt the document on this reader.
-	auth, err := pdfReader.DecryptWithCertificate(cert, key)
+	_, err = pdfReader.DecryptWithCertificate(cert, key)
 	if err != nil {
 		return err
-	}
-	if !auth {
-		return fmt.Errorf("unable to decrypt with the specified certificate")
 	}
 
 	numPages, err := pdfReader.GetNumPages()
