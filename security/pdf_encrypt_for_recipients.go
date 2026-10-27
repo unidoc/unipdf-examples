@@ -13,8 +13,8 @@
  * may also change the security settings of the file.
  *   -aes128      encrypts with AES-128 instead, for viewers without PDF 2.0 support.
  *   -print-only  lets the recipients view and print the file, but not modify it or
- *                copy its content. Extraction for accessibility is always allowed,
- *                as PDF 2.0 requires.
+ *                copy its content. Extraction for accessibility is always granted
+ *                by the public-key handler.
  * The permissions are the same for all recipients of the file.
  *
  * Run as: go run pdf_encrypt_for_recipients.go [-aes128] [-print-only] input.pdf output.pdf recipient.crt [recipient2.crt ...]

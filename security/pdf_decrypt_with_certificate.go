@@ -2,7 +2,8 @@
  * Decrypts a PDF file encrypted for recipients with the public-key security
  * handler (Adobe.PubSec), see pdf_encrypt_for_recipients.go, and writes an
  * unencrypted copy. The file is decrypted with the recipient's certificate and
- * private key using PdfReader.DecryptWithCertificate.
+ * private key using PdfReader.DecryptWithCertificate. Only a recipient with all
+ * permissions (owner-equivalent) may remove the encryption.
  *
  * The certificate is read from a PEM or DER file, the private key from a PEM file
  * (PKCS #1 or PKCS #8). The private key must be an RSA key. For a .p12/.pfx digital
@@ -93,9 +94,19 @@ func decryptPdf(inputPath, certPath, keyPath, outputPath string) error {
 		return err
 	}
 
-	// Decrypt with the recipient's certificate and private key. A password
-	// protected PDF is rejected with core.ErrPasswordRequired.
 	if isEncrypted {
+		// The unencrypted copy carries no permissions, so only an owner-equivalent
+		// recipient may make it. A password protected PDF is rejected with
+		// core.ErrPasswordRequired.
+		_, perms, err := pdfReader.CheckAccessRightsWithCertificate(cert, key)
+		if err != nil {
+			return err
+		}
+		if perms != security.PermOwner {
+			return errors.New("recipient is not allowed to remove the encryption")
+		}
+
+		// Decrypt with the recipient's certificate and private key.
 		_, err = pdfReader.DecryptWithCertificate(cert, key)
 		if err != nil {
 			return err
